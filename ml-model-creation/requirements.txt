@@ -1,0 +1,9 @@
+numpy
+scipy
+Flask
+flask-restplus
+pandas
+scikit_learn
+joblib
+requests
+sklearn-pmml-model
