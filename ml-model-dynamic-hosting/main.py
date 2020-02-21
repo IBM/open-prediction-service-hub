@@ -2,8 +2,8 @@
 import os
 from flask import Flask, jsonify
 from flask import request, jsonify
-from flask_restplus import Api, Resource, fields
-from flask_restplus import reqparse
+from flask_restx import Api, Resource, fields
+from flask_restx import reqparse
 
 import pandas as pd
 from joblib import load
