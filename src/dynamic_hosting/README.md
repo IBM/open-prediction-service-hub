@@ -13,7 +13,7 @@ Input parameters describing the loan are passed in JSON as the prediction return
 Same style of invocation for the classic Iris predictive model.
 
 
- ![Flow](../docs/images/ml-model-joblib-microservice-architecture.png "ML microservice stack")
+ ![Flow](../../docs/images/ml-model-joblib-microservice-architecture.png "ML microservice stack")
  
 ## Build the ML microservice
 ```console
@@ -39,13 +39,13 @@ You navidate to the OpenAPI page at the root of the wepp application.
 http://127.0.0.1:3000/ 
 ```
 You should see a SwaggerUI layout listing the exposed REST methods.
-![Flow](../docs/images/ml-model-dynamic-hosting-openapi-screen-1.png "OpenAPI menu")
+![Flow](../../docs/images/ml-model-dynamic-hosting-openapi-screen-1.png "OpenAPI menu")
 
 Open the predictive method and fill the input parameters in the UI to execute the REST endpoint.
-![Flow](../docs/images/ml-model-dynamic-hosting-openapi-screen-2.png "Prediction inputs")
+![Flow](../../docs/images/ml-model-dynamic-hosting-openapi-screen-2.png "Prediction inputs")
 
 After hitting the execute button you then gets the following screen.
-![Flow](../docs/images/ml-model-dynamic-hosting-openapi-screen-3.png "Prediction results")
+![Flow](../../docs/images/ml-model-dynamic-hosting-openapi-screen-3.png "Prediction results")
 
 Congratulations! You obtained a risk score computed by the scikit-learn ML model.
 In the JSON response you see the probability of a payment default.

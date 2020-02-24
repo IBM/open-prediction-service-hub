@@ -1,5 +1,5 @@
 #!flask/bin/python
-import os
+from os import path
 from flask import Flask, jsonify
 from flask import request, jsonify
 from flask_restx import Api, Resource, fields
@@ -16,16 +16,20 @@ import requests
 # Model registering
 #
 
+
+APP_ROOT = path.dirname(path.abspath(__file__))
+
+
 modelDictionary = dict({
     'models': [
         {
-            'path': "models/miniloandefault-rfc.joblib",
+            'path': path.join(APP_ROOT, "models/miniloandefault-rfc.joblib"),
         },
         {
-            'path': "models/miniloandefault-svm.joblib",
+            'path': path.join(APP_ROOT, "models/miniloandefault-svm.joblib"),
         },
         {
-            'path': "models/iris-svc.joblib",
+            'path': path.join(APP_ROOT, "models/iris-svc.joblib"),
         }
     ]
 })

@@ -1,4 +1,4 @@
-from main import app
+from dynamic_hosting import app
 
 
 # For debug
