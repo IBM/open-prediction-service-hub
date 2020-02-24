@@ -1,9 +1,9 @@
 #!flask/bin/python
-import os
+from os import path
 from flask import Flask, jsonify
 from flask import request, jsonify
-from flask_restplus import Api, Resource
-from flask_restplus import reqparse
+from flask_restx import Api, Resource
+from flask_restx import reqparse
 
 import pandas as pd
 from joblib import load
@@ -15,6 +15,10 @@ import requests
 #
 # Flask
 #
+
+
+APP_ROOT = path.dirname(path.abspath(__file__))
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -45,7 +49,7 @@ class LoanDefaultRiskScoring(Resource):  # Create a RESTful resource
         rate = float(request.args.get('rate'))
         yearlyReimbursement = float(request.args.get('yearlyReimbursement'))
 
-        modelPath = 'models/miniloandefault-rfc.pkl'
+        modelPath = path.join(APP_ROOT,'models/miniloandefault-rfc.pkl')
         loaded_model = pickle.load(open(modelPath, 'rb'))
         probabilities = loaded_model.predict_proba([[creditScore, income, loanAmount, monthDuration, rate, yearlyReimbursement]])
 

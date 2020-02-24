@@ -4,7 +4,7 @@ A simple example of ML running microservice for real time machine learning based
 On request arrival for prediction, a Random Forest Classification model is loaded and run to predict a loan payment default.
 Input parameters describing the loan are passed as HTTP parameters. Prediction is returned by the service.
 
- ![Flow](../docs/images/ml-model-pickle-microservice-architecture.png "ML microservice stack")
+ ![Flow](../../docs/images/ml-model-pickle-microservice-architecture.png "ML microservice stack")
  
 ## Build the ML microservice
 ```console
@@ -30,16 +30,16 @@ You navidate to the OpenAPI page at the root of the wepp application.
 http://127.0.0.1:3000/ 
 ```
 You should see a SwaggerUI layout listing the exposed REST methods.
-![Flow](../docs/images/ml-model-static-hosting-openapi-screen-1.png "OpenAPI menu")
+![Flow](../../docs/images/ml-model-static-hosting-openapi-screen-1.png "OpenAPI menu")
 
 Open the predictive method.
-![Flow](../docs/images/ml-model-static-hosting-openapi-screen-2.png "Predictive method")
+![Flow](../../docs/images/ml-model-static-hosting-openapi-screen-2.png "Predictive method")
 
 Fill input parameters in the UI to execute the REST endpoint.
-![Flow](../docs/images/ml-model-static-hosting-openapi-screen-3.png "Prediction inputs")
+![Flow](../../docs/images/ml-model-static-hosting-openapi-screen-3.png "Prediction inputs")
 
 After hitting the execute button you then gets the following screen.
-![Flow](../docs/images/ml-model-static-hosting-openapi-screen-4.png "Prediction results")
+![Flow](../../docs/images/ml-model-static-hosting-openapi-screen-4.png "Prediction results")
 
 Congratulations! You obtained a risk score computed by the scikit-learn ML model.
 In the JSON response you see the probability of a payment default.
