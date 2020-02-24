@@ -147,4 +147,4 @@ class PredictionService(Resource):
 
 if __name__ == '__main__':
     # Start a development server
-    app.run(port=5000, host='0.0.0.0')
+    app.run(host='127.0.0.1', port=5000, debug=True)
