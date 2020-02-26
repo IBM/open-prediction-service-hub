@@ -17,10 +17,7 @@ setup(
     author='Ke Li',
     author_email='Ke.Li1@ibm.com',
     url='https://github.ibm.com/dba/ads-ml-service',
-    # Setting the distribution root. Empty package name stands for the root package
-    # The Distutils will take care of converting this platform-neutral representation into whatever is appropriate
-    # on your current platform before actually using the pathname.
-    package_dir={'': path.join(PROJECT_ROOT, 'src')},
+    package_dir={'dynamic_hosting': path.join(path.join(PROJECT_ROOT, 'src'), 'dynamic_hosting')},
     packages=['dynamic_hosting'],
     install_requires=installation_dependencies,
     long_description=long_description,
