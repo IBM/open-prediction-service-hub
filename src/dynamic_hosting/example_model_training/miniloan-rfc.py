@@ -9,7 +9,7 @@ from pathlib import Path
 from time import gmtime, strftime
 from os import path
 
-from dynamic_hosting.core.models import MLModel
+from dynamic_hosting.core.model import MLModel
 
 
 def main():
