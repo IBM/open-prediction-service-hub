@@ -7,7 +7,6 @@ from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from pathlib import Path
 from time import gmtime, strftime
-from os import path
 
 from dynamic_hosting.core.model import MLModel
 
@@ -28,7 +27,7 @@ def main():
         'yearlyReimbursement': np.float64
     }
 
-    miniloan_dir = Path(path.abspath(__file__)).parents[3].joinpath('data', 'decisions-on-spark', 'data', 'miniloan')
+    miniloan_dir = Path(__file__).resolve().parents[3].joinpath('data', 'decisions-on-spark', 'data', 'miniloan')
     miniloan_file = miniloan_dir.joinpath('{dataset_name}.{extension}'.format(
         dataset_name='miniloan-decisions-ls-10K', extension='csv'))
 
@@ -137,7 +136,7 @@ def main():
 
     )
 
-    storage_root = Path(Path(path.abspath(__file__))).parents[3].joinpath('example_models')
+    storage_root = Path(__file__).resolve().parents[3].joinpath('example_models')
     internal_model.save_to_disk(storage_root=storage_root)
 
 

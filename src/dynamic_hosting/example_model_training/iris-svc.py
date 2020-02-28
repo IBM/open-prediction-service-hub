@@ -8,7 +8,6 @@ from sklearn.svm import SVC
 from sklearn.datasets import load_iris
 from pathlib import Path
 from time import gmtime, strftime
-from os import path
 
 from dynamic_hosting.core.model import MLModel
 
@@ -105,7 +104,7 @@ def main():
 
     )
 
-    storage_root = Path(Path(path.abspath(__file__))).parents[3].joinpath('example_models')
+    storage_root = Path(__file__).resolve().parents[3].joinpath('example_models')
     internal_model.save_to_disk(storage_root=storage_root)
 
 
