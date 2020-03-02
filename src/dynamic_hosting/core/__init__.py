@@ -1,5 +1,5 @@
-from .invocation import invoke_predict
-from .models import Model
+from .model import MLModel
+from .model_service import ModelService
 
 
-__all__ = ['invoke_predict', 'Model']
+__all__ = ['MLModel', 'ModelService']
