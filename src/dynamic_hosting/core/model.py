@@ -8,6 +8,8 @@ from pathlib import Path
 from pandas import DataFrame
 from logging import Logger
 
+from .util import rmdir
+
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
@@ -65,6 +67,29 @@ class MLModel:
             output_schema=model_config['output_schema'],
             metadata=model_config['model_metadata']
         )
+
+    @staticmethod
+    def remove_from_disk(
+            storage_root: Path,
+            model_name: Text,
+            model_version: Text = None
+    ) -> None:
+        logger: Logger = logging.getLogger(__name__)
+        if model_version:
+            logger.info(
+                'Deleting model: name <{model_name}> version <{model_version}>'.format(
+                    model_name=model_name,
+                    model_version=model_version
+                )
+            )
+            rmdir(storage_root.joinpath(model_name).joinpath(model_version))
+        else:
+            logger.info(
+                'Deleting model: name <{model_name}> for all versions'.format(
+                    model_name=model_name
+                )
+            )
+            rmdir(storage_root.joinpath(model_name))
 
     def save_to_disk(
             self: 'MLModel',
