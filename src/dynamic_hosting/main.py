@@ -19,7 +19,6 @@ import requests
 
 APP_ROOT = path.dirname(path.abspath(__file__))
 
-
 modelDictionary = dict({
     'models': [
         {
@@ -34,15 +33,20 @@ modelDictionary = dict({
     ]
 })
 
-#todo
-#Propagate the joblib metadata into the model management dictionary
+# todo
+# Propagate the joblib metadata into the model management dictionary
 
 #
 # Flask
 #
 
 app = Flask(__name__)
-api = Api(app)
+api = Api(
+    app,
+    version='0.0.1-SNAPSHOT',
+    title='Local ml provider',
+    description='A simple environment to test machine learning model',
+)
 
 ns = api.namespace('automation/api/v1.0/prediction/admin', description='administration')
 
@@ -53,15 +57,27 @@ class HeartBeat(Resource):  # Create a RESTful resource
         return {'answer': 'ok'}
 
 
-@ns.route("/models")
+# noinspection PyUnresolvedReferences
+@ns.route("/models/<string:model_name>")
 class Model(Resource):
-    def get(self):
+    def get(self, model_name):
         """Returns the list of ML models."""
-        return modelDictionary
+        if model_name in modelDictionary.keys():
+            return modelDictionary[model_name]
+        else:
+            return modelDictionary
+
 
 ns = api.namespace('automation/api/v1.0/prediction/generic', description='run any ML models')
 
-modelInvocation = api.model('Name Model', {'name': fields.String(required = True, description="Name of the model", help="Name cannot be blank.")})
+modelInvocation = api.model(
+    'Name Model', {
+        'name':
+            fields.String(required=True, description="Name of the model", help="Name cannot be blank."),
+        'data': fields.Raw()
+    }
+)
+
 
 @ns.route('/')
 class PredictionService(Resource):

@@ -19,7 +19,7 @@ The technologies selected here to fullfill a lightweight machine learning predic
 
 
 This repository is composed of 3 projects:
-- [ML model creation](src/ml-model-creation/README.md): Several source files to create variations of ML models with scikit-learn to predict a default for a loan repayment. These models are stored in the file system through a pickle serialization or JobLib serialization.
+- [ML model creation](src/dynamic_hosting/example_model_training/README.md): Several source files to create variations of ML models with scikit-learn to predict a default for a loan repayment. These models are stored in the file system through a pickle serialization or JobLib serialization.
 
 - [A static RESTful ML microservice for scikit-learn models serialized in pickle](src/ml-model-static-hosting/README.md): A sample of a predictive microservice running a Random Forest Classification model to predict a default for a loan repayment. The ml model has been serialized with pickle. Features values are directly sent as http parameters. The microservice exposes an OpenAPI descriptor.
 

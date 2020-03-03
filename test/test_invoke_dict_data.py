@@ -6,12 +6,13 @@ import numpy as np
 import pandas as pd
 from dynamic_hosting.core.model import MLModel
 from sklearn.datasets import load_iris
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.svm import SVC
 
 
 def main():
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     logger = logging.getLogger(__name__)
 
     col_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class_name']
@@ -110,7 +111,9 @@ def main():
     test_x: pd.DataFrame = test.loc[:, col_names[:-1]]
     test_dict = test_x.to_dict(orient='list')
 
-    internal_model.invoke_from_dict(test_dict)
+    predicted = internal_model.invoke_from_dict(test_dict)
+    logger.info(
+        'accuracy_score of model {score}'.format(score=accuracy_score(test.loc[:, col_names[-1]], predicted)))
 
 
 if __name__ == '__main__':
