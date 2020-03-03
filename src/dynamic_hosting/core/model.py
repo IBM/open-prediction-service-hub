@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-import logging
 import json
+import logging
 import pickle
-
-from typing import Mapping, Text, Optional, Sequence, Any
-from pathlib import Path
-from pandas import DataFrame
 from logging import Logger
+from operator import getitem, itemgetter
+from pathlib import Path
+from typing import Mapping, Text, Optional, Sequence, Any, Dict
+
+from pandas import DataFrame
 
 from .util import rmdir
 
@@ -32,8 +33,30 @@ class MLModel:
         self.output_schema: Optional[Mapping[Text, Any]] = output_schema
         self.metadata: Mapping[Text, Any] = metadata
 
-    # TODO: Add output mapping if `self.output_schema` is not None
-    def invoke(self: 'MLModel', data_input: DataFrame) -> Any:
+    def invoke_from_dict(
+            self: 'MLModel',
+            data_input: Dict
+    ) -> Any:
+        logger: Logger = logging.getLogger(__name__)
+
+        logger.debug('Received input dict <{input_dict}>'.format(input_dict=data_input))
+
+        data: DataFrame = DataFrame.from_dict(
+            data=data_input,
+            orient='columns'
+        ). \
+            reindex(columns=[getitem(item, 'name') for item in sorted(self.input_schema, key=itemgetter('order'))]). \
+            astype(
+            {
+                getitem(item, 'name'): getitem(item, 'type') for item in self.input_schema
+            }
+        )
+        return self.invoke(data)
+
+    def invoke(
+            self: 'MLModel',
+            data_input: DataFrame
+    ) -> Any:
         return getattr(self.model, self.method_name)(data_input)
 
     @staticmethod
