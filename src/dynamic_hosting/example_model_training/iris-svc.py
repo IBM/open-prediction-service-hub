@@ -79,17 +79,22 @@ def main():
             {
                 'name': "sepal_length",
                 'order': 0,
-                'type': 'float'
+                'type': 'float64'
+            },
+            {
+                'name': "sepal_width",
+                'order': 1,
+                'type': 'float64'
             },
             {
                 'name': "petal_length",
-                'order': 1,
-                'type': 'float'
+                'order': 2,
+                'type': 'float64'
             },
             {
                 'name': "petal_width",
-                'order': 2,
-                'type': 'float'
+                'order': 3,
+                'type': 'float64'
             }
         ],
         output_schema=None,
