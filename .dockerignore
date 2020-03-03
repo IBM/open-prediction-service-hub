@@ -241,3 +241,6 @@ fabric.properties
 
 # ------- This project ----------------
 .idea
+
+# --Docker specific (not in gitignore)-
+example_models

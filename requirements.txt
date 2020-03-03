@@ -1,9 +1,9 @@
 # Required
 numpy
 pandas
-gunicorn
-flask-restx
 scikit-learn
+flask-restx
+gunicorn
 # Optional
 joblib
 requests

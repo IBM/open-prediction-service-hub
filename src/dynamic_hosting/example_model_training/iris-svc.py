@@ -50,7 +50,7 @@ def main():
     random_search = {
         'param_distributions': grid,
         'random_state': 42,
-        'n_iter': 10000
+        'n_iter': 1000
     }
 
     parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
