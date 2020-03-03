@@ -1,19 +1,27 @@
 FROM python:3.7
 
+ENV ENVIRONMENT "local"
+ENV BUILD_DIR="/app/build"
+ENV RUNTIME_DIR="/app/runtime"
+
 
 # Install dependencies and this project
-WORKDIR /build/
-COPY . /build/
-RUN python3 -m pip install -r requirements.txt &&\
-    python ./setup.py install
+WORKDIR ${BUILD_DIR}
+COPY . ${BUILD_DIR}
+RUN python3 -m pip install -r requirements.txt && python ${BUILD_DIR}/setup.py install
 
 
-# prepare runtime environment
-WORKDIR /app/
-COPY ./runtime /app/runtime
+# Prepare runtime environment
+WORKDIR ${RUNTIME_DIR}
+COPY ./runtime ${RUNTIME_DIR}
 
 
-ENV ENVIRONMENT local
+# Prepare example ml model
+RUN bash ${BUILD_DIR}/src/dynamic_hosting/example_model_training/train.sh &&\
+    mkdir -p ${RUNTIME_DIR}/example_models/ &&\
+    cp -r ${BUILD_DIR}/example_models/* ${RUNTIME_DIR}/example_models
+
+
 USER nobody
 EXPOSE 5000
 
