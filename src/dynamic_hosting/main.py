@@ -1,44 +1,15 @@
-#!flask/bin/python
-from os import path
-from flask import Flask, jsonify
-from flask import request, jsonify
+#!/usr/bin/env python3
+
+import logging
+import sys
+
+from flask import Flask, request, Response
 from flask_restx import Api, Resource, fields
-from flask_restx import reqparse
-
-import pandas as pd
 from joblib import load
-import pickle
 
-import json
-import requests
+from dynamic_hosting.core.model_service import ModelService
+from dynamic_hosting.core.util import find_storage_root
 
-#
-# Model registering
-#
-
-
-APP_ROOT = path.dirname(path.abspath(__file__))
-
-modelDictionary = dict({
-    'models': [
-        {
-            'path': path.join(APP_ROOT, "models/miniloandefault-rfc.joblib"),
-        },
-        {
-            'path': path.join(APP_ROOT, "models/miniloandefault-svm.joblib"),
-        },
-        {
-            'path': path.join(APP_ROOT, "models/iris-svc.joblib"),
-        }
-    ]
-})
-
-# todo
-# Propagate the joblib metadata into the model management dictionary
-
-#
-# Flask
-#
 
 app = Flask(__name__)
 api = Api(
@@ -51,21 +22,18 @@ api = Api(
 ns = api.namespace('automation/api/v1.0/prediction/admin', description='administration')
 
 
-@ns.route('/isAlive')  # Create a URL route to this resource
-class HeartBeat(Resource):  # Create a RESTful resource
-    def get(self):  # Create GET endpoint
+@ns.route('/isAlive')
+class HeartBeat(Resource):
+    def get(self):
         return {'answer': 'ok'}
 
 
-# noinspection PyUnresolvedReferences
-@ns.route("/models/<string:model_name>")
+@ns.route("/models")
 class Model(Resource):
-    def get(self, model_name):
+    def get(self):
         """Returns the list of ML models."""
-        if model_name in modelDictionary.keys():
-            return modelDictionary[model_name]
-        else:
-            return modelDictionary
+        ms: ModelService = ModelService.load_from_disk(find_storage_root())
+        return Response(response=ms.json(exclude={'model'}), status=200, mimetype="application/json")
 
 
 ns = api.namespace('automation/api/v1.0/prediction/generic', description='run any ML models')
@@ -167,4 +135,5 @@ class PredictionService(Resource):
 
 if __name__ == '__main__':
     # Start a development server
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     app.run(host='127.0.0.1', port=5000, debug=True)
