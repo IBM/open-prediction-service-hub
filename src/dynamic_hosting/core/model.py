@@ -8,30 +8,21 @@ from pathlib import Path
 from typing import Mapping, Text, Optional, Sequence, Any, Dict
 
 from pandas import DataFrame
+from pydantic import BaseModel
 
 from .util import rmdir
 
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
-class MLModel:
-    def __init__(
-            self: 'MLModel',
-            model: Any,
-            name: Text,
-            version: Text,
-            method_name: Text,
-            input_schema: Sequence[Mapping[Text, Any]],
-            output_schema: Optional[Mapping[Text, Any]],
-            metadata: Mapping[Text, Any]
-    ) -> None:
-        self.model: Any = model
-        self.name: Text = name
-        self.version: Text = version
-        self.method_name: Text = method_name
-        self.input_schema: Sequence[Mapping[Text, Any]] = input_schema
-        self.output_schema: Optional[Mapping[Text, Any]] = output_schema
-        self.metadata: Mapping[Text, Any] = metadata
+class MLModel(BaseModel):
+    model: Any
+    name: Text
+    version: Text
+    method_name: Text
+    input_schema: Sequence[Mapping[Text, Any]]
+    output_schema: Optional[Mapping[Text, Any]]
+    metadata: Mapping[Text, Any]
 
     def invoke_from_dict(
             self: 'MLModel',
