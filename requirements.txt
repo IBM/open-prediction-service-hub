@@ -1,6 +1,7 @@
 # Required
 numpy
 pandas
+pydantic
 scikit-learn
 flask-restx
 gunicorn

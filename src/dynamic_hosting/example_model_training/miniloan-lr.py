@@ -9,10 +9,11 @@ from pathlib import Path
 from time import gmtime, strftime
 
 from dynamic_hosting.core.model import MLModel
+from dynamic_hosting.core.util import obj_to_base64
 
 
 def main():
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
     names = ['name', 'creditScore', 'income', 'loanAmount', 'monthDuration', 'approval', 'rate', 'yearlyReimbursement']
@@ -88,7 +89,7 @@ def main():
     logger.info('accuracy: ' + str(res))
 
     internal_model = MLModel(
-        model=best_estimator,
+        model=obj_to_base64(best_estimator),
         name='miniloan-lr-RandomizedSearchCV',
         version='v0',
         method_name='predict',

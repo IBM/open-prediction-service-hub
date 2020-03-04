@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import json
 import logging
-import pickle
 from logging import Logger
 from operator import getitem, itemgetter
 from pathlib import Path
@@ -10,13 +9,13 @@ from typing import Mapping, Text, Optional, Sequence, Any, Dict
 from pandas import DataFrame
 from pydantic import BaseModel
 
-from .util import rmdir
+from .util import rmdir, base64_to_obj
 
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
 class MLModel(BaseModel):
-    model: Any
+    model: Text  # pickled model in base64
     name: Text
     version: Text
     method_name: Text
@@ -48,7 +47,7 @@ class MLModel(BaseModel):
             self: 'MLModel',
             data_input: DataFrame
     ) -> Any:
-        return getattr(self.model, self.method_name)(data_input)
+        return getattr(base64_to_obj(self.model), self.method_name)(data_input)
 
     @staticmethod
     def load_from_disk(
@@ -59,28 +58,13 @@ class MLModel(BaseModel):
         logger: Logger = logging.getLogger(__name__)
         model_dir: Path = storage_root.joinpath(model_name).joinpath(model_version)
 
-        with model_dir.joinpath(
-                '{model_name}.{extension}'.format(
-                    model_name=model_name, extension='pkl'
-                )
-        ).open(mode='rb') as model_file:
-            model: Any = pickle.load(model_file)
-
         with model_dir.joinpath(MODEL_CONFIG_FILE_NAME).open() as model_config_file:
             model_config: Mapping[Text, Any] = json.load(model_config_file)
 
-        logger.info('Loaded model from: {storage_root}/{model_name}/{model_version}'.format(
-            storage_root=storage_root, model_name=model_name, model_version=model_version))
+            logger.info('Loaded model from: {storage_root}/{model_name}/{model_version}'.format(
+                storage_root=storage_root, model_name=model_name, model_version=model_version))
 
-        return MLModel(
-            model=model,
-            name=model_name,
-            version=model_version,
-            method_name=model_config['method_name'],
-            input_schema=model_config['input_schema'],
-            output_schema=model_config['output_schema'],
-            metadata=model_config['model_metadata']
-        )
+            return MLModel(**model_config)
 
     @staticmethod
     def remove_from_disk(
@@ -114,17 +98,14 @@ class MLModel(BaseModel):
         model_dir: Path = storage_root.joinpath(self.name).joinpath(self.version)
         model_dir.mkdir(parents=True, exist_ok=True)
 
-        with model_dir.joinpath('{model_name}.{extension}'.format(
-                model_name=self.name, extension='pkl')).open(mode='wb') as model_file:
-            pickle.dump(obj=self.model, file=model_file, fix_imports=False)
-
         with model_dir.joinpath(MODEL_CONFIG_FILE_NAME).open(mode='w') as model_config_file:
             json.dump(
                 fp=model_config_file,
-                obj={'method_name': self.method_name,
-                     'input_schema': self.input_schema,
-                     'output_schema': self.output_schema,
-                     'model_metadata': self.metadata}
+                obj=self.dict()
             )
+
         logger.info('Storied model to: {storage_root}/{model_name}/{model_version}'.format(
             storage_root=storage_root, model_name=self.name, model_version=self.version))
+
+
+
