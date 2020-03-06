@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 from pathlib import Path
-from typing import Mapping, Text, Any, Sequence
+from typing import Mapping, Text, Any, Sequence, Dict
 
 from pandas import DataFrame
 from pydantic import BaseModel
@@ -12,6 +12,28 @@ from .model import MLModel
 class ModelService(BaseModel):
     ml_models: Sequence[MLModel]
     storage_root: Path
+
+    def invoke_from_dict(
+            self,
+            model_name: Text,
+            model_version: Text,
+            data: Dict
+    ) -> Any:
+        logger = logging.getLogger(__name__)
+        logger.debug('Invoke ml model <{name}> version <{version}>'.format(name=model_name, version=model_version))
+
+        model_map: Mapping[Text, Mapping[Text, MLModel]] = self.__model_map()
+
+        if not model_map.get(model_name):
+            raise RuntimeError('Model <{name}> not found'.format(name=model_name))
+        if not model_map[model_name].get(model_version):
+            raise RuntimeError('Model <{name}> version  <{version}> not found'.format(
+                name=model_name,
+                version=model_version)
+            )
+
+        return model_map[model_name][model_version].invoke_from_dict(data_input=data)
+
 
     def invoke(
             self,
@@ -53,7 +75,7 @@ class ModelService(BaseModel):
         self.reload_models()
 
     def reload_models(self) -> None:
-        self.ml_models = ModelService.__load_models_from_disk(self.storage_root)
+        self.ml_models = ModelService._load_models_from_disk(self.storage_root)
 
     @staticmethod
     def load_from_disk(
@@ -63,12 +85,12 @@ class ModelService(BaseModel):
         logger.info('Loading ML service from storage root: {storage_root}'.format(storage_root=storage_root))
 
         return ModelService(
-            ml_models=ModelService.__load_models_from_disk(storage_root=storage_root),
+            ml_models=ModelService._load_models_from_disk(storage_root=storage_root),
             storage_root=storage_root
         )
 
     @staticmethod
-    def __load_models_from_disk(
+    def _load_models_from_disk(
             storage_root: Path
     ) -> Sequence[MLModel]:
         return [

@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 import json
 import logging
-from logging import Logger
-from operator import getitem, itemgetter
-from pathlib import Path
-from typing import Mapping, Text, Optional, Sequence, Any, Dict
 
+import fastapi
+
+from logging import Logger
+from pathlib import Path
+from typing import Mapping, Text, Optional, Sequence, Any, Dict, List, Callable
+
+from fastapi.openapi.utils import get_openapi
 from pandas import DataFrame
+from numpy import dtype
 from pydantic import BaseModel
 
 from .util import rmdir, base64_to_obj
@@ -14,14 +18,78 @@ from .util import rmdir, base64_to_obj
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
+class MLParam(BaseModel):
+    name: Text = 'Feature name'
+    order: int = 0
+    value: Any = 'Feature value'
+
+
+class MLRequest(BaseModel):
+    model_name: Text = 'model_name'
+    model_version: Text = 'model_version'
+    params: List[MLParam] = list()
+
+    @staticmethod
+    def params_to_dict(ml_req: 'MLRequest') -> Dict[Text, Sequence]:
+        return {
+            feat_val.name: [feat_val.value]
+            for feat_val in ml_req.params
+        }
+
+
+class MLResponse(BaseModel):
+    model_output: Any
+    model_output_raw: Text
+
+
+class Feature(BaseModel):
+    name: Text
+    order: int
+    type: Text
+
+
+class OpenapiMLModelSchema(BaseModel):
+    title: Text
+    required: Sequence[Text]
+    type: Text = 'object'
+    properties: Mapping[Text, Mapping[Text, Any]]
+
+    @staticmethod
+    def get_property_map(model: 'MLModel') -> Mapping[Text,  Mapping[Text, Text]]:
+        return {
+            feat: {
+                'title': '{model_name}-{model_version}.{feature_name}'.format(
+                    model_name=model.name, model_version=model.version, feature_name=feat),
+                'type': str(t)
+            }
+            for feat, t in model.get_feat_type_map().items()
+        }
+
+    @staticmethod
+    def from_ml_model(model: 'MLModel') -> 'OpenapiMLModelSchema':
+
+        return OpenapiMLModelSchema(
+            title=model.name,
+            required=model.get_ordered_column_name_vec(),
+            properties=OpenapiMLModelSchema.get_property_map(model)
+        )
+
+
 class MLModel(BaseModel):
     model: Text  # pickled model in base64
     name: Text
     version: Text
     method_name: Text
-    input_schema: Sequence[Mapping[Text, Any]]
+    input_schema: Sequence[Feature]
     output_schema: Optional[Mapping[Text, Any]]
-    metadata: Mapping[Text, Any]
+    metadata: Mapping
+    additional_input_schema: Optional[OpenapiMLModelSchema] = None
+
+    def get_ordered_column_name_vec(self) -> Sequence[Text]:
+        return [getattr(item, 'name') for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
+
+    def get_feat_type_map(self) -> Mapping[Text, Text]:
+        return {getattr(item, 'name'): dtype(getattr(item, 'type')) for item in self.input_schema}
 
     def invoke_from_dict(
             self: 'MLModel',
@@ -35,11 +103,11 @@ class MLModel(BaseModel):
             data=data_input,
             orient='columns'
         ). \
-            reindex(columns=[getitem(item, 'name') for item in sorted(self.input_schema, key=itemgetter('order'))]). \
+            reindex(
+                columns=self.get_ordered_column_name_vec()
+        ). \
             astype(
-            {
-                getitem(item, 'name'): getitem(item, 'type') for item in self.input_schema
-            }
+                dtype=self.get_feat_type_map()
         )
         return self.invoke(data)
 
@@ -63,8 +131,9 @@ class MLModel(BaseModel):
 
             logger.info('Loaded model from: {storage_root}/{model_name}/{model_version}'.format(
                 storage_root=storage_root, model_name=model_name, model_version=model_version))
-
-            return MLModel(**model_config)
+            model: 'MLModel' = MLModel(**model_config)
+            model.additional_input_schema = OpenapiMLModelSchema.from_ml_model(model)
+            return model
 
     @staticmethod
     def remove_from_disk(
@@ -106,6 +175,3 @@ class MLModel(BaseModel):
 
         logger.info('Storied model to: {storage_root}/{model_name}/{model_version}'.format(
             storage_root=storage_root, model_name=self.name, model_version=self.version))
-
-
-

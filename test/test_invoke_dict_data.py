@@ -5,6 +5,7 @@ from time import gmtime, strftime
 import numpy as np
 import pandas as pd
 from dynamic_hosting.core.model import MLModel
+from dynamic_hosting.core.util import obj_to_base64
 from sklearn.datasets import load_iris
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
@@ -70,7 +71,7 @@ def main():
     logger.info('accuracy: ' + str(res))
 
     internal_model = MLModel(
-        model=best_estimator,
+        model=obj_to_base64(best_estimator),
         name='iris-svc-RandomizedSearchCV',
         version='v0',
         method_name='predict',
@@ -102,10 +103,9 @@ def main():
             'author': 'ke',
             'date': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
             'metrics': {
-                'accuracy': res
+                'accuracy': float(res)
             }
         }
-
     )
 
     test_x: pd.DataFrame = test.loc[:, col_names[:-1]]

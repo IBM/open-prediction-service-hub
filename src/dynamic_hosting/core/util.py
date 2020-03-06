@@ -3,10 +3,8 @@ import base64
 import logging
 import os
 import pickle
-
-from pathlib import Path
 from logging import Logger
-
+from pathlib import Path
 from typing import Text, Any
 
 DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'example_models'
@@ -41,7 +39,7 @@ def find_storage_root() -> Path:
 
 
 def obj_to_base64(obj: Any) -> Text:
-    return base64.b64encode(pickle.dumps(obj))
+    return base64.b64encode(pickle.dumps(obj)).decode('ascii')
 
 
 def base64_to_obj(serialized: Text) -> Any:
