@@ -22,7 +22,7 @@ class ModelService(BaseModel):
         logger = logging.getLogger(__name__)
         logger.debug('Invoke ml model <{name}> version <{version}>'.format(name=model_name, version=model_version))
 
-        model_map: Mapping[Text, Mapping[Text, Model]] = self.__model_map()
+        model_map: Mapping[Text, Mapping[Text, Model]] = self.model_map()
 
         if not model_map.get(model_name):
             raise RuntimeError('Model <{name}> not found'.format(name=model_name))
@@ -44,7 +44,7 @@ class ModelService(BaseModel):
         logger = logging.getLogger(__name__)
         logger.debug('Invoke ml model <{name}> version <{version}>'.format(name=model_name, version=model_version))
 
-        model_map: Mapping[Text, Mapping[Text, Model]] = self.__model_map()
+        model_map: Mapping[Text, Mapping[Text, Model]] = self.model_map()
 
         if not model_map.get(model_name):
             raise RuntimeError('Model <{name}> not found'.format(name=model_name))
@@ -105,7 +105,7 @@ class ModelService(BaseModel):
             if versioned_model_abspath.is_dir()
         ]
 
-    def __model_map(self) -> Mapping[Text, Mapping[Text, Model]]:
+    def model_map(self) -> Mapping[Text, Mapping[Text, Model]]:
         return {
             model.name: {
                 model.version: model

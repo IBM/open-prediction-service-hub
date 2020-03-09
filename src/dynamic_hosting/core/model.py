@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import logging
 from logging import Logger
 from pathlib import Path
-from typing import Mapping, Text, Optional, Sequence, Any, Dict, List
+from typing import Mapping, Text, Optional, Sequence, Any, Dict, List, Type, OrderedDict
 
-from numpy import dtype
+import numpy as np
+from fastapi.utils import get_model_definitions
 from pandas import DataFrame
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model
 
 from .util import rmdir, base64_to_obj
 
@@ -20,9 +23,12 @@ class Parameter(BaseModel):
     value: Any = 'Feature value'
 
 
-class GenericRequestBody(BaseModel):
+class BaseRequestBody(BaseModel):
     model_name: Text = 'model_name'
     model_version: Text = 'model_version'
+
+
+class GenericRequestBody(BaseRequestBody):
     params: List[Parameter] = list()
 
     @staticmethod
@@ -44,33 +50,6 @@ class Feature(BaseModel):
     type: Text
 
 
-class OpenapiMLModelSchema(BaseModel):
-    title: Text
-    required: Sequence[Text]
-    type: Text = 'object'
-    properties: Mapping[Text, Mapping[Text, Any]]
-
-    @staticmethod
-    def get_property_map(model: 'Model') -> Mapping[Text, Mapping[Text, Text]]:
-        return {
-            feat: {
-                'title': '{model_name}-{model_version}.{feature_name}'.format(
-                    model_name=model.name, model_version=model.version, feature_name=feat),
-                'type': str(t)
-            }
-            for feat, t in model.get_feat_type_map().items()
-        }
-
-    @staticmethod
-    def from_ml_model(model: 'Model') -> 'OpenapiMLModelSchema':
-
-        return OpenapiMLModelSchema(
-            title=model.name,
-            required=model.get_ordered_column_name_vec(),
-            properties=OpenapiMLModelSchema.get_property_map(model)
-        )
-
-
 class Model(BaseModel):
     model: Text  # pickled model in base64
     name: Text
@@ -79,13 +58,47 @@ class Model(BaseModel):
     input_schema: Sequence[Feature]
     output_schema: Optional[Mapping[Text, Any]]
     metadata: Mapping
-    additional_input_schema: Optional[OpenapiMLModelSchema] = None
+
+    def get_model_definition(self) -> Dict[Text, Any]:
+        model = create_model(
+            self.name,
+            **{
+                name: (t, ...)
+                for name, t in self.get_feat_type_map().items()
+            },
+            __base__=BaseRequestBody
+        )
+        return get_model_definitions(
+            flat_models={model},
+            model_name_map={
+                model: '{model_name}-{model_version}'.format(
+                    model_name=self.name,
+                    model_version=self.version
+                )
+            }
+        )
 
     def get_ordered_column_name_vec(self) -> Sequence[Text]:
         return [getattr(item, 'name') for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
 
-    def get_feat_type_map(self) -> Mapping[Text, Text]:
-        return {getattr(item, 'name'): dtype(getattr(item, 'type')) for item in self.input_schema}
+    # TODO: Add better type casting
+    def get_feat_type_map(self) -> Mapping[Text, Type]:
+        m: Dict[Text, Type] = {}
+        for item in self.input_schema:
+            if np.issubdtype(np.dtype(getattr(item, 'type')), np.number):
+                m[getattr(item, 'name')] = np.float64
+            else:
+                m[getattr(item, 'name')] = np.unicode
+        return m
+
+    def transform_internal_dict(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
+        data_frame_compatible_dict: Dict = dict()
+        feature_map = self.get_feat_type_map()
+        for key, val in kv_pair:
+            if key in feature_map.keys():
+                data_frame_compatible_dict[key] = [val]
+        return data_frame_compatible_dict
+
 
     def invoke_from_dict(
             self: 'Model',
@@ -100,10 +113,10 @@ class Model(BaseModel):
             orient='columns'
         ). \
             reindex(
-                columns=self.get_ordered_column_name_vec()
+            columns=self.get_ordered_column_name_vec()
         ). \
             astype(
-                dtype=self.get_feat_type_map()
+            dtype=self.get_feat_type_map()
         )
         return self.invoke(data)
 
@@ -128,7 +141,6 @@ class Model(BaseModel):
             logger.info('Loaded model from: {storage_root}/{model_name}/{model_version}'.format(
                 storage_root=storage_root, model_name=model_name, model_version=model_version))
             model: 'Model' = Model(**model_config)
-            model.additional_input_schema = OpenapiMLModelSchema.from_ml_model(model)
             return model
 
     @staticmethod
