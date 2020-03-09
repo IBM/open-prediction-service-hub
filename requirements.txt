@@ -5,7 +5,6 @@ pydantic
 scikit-learn
 fastapi
 uvicorn
-flask-restx
 gunicorn
 # Optional
 joblib

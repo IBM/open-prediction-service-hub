@@ -1,15 +1,14 @@
 import logging
 import sys
-from typing import Callable
+from typing import Callable, Text
 
 import uvicorn
-from dynamic_hosting.core.model import MLRequest, MLResponse, MLModel, OpenapiMLModelSchema
+from dynamic_hosting.core.model import MLRequest, MLResponse, MLModel
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.util import find_storage_root
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from pydantic import BaseModel
-from typing_extensions import Text
 
 app = FastAPI(
     version='0.0.1-SNAPSHOT',

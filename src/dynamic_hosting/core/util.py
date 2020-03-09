@@ -35,7 +35,7 @@ def find_storage_root() -> Path:
                 storage_root=DEFAULT_STORAGE_ROOT))
         return DEFAULT_STORAGE_ROOT
     else:
-        return Path(os.environ['RUNTIME_DIR']).joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
+        return Path(os.environ['BUILD_DIR']).joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
 
 
 def obj_to_base64(obj: Any) -> Text:
