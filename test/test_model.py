@@ -9,7 +9,7 @@ from sklearn.datasets import load_iris
 from pathlib import Path
 from time import gmtime, strftime
 
-from dynamic_hosting.core.model import MLModel
+from dynamic_hosting.core.model import Model
 
 
 def main():
@@ -70,7 +70,7 @@ def main():
                                test.loc[:, col_names[-1]])
     logger.info('accuracy: ' + str(res))
 
-    internal_model = MLModel(
+    internal_model = Model(
         model=best_estimator,
         name='iris-svc-RandomizedSearchCV',
         version='v0',
@@ -106,7 +106,7 @@ def main():
 
     storage_root = Path(__file__).resolve().parents[1].joinpath('example_models')
     internal_model.save_to_disk(storage_root=storage_root)
-    MLModel.remove_from_disk(storage_root=storage_root, model_name='iris-svc-RandomizedSearchCV')
+    Model.remove_from_disk(storage_root=storage_root, model_name='iris-svc-RandomizedSearchCV')
 
 
 if __name__ == '__main__':

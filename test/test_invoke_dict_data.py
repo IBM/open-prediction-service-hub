@@ -4,7 +4,7 @@ from time import gmtime, strftime
 
 import numpy as np
 import pandas as pd
-from dynamic_hosting.core.model import MLModel
+from dynamic_hosting.core.model import Model
 from dynamic_hosting.core.util import obj_to_base64
 from sklearn.datasets import load_iris
 from sklearn.metrics import accuracy_score
@@ -70,7 +70,7 @@ def main():
                                test.loc[:, col_names[-1]])
     logger.info('accuracy: ' + str(res))
 
-    internal_model = MLModel(
+    internal_model = Model(
         model=obj_to_base64(best_estimator),
         name='iris-svc-RandomizedSearchCV',
         version='v0',

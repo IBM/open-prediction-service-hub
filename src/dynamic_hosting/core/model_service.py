@@ -6,11 +6,11 @@ from typing import Mapping, Text, Any, Sequence, Dict
 from pandas import DataFrame
 from pydantic import BaseModel
 
-from .model import MLModel
+from .model import Model
 
 
 class ModelService(BaseModel):
-    ml_models: Sequence[MLModel]
+    ml_models: Sequence[Model]
     storage_root: Path
 
     def invoke_from_dict(
@@ -22,7 +22,7 @@ class ModelService(BaseModel):
         logger = logging.getLogger(__name__)
         logger.debug('Invoke ml model <{name}> version <{version}>'.format(name=model_name, version=model_version))
 
-        model_map: Mapping[Text, Mapping[Text, MLModel]] = self.__model_map()
+        model_map: Mapping[Text, Mapping[Text, Model]] = self.__model_map()
 
         if not model_map.get(model_name):
             raise RuntimeError('Model <{name}> not found'.format(name=model_name))
@@ -44,7 +44,7 @@ class ModelService(BaseModel):
         logger = logging.getLogger(__name__)
         logger.debug('Invoke ml model <{name}> version <{version}>'.format(name=model_name, version=model_version))
 
-        model_map: Mapping[Text, Mapping[Text, MLModel]] = self.__model_map()
+        model_map: Mapping[Text, Mapping[Text, Model]] = self.__model_map()
 
         if not model_map.get(model_name):
             raise RuntimeError('Model <{name}> not found'.format(name=model_name))
@@ -57,7 +57,7 @@ class ModelService(BaseModel):
         return model_map[model_name][model_version].invoke(data_input=data)
 
     def add_model(
-            self, model: MLModel
+            self, model: Model
     ) -> None:
         model.save_to_disk(self.storage_root)
         self.reload_models()
@@ -67,7 +67,7 @@ class ModelService(BaseModel):
             model_name: Text,
             model_version: Text = None
     ) -> None:
-        MLModel.remove_from_disk(
+        Model.remove_from_disk(
             storage_root=self.storage_root,
             model_name=model_name,
             model_version=model_version
@@ -92,9 +92,9 @@ class ModelService(BaseModel):
     @staticmethod
     def _load_models_from_disk(
             storage_root: Path
-    ) -> Sequence[MLModel]:
+    ) -> Sequence[Model]:
         return [
-            MLModel.load_from_disk(
+            Model.load_from_disk(
                 storage_root=storage_root,
                 model_name=model_abspath.name,
                 model_version=versioned_model_abspath.name)
@@ -105,7 +105,7 @@ class ModelService(BaseModel):
             if versioned_model_abspath.is_dir()
         ]
 
-    def __model_map(self) -> Mapping[Text, Mapping[Text, MLModel]]:
+    def __model_map(self) -> Mapping[Text, Mapping[Text, Model]]:
         return {
             model.name: {
                 model.version: model

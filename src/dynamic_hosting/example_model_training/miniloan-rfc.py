@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from pathlib import Path
 from time import gmtime, strftime
 
-from dynamic_hosting.core.model import MLModel
+from dynamic_hosting.core.model import Model
 from dynamic_hosting.core.util import obj_to_base64
 
 
@@ -88,7 +88,7 @@ def main():
                                test.loc[:, 'approval'])
     logger.info('accuracy: ' + str(res))
 
-    internal_model = MLModel(
+    internal_model = Model(
         model=obj_to_base64(best_estimator),
         name='miniloan-rfc-RandomizedSearchCV',
         version='v0',

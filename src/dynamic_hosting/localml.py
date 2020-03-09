@@ -1,9 +1,9 @@
 import logging
 import sys
-from typing import Callable, Text
+from typing import Callable, Text, Mapping
 
 import uvicorn
-from dynamic_hosting.core.model import MLRequest, MLResponse, MLModel
+from dynamic_hosting.core.model import GenericRequestBody, ResponseBody, Model
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.util import find_storage_root
 from fastapi import FastAPI
@@ -40,13 +40,9 @@ def dynamic_io_schema_gen(ms: ModelService) -> Callable:
     return dynamic_io_schema
 
 
-class ServerStatus(BaseModel):
-    status: str = 'bad'
-
-
-@app.get('/isAlive', response_model=ServerStatus)
-def heart_beat() -> ServerStatus:
-    return ServerStatus(status='good')
+@app.get('/isAlive', response_model=Mapping)
+def heart_beat() -> Mapping:
+    return {'status': 'good'}
 
 
 @app.get('/models', response_model=ModelService)
@@ -56,7 +52,7 @@ def get_models() -> ModelService:
 
 
 @app.post('/models')
-def add_model(m: MLModel) -> None:
+def add_model(m: Model) -> None:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
     ms.add_model(m)
 
@@ -67,15 +63,15 @@ def remove_model(model_name: Text, model_version: Text = None) -> None:
     ms.remove_model(model_name=model_name, model_version=model_version)
 
 
-@app.post('/generic', response_model=MLResponse)
-def predict(ml_req: MLRequest) -> MLResponse:
+@app.post('/generic', response_model=ResponseBody)
+def predict(ml_req: GenericRequestBody) -> ResponseBody:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
     internal_res = ms.invoke_from_dict(
         model_name=ml_req.model_name,
         model_version=ml_req.model_version,
-        data=MLRequest.params_to_dict(ml_req)
+        data=GenericRequestBody.params_to_dict(ml_req)
     )
-    return MLResponse(
+    return ResponseBody(
         model_output_raw=str(internal_res)
     )
 

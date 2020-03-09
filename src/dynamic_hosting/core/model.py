@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 import json
 import logging
-
-import fastapi
-
 from logging import Logger
 from pathlib import Path
-from typing import Mapping, Text, Optional, Sequence, Any, Dict, List, Callable
+from typing import Mapping, Text, Optional, Sequence, Any, Dict, List
 
-from fastapi.openapi.utils import get_openapi
-from pandas import DataFrame
 from numpy import dtype
+from pandas import DataFrame
 from pydantic import BaseModel
 
 from .util import rmdir, base64_to_obj
@@ -18,26 +14,26 @@ from .util import rmdir, base64_to_obj
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
-class MLParam(BaseModel):
+class Parameter(BaseModel):
     name: Text = 'Feature name'
     order: int = 0
     value: Any = 'Feature value'
 
 
-class MLRequest(BaseModel):
+class GenericRequestBody(BaseModel):
     model_name: Text = 'model_name'
     model_version: Text = 'model_version'
-    params: List[MLParam] = list()
+    params: List[Parameter] = list()
 
     @staticmethod
-    def params_to_dict(ml_req: 'MLRequest') -> Dict[Text, Sequence]:
+    def params_to_dict(ml_req: 'GenericRequestBody') -> Dict[Text, Sequence]:
         return {
             feat_val.name: [feat_val.value]
             for feat_val in ml_req.params
         }
 
 
-class MLResponse(BaseModel):
+class ResponseBody(BaseModel):
     model_output: Any
     model_output_raw: Text
 
@@ -55,7 +51,7 @@ class OpenapiMLModelSchema(BaseModel):
     properties: Mapping[Text, Mapping[Text, Any]]
 
     @staticmethod
-    def get_property_map(model: 'MLModel') -> Mapping[Text,  Mapping[Text, Text]]:
+    def get_property_map(model: 'Model') -> Mapping[Text, Mapping[Text, Text]]:
         return {
             feat: {
                 'title': '{model_name}-{model_version}.{feature_name}'.format(
@@ -66,7 +62,7 @@ class OpenapiMLModelSchema(BaseModel):
         }
 
     @staticmethod
-    def from_ml_model(model: 'MLModel') -> 'OpenapiMLModelSchema':
+    def from_ml_model(model: 'Model') -> 'OpenapiMLModelSchema':
 
         return OpenapiMLModelSchema(
             title=model.name,
@@ -75,7 +71,7 @@ class OpenapiMLModelSchema(BaseModel):
         )
 
 
-class MLModel(BaseModel):
+class Model(BaseModel):
     model: Text  # pickled model in base64
     name: Text
     version: Text
@@ -92,7 +88,7 @@ class MLModel(BaseModel):
         return {getattr(item, 'name'): dtype(getattr(item, 'type')) for item in self.input_schema}
 
     def invoke_from_dict(
-            self: 'MLModel',
+            self: 'Model',
             data_input: Dict
     ) -> Any:
         logger: Logger = logging.getLogger(__name__)
@@ -112,7 +108,7 @@ class MLModel(BaseModel):
         return self.invoke(data)
 
     def invoke(
-            self: 'MLModel',
+            self: 'Model',
             data_input: DataFrame
     ) -> Any:
         return getattr(base64_to_obj(self.model), self.method_name)(data_input)
@@ -122,7 +118,7 @@ class MLModel(BaseModel):
             storage_root: Path,
             model_name: Text,
             model_version: Text
-    ) -> 'MLModel':
+    ) -> 'Model':
         logger: Logger = logging.getLogger(__name__)
         model_dir: Path = storage_root.joinpath(model_name).joinpath(model_version)
 
@@ -131,7 +127,7 @@ class MLModel(BaseModel):
 
             logger.info('Loaded model from: {storage_root}/{model_name}/{model_version}'.format(
                 storage_root=storage_root, model_name=model_name, model_version=model_version))
-            model: 'MLModel' = MLModel(**model_config)
+            model: 'Model' = Model(**model_config)
             model.additional_input_schema = OpenapiMLModelSchema.from_ml_model(model)
             return model
 
@@ -159,7 +155,7 @@ class MLModel(BaseModel):
             rmdir(storage_root.joinpath(model_name))
 
     def save_to_disk(
-            self: 'MLModel',
+            self: 'Model',
             storage_root: Path
     ) -> None:
         logger: Logger = logging.getLogger(__name__)
