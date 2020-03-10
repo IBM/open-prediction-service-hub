@@ -37,16 +37,22 @@ class Model(BaseModel):
     output_schema: Optional[Mapping[Text, Any]]
     metadata: Mapping
 
-    def get_model_definition(self) -> Dict[Text, Any]:
+    def input_schema_model(self) -> Type[BaseModel]:
         fields_dict = {
-                name: (t, ...)
-                for name, t in self.get_feat_type_map().items()
-            }
-        model = create_model(
-            self.name,
+            name: (t, ...)
+            for name, t in self.get_feat_type_map().items()
+        }
+        return create_model(
+            '{model_name}-{model_version}'.format(
+                model_name=self.name,
+                model_version=self.version
+            ),
             **fields_dict,
-            __base__=BaseRequestBody
+            __base__=BaseModel
         )
+
+    def input_schema_definition(self) -> Dict[Text, Any]:
+        model: Type[BaseModel] = self.input_schema_model()
         return get_model_definitions(
             flat_models={model},
             model_name_map={
