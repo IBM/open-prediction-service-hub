@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from fastapi.utils import get_model_definitions
-from dynamic_hosting.core.model import Parameter
+from dynamic_hosting.core.openapi.request import Parameter
 
 
 def main():

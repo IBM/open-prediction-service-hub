@@ -6,7 +6,7 @@ from typing import Mapping, Text, Any, Sequence, Dict
 from pandas import DataFrame
 from pydantic import BaseModel
 
-from .model import Model
+from dynamic_hosting.core.openapi.model import Model
 
 
 class ModelService(BaseModel):

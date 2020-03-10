@@ -1,14 +1,14 @@
 import logging
 import sys
-from typing import Callable, Text, Mapping
+from typing import Callable, Text, Mapping, Any, Dict
 
 import uvicorn
-from dynamic_hosting.core.model import GenericRequestBody, ResponseBody, Model, BaseRequestBody
+from dynamic_hosting.core.openapi.model import ResponseBody, Model
+from dynamic_hosting.core.openapi.request import GenericRequestBody
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.util import find_storage_root
 from fastapi import FastAPI
-from fastapi.openapi.utils import get_openapi, get_model_definitions
-from pydantic import BaseModel
+from fastapi.openapi.utils import get_openapi
 
 app = FastAPI(
     version='0.0.1-SNAPSHOT',
@@ -63,8 +63,8 @@ def remove_model(model_name: Text, model_version: Text = None) -> None:
 def predict(ml_req: GenericRequestBody) -> ResponseBody:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
     internal_res = ms.invoke_from_dict(
-        model_name=ml_req.model_name,
-        model_version=ml_req.model_version,
+        model_name=ml_req.metadata.model_name,
+        model_version=ml_req.metadata.model_version,
         data=GenericRequestBody.params_to_dict(ml_req)
     )
     return ResponseBody(
@@ -73,12 +73,12 @@ def predict(ml_req: GenericRequestBody) -> ResponseBody:
 
 
 @app.post('/specific', response_model=ResponseBody)
-def predict(ml_req: BaseRequestBody) -> ResponseBody:
+def predict(ml_req: Dict[Text, Any]) -> ResponseBody:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
     internal_res = ms.invoke_from_dict(
-        model_name=ml_req.model_name,
-        model_version=ml_req.model_version,
-        data=ms.model_map()[ml_req.model_name][ml_req.model_version].transform_internal_dict(ml_req.__dict__)
+        model_name=ml_req['model_name'],
+        model_version=ml_req['model_version'],
+        data=ms.model_map()[ml_req['model_name']][ml_req['model_version']].transform_internal_dict(ml_req)
     )
     return ResponseBody(
         model_output_raw=str(internal_res)

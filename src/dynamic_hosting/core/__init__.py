@@ -1,4 +1,4 @@
-from .model import Model
+from dynamic_hosting.core.openapi.model import Model
 from .model_service import ModelService
 
 

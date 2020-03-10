@@ -9,7 +9,7 @@ from sklearn.datasets import load_iris
 from pathlib import Path
 from time import gmtime, strftime
 
-from dynamic_hosting.core.model import Model
+from dynamic_hosting.core.openapi.model import Model
 
 
 def main():

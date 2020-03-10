@@ -5,38 +5,16 @@ import json
 import logging
 from logging import Logger
 from pathlib import Path
-from typing import Mapping, Text, Optional, Sequence, Any, Dict, List, Type, OrderedDict
+from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDict
 
 import numpy as np
+from dynamic_hosting.core.openapi.request import RequestMetadata, BaseRequestBody
+from dynamic_hosting.core.util import rmdir, base64_to_obj
 from fastapi.utils import get_model_definitions
 from pandas import DataFrame
 from pydantic import BaseModel, create_model
 
-from .util import rmdir, base64_to_obj
-
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
-
-
-class Parameter(BaseModel):
-    name: Text = 'Feature name'
-    order: int = 0
-    value: Any = 'Feature value'
-
-
-class BaseRequestBody(BaseModel):
-    model_name: Text = 'model_name'
-    model_version: Text = 'model_version'
-
-
-class GenericRequestBody(BaseRequestBody):
-    params: List[Parameter] = list()
-
-    @staticmethod
-    def params_to_dict(ml_req: 'GenericRequestBody') -> Dict[Text, Sequence]:
-        return {
-            feat_val.name: [feat_val.value]
-            for feat_val in ml_req.params
-        }
 
 
 class ResponseBody(BaseModel):
@@ -60,12 +38,13 @@ class Model(BaseModel):
     metadata: Mapping
 
     def get_model_definition(self) -> Dict[Text, Any]:
-        model = create_model(
-            self.name,
-            **{
+        fields_dict = {
                 name: (t, ...)
                 for name, t in self.get_feat_type_map().items()
-            },
+            }
+        model = create_model(
+            self.name,
+            **fields_dict,
             __base__=BaseRequestBody
         )
         return get_model_definitions(
@@ -74,7 +53,8 @@ class Model(BaseModel):
                 model: '{model_name}-{model_version}'.format(
                     model_name=self.name,
                     model_version=self.version
-                )
+                ),
+                RequestMetadata: 'RequestMetadata'
             }
         )
 
@@ -94,14 +74,13 @@ class Model(BaseModel):
     def transform_internal_dict(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
         data_frame_compatible_dict: Dict = dict()
         feature_map = self.get_feat_type_map()
-        for key, val in kv_pair:
+        for key, val in kv_pair.items():
             if key in feature_map.keys():
                 data_frame_compatible_dict[key] = [val]
         return data_frame_compatible_dict
 
-
     def invoke_from_dict(
-            self: 'Model',
+            self,
             data_input: Dict
     ) -> Any:
         logger: Logger = logging.getLogger(__name__)
@@ -121,7 +100,7 @@ class Model(BaseModel):
         return self.invoke(data)
 
     def invoke(
-            self: 'Model',
+            self,
             data_input: DataFrame
     ) -> Any:
         return getattr(base64_to_obj(self.model), self.method_name)(data_input)
@@ -131,7 +110,7 @@ class Model(BaseModel):
             storage_root: Path,
             model_name: Text,
             model_version: Text
-    ) -> 'Model':
+    ) -> Model:
         logger: Logger = logging.getLogger(__name__)
         model_dir: Path = storage_root.joinpath(model_name).joinpath(model_version)
 
@@ -167,7 +146,7 @@ class Model(BaseModel):
             rmdir(storage_root.joinpath(model_name))
 
     def save_to_disk(
-            self: 'Model',
+            self,
             storage_root: Path
     ) -> None:
         logger: Logger = logging.getLogger(__name__)
