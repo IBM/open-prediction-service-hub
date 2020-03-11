@@ -58,18 +58,20 @@ class GenericRequestBody(BaseRequestBody):
 class DirectRequestBody(BaseRequestBody):
     """Concrete class which captures necessary information for direct model invocation"""
 
+    params: Any  # placeholder for dynamic generated parameter dict
+
     def get_parameters(self) -> List[Parameter]:
         try:
-            dynamic_params: BaseModel = getattr(self, 'params')
+            dynamic_params: Dict = getattr(self, 'params')
+            return [
+                Parameter(name=name, order=order, value=value)
+                for order, (name, value) in enumerate(dynamic_params.items())
+            ]
         except PydanticTypeError:
-            raise RuntimeError('Can not cast received data into input format')
-        return [
-            Parameter(name=i, order=item[0], value=item[1])
-            for i, item in enumerate(dynamic_params.__fields__.items())
-        ]
+            raise RuntimeError('Can not cast received data into ml input format')
 
     def get_dict(self) -> Dict[Text, Sequence[Any]]:
         return {
-            getattr(feat_val, 'name'): [getattr(feat_val, 'value')]
+            getattr(feat_val, 'name'): getattr(feat_val, 'value')
             for feat_val in self.get_parameters()
         }
