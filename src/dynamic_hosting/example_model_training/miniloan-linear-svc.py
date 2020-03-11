@@ -98,32 +98,32 @@ def main():
             {
                 'name': "creditScore",
                 'order': 0,
-                'type': 'float'
+                'type': 'float64'
             },
             {
                 'name': "income",
                 'order': 1,
-                'type': 'float'
+                'type': 'float64'
             },
             {
                 'name': "loanAmount",
                 'order': 2,
-                'type': 'float'
+                'type': 'float64'
             },
             {
                 'name': "monthDuration",
                 'order': 3,
-                'type': 'float'
+                'type': 'float64'
             },
             {
                 'name': "rate",
                 'order': 4,
-                'type': 'float'
+                'type': 'float64'
             },
             {
                 'name': "yearlyReimbursement",
                 'order': 5,
-                'type': 'float'
+                'type': 'float64'
             }
         ],
         output_schema=None,

@@ -37,7 +37,7 @@ def dynamic_io_schema_gen(ms: ModelService) -> Callable:
             routes=app.routes,
         )
 
-        input_schema_models: Tuple[Type[BaseModel]] = tuple((model.input_schema_model() for model in ms.ml_models))
+        input_schema_models: Tuple[Type[BaseModel]] = tuple((model.input_schema_t() for model in ms.ml_models))
         real_request_class_name: Text = 'Dynamic{class_name}'.format(class_name=DirectRequestBody.__name__)
 
         m: Type[BaseModel] = create_model(
@@ -97,7 +97,7 @@ def remove_model(model_name: Text, model_version: Text = None) -> None:
 @app.post('/generic', response_model=ResponseBody)
 def predict(ml_req: GenericRequestBody) -> ResponseBody:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
-    internal_res = ms.invoke_from_dict(
+    internal_res = ms.invoke(
         model_name=ml_req.metadata.model_name,
         model_version=ml_req.metadata.model_version,
         data=ml_req.get_dict()
@@ -110,7 +110,7 @@ def predict(ml_req: GenericRequestBody) -> ResponseBody:
 @app.post('/direct', response_model=ResponseBody)
 def predict(ml_req: DirectRequestBody) -> ResponseBody:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
-    internal_res = ms.invoke_from_dict(
+    internal_res = ms.invoke(
         model_name=ml_req.get_model_name(),
         model_version=ml_req.get_version(),
         data=ms.model_map()[ml_req.get_model_name()][ml_req.get_version()].transform_internal_dict(ml_req.get_dict())

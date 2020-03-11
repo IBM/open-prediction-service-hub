@@ -111,7 +111,7 @@ def main():
     test_x: pd.DataFrame = test.loc[:, col_names[:-1]]
     test_dict = test_x.to_dict(orient='list')
 
-    predicted = internal_model.invoke_from_dict(test_dict)
+    predicted = internal_model.invoke(test_dict)
     logger.info(
         'accuracy_score of model {score}'.format(score=accuracy_score(test.loc[:, col_names[-1]], predicted)))
 

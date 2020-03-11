@@ -13,33 +13,11 @@ class ModelService(BaseModel):
     ml_models: Sequence[Model]
     storage_root: Path
 
-    def invoke_from_dict(
-            self,
-            model_name: Text,
-            model_version: Text,
-            data: Dict
-    ) -> Any:
-        logger = logging.getLogger(__name__)
-        logger.debug('Invoke ml model <{name}> version <{version}>'.format(name=model_name, version=model_version))
-
-        model_map: Mapping[Text, Mapping[Text, Model]] = self.model_map()
-
-        if not model_map.get(model_name):
-            raise RuntimeError('Model <{name}> not found'.format(name=model_name))
-        if not model_map[model_name].get(model_version):
-            raise RuntimeError('Model <{name}> version  <{version}> not found'.format(
-                name=model_name,
-                version=model_version)
-            )
-
-        return model_map[model_name][model_version].invoke_from_dict(data_input=data)
-
-
     def invoke(
             self,
             model_name: Text,
             model_version: Text,
-            data: DataFrame
+            data: Dict
     ) -> Any:
         logger = logging.getLogger(__name__)
         logger.debug('Invoke ml model <{name}> version <{version}>'.format(name=model_name, version=model_version))

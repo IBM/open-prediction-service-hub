@@ -11,11 +11,13 @@ from pydantic.errors import PydanticTypeError
 
 
 class RequestMetadata(BaseModel):
+    """Necessary information for model invocation"""
     model_name: Text = Field(..., description='Name of model')
     model_version: Text = Field(..., description='Version of model')
 
 
 class Parameter(BaseModel):
+    """Parameter for ml model invocation"""
     name: Text = Field(..., description='Name of the feature')
     order: int = Field(..., description='Position of the feature')
     value: Union[np.str, np.long, np.float] = Field(..., description='Value of the feature')
@@ -58,8 +60,9 @@ class GenericRequestBody(BaseRequestBody):
 class DirectRequestBody(BaseRequestBody):
     """Concrete class which captures necessary information for direct model invocation"""
 
-    params: Any  # placeholder for dynamic generated parameter dict
+    params: Any = Field(..., description='Placeholder for dynamic generated parameter dict')
 
+    # TODO: Add type cast cast(params) -> dynamicType
     def get_parameters(self) -> List[Parameter]:
         try:
             dynamic_params: Dict = getattr(self, 'params')
