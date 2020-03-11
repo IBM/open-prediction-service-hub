@@ -23,7 +23,7 @@ class Parameter(BaseModel):
 
 class BaseRequestBody(BaseModel, ABC):
     """Abstract class which captures common information for model invocation"""
-    metadata: RequestMetadata = Field(..., alias='__metadata__', description='Name of this feature')
+    metadata: RequestMetadata = Field(..., alias='metadata', description='Name of this feature')
 
     def get_model_name(self) -> Text:
         return self.metadata.model_name

@@ -1,11 +1,13 @@
+#!/usr/bin/env python3
+
 import logging
 import sys
-from typing import Callable, Text, Mapping, Type, List, Union, Tuple
+from typing import Callable, Text, Mapping, Type, Union, Tuple
 
 import uvicorn
+from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.openapi.model import ResponseBody, Model
 from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectRequestBody, RequestMetadata
-from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.util import find_storage_root, load_direct_request_schema, replace_any_of
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
@@ -27,6 +29,7 @@ def model_name_map_gen(model_types: Tuple[Type[BaseModel]]) -> Mapping[Type, Tex
 def dynamic_io_schema_gen(ms: ModelService) -> Callable:
     def dynamic_io_schema():
         ms.reload_models()
+
         openapi_schema = get_openapi(
             title=app.title,
             version=app.version,
@@ -34,39 +37,36 @@ def dynamic_io_schema_gen(ms: ModelService) -> Callable:
             routes=app.routes,
         )
 
-        input_schema_models: Tuple[Type[BaseModel]] = tuple()
-        for model in ms.ml_models:
-            openapi_schema['components']['schemas'].update(
-                model.input_schema_definition()
-            )
-            input_schema_models += (model.input_schema_model(), )
+        input_schema_models: Tuple[Type[BaseModel]] = tuple((model.input_schema_model() for model in ms.ml_models))
+        real_request_class_name: Text = 'Dynamic{class_name}'.format(class_name=DirectRequestBody.__name__)
 
-        m = create_model(
-            'Dynamic{class_name}'.format(class_name=DirectRequestBody.__name__),
-            dynamic_params=(Union[tuple(input_schema_models)], ...),
+        m: Type[BaseModel] = create_model(
+            real_request_class_name,
+            params=(Union[tuple(input_schema_models)], ...),
             __base__=DirectRequestBody
         )
 
-        real_request_class_name: Text = 'Dynamic{class_name}'.format(class_name=DirectRequestBody.__name__)
-
-        d = get_model_definitions(
-            flat_models={m, *input_schema_models},
-            model_name_map={m: real_request_class_name,
-                            **model_name_map_gen(input_schema_models),
-                            RequestMetadata: 'RequestMetadata'}
-
-        )
-
         openapi_schema['components']['schemas'].update(
-            d
+            get_model_definitions(
+                flat_models={m, *input_schema_models},
+                model_name_map={m: real_request_class_name,
+                                **model_name_map_gen(input_schema_models),
+                                RequestMetadata: 'RequestMetadata'}
+            )
         )
 
-        load_direct_request_schema(openapi_schema['paths']['/direct'], DirectRequestBody.__name__, real_request_class_name)
-
-        replace_any_of(openapi_schema['components']['schemas'], real_request_class_name, 'dynamic_params')
+        load_direct_request_schema(
+            openapi_schema['paths']['/direct'],
+            DirectRequestBody.__name__,
+            real_request_class_name
+        )
+        replace_any_of(
+            openapi_schema['components']['schemas'],
+            real_request_class_name,
+            'params'
+        )
 
         return openapi_schema
-
     return dynamic_io_schema
 
 
@@ -77,6 +77,7 @@ def heart_beat() -> Mapping:
 
 @app.get('/models', response_model=ModelService)
 def get_models() -> ModelService:
+    """Returns the list of ML models."""
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
     return ms
 
@@ -112,7 +113,7 @@ def predict(ml_req: DirectRequestBody) -> ResponseBody:
     internal_res = ms.invoke_from_dict(
         model_name=ml_req.get_model_name(),
         model_version=ml_req.get_version(),
-        data=ms.model_map()[ml_req.get_model_name()][ml_req.get_version()].transform_internal_dict(ml_req)
+        data=ms.model_map()[ml_req.get_model_name()][ml_req.get_version()].transform_internal_dict(ml_req.get_dict())
     )
     return ResponseBody(
         model_output_raw=str(internal_res)
