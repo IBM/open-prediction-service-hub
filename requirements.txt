@@ -1,11 +1,12 @@
-# Required
+# Required:
+## Data structure
 numpy
 pandas
 pydantic
+## ML lib
 scikit-learn
+## Web interface
 fastapi
 uvicorn
 gunicorn
-# Optional
-joblib
-requests
+# Optional:
