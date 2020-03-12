@@ -41,6 +41,10 @@ class Feature(BaseModel):
         return t
 
 
+class InputSchema(BaseModel):
+    pass
+
+
 class Model(BaseModel):
     """Internal representation of ML model"""
     model: Text = Field(..., description='Pickled model in base64 format')
@@ -64,7 +68,7 @@ class Model(BaseModel):
                 model_version=self.version
             ),
             **fields_dict,
-            __base__=BaseModel
+            __base__=InputSchema
         )
 
     def input_schema_definition(self) -> Dict[Text, Any]:

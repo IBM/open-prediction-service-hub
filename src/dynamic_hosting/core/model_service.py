@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 from pathlib import Path
-from typing import Mapping, Text, Any, Sequence, Dict
+from typing import Mapping, Text, Any, Sequence, Dict, Type, Set
 
 from pandas import DataFrame
 from pydantic import BaseModel
@@ -90,3 +90,16 @@ class ModelService(BaseModel):
             }
             for model in self.ml_models
         }
+
+    def input_schema_t_map(self) -> Mapping[Text, Mapping[Text, Type[BaseModel]]]:
+        return {
+            model.name: {
+                model.version: model.input_schema_t()
+            }
+            for model in self.ml_models
+        }
+
+    def input_schema_t_set(self) -> Set[Type[BaseModel]]:
+        return {model.input_schema_t() for model in self.ml_models}
+
+

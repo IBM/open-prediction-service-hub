@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import typing
 from abc import ABC, abstractmethod
-from typing import Text, Dict, Sequence, Union, Mapping, Any, List
+from typing import Text, Dict, Sequence, Union, Any, List, Type
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -62,13 +61,12 @@ class DirectRequestBody(BaseRequestBody):
 
     params: Any = Field(..., description='Placeholder for dynamic generated parameter dict')
 
-    # TODO: Add type cast cast(params) -> dynamicType
     def get_parameters(self) -> List[Parameter]:
         try:
-            dynamic_params: Dict = getattr(self, 'params')
+            dynamic_params: BaseModel = getattr(self, 'params')
             return [
                 Parameter(name=name, order=order, value=value)
-                for order, (name, value) in enumerate(dynamic_params.items())
+                for order, (name, value) in enumerate(dynamic_params.dict().items())
             ]
         except PydanticTypeError:
             raise RuntimeError('Can not cast received data into ml input format')

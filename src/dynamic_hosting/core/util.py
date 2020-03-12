@@ -5,7 +5,12 @@ import os
 import pickle
 from logging import Logger
 from pathlib import Path
-from typing import Text, Any, Dict, NoReturn
+from typing import Text, Any, Dict, NoReturn, Type, Union, Tuple
+
+from pydantic import BaseModel, create_model
+
+
+DynamicIOSchemaPrefix = 'Dynamic'
 
 DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'example_models'
 DEFAULT_STORAGE_ROOT: Path = Path(__file__).resolve().parents[3].joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
@@ -55,3 +60,17 @@ def replace_any_of(schema: Dict, real_request_name: Text, property_name: Text) -
     property_map: Dict = schema[real_request_name]['properties'][property_name]
     property_map['oneOf'] = property_map['anyOf']
     del property_map['anyOf']
+
+
+def get_real_request_class(
+        generic_request_class: Type[BaseModel],
+        parameter_types: Tuple[Type[BaseModel]]
+) -> Type:
+    return create_model(
+        '{prefix}{genetic_class_name}'.format(
+            prefix=DynamicIOSchemaPrefix,
+            genetic_class_name=generic_request_class.__name__
+        ),
+        params=(Union[parameter_types], ...),
+        __base__=generic_request_class
+    )

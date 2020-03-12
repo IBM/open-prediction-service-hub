@@ -8,7 +8,8 @@ import uvicorn
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.openapi.model import ResponseBody, Model
 from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectRequestBody, RequestMetadata
-from dynamic_hosting.core.util import find_storage_root, load_direct_request_schema, replace_any_of
+from dynamic_hosting.core.util import find_storage_root, load_direct_request_schema, replace_any_of, \
+    get_real_request_class
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.utils import get_model_definitions
@@ -20,6 +21,8 @@ app = FastAPI(
     description='A simple environment to test machine learning model',
     docs_url='/'
 )
+
+DynamicIOSchemaPrefix = 'Dynamic'
 
 
 def model_name_map_gen(model_types: Tuple[Type[BaseModel]]) -> Mapping[Type, Text]:
@@ -37,20 +40,15 @@ def dynamic_io_schema_gen(ms: ModelService) -> Callable:
             routes=app.routes,
         )
 
-        input_schema_models: Tuple[Type[BaseModel]] = tuple((model.input_schema_t() for model in ms.ml_models))
-        real_request_class_name: Text = 'Dynamic{class_name}'.format(class_name=DirectRequestBody.__name__)
-
-        m: Type[BaseModel] = create_model(
-            real_request_class_name,
-            params=(Union[tuple(input_schema_models)], ...),
-            __base__=DirectRequestBody
-        )
+        input_request_types: Tuple[Type[BaseModel]] = tuple(ms.input_schema_t_set())
+        real_request_class = get_real_request_class(generic_request_class=DirectRequestBody,
+                                                    parameter_types=input_request_types)
 
         openapi_schema['components']['schemas'].update(
             get_model_definitions(
-                flat_models={m, *input_schema_models},
-                model_name_map={m: real_request_class_name,
-                                **model_name_map_gen(input_schema_models),
+                flat_models={real_request_class, *input_request_types},
+                model_name_map={real_request_class: real_request_class.__name__,
+                                **model_name_map_gen(input_request_types),
                                 RequestMetadata: 'RequestMetadata'}
             )
         )
@@ -58,15 +56,16 @@ def dynamic_io_schema_gen(ms: ModelService) -> Callable:
         load_direct_request_schema(
             openapi_schema['paths']['/direct'],
             DirectRequestBody.__name__,
-            real_request_class_name
+            real_request_class.__name__
         )
         replace_any_of(
             openapi_schema['components']['schemas'],
-            real_request_class_name,
+            real_request_class.__name__,
             'params'
         )
 
         return openapi_schema
+
     return dynamic_io_schema
 
 
@@ -110,10 +109,21 @@ def predict(ml_req: GenericRequestBody) -> ResponseBody:
 @app.post('/direct', response_model=ResponseBody)
 def predict(ml_req: DirectRequestBody) -> ResponseBody:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
+
+    # parameterized instantiation
+    concrete_input_model = get_real_request_class(
+        generic_request_class=DirectRequestBody,
+        parameter_types=tuple(ms.input_schema_t_set())
+    )(
+        metadata=ml_req.metadata,
+        params=ml_req.params
+    )
+
     internal_res = ms.invoke(
-        model_name=ml_req.get_model_name(),
-        model_version=ml_req.get_version(),
-        data=ms.model_map()[ml_req.get_model_name()][ml_req.get_version()].transform_internal_dict(ml_req.get_dict())
+        model_name=concrete_input_model.get_model_name(),
+        model_version=concrete_input_model.get_version(),
+        data=ms.model_map()[concrete_input_model.get_model_name()][
+            concrete_input_model.get_version()].transform_internal_dict(concrete_input_model.get_dict())
     )
     return ResponseBody(
         model_output_raw=str(internal_res)
