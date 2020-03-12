@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Text
 
 import numpy as np
 import pandas as pd
@@ -10,7 +11,10 @@ from pathlib import Path
 from time import gmtime, strftime
 
 from dynamic_hosting.core.openapi.model import Model
-from dynamic_hosting.core.util import obj_to_base64, DEFAULT_STORAGE_ROOT
+from dynamic_hosting.core.util import obj_to_base64
+
+DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'example_models'
+DEFAULT_STORAGE_ROOT: Path = Path(__file__).resolve().parents[5].joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
 
 
 def main():

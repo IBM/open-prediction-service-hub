@@ -24,9 +24,10 @@ app = FastAPI(
 )
 
 
-def dynamic_io_schema_gen(ms: ModelService) -> Callable:
+def dynamic_io_schema_gen() -> Callable:
+
     def dynamic_io_schema():
-        ms.reload_models()
+        ms: ModelService = ModelService.load_from_disk(storage_root())
 
         openapi_schema = get_openapi(
             title=app.title,
@@ -128,7 +129,7 @@ def predict(
     )
 
 
-app.openapi = dynamic_io_schema_gen(ms=ModelService.load_from_disk(storage_root()))
+app.openapi = dynamic_io_schema_gen()
 
 if __name__ == '__main__':
     import uvicorn
