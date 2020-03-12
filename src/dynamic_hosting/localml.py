@@ -10,7 +10,7 @@ from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectReque
 from dynamic_hosting.core.util import find_storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError, HTTPException
+from fastapi.exceptions import HTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.utils import get_model_definitions
 from pandas import DataFrame
@@ -43,7 +43,7 @@ def dynamic_io_schema_gen(ms: ModelService) -> Callable:
 
         input_request_types: Tuple[Type[BaseModel]] = tuple(ms.input_schema_t_set())
         real_request_class = get_real_request_class(generic_request_class=DirectRequestBody,
-                                                    parameter_types=input_request_types)
+                                                    parameter_types=set(input_request_types))
 
         openapi_schema['components']['schemas'].update(
             get_model_definitions(
@@ -142,5 +142,6 @@ app.openapi = dynamic_io_schema_gen(ms=ModelService.load_from_disk(find_storage_
 
 if __name__ == '__main__':
     import uvicorn
+
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     uvicorn.run(app, host='127.0.0.1', port=8000)
