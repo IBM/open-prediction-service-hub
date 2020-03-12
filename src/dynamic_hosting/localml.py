@@ -10,7 +10,7 @@ from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectReque
 from dynamic_hosting.core.util import find_storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, HTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.utils import get_model_definitions
 from pandas import DataFrame
@@ -109,18 +109,27 @@ def predict(ml_req: GenericRequestBody) -> ResponseBody:
 
 @app.post('/direct', response_model=ResponseBody)
 def predict(
-        ml_req: get_real_request_class(
-            generic_request_class=DirectRequestBody,
-            parameter_types=ModelService.load_from_disk(find_storage_root()).input_schema_t_set()
-        )
+        ml_req: DirectRequestBody
 ) -> ResponseBody:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
 
+    # parameterized instantiation
+    try:
+        concrete_input_model: DirectRequestBody = get_real_request_class(
+            generic_request_class=DirectRequestBody,
+            parameter_types=ms.input_schema_t_set()
+        )(
+            metadata=ml_req.metadata,
+            params=ml_req.params
+        )
+    except ValidationError:
+        raise HTTPException(status_code=422, detail='ML input mapping failure')
+
     internal_res: Any = ms.invoke(
-        model_name=ml_req.get_model_name(),
-        model_version=ml_req.get_version(),
-        data=ms.model_map()[ml_req.get_model_name()][
-            ml_req.get_version()].transform_internal_dict(ml_req.get_dict())
+        model_name=concrete_input_model.get_model_name(),
+        model_version=concrete_input_model.get_version(),
+        data=ms.model_map()[concrete_input_model.get_model_name()][
+            concrete_input_model.get_version()].transform_internal_dict(concrete_input_model.get_dict())
     )
 
     return ResponseBody(
