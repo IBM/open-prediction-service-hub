@@ -25,6 +25,6 @@ setup(
     install_requires=installation_dependencies,
     long_description=long_description,
     long_description_content_type='text/markdown',
-    # To full support Flask, the source file can not be compressed in an .egg
-    zip_safe=False
+    # Unlike Flask, the source file can be compressed in an .egg
+    zip_safe=True
 )
