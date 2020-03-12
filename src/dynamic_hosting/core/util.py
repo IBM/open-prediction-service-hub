@@ -5,7 +5,7 @@ import os
 import pickle
 from logging import Logger
 from pathlib import Path
-from typing import Text, Any, Dict, NoReturn, Type, Union, Tuple
+from typing import Text, Any, Dict, NoReturn, Type, Union, Tuple, Set
 
 from pydantic import BaseModel, create_model
 
@@ -64,13 +64,13 @@ def replace_any_of(schema: Dict, real_request_name: Text, property_name: Text) -
 
 def get_real_request_class(
         generic_request_class: Type[BaseModel],
-        parameter_types: Tuple[Type[BaseModel]]
+        parameter_types: Set[Type[BaseModel]]
 ) -> Type:
     return create_model(
         '{prefix}{genetic_class_name}'.format(
             prefix=DynamicIOSchemaPrefix,
             genetic_class_name=generic_request_class.__name__
         ),
-        params=(Union[parameter_types], ...),
+        params=(Union[tuple(parameter_types)], ...),
         __base__=generic_request_class
     )

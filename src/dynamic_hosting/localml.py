@@ -2,18 +2,19 @@
 
 import logging
 import sys
-from typing import Callable, Text, Mapping, Type, Union, Tuple
+from typing import Callable, Text, Mapping, Type, Tuple, Any
 
-import uvicorn
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.openapi.model import ResponseBody, Model
 from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectRequestBody, RequestMetadata
 from dynamic_hosting.core.util import find_storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.openapi.utils import get_openapi
 from fastapi.utils import get_model_definitions
-from pydantic import BaseModel, create_model
+from pandas import DataFrame
+from pydantic import BaseModel, ValidationError
 
 app = FastAPI(
     version='0.0.1-SNAPSHOT',
@@ -107,25 +108,23 @@ def predict(ml_req: GenericRequestBody) -> ResponseBody:
 
 
 @app.post('/direct', response_model=ResponseBody)
-def predict(ml_req: DirectRequestBody) -> ResponseBody:
+def predict(
+        ml_req: get_real_request_class(
+            generic_request_class=DirectRequestBody,
+            parameter_types=ModelService.load_from_disk(find_storage_root()).input_schema_t_set()
+        )
+) -> ResponseBody:
     ms: ModelService = ModelService.load_from_disk(find_storage_root())
 
-    # parameterized instantiation
-    concrete_input_model = get_real_request_class(
-        generic_request_class=DirectRequestBody,
-        parameter_types=tuple(ms.input_schema_t_set())
-    )(
-        metadata=ml_req.metadata,
-        params=ml_req.params
+    internal_res: Any = ms.invoke(
+        model_name=ml_req.get_model_name(),
+        model_version=ml_req.get_version(),
+        data=ms.model_map()[ml_req.get_model_name()][
+            ml_req.get_version()].transform_internal_dict(ml_req.get_dict())
     )
 
-    internal_res = ms.invoke(
-        model_name=concrete_input_model.get_model_name(),
-        model_version=concrete_input_model.get_version(),
-        data=ms.model_map()[concrete_input_model.get_model_name()][
-            concrete_input_model.get_version()].transform_internal_dict(concrete_input_model.get_dict())
-    )
     return ResponseBody(
+        model_output=DataFrame(internal_res).to_dict(orient='list'),
         model_output_raw=str(internal_res)
     )
 
@@ -133,5 +132,6 @@ def predict(ml_req: DirectRequestBody) -> ResponseBody:
 app.openapi = dynamic_io_schema_gen(ms=ModelService.load_from_disk(find_storage_root()))
 
 if __name__ == '__main__':
+    import uvicorn
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     uvicorn.run(app, host='127.0.0.1', port=8000)
