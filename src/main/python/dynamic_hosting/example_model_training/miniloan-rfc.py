@@ -4,12 +4,12 @@ import sys
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier
 from pathlib import Path
 from time import gmtime, strftime
 
 from dynamic_hosting.core.openapi.model import Model
-from dynamic_hosting.core.util import obj_to_base64
+from dynamic_hosting.core.util import obj_to_base64, DEFAULT_STORAGE_ROOT
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
         'yearlyReimbursement': np.float64
     }
 
-    miniloan_dir = Path(__file__).resolve().parents[3].joinpath('data', 'decisions-on-spark', 'data', 'miniloan')
+    miniloan_dir = DEFAULT_STORAGE_ROOT.parent.joinpath('data', 'decisions-on-spark', 'data', 'miniloan')
     miniloan_file = miniloan_dir.joinpath('{dataset_name}.{extension}'.format(
         dataset_name='miniloan-decisions-ls-10K', extension='csv'))
 
@@ -50,14 +50,14 @@ def main():
     logger.info('validation size: {size}'.format(size=len(test)))
 
     grid = {
-        'penalty': ['l1'],
-        'loss': ['squared_hinge'],
-        'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
-        'C': [x for x in np.linspace(1e-5, 1.0, num=1000)]
+        'criterion': ['gini'],
+        'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
+        'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
+        'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
     }
 
     hyper_tuning_params = {
-        'estimator': LinearSVC(random_state=0, dual=False),
+        'estimator': RandomForestClassifier(random_state=0),
         'cv': 3,
         'verbose': bool(__debug__),
         'n_jobs': -1,
@@ -68,7 +68,7 @@ def main():
     random_search = {
         'param_distributions': grid,
         'random_state': 42,
-        'n_iter': 1000
+        'n_iter': 20
     }
 
     parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
@@ -77,9 +77,8 @@ def main():
     y = train.loc[:, 'approval']
 
     parameter_estimator.fit(x, y)
-    best_estimator = LinearSVC(
+    best_estimator = RandomForestClassifier(
         random_state=0,
-        dual=False,
         **parameter_estimator.best_params_
     )
 
@@ -91,7 +90,7 @@ def main():
 
     internal_model = Model(
         model=obj_to_base64(best_estimator),
-        name='miniloan-linear-svc-RandomizedSearchCV',
+        name='miniloan-rfc-RandomizedSearchCV',
         version='v0',
         method_name='predict',
         input_schema=[
@@ -138,8 +137,7 @@ def main():
 
     )
 
-    storage_root = Path(__file__).resolve().parents[3].joinpath('example_models')
-    internal_model.save_to_disk(storage_root=storage_root)
+    internal_model.save_to_disk(storage_root=DEFAULT_STORAGE_ROOT)
 
 
 if __name__ == '__main__':

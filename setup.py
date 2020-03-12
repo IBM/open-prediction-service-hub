@@ -12,7 +12,7 @@ with open(path.join(PROJECT_ROOT, 'README.md'), encoding='utf-8') as fd:
 
 setup(
     name='ml-local-provider',
-    version='2020.2.24.dev1',
+    version='2020.2.24.dev0',
     description='ML service for ADS',
     author='Ke Li',
     author_email='Ke.Li1@ibm.com',
@@ -20,11 +20,11 @@ setup(
     # Setting the distribution root. Empty package name stands for the root package
     # The Distutils will take care of converting this platform-neutral representation into whatever is appropriate
     # on your current platform before actually using the pathname.
-    package_dir={'': 'src'},
-    packages=find_packages('src'),
+    package_dir={'': 'src/main/python'},
+    packages=find_packages('src/main/python'),
     install_requires=installation_dependencies,
     long_description=long_description,
     long_description_content_type='text/markdown',
     # Unlike Flask, the source file can be compressed in an .egg
-    zip_safe=True
+    zip_safe=False
 )

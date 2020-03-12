@@ -14,8 +14,9 @@ WORKDIR ${BUILD_DIR}
 COPY . ${BUILD_DIR}
 
 RUN python3 -m pip install -r requirements.txt && \
-    python setup.py install && \
-    bash src/dynamic_hosting/example_model_training/train.sh &&\
+    python3 setup.py install
+
+RUN bash src/main/python/dynamic_hosting/example_model_training/train.sh &&\
     mkdir -p ${RUNTIME_DIR}/example_models/ &&\
     cp -r example_models/* ${RUNTIME_DIR}/example_models
 

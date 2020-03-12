@@ -7,7 +7,7 @@ from typing import Callable, Text, Mapping, Type, Tuple, Any
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.openapi.model import ResponseBody, Model
 from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectRequestBody, RequestMetadata
-from dynamic_hosting.core.util import find_storage_root, load_direct_request_schema, replace_any_of, \
+from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class
 from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
@@ -72,22 +72,22 @@ def heart_beat() -> Mapping:
 @app.get(tags=['Admin'], path='/models', response_model=ModelService)
 def get_models() -> ModelService:
     """Returns the list of ML models."""
-    return ModelService.load_from_disk(find_storage_root())
+    return ModelService.load_from_disk(storage_root())
 
 
 @app.post(tags=['Admin'], path='/models')
 def add_model(m: Model) -> None:
-    ModelService.load_from_disk(find_storage_root()).add_model(m)
+    ModelService.load_from_disk(storage_root()).add_model(m)
 
 
 @app.delete(tags=['Admin'], path='/models')
 def remove_model(model_name: Text, model_version: Text = None) -> None:
-    ModelService.load_from_disk(find_storage_root()).remove_model(model_name=model_name, model_version=model_version)
+    ModelService.load_from_disk(storage_root()).remove_model(model_name=model_name, model_version=model_version)
 
 
 @app.post(tags=['ML'], path='/generic', response_model=ResponseBody)
 def predict(ml_req: GenericRequestBody) -> ResponseBody:
-    internal_res = ModelService.load_from_disk(find_storage_root()).invoke(
+    internal_res = ModelService.load_from_disk(storage_root()).invoke(
         model_name=ml_req.metadata.model_name,
         model_version=ml_req.metadata.model_version,
         data=ml_req.get_dict()
@@ -101,7 +101,7 @@ def predict(ml_req: GenericRequestBody) -> ResponseBody:
 def predict(
         ml_req: DirectRequestBody
 ) -> ResponseBody:
-    ms: ModelService = ModelService.load_from_disk(find_storage_root())
+    ms: ModelService = ModelService.load_from_disk(storage_root())
 
     # parameterized instantiation
     try:
@@ -128,7 +128,7 @@ def predict(
     )
 
 
-app.openapi = dynamic_io_schema_gen(ms=ModelService.load_from_disk(find_storage_root()))
+app.openapi = dynamic_io_schema_gen(ms=ModelService.load_from_disk(storage_root()))
 
 if __name__ == '__main__':
     import uvicorn

@@ -5,15 +5,14 @@ import os
 import pickle
 from logging import Logger
 from pathlib import Path
-from typing import Text, Any, Dict, NoReturn, Type, Union, Tuple, Set
+from typing import Text, Any, Dict, NoReturn, Type, Union, Set
 
 from pydantic import BaseModel, create_model
-
 
 DynamicIOSchemaPrefix = 'Dynamic'
 
 DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'example_models'
-DEFAULT_STORAGE_ROOT: Path = Path(__file__).resolve().parents[3].joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
+DEFAULT_STORAGE_ROOT: Path = Path(__file__).resolve().parents[5].joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
 
 
 def rmdir(
@@ -30,7 +29,8 @@ def rmdir(
     logger.info('Removed directory: <{directory}>'.format(directory=directory))
 
 
-def find_storage_root() -> Path:
+def storage_root() -> Path:
+    """Find storage root for runtime env"""
     logger: Logger = logging.getLogger(__name__)
 
     logger.debug('Finding storage root')
@@ -40,7 +40,7 @@ def find_storage_root() -> Path:
                 storage_root=DEFAULT_STORAGE_ROOT))
         return DEFAULT_STORAGE_ROOT
     else:
-        return Path(os.environ['BUILD_DIR']).joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
+        return Path(os.environ['RUNTIME_DIR']).joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
 
 
 def obj_to_base64(obj: Any) -> Text:
