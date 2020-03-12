@@ -17,17 +17,11 @@ from pandas import DataFrame
 from pydantic import BaseModel, ValidationError
 
 app = FastAPI(
-    version='0.0.1-SNAPSHOT',
+    version='0.0.0-SNAPSHOT',
     title='Local ml provider',
     description='A simple environment to test machine learning model',
     docs_url='/'
 )
-
-DynamicIOSchemaPrefix = 'Dynamic'
-
-
-def model_name_map_gen(model_types: Tuple[Type[BaseModel]]) -> Mapping[Type, Text]:
-    return {c: c.__name__ for c in model_types}
 
 
 def dynamic_io_schema_gen(ms: ModelService) -> Callable:
@@ -49,7 +43,7 @@ def dynamic_io_schema_gen(ms: ModelService) -> Callable:
             get_model_definitions(
                 flat_models={real_request_class, *input_request_types},
                 model_name_map={real_request_class: real_request_class.__name__,
-                                **model_name_map_gen(input_request_types),
+                                **{t: t.__name__ for t in input_request_types},
                                 RequestMetadata: 'RequestMetadata'}
             )
         )
@@ -70,34 +64,30 @@ def dynamic_io_schema_gen(ms: ModelService) -> Callable:
     return dynamic_io_schema
 
 
-@app.get('/isAlive', response_model=Mapping)
+@app.get(tags=['Admin'], path='/isAlive', response_model=Mapping)
 def heart_beat() -> Mapping:
     return {'status': 'good'}
 
 
-@app.get('/models', response_model=ModelService)
+@app.get(tags=['Admin'], path='/models', response_model=ModelService)
 def get_models() -> ModelService:
     """Returns the list of ML models."""
-    ms: ModelService = ModelService.load_from_disk(find_storage_root())
-    return ms
+    return ModelService.load_from_disk(find_storage_root())
 
 
-@app.post('/models')
+@app.post(tags=['Admin'], path='/models')
 def add_model(m: Model) -> None:
-    ms: ModelService = ModelService.load_from_disk(find_storage_root())
-    ms.add_model(m)
+    ModelService.load_from_disk(find_storage_root()).add_model(m)
 
 
-@app.delete('/models')
+@app.delete(tags=['Admin'], path='/models')
 def remove_model(model_name: Text, model_version: Text = None) -> None:
-    ms: ModelService = ModelService.load_from_disk(find_storage_root())
-    ms.remove_model(model_name=model_name, model_version=model_version)
+    ModelService.load_from_disk(find_storage_root()).remove_model(model_name=model_name, model_version=model_version)
 
 
-@app.post('/generic', response_model=ResponseBody)
+@app.post(tags=['ML'], path='/generic', response_model=ResponseBody)
 def predict(ml_req: GenericRequestBody) -> ResponseBody:
-    ms: ModelService = ModelService.load_from_disk(find_storage_root())
-    internal_res = ms.invoke(
+    internal_res = ModelService.load_from_disk(find_storage_root()).invoke(
         model_name=ml_req.metadata.model_name,
         model_version=ml_req.metadata.model_version,
         data=ml_req.get_dict()
@@ -107,7 +97,7 @@ def predict(ml_req: GenericRequestBody) -> ResponseBody:
     )
 
 
-@app.post('/direct', response_model=ResponseBody)
+@app.post(tags=['ML'], path='/direct', response_model=ResponseBody)
 def predict(
         ml_req: DirectRequestBody
 ) -> ResponseBody:
