@@ -22,6 +22,12 @@ This repository is composed of 3 projects:
 
 - [A generic REST ML microservice for scikit-learn models serialized in pickle](src/dynamic_hosting/README.md): A sample of a lightweight REST/JSON microservice to run multiple sklearn ML models captured as joblib files.
 
+## Clone the project 
+```shell script
+git clone --recurse-submodules git@github.ibm.com:dba/ads-ml-service.git ads-ml-service
+```
+the `--recurse-submodules` option is needed to download training data for example models
+
 ## Build the ML microservice
 ```shell script
 make image
