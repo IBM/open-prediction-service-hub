@@ -25,4 +25,12 @@ This repository is composed of 3 projects:
 
 - [A generic REST ML microservice for scikit-learn models serialized in joblib](src/dynamic_hosting/README.md): A sample of a lightweight REST/JSON microservice to run multiple sklearn ML models captured as joblib files.
 
-
+## Build the ML microservice
+```shell script
+make image
+```
+## Run the ML microservice
+```console
+make run-image
+```
+Your predictive service is ready to predict on the 127.0.0.1:8080 port.
