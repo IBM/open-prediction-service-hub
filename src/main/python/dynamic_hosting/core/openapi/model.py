@@ -18,15 +18,6 @@ from pydantic import BaseModel, create_model, Field, validator
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
-class ResponseBody(BaseModel):
-    """Ml output configuration"""
-    model_output: Optional[Any] = Field(
-        None,
-        description='Structured model output. Its format is parameterized by output schema'
-    )
-    model_output_raw: Text = Field(..., description='String representation of output')
-
-
 class Feature(BaseModel):
     """Ml input element"""
     name: Text = Field(..., description='Feature name')

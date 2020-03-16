@@ -5,7 +5,8 @@ import sys
 from typing import Callable, Text, Mapping, Type, Tuple, Any
 
 from dynamic_hosting.core.model_service import ModelService
-from dynamic_hosting.core.openapi.model import ResponseBody, Model
+from dynamic_hosting.core.openapi.model import Model
+from dynamic_hosting.core.openapi.response import BaseResponseBody
 from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectRequestBody, RequestMetadata
 from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class
@@ -86,22 +87,22 @@ def remove_model(model_name: Text, model_version: Text = None) -> None:
     ModelService.load_from_disk(storage_root()).remove_model(model_name=model_name, model_version=model_version)
 
 
-@app.post(tags=['ML'], path='/generic', response_model=ResponseBody)
-def predict(ml_req: GenericRequestBody) -> ResponseBody:
+@app.post(tags=['ML'], path='/generic', response_model=BaseResponseBody)
+def predict(ml_req: GenericRequestBody) -> BaseResponseBody:
     internal_res = ModelService.load_from_disk(storage_root()).invoke(
         model_name=ml_req.metadata.model_name,
         model_version=ml_req.metadata.model_version,
         data=ml_req.get_dict()
     )
-    return ResponseBody(
-        model_output_raw=str(internal_res)
+    return BaseResponseBody(
+        model_output=DataFrame(internal_res).to_dict(orient='list')
     )
 
 
-@app.post(tags=['ML'], path='/direct', response_model=ResponseBody)
+@app.post(tags=['ML'], path='/direct', response_model=BaseResponseBody)
 def predict(
         ml_req: DirectRequestBody
-) -> ResponseBody:
+) -> BaseResponseBody:
     ms: ModelService = ModelService.load_from_disk(storage_root())
 
     # parameterized instantiation
@@ -123,9 +124,8 @@ def predict(
             concrete_input_model.get_version()].transform_internal_dict(concrete_input_model.get_dict())
     )
 
-    return ResponseBody(
-        model_output=DataFrame(internal_res).to_dict(orient='list'),
-        model_output_raw=str(internal_res)
+    return BaseResponseBody(
+        model_output=DataFrame(internal_res).to_dict(orient='list')
     )
 
 
