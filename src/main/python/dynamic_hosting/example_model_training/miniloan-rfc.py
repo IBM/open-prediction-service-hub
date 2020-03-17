@@ -96,7 +96,7 @@ def main():
         model=obj_to_base64(best_estimator),
         name='miniloan-rfc-RandomizedSearchCV',
         version='v0',
-        method_name='predict',
+        method_name='predict_proba',
         input_schema=[
             {
                 'name': "creditScore",
@@ -121,11 +121,6 @@ def main():
             {
                 'name': "rate",
                 'order': 4,
-                'type': 'float64'
-            },
-            {
-                'name': "yearlyReimbursement",
-                'order': 5,
                 'type': 'float64'
             }
         ],

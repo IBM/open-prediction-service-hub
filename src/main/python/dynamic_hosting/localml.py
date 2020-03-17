@@ -2,11 +2,11 @@
 
 import logging
 import sys
-from typing import Callable, Text, Mapping, Type, Tuple, Any
+from typing import Callable, Text, Mapping, Type, Tuple, Any, Union
 
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.openapi.model import Model
-from dynamic_hosting.core.openapi.response import BaseResponseBody
+from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody
 from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectRequestBody, RequestMetadata
 from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class
@@ -26,7 +26,6 @@ app = FastAPI(
 
 
 def dynamic_io_schema_gen() -> Callable:
-
     def dynamic_io_schema():
         ms: ModelService = ModelService.load_from_disk(storage_root())
 
@@ -59,6 +58,11 @@ def dynamic_io_schema_gen() -> Callable:
             openapi_schema['components']['schemas'],
             real_request_class.__name__,
             'params'
+        )
+        replace_any_of(
+            openapi_schema['components']['schemas'],
+            PredictResponseBody.__name__,
+            'predict_output'
         )
 
         return openapi_schema
@@ -99,7 +103,8 @@ def predict(ml_req: GenericRequestBody) -> BaseResponseBody:
     )
 
 
-@app.post(tags=['ML'], path='/direct', response_model=BaseResponseBody)
+@app.post(tags=['ML'], path='/direct',
+          response_model=Union[BaseResponseBody, PredictResponseBody, PredictProbaResponseBody])
 def predict(
         ml_req: DirectRequestBody
 ) -> BaseResponseBody:

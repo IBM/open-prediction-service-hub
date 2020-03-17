@@ -122,11 +122,6 @@ def main():
                 'name': "rate",
                 'order': 4,
                 'type': 'float64'
-            },
-            {
-                'name': "yearlyReimbursement",
-                'order': 5,
-                'type': 'float64'
             }
         ],
         output_schema=None,
