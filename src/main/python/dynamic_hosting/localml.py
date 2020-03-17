@@ -9,8 +9,9 @@ from typing import Callable, Text, Mapping, Type, Tuple, Any, Union
 import numpy as np
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.openapi.model import Model
-from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectRequestBody, RequestMetadata
-from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody
+from dynamic_hosting.core.openapi.request import RequestBody, RequestMetadata
+from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody, \
+    FeatProbaPair
 from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class, replace_any_of_in_response
 from fastapi import FastAPI
@@ -40,7 +41,7 @@ def dynamic_io_schema_gen() -> Callable:
         )
 
         input_request_types: Tuple[Type[BaseModel]] = tuple(ms.input_schema_t_set())
-        real_request_class = get_real_request_class(generic_request_class=DirectRequestBody,
+        real_request_class = get_real_request_class(generic_request_class=RequestBody,
                                                     parameter_types=set(input_request_types))
 
         openapi_schema['components']['schemas'].update(
@@ -53,12 +54,12 @@ def dynamic_io_schema_gen() -> Callable:
         )
 
         load_direct_request_schema(
-            direct_path=openapi_schema['paths']['/direct'],
-            placeholder_name=DirectRequestBody.__name__,
+            direct_path=openapi_schema['paths']['/invocation'],
+            placeholder_name=RequestBody.__name__,
             real_request_name=real_request_class.__name__
         )
         replace_any_of_in_response(
-            p=openapi_schema['paths']['/direct']
+            p=openapi_schema['paths']['/invocation']
         )
         replace_any_of(
             openapi_schema['components']['schemas'],
@@ -102,30 +103,19 @@ def remove_model(model_name: Text, model_version: Text = None) -> None:
     ModelService.load_from_disk(storage_root()).remove_model(model_name=model_name, model_version=model_version)
 
 
-@app.post(tags=['ML'], path='/generic', response_model=BaseResponseBody)
-def predict(ml_req: GenericRequestBody) -> BaseResponseBody:
-    internal_res = ModelService.load_from_disk(storage_root()).invoke(
-        model_name=ml_req.metadata.model_name,
-        model_version=ml_req.metadata.model_version,
-        data=ml_req.get_data()
-    )
-    return BaseResponseBody(
-        model_output=DataFrame(internal_res).to_dict(orient='list')
-    )
-
-
-@app.post(tags=['ML'], path='/direct',
+@app.post(tags=['ML'], path='/invocation',
           response_model=Union[PredictProbaResponseBody, PredictResponseBody, BaseResponseBody])
 def predict(
-        ml_req: DirectRequestBody
+        ml_req: RequestBody
 ) -> BaseResponseBody:
     logger: Logger = logging.getLogger(__name__)
+
     ms: ModelService = ModelService.load_from_disk(storage_root())
 
     # parameterized instantiation
     try:
-        concrete_input_model: DirectRequestBody = get_real_request_class(
-            generic_request_class=DirectRequestBody,
+        concrete_input_model: RequestBody = get_real_request_class(
+            generic_request_class=RequestBody,
             parameter_types=ms.input_schema_t_set()
         )(
             metadata=ml_req.metadata,
@@ -160,13 +150,13 @@ def predict(
         elif model.method_name == 'predict_proba':
             res_line = res_data[0]  # We have only one instance
 
-            assert np.isclose(sum(res_line), 1, rtol=1e-05, atol=1e-08, equal_nan=False)  # The sum needs to be 1
+            assert np.isclose(sum(res_line), 1, rtol=1e-08, atol=1e-08, equal_nan=False)  # The sum needs to be 1
 
             return PredictProbaResponseBody(
                 raw_output=DataFrame(res_line).to_dict(),
                 predict_output=model.get_model_attr('classes_')[max(enumerate(res_line), key=itemgetter(1))[0]],
-                probabilities={model.get_model_attr('classes_')[i]: res_line.tolist()[i] for i in
-                               range(len(model.get_model_attr('classes_')))}
+                probabilities=[FeatProbaPair(feature_name=model.get_model_attr('classes_')[i], proba=res_line.tolist()[i]) for i in
+                               range(len(model.get_model_attr('classes_')))]
             )
     except ValidationError:
         return BaseResponseBody(

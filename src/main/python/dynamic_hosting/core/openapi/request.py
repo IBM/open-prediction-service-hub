@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Text, Dict, Sequence, Union, Any, List, Type
+from typing import Text, Dict, Union, Any, List
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -10,7 +10,7 @@ from pydantic.errors import PydanticTypeError
 
 
 class RequestMetadata(BaseModel):
-    """Necessary information for model invocation"""
+    """Metadata for model invocation"""
     model_name: Text = Field(..., description='Name of model')
     model_version: Text = Field(..., description='Version of model')
 
@@ -22,9 +22,10 @@ class Parameter(BaseModel):
     value: Union[np.str, np.long, np.float] = Field(..., description='Value of the feature')
 
 
-class BaseRequestBody(BaseModel, ABC):
-    """Abstract class which captures common information for model invocation"""
+class RequestBody(BaseModel):
+    """RequestBody captures all information needed for model invocation"""
     metadata: RequestMetadata = Field(..., alias='metadata', description='Name of this feature')
+    params: Any = Field(..., description='Placeholder for dynamic generated parameter dict')
 
     def get_model_name(self) -> Text:
         return self.metadata.model_name
@@ -32,47 +33,17 @@ class BaseRequestBody(BaseModel, ABC):
     def get_version(self) -> Text:
         return self.metadata.model_version
 
-    @abstractmethod
-    def get_parameters(self) -> List[Parameter]:
-        pass
-
-    @abstractmethod
-    def get_data(self) -> Dict[Text, Sequence[Any]]:
-        pass
-
-
-class GenericRequestBody(BaseRequestBody):
-    """Concrete class which captures necessary information for generic model invocation"""
-
-    params: List[Parameter] = Field(..., description='Input parameters')
-
-    def get_parameters(self) -> List[Parameter]:
-        return self.params
-
-    def get_data(self) -> Dict[Text, Sequence[Any]]:
-        return {
-            feat_val.name: [feat_val.value]
-            for feat_val in self.params
-        }
-
-
-class DirectRequestBody(BaseRequestBody):
-    """Concrete class which captures necessary information for direct model invocation"""
-
-    params: Any = Field(..., description='Placeholder for dynamic generated parameter dict')
-
     def get_parameters(self) -> List[Parameter]:
         try:
-            dynamic_params: BaseModel = getattr(self, 'params')
             return [
                 Parameter(name=name, order=order, value=value)
-                for order, (name, value) in enumerate(dynamic_params.dict().items())
+                for order, (name, value) in enumerate(getattr(self, 'params').dict().items())
             ]
         except PydanticTypeError:
             raise RuntimeError('Can not cast received data into ml input format')
 
-    def get_data(self) -> Dict[Text, Sequence[Any]]:
+    def get_data(self) -> Dict[Text, List[Any]]:
         return {
-            getattr(feat_val, 'name'): getattr(feat_val, 'value')
-            for feat_val in self.get_parameters()
+            getattr(parameter, 'name'): getattr(parameter, 'value')
+            for parameter in self.get_parameters()
         }

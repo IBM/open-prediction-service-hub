@@ -28,12 +28,8 @@ class Feature(BaseModel):
     @validator('type')
     def name_must_contain_space(cls, t):
         if not getattr(np, t):
-            raise ValueError('must contain a space')
+            raise ValueError('Type not supported')
         return t
-
-
-class InputSchema(BaseModel):
-    pass
 
 
 class Model(BaseModel):
@@ -59,7 +55,7 @@ class Model(BaseModel):
                 model_version=self.version
             ),
             **fields_dict,
-            __base__=InputSchema
+            __base__=BaseModel
         )
 
     def input_schema_definition(self) -> Dict[Text, Any]:

@@ -27,6 +27,12 @@ class PredictResponseBody(BaseResponseBody):
     )
 
 
+class FeatProbaPair(BaseModel):
+    """Pair of feature name and its corresponding probability"""
+    name: Text
+    proba: np.float64
+
+
 class PredictProbaResponseBody(BaseResponseBody):
     """Ml output for the most common model.predict(array_like)"""
     predict_output: Text = Field(
@@ -34,7 +40,7 @@ class PredictProbaResponseBody(BaseResponseBody):
         description=
         'The classification result which maximize model.predict_proba(array_like)'
     )
-    probabilities: Mapping[Text, np.float64] = Field(
+    probabilities: List[FeatProbaPair] = Field(
         ...,
         description=
         'Common output for model.predict_proba(array_like)'
