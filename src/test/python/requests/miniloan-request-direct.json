@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "model_name": "miniloan-rfc-RandomizedSearchCV",
+    "model_name": "miniloan-linear-svc-RandomizedSearchCV",
     "model_version": "v0"
   },
   "params": {

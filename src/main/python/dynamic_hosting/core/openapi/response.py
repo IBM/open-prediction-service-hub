@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Text, Union, List
+from typing import Any, Text, Union, List, Dict, Mapping
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 class BaseResponseBody(BaseModel):
     """Ml output"""
-    raw_output: Any = Field(
+    raw_output: Union[Text, Dict] = Field(
         ...,
         description=
         'Data frame representation of result ndarray. '
@@ -34,7 +34,7 @@ class PredictProbaResponseBody(BaseResponseBody):
         description=
         'The classification result which maximize model.predict_proba(array_like)'
     )
-    predict_proba_output: List[np.float64] = Field(
+    probabilities: Mapping[Text, np.float64] = Field(
         ...,
         description=
         'Common output for model.predict_proba(array_like)'

@@ -56,6 +56,12 @@ def load_direct_request_schema(direct_path: Dict, placeholder_name: Text, real_r
     schema['$ref'] = schema['$ref'].replace(placeholder_name, real_request_name)
 
 
+def replace_any_of_in_response(p: Dict) -> NoReturn:
+    schema: Dict = p['post']['responses']['200']['content']['application/json']['schema']
+    schema['oneOf'] = schema['anyOf']
+    del schema['anyOf']
+
+
 def replace_any_of(schema: Dict, real_request_name: Text, property_name: Text) -> NoReturn:
     property_map: Dict = schema[real_request_name]['properties'][property_name]
     property_map['oneOf'] = property_map['anyOf']

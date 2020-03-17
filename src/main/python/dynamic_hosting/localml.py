@@ -2,14 +2,17 @@
 
 import logging
 import sys
+from logging import Logger
+from operator import itemgetter
 from typing import Callable, Text, Mapping, Type, Tuple, Any, Union
 
+import numpy as np
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.openapi.model import Model
-from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody
 from dynamic_hosting.core.openapi.request import GenericRequestBody, DirectRequestBody, RequestMetadata
+from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody
 from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
-    get_real_request_class
+    get_real_request_class, replace_any_of_in_response
 from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
 from fastapi.openapi.utils import get_openapi
@@ -50,9 +53,12 @@ def dynamic_io_schema_gen() -> Callable:
         )
 
         load_direct_request_schema(
-            openapi_schema['paths']['/direct'],
-            DirectRequestBody.__name__,
-            real_request_class.__name__
+            direct_path=openapi_schema['paths']['/direct'],
+            placeholder_name=DirectRequestBody.__name__,
+            real_request_name=real_request_class.__name__
+        )
+        replace_any_of_in_response(
+            p=openapi_schema['paths']['/direct']
         )
         replace_any_of(
             openapi_schema['components']['schemas'],
@@ -63,6 +69,11 @@ def dynamic_io_schema_gen() -> Callable:
             openapi_schema['components']['schemas'],
             PredictResponseBody.__name__,
             'predict_output'
+        )
+        replace_any_of(
+            openapi_schema['components']['schemas'],
+            BaseResponseBody.__name__,
+            'raw_output'
         )
 
         return openapi_schema
@@ -96,7 +107,7 @@ def predict(ml_req: GenericRequestBody) -> BaseResponseBody:
     internal_res = ModelService.load_from_disk(storage_root()).invoke(
         model_name=ml_req.metadata.model_name,
         model_version=ml_req.metadata.model_version,
-        data=ml_req.get_dict()
+        data=ml_req.get_data()
     )
     return BaseResponseBody(
         model_output=DataFrame(internal_res).to_dict(orient='list')
@@ -104,10 +115,11 @@ def predict(ml_req: GenericRequestBody) -> BaseResponseBody:
 
 
 @app.post(tags=['ML'], path='/direct',
-          response_model=Union[BaseResponseBody, PredictResponseBody, PredictProbaResponseBody])
+          response_model=Union[PredictProbaResponseBody, PredictResponseBody, BaseResponseBody])
 def predict(
         ml_req: DirectRequestBody
 ) -> BaseResponseBody:
+    logger: Logger = logging.getLogger(__name__)
     ms: ModelService = ModelService.load_from_disk(storage_root())
 
     # parameterized instantiation
@@ -122,16 +134,44 @@ def predict(
     except ValidationError:
         raise HTTPException(status_code=422, detail='ML input mapping failure')
 
-    internal_res: Any = ms.invoke(
-        model_name=concrete_input_model.get_model_name(),
-        model_version=concrete_input_model.get_version(),
-        data=ms.model_map()[concrete_input_model.get_model_name()][
-            concrete_input_model.get_version()].transform_internal_dict(concrete_input_model.get_dict())
+    model_name: Text = concrete_input_model.get_model_name()
+    model_version: Text = concrete_input_model.get_version()
+    model: Model = ms.model_map()[concrete_input_model.get_model_name()][
+        concrete_input_model.get_version()]
+
+    res_data: Any = ms.invoke(
+        model_name=model_name,
+        model_version=model_version,
+        data=model.to_dataframe_compatible(concrete_input_model.get_data())
     )
 
-    return BaseResponseBody(
-        model_output=DataFrame(internal_res).to_dict(orient='list')
-    )
+    # We suppose the most common output of ml model is ndarray
+    try:
+        if model.method_name == 'predict':
+            if isinstance(res_data, np.ndarray) and len(res_data) == 1:
+                return PredictResponseBody(
+                    raw_output=DataFrame(res_data).to_dict(),
+                    predict_output=str(res_data[0])
+                )
+            else:
+                return BaseResponseBody(
+                    raw_output=DataFrame(res_data).to_dict()
+                )
+        elif model.method_name == 'predict_proba':
+            res_line = res_data[0]  # We have only one instance
+
+            assert np.isclose(sum(res_line), 1, rtol=1e-05, atol=1e-08, equal_nan=False)  # The sum needs to be 1
+
+            return PredictProbaResponseBody(
+                raw_output=DataFrame(res_line).to_dict(),
+                predict_output=model.get_model_attr('classes_')[max(enumerate(res_line), key=itemgetter(1))[0]],
+                probabilities={model.get_model_attr('classes_')[i]: res_line.tolist()[i] for i in
+                               range(len(model.get_model_attr('classes_')))}
+            )
+    except ValidationError:
+        return BaseResponseBody(
+            raw_output=str(res_data)
+        )
 
 
 app.openapi = dynamic_io_schema_gen()

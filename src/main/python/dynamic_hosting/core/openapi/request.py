@@ -37,7 +37,7 @@ class BaseRequestBody(BaseModel, ABC):
         pass
 
     @abstractmethod
-    def get_dict(self) -> Dict[Text, Sequence[Any]]:
+    def get_data(self) -> Dict[Text, Sequence[Any]]:
         pass
 
 
@@ -49,7 +49,7 @@ class GenericRequestBody(BaseRequestBody):
     def get_parameters(self) -> List[Parameter]:
         return self.params
 
-    def get_dict(self) -> Dict[Text, Sequence[Any]]:
+    def get_data(self) -> Dict[Text, Sequence[Any]]:
         return {
             feat_val.name: [feat_val.value]
             for feat_val in self.params
@@ -71,7 +71,7 @@ class DirectRequestBody(BaseRequestBody):
         except PydanticTypeError:
             raise RuntimeError('Can not cast received data into ml input format')
 
-    def get_dict(self) -> Dict[Text, Sequence[Any]]:
+    def get_data(self) -> Dict[Text, Sequence[Any]]:
         return {
             getattr(feat_val, 'name'): getattr(feat_val, 'value')
             for feat_val in self.get_parameters()

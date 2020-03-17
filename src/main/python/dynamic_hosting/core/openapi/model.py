@@ -81,7 +81,7 @@ class Model(BaseModel):
     def get_feat_type_map(self) -> Mapping[Text, np.dtype]:
         return {getattr(item, 'name'): getattr(np, getattr(item, 'type')) for item in self.input_schema}
 
-    def transform_internal_dict(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
+    def to_dataframe_compatible(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
         data_frame_compatible_dict: Dict = dict()
         feature_map = self.get_feat_type_map()
         for key, val in kv_pair.items():
@@ -114,6 +114,11 @@ class Model(BaseModel):
             data_input: DataFrame
     ) -> Any:
         return getattr(base64_to_obj(self.model), self.method_name)(data_input)
+
+    def get_model_attr(self, attr: Text) -> Any:
+        model: Any = base64_to_obj(self.model)
+        if hasattr(model, attr):
+            return getattr(model, attr)
 
     @staticmethod
     def load_from_disk(
