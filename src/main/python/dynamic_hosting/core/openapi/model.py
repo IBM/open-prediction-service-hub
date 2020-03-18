@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDict
 
 import numpy as np
-from dynamic_hosting.core.openapi.request import RequestMetadata
 from dynamic_hosting.core.util import rmdir, base64_to_obj
 from fastapi.utils import get_model_definitions
 from pandas import DataFrame
@@ -66,8 +65,7 @@ class Model(BaseModel):
                 model: '{model_name}-{model_version}'.format(
                     model_name=self.name,
                     model_version=self.version
-                ),
-                RequestMetadata: 'RequestMetadata'
+                )
             }
         )
 

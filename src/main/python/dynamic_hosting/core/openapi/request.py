@@ -9,12 +9,6 @@ from pydantic import BaseModel, Field
 from pydantic.errors import PydanticTypeError
 
 
-class RequestMetadata(BaseModel):
-    """Metadata for model invocation"""
-    model_name: Text = Field(..., description='Name of model')
-    model_version: Text = Field(..., description='Version of model')
-
-
 class Parameter(BaseModel):
     """Parameter for ml model invocation"""
     name: Text = Field(..., description='Name of the feature')
@@ -24,14 +18,15 @@ class Parameter(BaseModel):
 
 class RequestBody(BaseModel):
     """RequestBody captures all information needed for model invocation"""
-    metadata: RequestMetadata = Field(..., alias='metadata', description='Name of this feature')
+    model_name: Text = Field(..., description='Name of model')
+    model_version: Text = Field(..., description='Version of model')
     params: Any = Field(..., description='Placeholder for dynamic generated parameter dict')
 
     def get_model_name(self) -> Text:
-        return self.metadata.model_name
+        return self.model_name
 
     def get_version(self) -> Text:
-        return self.metadata.model_version
+        return self.model_version
 
     def get_parameters(self) -> List[Parameter]:
         try:

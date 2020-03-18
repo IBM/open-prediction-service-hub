@@ -9,7 +9,7 @@ from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List
 import numpy as np
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.openapi.model import Model
-from dynamic_hosting.core.openapi.request import RequestBody, RequestMetadata
+from dynamic_hosting.core.openapi.request import RequestBody
 from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody, \
     FeatProbaPair
 from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
@@ -41,15 +41,14 @@ def dynamic_io_schema_gen() -> Callable:
         )
 
         input_request_types: Tuple[Type[BaseModel]] = tuple(ms.input_schema_t_set())
-        real_request_class = get_real_request_class(generic_request_class=RequestBody,
-                                                    parameter_types=set(input_request_types))
+        real_request_class: Type[BaseModel] = get_real_request_class(generic_request_class=RequestBody,
+                                                                     parameter_types=set(input_request_types))
 
         openapi_schema['components']['schemas'].update(
             get_model_definitions(
                 flat_models={real_request_class, *input_request_types},
                 model_name_map={real_request_class: real_request_class.__name__,
-                                **{t: t.__name__ for t in input_request_types},
-                                RequestMetadata: 'RequestMetadata'}
+                                **{t: t.__name__ for t in input_request_types}}
             )
         )
 
@@ -118,7 +117,8 @@ def predict(
             generic_request_class=RequestBody,
             parameter_types=ms.input_schema_t_set()
         )(
-            metadata=ml_req.metadata,
+            model_name=ml_req.model_name,
+            model_version=ml_req.model_version,
             params=ml_req.params
         )
     except ValidationError:

@@ -101,18 +101,16 @@ There is no constraint for `metadata`.
 
 ```json
 {
-  "metadata": {
-    "model_name": "miniloan-rfc-RandomizedSearchCV",
-    "model_version": "v0"
-  },
+  "model_name": "miniloan-rfc-RandomizedSearchCV",
+  "model_version": "v0",
   "params": {
     "creditScore": 5.9,
     "income": 3.0,
     "loanAmount": 5.1,
     "monthDuration": 1.8,
-    "yearlyReimbursement": 40,
     "rate": 1.8
   }
 }
 ```
+
 

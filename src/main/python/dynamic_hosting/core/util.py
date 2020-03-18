@@ -7,6 +7,7 @@ from logging import Logger
 from pathlib import Path
 from typing import Text, Any, Dict, NoReturn, Type, Union, Set
 
+from dynamic_hosting.core.openapi.request import RequestBody
 from pydantic import BaseModel, create_model
 
 DynamicIOSchemaPrefix = 'Dynamic'
@@ -68,10 +69,12 @@ def replace_any_of(schema: Dict, real_request_name: Text, property_name: Text) -
     del property_map['anyOf']
 
 
+# Disable type check because this function use dynamic type
+# noinspection PyTypeChecker
 def get_real_request_class(
         generic_request_class: Type[BaseModel],
         parameter_types: Set[Type[BaseModel]]
-) -> Type:
+) -> Type[RequestBody]:
     return create_model(
         '{prefix}{genetic_class_name}'.format(
             prefix=DynamicIOSchemaPrefix,
