@@ -32,3 +32,70 @@ make image
 make launch
 ```
 Your predictive service is ready to predict on the 127.0.0.1:8080 port.
+
+## Configurations
+
+### Configuration example for miniloan classification.
+
+```json
+{
+  "name": "miniloan-lr-RandomizedSearchCV",
+  "version": "v0",
+  "library": "scikit-learn",
+  "method_name": "predict",
+  "input_schema": [
+    {
+      "name": "creditScore",
+      "order": 0,
+      "type": "float64"
+    },
+    {
+      "name": "income",
+      "order": 1,
+      "type": "float64"
+    },
+    {
+      "name": "loanAmount",
+      "order": 2,
+      "type": "float64"
+    },
+    {
+      "name": "monthDuration",
+      "order": 3,
+      "type": "float64"
+    },
+    {
+      "name": "rate",
+      "order": 4,
+      "type": "float64"
+    }
+  ],
+  "output_schema": null,
+  "metadata": {
+    "name": "Loan payment classification",
+    "date": "2020-03-17 13:25:23",
+    "metrics": {
+      "accuracy": 0.9471577261809447
+    }
+  }
+}
+```
+
+A ML model is uniquely identified by its `name` and `version`. 
+
+`library` will be used in next iteration (It is ignored in current version).
+
+A ML model is a python class. The local provider needs to know the `method_name` of prediction method.
+
+`input_schema` is used as lookup table which local provider use to find type/position of 
+each feature. `type` needs to be a type in `numpy`module.
+
+`output_schema` will be used in next iteration for parametric output mapping. It is ignored 
+in the current iteration and local provider gives formatted result for the most common use 
+cases (by using pre-configured output mapping).
+
+There is no constraint for `metadata`.
+
+
+
+
