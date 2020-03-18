@@ -33,9 +33,9 @@ make launch
 ```
 Your predictive service is ready to predict on the 127.0.0.1:8080 port.
 
-## Configurations
+## Usage
 
-### Configuration example for miniloan classification.
+### Configuration example for miniloan classification
 
 ```json
 {
@@ -93,9 +93,26 @@ each feature. `type` needs to be a type in `numpy`module.
 `output_schema` will be used in next iteration for parametric output mapping. It is ignored 
 in the current iteration and local provider gives formatted result for the most common use 
 cases (by using pre-configured output mapping).
+Now the local provider supports the default output of predict/predict_proba for scikit-learn.
 
 There is no constraint for `metadata`.
 
+### Example for model invocation
 
-
+```json
+{
+  "metadata": {
+    "model_name": "miniloan-rfc-RandomizedSearchCV",
+    "model_version": "v0"
+  },
+  "params": {
+    "creditScore": 5.9,
+    "income": 3.0,
+    "loanAmount": 5.1,
+    "monthDuration": 1.8,
+    "yearlyReimbursement": 40,
+    "rate": 1.8
+  }
+}
+```
 

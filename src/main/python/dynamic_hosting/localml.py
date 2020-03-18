@@ -4,7 +4,7 @@ import logging
 import sys
 from logging import Logger
 from operator import itemgetter
-from typing import Callable, Text, Mapping, Type, Tuple, Any, Union
+from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List
 
 import numpy as np
 from dynamic_hosting.core.model_service import ModelService
@@ -149,15 +149,20 @@ def predict(
                 )
         elif model.method_name == 'predict_proba':
             res_line = res_data[0]  # We have only one instance
+            feature_names: List[Text] = model.get_model_attr('classes_')
 
             assert np.isclose(sum(res_line), 1, rtol=1e-08, atol=1e-08, equal_nan=False)  # The sum needs to be 1
+            assert len(feature_names) == len(res_line)
 
-            return PredictProbaResponseBody(
+            x = PredictProbaResponseBody(
                 raw_output=DataFrame(res_line).to_dict(),
-                predict_output=model.get_model_attr('classes_')[max(enumerate(res_line), key=itemgetter(1))[0]],
-                probabilities=[FeatProbaPair(feature_name=model.get_model_attr('classes_')[i], proba=res_line.tolist()[i]) for i in
-                               range(len(model.get_model_attr('classes_')))]
+                predict_output=feature_names[max(enumerate(res_line), key=itemgetter(1))[0]],
+                probabilities=[
+                    FeatProbaPair(name=feature_names[i], proba=res_line[i])
+                    for i in range(len(feature_names))
+                ]
             )
+            return x
     except ValidationError:
         return BaseResponseBody(
             raw_output=str(res_data)
