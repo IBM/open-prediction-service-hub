@@ -113,5 +113,5 @@ There is no constraint for `metadata`.
 }
 ```
 
-`model_name` and `model_version`are used to load ml model on disk. Parameters of ml
+`model_name` and `model_version`are used to load ml model from disk. Parameters of ml
 models are arranged in key-values pairs.
