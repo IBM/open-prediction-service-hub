@@ -39,7 +39,7 @@ Your predictive service is ready to predict on the 127.0.0.1:8080 port.
 
 ```json
 {
-  "name": "miniloan-lr-RandomizedSearchCV",
+  "name": "miniloan-rfc-RandomizedSearchCV",
   "version": "v0",
   "library": "scikit-learn",
   "method_name": "predict",
@@ -81,14 +81,14 @@ Your predictive service is ready to predict on the 127.0.0.1:8080 port.
 }
 ```
 
-A ML model is uniquely identified by its `name` and `version`. 
+ML model is uniquely identified by its `name` and its `version`. 
 
 `library` will be used in next iteration (It is ignored in current version).
 
-A ML model is a python class. The local provider needs to know the `method_name` of prediction method.
+ML models are python classes. Local provider needs to know the `method_name` of prediction method.
 
 `input_schema` is used as lookup table which local provider use to find type/position of 
-each feature. `type` needs to be a type in `numpy`module.
+each feature. `type` needs to be a type alias in `numpy`module.
 
 `output_schema` will be used in next iteration for parametric output mapping. It is ignored 
 in the current iteration and local provider gives formatted result for the most common use 
@@ -113,4 +113,5 @@ There is no constraint for `metadata`.
 }
 ```
 
-
+`model_name` and `model_version`are used to load ml model on disk. Parameters of ml
+models are arranged in key-values pairs.
