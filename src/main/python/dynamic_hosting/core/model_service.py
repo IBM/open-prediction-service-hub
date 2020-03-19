@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import logging
 from pathlib import Path
-from typing import Mapping, Text, Any, Sequence, Dict, Type, Set
+from typing import Mapping, Text, Any, Sequence, Dict, Type, Set, NoReturn
 
 from pandas import DataFrame
 from pydantic import BaseModel
@@ -39,6 +39,16 @@ class ModelService(BaseModel):
     ) -> None:
         model.save_to_disk(self.storage_root)
         self.reload_models()
+
+    def add_archive(
+            self,
+            archive: bytes
+    ) -> NoReturn:
+        self.add_model(
+            Model.from_archive(
+                archive=archive
+            )
+        )
 
     def remove_model(
             self,

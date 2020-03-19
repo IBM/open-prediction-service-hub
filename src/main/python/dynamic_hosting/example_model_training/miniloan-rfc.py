@@ -137,6 +137,7 @@ def main():
     )
 
     internal_model.save_to_disk(storage_root=DEFAULT_STORAGE_ROOT)
+    internal_model.to_archive(storage_root=DEFAULT_STORAGE_ROOT)
 
 
 if __name__ == '__main__':
