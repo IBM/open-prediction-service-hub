@@ -8,13 +8,13 @@ from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List
 
 import numpy as np
 from dynamic_hosting.core.model_service import ModelService
-from dynamic_hosting.core.openapi.model import Model
+from dynamic_hosting.core.openapi.model import Model, MetaMLModel
 from dynamic_hosting.core.openapi.request import RequestBody
 from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody, \
     FeatProbaPair
 from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class, replace_any_of_in_response
-from fastapi import FastAPI
+from fastapi import FastAPI, File
 from fastapi.exceptions import HTTPException
 from fastapi.openapi.utils import get_openapi
 from fastapi.utils import get_model_definitions
@@ -86,15 +86,23 @@ def heart_beat() -> Mapping:
     return {'status': 'good'}
 
 
-@app.get(tags=['Admin'], path='/models', response_model=ModelService)
-def get_models() -> ModelService:
+@app.get(tags=['Admin'], path='/models', response_model=List[MetaMLModel])
+def get_models() -> List[MetaMLModel]:
     """Returns the list of ML models."""
-    return ModelService.load_from_disk(storage_root())
+    ms: ModelService = ModelService.load_from_disk(storage_root())
+    return [
+        model.get_meta_model() for model in ms.ml_models
+    ]
 
 
-@app.post(tags=['Admin'], path='/models')
+@app.post(tags=['Admin'], path='/models', deprecated=True)
 def add_model(m: Model) -> None:
     ModelService.load_from_disk(storage_root()).add_model(m)
+
+
+@app.post(tags=['Admin'], path='/archives')
+def add_model(file: bytes = File(...)) -> None:
+    ModelService.load_from_disk(storage_root()).add_archive(file)
 
 
 @app.delete(tags=['Admin'], path='/models')

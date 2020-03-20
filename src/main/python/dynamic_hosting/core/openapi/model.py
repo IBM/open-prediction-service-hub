@@ -35,15 +35,19 @@ class Feature(BaseModel):
         return t
 
 
-class Model(BaseModel):
-    """Internal representation of ML model"""
-    model: Text = Field(..., description='Pickled model in base64 format')
+class MetaMLModel(BaseModel):
+    """Model independent information"""
     name: Text = Field(..., description='Name of model')
     version: Text = Field(..., description='Version of model')
     method_name: Text = Field(..., description='Name of method. (e.g predict, predict_proba)')
     input_schema: Sequence[Feature] = Field(..., description='Input schema of ml model')
     output_schema: Optional[Mapping[Text, Any]] = Field(..., description='Output schema of ml model')
     metadata: Mapping[Text, Any] = Field(..., description='Additional information for ml model')
+
+
+class Model(MetaMLModel):
+    """Internal representation of ML model"""
+    model: Text = Field(..., description='Pickled model in base64 format')
 
     # TODO: Add better type casting for openapi schema
     def input_schema_t(self) -> Type[BaseModel]:
@@ -217,3 +221,6 @@ class Model(BaseModel):
             model=obj_to_base64(model),
             **conf
         )
+
+    def get_meta_model(self):
+        return MetaMLModel(**self.dict())
