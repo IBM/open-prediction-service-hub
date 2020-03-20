@@ -12,7 +12,7 @@ from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDi
 from io import BytesIO
 from zipfile import ZipFile
 
-import numpy as np
+import numpy
 from dynamic_hosting.core.util import rmdir, base64_to_obj, obj_to_base64
 from fastapi.utils import get_model_definitions
 from pandas import DataFrame
@@ -29,10 +29,13 @@ class Feature(BaseModel):
 
     @classmethod
     @validator('type')
-    def name_must_contain_space(cls, t):
-        if not getattr(np, t):
+    def type_must_be_numpy_type(cls, t):
+        if t in ('int', 'float', 'str'):
+            return t
+        if getattr(numpy, t) and numpy.issubdtype(t, numpy.generic):
+            return t
+        else:
             raise ValueError('Type not supported')
-        return t
 
 
 class MetaMLModel(BaseModel):
@@ -53,8 +56,8 @@ class Model(MetaMLModel):
     def input_schema_t(self) -> Type[BaseModel]:
         fields_dict: Dict[Text, Any] = dict()
 
-        for feature_name, numpy_type in self.get_feat_type_map().items():
-            fields_dict[feature_name] = (numpy_type, ...)
+        for feature_name, t in self.get_feat_type_map().items():
+            fields_dict[feature_name] = (t, ...)
 
         return create_model(
             '{model_name}-{model_version}'.format(
@@ -80,8 +83,22 @@ class Model(MetaMLModel):
     def get_ordered_column_name_vec(self) -> Sequence[Text]:
         return [getattr(item, 'name') for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
 
-    def get_feat_type_map(self) -> Mapping[Text, np.dtype]:
-        return {getattr(item, 'name'): getattr(np, getattr(item, 'type')) for item in self.input_schema}
+    def get_feat_type_map(self) -> Mapping[Text, Type]:
+        m: Dict[Text, Type] = {}
+        for item in self.input_schema:
+            name: Text = getattr(item, 'name')
+            t: Type = getattr(item, 'type')
+
+            if t in ('int', 'float', 'str'):
+                if t == 'int:':
+                    m[name] = int
+                elif t == 'float:':
+                    m[name] = float
+                else:
+                    m[name] = str
+            else:
+                m[name] = getattr(numpy, getattr(item, 'type'))
+        return m
 
     def to_dataframe_compatible(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
         data_frame_compatible_dict: Dict = dict()

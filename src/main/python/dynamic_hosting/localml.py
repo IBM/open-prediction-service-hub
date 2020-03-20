@@ -117,6 +117,8 @@ def predict(
 ) -> BaseResponseBody:
     logger: Logger = logging.getLogger(__name__)
 
+    logger.info('Received request: {r}'.format(r=ml_req))
+
     ms: ModelService = ModelService.load_from_disk(storage_root())
 
     # parameterized instantiation
@@ -183,4 +185,4 @@ if __name__ == '__main__':
     import uvicorn
 
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-    uvicorn.run(app, host='127.0.0.1', port=8000)
+    uvicorn.run(app, host='127.0.0.1', port=8000, debug=True)

@@ -101,7 +101,7 @@ def main():
             {
                 'name': "creditScore",
                 'order': 0,
-                'type': 'float64'
+                'type': 'int'
             },
             {
                 'name': "income",
