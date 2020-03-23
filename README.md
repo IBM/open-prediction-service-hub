@@ -115,3 +115,9 @@ There is no constraint for `metadata`.
 
 `model_name` and `model_version`are used to load ml model from disk. Parameters of ml
 models are arranged in key-values pairs.
+
+## Features to be added
+
+* Range support
+* Add format for numerical features
+* Individual output schema for each model
