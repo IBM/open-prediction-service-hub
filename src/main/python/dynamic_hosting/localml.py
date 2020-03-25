@@ -4,7 +4,7 @@ import logging
 import sys
 from logging import Logger
 from operator import itemgetter
-from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List
+from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List, NoReturn
 
 import numpy as np
 from dynamic_hosting.core.model_service import ModelService
@@ -95,24 +95,41 @@ def get_models() -> List[MetaMLModel]:
     ]
 
 
-@app.post(tags=['Admin'], path='/models', deprecated=True)
+@app.post(
+    tags=['Admin'],
+    path='/models',
+    responses={
+        200: {
+            'description': 'Model has been uploaded successfully',
+        }
+    },
+    deprecated=True)
 def add_model(m: Model) -> None:
     ModelService.load_from_disk(storage_root()).add_model(m)
 
 
-@app.post(tags=['Admin'], path='/archives')
-def add_model(file: bytes = File(...)) -> None:
+@app.post(
+    tags=['Admin'],
+    path='/archives',
+    responses={
+        200: {
+            'description': 'Model has been uploaded successfully',
+        }
+    }
+)
+def add_model(*, file: bytes = File(...)) -> None:
     ModelService.load_from_disk(storage_root()).add_archive(file)
 
 
 @app.delete(tags=['Admin'], path='/models')
-def remove_model(model_name: Text, model_version: Text = None) -> None:
+def remove_model(*, model_name: Text, model_version: Text = None) -> None:
     ModelService.load_from_disk(storage_root()).remove_model(model_name=model_name, model_version=model_version)
 
 
 @app.post(tags=['ML'], path='/invocation',
           response_model=Union[PredictProbaResponseBody, PredictResponseBody, BaseResponseBody])
 def predict(
+        *,
         ml_req: RequestBody
 ) -> BaseResponseBody:
     logger: Logger = logging.getLogger(__name__)
