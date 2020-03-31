@@ -10,7 +10,7 @@ from sklearn.datasets import load_iris
 from pathlib import Path
 from time import gmtime, strftime
 
-from dynamic_hosting.core.openapi.model import Model
+from dynamic_hosting.core.model import Model
 from dynamic_hosting.core.util import obj_to_base64
 
 DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'example_models'

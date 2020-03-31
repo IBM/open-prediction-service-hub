@@ -1,0 +1,24 @@
+{
+  "case_int": {
+  "model_name": "miniloan-rfc-RandomizedSearchCV",
+  "model_version": "v0",
+  "params": {
+    "creditScore": 65768576465476548765786576687678657685,
+    "income": 3.0,
+    "loanAmount": 5.1,
+    "monthDuration": 1.8,
+    "rate": 1.8
+  }
+},
+  "case_srt": {
+    "model_name": "miniloan-rfc-RandomizedSearchCV",
+    "model_version": "v0",
+    "params": {
+      "creditScore": "65768576465476548765786576687678657685",
+      "income": 3.0,
+      "loanAmount": 5.1,
+      "monthDuration": 1.8,
+      "rate": 1.8
+    }
+  }
+}

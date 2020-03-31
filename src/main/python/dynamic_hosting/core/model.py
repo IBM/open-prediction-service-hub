@@ -12,30 +12,13 @@ from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDi
 from io import BytesIO
 from zipfile import ZipFile
 
-import numpy
+from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.core.util import rmdir, base64_to_obj, obj_to_base64
 from fastapi.utils import get_model_definitions
 from pandas import DataFrame
-from pydantic import BaseModel, create_model, Field, validator
+from pydantic import BaseModel, create_model, Field
 
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
-
-
-class Feature(BaseModel):
-    """Ml input element"""
-    name: Text = Field(..., description='Feature name')
-    order: int = Field(..., description='Position of feature')
-    type: Text = Field(..., description='Numpy type of feature')
-
-    @classmethod
-    @validator('type')
-    def type_must_be_numpy_type(cls, t):
-        if t in ('int', 'float', 'str'):
-            return t
-        if getattr(numpy, t) and numpy.issubdtype(t, numpy.generic):
-            return t
-        else:
-            raise ValueError('Type not supported')
 
 
 class MetaMLModel(BaseModel):
@@ -84,21 +67,7 @@ class Model(MetaMLModel):
         return [getattr(item, 'name') for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
 
     def get_feat_type_map(self) -> Mapping[Text, Type]:
-        m: Dict[Text, Type] = {}
-        for item in self.input_schema:
-            name: Text = getattr(item, 'name')
-            t: Type = getattr(item, 'type')
-
-            if t in ('int', 'float', 'str'):
-                if t == 'int:':
-                    m[name] = int
-                elif t == 'float:':
-                    m[name] = float
-                else:
-                    m[name] = str
-            else:
-                m[name] = getattr(numpy, getattr(item, 'type'))
-        return m
+        return {getattr(item, 'name'): item.get_type() for item in self.input_schema}
 
     def to_dataframe_compatible(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
         data_frame_compatible_dict: Dict = dict()

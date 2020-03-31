@@ -4,7 +4,7 @@ from time import gmtime, strftime
 
 import numpy as np
 import pandas as pd
-from dynamic_hosting.core.openapi.model import Model
+from dynamic_hosting.core.model import Model
 from dynamic_hosting.core.util import obj_to_base64
 from sklearn.datasets import load_iris
 from sklearn.metrics import accuracy_score

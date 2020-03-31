@@ -3,10 +3,9 @@ import logging
 from pathlib import Path
 from typing import Mapping, Text, Any, Sequence, Dict, Type, Set, NoReturn
 
-from pandas import DataFrame
 from pydantic import BaseModel
 
-from dynamic_hosting.core.openapi.model import Model
+from dynamic_hosting.core.model import Model
 
 
 class ModelService(BaseModel):

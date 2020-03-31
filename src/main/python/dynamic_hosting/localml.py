@@ -4,11 +4,11 @@ import logging
 import sys
 from logging import Logger
 from operator import itemgetter
-from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List, NoReturn
+from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List
 
 import numpy as np
 from dynamic_hosting.core.model_service import ModelService
-from dynamic_hosting.core.openapi.model import Model, MetaMLModel
+from dynamic_hosting.core.model import Model, MetaMLModel
 from dynamic_hosting.core.openapi.request import RequestBody
 from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody, \
     FeatProbaPair
