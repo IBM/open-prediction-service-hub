@@ -101,12 +101,12 @@ def main():
             {
                 'name': "creditScore",
                 'order': 0,
-                'type': 'int'
+                'type': 'int64'
             },
             {
                 'name': "income",
                 'order': 1,
-                'type': 'float64'
+                'type': 'long'
             },
             {
                 'name': "loanAmount",

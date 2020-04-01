@@ -21,6 +21,11 @@ from pydantic import BaseModel, create_model, Field
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
+class AbstractParameters(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+
+
 class MetaMLModel(BaseModel):
     """Model independent information"""
     name: Text = Field(..., description='Name of model')
@@ -38,18 +43,23 @@ class Model(MetaMLModel):
     # TODO: Add better type casting for openapi schema
     def input_schema_t(self) -> Type[BaseModel]:
         fields_dict: Dict[Text, Any] = dict()
+        type_validators: Dict[Text, classmethod] = dict()
 
-        for feature_name, t in self.get_feat_type_map().items():
-            fields_dict[feature_name] = (t, ...)
+        for feature in self.input_schema:
+            fields_dict[feature.get_name()] = (feature.get_openapi_type(), ...)
+            type_validators[feature.get_name()] = feature.get_type_validator()
 
-        return create_model(
+        m: Type[BaseModel] = create_model(
             '{model_name}-{model_version}'.format(
                 model_name=self.name,
                 model_version=self.version
             ),
             **fields_dict,
-            __base__=BaseModel
+            __base__=AbstractParameters,
+            __validators__=type_validators,
         )
+
+        return m
 
     def input_schema_definition(self) -> Dict[Text, Any]:
         model: Type[BaseModel] = self.input_schema_t()
@@ -64,10 +74,10 @@ class Model(MetaMLModel):
         )
 
     def get_ordered_column_name_vec(self) -> Sequence[Text]:
-        return [getattr(item, 'name') for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
+        return [item.get_name() for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
 
     def get_feat_type_map(self) -> Mapping[Text, Type]:
-        return {getattr(item, 'name'): item.get_type() for item in self.input_schema}
+        return {item.get_name(): item.get_type() for item in self.input_schema}
 
     def to_dataframe_compatible(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
         data_frame_compatible_dict: Dict = dict()
