@@ -117,6 +117,8 @@ class Model(MetaMLModel):
         model: Any = base64_to_obj(self.model)
         if hasattr(model, attr):
             return getattr(model, attr)
+        else:
+            TypeError('model dose not have attribute {att}'.format(att=attr))
 
     @staticmethod
     def load_from_disk(
@@ -181,7 +183,7 @@ class Model(MetaMLModel):
             storage_root: Path,
             archive_name: Text = 'archive.zip',
             model_file_name: Text = 'archive.pkl',
-            conf_file_name: Text = 'conf.json'
+            conf_file_name: Text = MODEL_CONFIG_FILE_NAME
     ) -> NoReturn:
         logger: Logger = logging.getLogger(__name__)
 
@@ -204,7 +206,7 @@ class Model(MetaMLModel):
     def from_archive(
             archive: bytes,
             model_file_name: Text = 'archive.pkl',
-            conf_file_name: Text = 'conf.json'
+            conf_file_name: Text = MODEL_CONFIG_FILE_NAME
     ) -> Model:
         zp: ZipFile = ZipFile(BytesIO(archive))
 
