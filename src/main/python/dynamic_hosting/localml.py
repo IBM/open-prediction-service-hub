@@ -9,8 +9,8 @@ from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List
 import numpy as np
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.model import Model, MetaMLModel
-from dynamic_hosting.core.openapi.request import RequestBody
-from dynamic_hosting.core.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody, \
+from dynamic_hosting.openapi.request import RequestBody
+from dynamic_hosting.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody, \
     FeatProbaPair
 from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
     get_real_request_class, replace_any_of_in_response

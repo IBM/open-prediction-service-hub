@@ -7,7 +7,7 @@ from logging import Logger
 from pathlib import Path
 from typing import Text, Any, Dict, NoReturn, Type, Union, Set
 
-from dynamic_hosting.core.openapi.request import RequestBody
+from dynamic_hosting.openapi.request import RequestBody
 from pydantic import BaseModel, create_model
 
 DynamicIOSchemaPrefix = 'Dynamic'

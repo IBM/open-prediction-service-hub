@@ -69,7 +69,6 @@ class Feature(BaseModel):
         else:
             raise ValueError('Unsupported openapi type: {t}'.format(t=t))
 
-
     def get_type_validator(self) -> classmethod:
         if self.type in ('int', 'float', 'str'):
             if self.type == 'int:':
