@@ -18,6 +18,8 @@ from fastapi.utils import get_model_definitions
 from pandas import DataFrame
 from pydantic import BaseModel, create_model, Field
 
+MODEL_PICKLE_FILE_NAME: Text = 'archive.pkl'
+MODEL_ARCHIVE_NAME: Text = 'archive.zip'
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
@@ -87,6 +89,7 @@ class Model(MetaMLModel):
                 data_frame_compatible_dict[key] = [val]
         return data_frame_compatible_dict
 
+    # TODO: better management for conversion error
     def invoke(
             self,
             data_input: Dict
@@ -103,7 +106,8 @@ class Model(MetaMLModel):
             columns=self.get_ordered_column_name_vec()
         ). \
             astype(
-            dtype=self.get_feat_type_map()
+            dtype=self.get_feat_type_map(),
+            errors='ignore'
         )
         return self.__invoke__(data)
 
@@ -180,16 +184,16 @@ class Model(MetaMLModel):
 
     def to_archive(
             self,
-            storage_root: Path,
-            archive_name: Text = 'archive.zip',
-            model_file_name: Text = 'archive.pkl',
-            conf_file_name: Text = MODEL_CONFIG_FILE_NAME
+            directory: Path,
+            metadata_file_name: Text = MODEL_CONFIG_FILE_NAME,
+            pickle_file_name: Text = MODEL_PICKLE_FILE_NAME,
+            zip_file_name: Text = MODEL_ARCHIVE_NAME
     ) -> NoReturn:
+
         logger: Logger = logging.getLogger(__name__)
 
-        model_dir: Path = storage_root.joinpath(self.name).joinpath(self.version)
-        model_dir.mkdir(parents=True, exist_ok=True)
-        zipfile_path: Path = model_dir.joinpath(archive_name)
+        directory.mkdir(parents=True, exist_ok=True)
+        zipfile_path: Path = directory.joinpath(zip_file_name)
 
         conf: Dict = self.dict(exclude={'model'})  # in archive the model in storied in binary format
 
@@ -197,15 +201,15 @@ class Model(MetaMLModel):
         conf_encoded: bytes = json.dumps(conf).encode(encoding='utf8')
 
         with ZipFile(str(zipfile_path), 'w') as zipFile:
-            zipFile.writestr(zinfo_or_arcname=model_file_name, data=model)
-            zipFile.writestr(zinfo_or_arcname=conf_file_name, data=conf_encoded)
+            zipFile.writestr(zinfo_or_arcname=pickle_file_name, data=model)
+            zipFile.writestr(zinfo_or_arcname=metadata_file_name, data=conf_encoded)
 
         logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
 
     @staticmethod
     def from_archive(
             archive: bytes,
-            model_file_name: Text = 'archive.pkl',
+            model_file_name: Text = MODEL_PICKLE_FILE_NAME,
             conf_file_name: Text = MODEL_CONFIG_FILE_NAME
     ) -> Model:
         zp: ZipFile = ZipFile(BytesIO(archive))

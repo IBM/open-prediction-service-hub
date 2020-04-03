@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "model_name": "iris-svc-RandomizedSearchCV",
+    "model_name": "iris-svc",
     "model_version": "v0"
   },
   "params": {

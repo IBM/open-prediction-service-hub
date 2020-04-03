@@ -17,7 +17,6 @@ COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
     python3 -m pip install -r requirements.txt && \
     python3 setup.py install && \
-    bash src/main/python/dynamic_hosting/example_model_training/train.sh &&\
     mkdir -p ${RUNTIME_DIR}/example_models/ &&\
     cp -r example_models/* ${RUNTIME_DIR}/example_models &&\
     chown --recursive ${APP_USER}:${APP_USER} ${RUNTIME_DIR}/example_models

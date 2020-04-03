@@ -94,7 +94,7 @@ def main():
 
     internal_model = Model(
         model=obj_to_base64(best_estimator),
-        name='miniloan-rfc-RandomizedSearchCV',
+        name='miniloan-rfc',
         version='v0',
         method_name='predict_proba',
         input_schema=[
@@ -106,7 +106,7 @@ def main():
             {
                 'name': "income",
                 'order': 1,
-                'type': 'long'
+                'type': 'float32'
             },
             {
                 'name': "loanAmount",
@@ -136,8 +136,7 @@ def main():
 
     )
 
-    internal_model.save_to_disk(storage_root=DEFAULT_STORAGE_ROOT)
-    internal_model.to_archive(storage_root=DEFAULT_STORAGE_ROOT)
+    internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='miniloan-rfc.zip')
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 {
   "case_int": {
-  "model_name": "miniloan-rfc-RandomizedSearchCV",
+  "model_name": "miniloan-rfc",
   "model_version": "v0",
   "params": {
     "creditScore": 65768576465476548765786576687678657685,

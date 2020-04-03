@@ -1,6 +1,6 @@
 {
 
-  "model_name": "miniloan-linear-svc-RandomizedSearchCV",
+  "model_name": "miniloan-linear-svc",
   "model_version": "v0",
   "params": {
     "creditScore": 5.9,

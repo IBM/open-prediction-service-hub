@@ -1,5 +1,5 @@
 {
-  "model_name": "miniloan-rfc-RandomizedSearchCV",
+  "model_name": "miniloan-rfc",
   "model_version": "v0",
   "params": {
     "creditScore": 5.9,

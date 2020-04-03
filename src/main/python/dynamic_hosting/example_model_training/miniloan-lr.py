@@ -94,7 +94,7 @@ def main():
 
     internal_model = Model(
         model=obj_to_base64(best_estimator),
-        name='miniloan-lr-RandomizedSearchCV',
+        name='miniloan-lr',
         version='v0',
         method_name='predict',
         input_schema=[
@@ -136,7 +136,7 @@ def main():
 
     )
 
-    internal_model.save_to_disk(storage_root=DEFAULT_STORAGE_ROOT)
+    internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='miniloan-lr.zip')
 
 
 if __name__ == '__main__':
