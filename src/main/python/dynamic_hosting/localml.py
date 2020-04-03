@@ -40,6 +40,9 @@ def dynamic_io_schema_gen() -> Callable:
             routes=app.routes,
         )
 
+        if len(ms.ml_models) == 0:
+            return openapi_schema
+
         input_request_types: Tuple[Type[BaseModel]] = tuple(ms.input_schema_t_set())
         real_request_class: Type[BaseModel] = get_real_request_class(generic_request_class=RequestBody,
                                                                      parameter_types=set(input_request_types))
