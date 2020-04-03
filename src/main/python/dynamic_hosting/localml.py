@@ -100,19 +100,6 @@ def get_models() -> List[MetaMLModel]:
 
 @app.post(
     tags=['Admin'],
-    path='/models',
-    responses={
-        200: {
-            'description': 'Model has been uploaded successfully',
-        }
-    },
-    deprecated=True)
-def add_model(m: Model) -> None:
-    ModelService.load_from_disk(storage_root()).add_model(m)
-
-
-@app.post(
-    tags=['Admin'],
     path='/archives',
     responses={
         200: {
