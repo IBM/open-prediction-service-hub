@@ -25,7 +25,7 @@ class RequestBody(BaseModel):
     def get_model_name(self) -> Text:
         return self.model_name
 
-    def get_version(self) -> Text:
+    def get_model_version(self) -> Text:
         return self.model_version
 
     def get_parameters(self) -> List[Parameter]:

@@ -142,9 +142,9 @@ def predict(
         raise HTTPException(status_code=422, detail='ML input mapping failure')
 
     model_name: Text = concrete_input_model.get_model_name()
-    model_version: Text = concrete_input_model.get_version()
+    model_version: Text = concrete_input_model.get_model_version()
     model: Model = ms.model_map()[concrete_input_model.get_model_name()][
-        concrete_input_model.get_version()]
+        concrete_input_model.get_model_version()]
 
     res_data: Any = ms.invoke(
         model_name=model_name,
