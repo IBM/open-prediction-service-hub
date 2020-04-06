@@ -4,22 +4,18 @@ import logging
 import sys
 from logging import Logger
 from operator import itemgetter
-from typing import Callable, Text, Mapping, Type, Tuple, Any, Union, List
+from typing import Text, Mapping, Any, List
 
 import numpy as np
-from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.model import Model, MetaMLModel
+from dynamic_hosting.core.model_service import ModelService
+from dynamic_hosting.core.util import storage_root
 from dynamic_hosting.openapi.request import RequestBody
-from dynamic_hosting.openapi.response import BaseResponseBody, PredictResponseBody, PredictProbaResponseBody, \
-    FeatProbaPair
-from dynamic_hosting.core.util import storage_root, load_direct_request_schema, replace_any_of, \
-    get_real_request_class, replace_any_of_in_response
+from dynamic_hosting.openapi.response import BaseResponseBody, PredictProbaResponse, \
+    FeatProbaPair, ClassificationResponse, RegressionResponse
 from fastapi import FastAPI, File
-from fastapi.exceptions import HTTPException
-from fastapi.openapi.utils import get_openapi
-from fastapi.utils import get_model_definitions
 from pandas import DataFrame
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 
 app = FastAPI(
     version='0.0.0-SNAPSHOT',
@@ -27,6 +23,19 @@ app = FastAPI(
     description='A simple environment to test machine learning model',
     docs_url='/'
 )
+
+
+def _predict(ml_req: RequestBody, ms: ModelService) -> Any:
+
+    model: Model = ms.model_map()[ml_req.get_model_name()][ml_req.get_model_version()]
+
+    res_data: Any = ms.invoke(
+        model_name=ml_req.get_model_name(),
+        model_version=ml_req.get_model_version(),
+        data=model.to_dataframe_compatible(ml_req.get_data())
+    )
+
+    return res_data
 
 
 @app.get(tags=['Admin'], path='/isAlive', response_model=Mapping)
@@ -61,60 +70,91 @@ def remove_model(*, model_name: Text, model_version: Text = None) -> None:
     ModelService.load_from_disk(storage_root()).remove_model(model_name=model_name, model_version=model_version)
 
 
-@app.post(tags=['ML'], path='/invocation',
-          response_model=Union[PredictProbaResponseBody, PredictResponseBody, BaseResponseBody])
-def predict(
+@app.post(tags=['ML'], path='/classification',
+          response_model=ClassificationResponse)
+def classification(
         *,
         ml_req: RequestBody
-) -> BaseResponseBody:
+) -> ClassificationResponse:
     logger: Logger = logging.getLogger(__name__)
 
     logger.info('Received request: {r}'.format(r=ml_req))
 
     ms: ModelService = ModelService.load_from_disk(storage_root())
 
-    model_name: Text = ml_req.get_model_name()
-    model_version: Text = ml_req.get_model_version()
+    res_data: Any = _predict(ml_req=ml_req, ms=ms)
+
+    # We suppose the most common output of ml model is ndarray
+    if isinstance(res_data, np.ndarray) and len(res_data) == 1:
+        return ClassificationResponse(
+            classification_output=str(res_data[0])
+        )
+    else:
+        raise ValueError('Model output can not be serialized, Raw output: {raw}'.format(raw=BaseResponseBody(
+                    raw_output=DataFrame(res_data).to_dict()
+                )))
+
+
+@app.post(tags=['ML'], path='/regression',
+          response_model=RegressionResponse)
+def regression(
+        *,
+        ml_req: RequestBody
+) -> RegressionResponse:
+    logger: Logger = logging.getLogger(__name__)
+
+    logger.info('Received request: {r}'.format(r=ml_req))
+
+    ms: ModelService = ModelService.load_from_disk(storage_root())
+
+    res_data: Any = _predict(ml_req=ml_req, ms=ms)
+
+    # We suppose the most common output of ml model is ndarray
+    if isinstance(res_data, np.ndarray) and len(res_data) == 1:
+        return RegressionResponse(
+            regression_output=float(res_data[0])
+        )
+    else:
+        raise ValueError('Model output can not be serialized, Raw output: {raw}'.format(raw=BaseResponseBody(
+            raw_output=DataFrame(res_data).to_dict()
+        )))
+
+
+@app.post(tags=['ML'], path='/predict_proba',
+          response_model=PredictProbaResponse)
+def predict_proba(
+        *,
+        ml_req: RequestBody
+) -> PredictProbaResponse:
+    logger: Logger = logging.getLogger(__name__)
+
+    logger.info('Received request: {r}'.format(r=ml_req))
+
+    ms: ModelService = ModelService.load_from_disk(storage_root())
+
     model: Model = ms.model_map()[ml_req.get_model_name()][ml_req.get_model_version()]
 
-    res_data: Any = ms.invoke(
-        model_name=model_name,
-        model_version=model_version,
-        data=model.to_dataframe_compatible(ml_req.get_data())
-    )
+    res_data: Any = _predict(ml_req=ml_req, ms=ms)
 
     # We suppose the most common output of ml model is ndarray
     try:
-        if model.method_name == 'predict':
-            if isinstance(res_data, np.ndarray) and len(res_data) == 1:
-                return PredictResponseBody(
-                    raw_output=DataFrame(res_data).to_dict(),
-                    predict_output=str(res_data[0])
-                )
-            else:
-                return BaseResponseBody(
-                    raw_output=DataFrame(res_data).to_dict()
-                )
-        elif model.method_name == 'predict_proba':
+        if model.method_name == 'predict_proba':
             res_line = res_data[0]  # We have only one instance
             feature_names: List[Text] = model.get_model_attr('classes_')
 
-            assert np.isclose(sum(res_line), 1, rtol=1e-08, atol=1e-08, equal_nan=False)  # The sum needs to be 1
             assert len(feature_names) == len(res_line)
 
-            x = PredictProbaResponseBody(
-                raw_output=DataFrame(res_line).to_dict(),
+            return PredictProbaResponse(
                 predict_output=feature_names[max(enumerate(res_line), key=itemgetter(1))[0]],
                 probabilities=[
                     FeatProbaPair(name=feature_names[i], proba=res_line[i])
                     for i in range(len(feature_names))
                 ]
             )
-            return x
     except ValidationError:
-        return BaseResponseBody(
-            raw_output=str(res_data)
-        )
+        raise ValueError('Model output can not be serialized, Raw output: {raw}'.format(raw=BaseResponseBody(
+            raw_output=DataFrame(res_data).to_dict()
+        )))
 
 
 if __name__ == '__main__':

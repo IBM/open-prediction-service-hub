@@ -1,8 +1,6 @@
 {
-  "metadata": {
-    "model_name": "iris-svc",
-    "model_version": "v0"
-  },
+  "model_name": "iris-svc",
+  "model_version": "v0",
   "params": [
     {
       "name": "sepal_length",

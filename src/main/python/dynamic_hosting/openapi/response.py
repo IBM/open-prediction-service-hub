@@ -2,28 +2,38 @@
 
 from __future__ import annotations
 
-from typing import Any, Text, Union, List, Dict, Mapping
+from typing import Text, List, Dict
 
 import numpy as np
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class BaseResponseBody(BaseModel):
     """Ml output"""
-    raw_output: Union[Text, Dict] = Field(
+    raw_output: Dict = Field(
         ...,
         description=
         'Data frame representation of result ndarray. '
-        'It should be used when the result of predictor can not be serialized by predefined output serializer'
+        'It should be used when the result of predictor can not be serialized by predefined output serializer',
+        example={'row_index': {'column_index': 'value'}}
     )
 
 
-class PredictResponseBody(BaseResponseBody):
+class ClassificationResponse(BaseModel):
     """Ml output for the most common model.predict(array_like)"""
-    predict_output: Union[Text, np.float64] = Field(
+    classification_output: Text = Field(
         ...,
         description=
-        'Common output for model.predict(array_like)'
+        'Classification output for model.predict(array_like)'
+    )
+
+
+class RegressionResponse(BaseModel):
+    """Ml output for the most common model.predict(array_like)"""
+    regression_output: float = Field(
+        ...,
+        description=
+        'Regression output for model.predict(array_like)'
     )
 
 
@@ -33,7 +43,7 @@ class FeatProbaPair(BaseModel):
     proba: np.float64
 
 
-class PredictProbaResponseBody(BaseResponseBody):
+class PredictProbaResponse(BaseModel):
     """Ml output for the most common model.predict(array_like)"""
     predict_output: Text = Field(
         ...,
@@ -45,3 +55,11 @@ class PredictProbaResponseBody(BaseResponseBody):
         description=
         'Common output for model.predict_proba(array_like)'
     )
+
+    @classmethod
+    @validator('probabilities', pre=False, always=True)
+    def probabilities_check(cls, probabilities: List[FeatProbaPair]) -> List[FeatProbaPair]:
+        if np.isclose(sum([pair.proba for pair in probabilities]), 1, rtol=1e-08, atol=1e-08, equal_nan=False):
+            return probabilities
+        else:
+            raise ValueError('The sum of probabilities needs to be 1')
