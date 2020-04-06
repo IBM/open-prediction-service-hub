@@ -29,61 +29,6 @@ app = FastAPI(
 )
 
 
-def dynamic_io_schema_gen() -> Callable:
-    def dynamic_io_schema():
-        ms: ModelService = ModelService.load_from_disk(storage_root())
-
-        openapi_schema = get_openapi(
-            title=app.title,
-            version=app.version,
-            description=app.description,
-            routes=app.routes,
-        )
-
-        if len(ms.ml_models) == 0:
-            return openapi_schema
-
-        input_request_types: Tuple[Type[BaseModel]] = tuple(ms.input_schema_t_set())
-        real_request_class: Type[BaseModel] = get_real_request_class(generic_request_class=RequestBody,
-                                                                     parameter_types=set(input_request_types))
-
-        openapi_schema['components']['schemas'].update(
-            get_model_definitions(
-                flat_models={real_request_class, *input_request_types},
-                model_name_map={real_request_class: real_request_class.__name__,
-                                **{t: t.__name__ for t in input_request_types}}
-            )
-        )
-
-        load_direct_request_schema(
-            direct_path=openapi_schema['paths']['/invocation'],
-            placeholder_name=RequestBody.__name__,
-            real_request_name=real_request_class.__name__
-        )
-        replace_any_of_in_response(
-            p=openapi_schema['paths']['/invocation']
-        )
-        replace_any_of(
-            openapi_schema['components']['schemas'],
-            real_request_class.__name__,
-            'params'
-        )
-        replace_any_of(
-            openapi_schema['components']['schemas'],
-            PredictResponseBody.__name__,
-            'predict_output'
-        )
-        replace_any_of(
-            openapi_schema['components']['schemas'],
-            BaseResponseBody.__name__,
-            'raw_output'
-        )
-
-        return openapi_schema
-
-    return dynamic_io_schema
-
-
 @app.get(tags=['Admin'], path='/isAlive', response_model=Mapping)
 def heart_beat() -> Mapping:
     return {'status': 'good'}
@@ -128,28 +73,14 @@ def predict(
 
     ms: ModelService = ModelService.load_from_disk(storage_root())
 
-    # parameterized instantiation
-    try:
-        concrete_input_model: RequestBody = get_real_request_class(
-            generic_request_class=RequestBody,
-            parameter_types=ms.input_schema_t_set()
-        )(
-            model_name=ml_req.model_name,
-            model_version=ml_req.model_version,
-            params=ml_req.params
-        )
-    except ValidationError:
-        raise HTTPException(status_code=422, detail='ML input mapping failure')
-
-    model_name: Text = concrete_input_model.get_model_name()
-    model_version: Text = concrete_input_model.get_model_version()
-    model: Model = ms.model_map()[concrete_input_model.get_model_name()][
-        concrete_input_model.get_model_version()]
+    model_name: Text = ml_req.get_model_name()
+    model_version: Text = ml_req.get_model_version()
+    model: Model = ms.model_map()[ml_req.get_model_name()][ml_req.get_model_version()]
 
     res_data: Any = ms.invoke(
         model_name=model_name,
         model_version=model_version,
-        data=model.to_dataframe_compatible(concrete_input_model.get_data())
+        data=model.to_dataframe_compatible(ml_req.get_data())
     )
 
     # We suppose the most common output of ml model is ndarray
@@ -185,8 +116,6 @@ def predict(
             raw_output=str(res_data)
         )
 
-
-app.openapi = dynamic_io_schema_gen()
 
 if __name__ == '__main__':
     import uvicorn
