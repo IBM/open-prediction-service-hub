@@ -2,6 +2,7 @@
 
 import logging
 import sys
+from datetime import datetime
 from logging import Logger
 from operator import itemgetter
 from typing import Text, Mapping, Any, List
@@ -12,7 +13,7 @@ from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.util import storage_root
 from dynamic_hosting.openapi.request import RequestBody
 from dynamic_hosting.openapi.response import BaseResponseBody, PredictProbaResponse, \
-    FeatProbaPair, ClassificationResponse, RegressionResponse
+    FeatProbaPair, ClassificationResponse, RegressionResponse, ServerStatus
 from fastapi import FastAPI, File
 from pandas import DataFrame
 from pydantic import ValidationError
@@ -38,9 +39,10 @@ def _predict(ml_req: RequestBody, ms: ModelService) -> Any:
     return res_data
 
 
-@app.get(tags=['Admin'], path='/isAlive', response_model=Mapping)
-def heart_beat() -> Mapping:
-    return {'status': 'good'}
+@app.get(tags=['Admin'], path='/status', response_model=ServerStatus)
+def heart_beat() -> ServerStatus:
+    ms: ModelService = ModelService.load_from_disk(storage_root())
+    return ServerStatus(time=datetime.now(), count=len(ms.ml_models))
 
 
 @app.get(tags=['Admin'], path='/models', response_model=List[MetaMLModel])
