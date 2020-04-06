@@ -42,7 +42,7 @@ def _predict(ml_req: RequestBody, ms: ModelService) -> Any:
 @app.get(tags=['Admin'], path='/status', response_model=ServerStatus)
 def get_server_status() -> ServerStatus:
     ms: ModelService = ModelService.load_from_disk(storage_root())
-    return ServerStatus(time=datetime.now(), count=len(ms.ml_models))
+    return ServerStatus(count=len(ms.ml_models))
 
 
 @app.get(tags=['Admin'], path='/models', response_model=List[MetaMLModel])

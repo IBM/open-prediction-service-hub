@@ -10,7 +10,6 @@ from pydantic import BaseModel, Field, validator
 
 
 class ServerStatus(BaseModel):
-    time: datetime = Field(..., description='Server time')
     count: int = Field(..., description='Number of ml models in local provider')
 
 
