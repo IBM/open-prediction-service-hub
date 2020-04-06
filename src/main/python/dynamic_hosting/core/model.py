@@ -6,6 +6,7 @@ import base64
 import json
 import logging
 import pickle
+from enum import Enum
 from logging import Logger
 from pathlib import Path
 from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDict, NoReturn
@@ -23,6 +24,12 @@ MODEL_ARCHIVE_NAME: Text = 'archive.zip'
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
+class MLType(str, Enum):
+    classification: Text = 'CLASSIFICATION'
+    regression: Text = 'REGRESSION'
+    predict_proba: Text = 'PREDICT_PROBA'
+
+
 class AbstractParameters(BaseModel):
     class Config:
         arbitrary_types_allowed = True
@@ -33,6 +40,7 @@ class MetaMLModel(BaseModel):
     name: Text = Field(..., description='Name of model')
     version: Text = Field(..., description='Version of model')
     method_name: Text = Field(..., description='Name of method. (e.g predict, predict_proba)')
+    type: MLType = Field(..., description='Output type of ml model')
     input_schema: Sequence[Feature] = Field(..., description='Input schema of ml model')
     output_schema: Optional[Mapping[Text, Any]] = Field(..., description='Output schema of ml model')
     metadata: Mapping[Text, Any] = Field(..., description='Additional information for ml model')

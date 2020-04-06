@@ -97,6 +97,7 @@ def main():
         name='miniloan-rfc',
         version='v0',
         method_name='predict_proba',
+        type='PREDICT_PROBA',
         input_schema=[
             {
                 'name': "creditScore",
