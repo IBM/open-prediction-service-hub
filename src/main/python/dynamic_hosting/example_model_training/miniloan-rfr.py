@@ -5,7 +5,7 @@ from typing import Text
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestRegressor
 from pathlib import Path
 from time import gmtime, strftime
 
@@ -46,7 +46,7 @@ def main():
     )
 
     data = data.replace([np.inf, -np.inf], np.nan).dropna()
-    data = data.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'approval']]
+    data = data.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'yearlyReimbursement']]
 
     train, test = train_test_split(data, random_state=0)
 
@@ -54,34 +54,33 @@ def main():
     logger.info('validation size: {size}'.format(size=len(test)))
 
     grid = {
-        'penalty': ['l2'],
-        'dual': [False],
-        'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
-        'C': [x for x in np.linspace(1e-5, 1.0, num=1000)]
+        'criterion': ['mse'],
+        'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
+        'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
+        'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
     }
 
     hyper_tuning_params = {
-        'estimator': LogisticRegression(random_state=0),
+        'estimator': RandomForestRegressor(random_state=0),
         'cv': 3,
         'verbose': bool(__debug__),
         'n_jobs': -1,
-        'scoring': 'accuracy',
         'error_score': 'raise'
     }
 
     random_search = {
         'param_distributions': grid,
         'random_state': 42,
-        'n_iter': 500
+        'n_iter': 20
     }
 
     parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
 
     x = train.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate']]
-    y = train.loc[:, 'approval']
+    y = train.loc[:, 'yearlyReimbursement']
 
     parameter_estimator.fit(x, y)
-    best_estimator = LogisticRegression(
+    best_estimator = RandomForestRegressor(
         random_state=0,
         **parameter_estimator.best_params_
     )
@@ -89,25 +88,25 @@ def main():
     best_estimator.fit(x, y)
 
     res = best_estimator.score(test.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate']],
-                               test.loc[:, 'approval'])
-    logger.info('accuracy: ' + str(res))
+                               test.loc[:, 'yearlyReimbursement'])
+    logger.info('score: ' + str(res))
 
     internal_model = Model(
         model=obj_to_base64(best_estimator),
-        name='miniloan-lr',
+        name='miniloan-rfr',
         version='v0',
         method_name='predict',
-        type='CLASSIFICATION',
+        type='REGRESSION',
         input_schema=[
             {
                 'name': "creditScore",
                 'order': 0,
-                'type': 'float64'
+                'type': 'int64'
             },
             {
                 'name': "income",
                 'order': 1,
-                'type': 'float64'
+                'type': 'float32'
             },
             {
                 'name': "loanAmount",
@@ -137,7 +136,7 @@ def main():
 
     )
 
-    internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='miniloan-lr.zip')
+    internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='miniloan-rfr.zip')
 
 
 if __name__ == '__main__':
