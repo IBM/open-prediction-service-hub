@@ -4,19 +4,15 @@
   "params": [
     {
       "name": "sepal_length",
-      "order": 0,
       "value": 5.9
     },{
       "name": "sepal_width",
-      "order": 1,
       "value":3.0
     },{
       "name": "petal_length",
-      "order": 2,
       "value": 5.1
     },{
       "name": "petal_width",
-      "order": 3,
       "value": 1.8
     }
   ]
