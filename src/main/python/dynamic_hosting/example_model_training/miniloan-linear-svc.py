@@ -98,6 +98,7 @@ def main():
         name='miniloan-linear-svc',
         version='v0',
         method_name='predict',
+        type='CLASSIFICATION',
         input_schema=[
             {
                 'name': "creditScore",
