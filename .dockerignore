@@ -282,3 +282,4 @@ buildNumber.properties
 # ------- This project ----------------
 .idea
 *.iml
+data
