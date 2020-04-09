@@ -99,16 +99,3 @@ class ModelService(BaseModel):
             }
             for model in self.ml_models
         }
-
-    def input_schema_t_map(self) -> Mapping[Text, Mapping[Text, Type[BaseModel]]]:
-        return {
-            model.name: {
-                model.version: model.input_schema_t()
-            }
-            for model in self.ml_models
-        }
-
-    def input_schema_t_set(self) -> Set[Type[BaseModel]]:
-        return {model.input_schema_t() for model in self.ml_models}
-
-

@@ -6,18 +6,18 @@ import base64
 import json
 import logging
 import pickle
+from datetime import datetime
 from enum import Enum
+from io import BytesIO
 from logging import Logger
 from pathlib import Path
-from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDict, NoReturn
-from io import BytesIO
+from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDict, NoReturn, List
 from zipfile import ZipFile
 
 from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.core.util import rmdir, base64_to_obj, obj_to_base64
-from fastapi.utils import get_model_definitions
 from pandas import DataFrame
-from pydantic import BaseModel, create_model, Field
+from pydantic import BaseModel, Field
 
 MODEL_PICKLE_FILE_NAME: Text = 'archive.pkl'
 MODEL_ARCHIVE_NAME: Text = 'archive.zip'
@@ -30,9 +30,16 @@ class MLType(str, Enum):
     predict_proba: Text = 'PREDICT_PROBA'
 
 
-class AbstractParameters(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
+class Metric(BaseModel):
+    name: Text = Field(..., description='Name of metric')
+    value: Text = Field(..., description='Value of metric')
+
+
+class Metadata(BaseModel):
+    description: Text = Field(..., description='Description of model')
+    author: Text = Field(..., description='Author of model')
+    trained_at: datetime = Field(..., description='Training date')
+    metrics: List[Metric] = Field(..., description='Metrics for model')
 
 
 class MetaMLModel(BaseModel):
@@ -43,45 +50,12 @@ class MetaMLModel(BaseModel):
     type: MLType = Field(..., description='Output type of ml model')
     input_schema: Sequence[Feature] = Field(..., description='Input schema of ml model')
     output_schema: Optional[Mapping[Text, Any]] = Field(..., description='Output schema of ml model')
-    metadata: Mapping[Text, Any] = Field(..., description='Additional information for ml model')
+    metadata: Metadata = Field(..., description='Additional information for ml model')
 
 
 class Model(MetaMLModel):
     """Internal representation of ML model"""
     model: Text = Field(..., description='Pickled model in base64 format')
-
-    # TODO: Add better type casting for openapi schema
-    def input_schema_t(self) -> Type[BaseModel]:
-        fields_dict: Dict[Text, Any] = dict()
-        type_validators: Dict[Text, classmethod] = dict()
-
-        for feature in self.input_schema:
-            fields_dict[feature.get_name()] = (feature.get_openapi_type(), ...)
-            type_validators[feature.get_name()] = feature.get_type_validator()
-
-        m: Type[BaseModel] = create_model(
-            '{model_name}-{model_version}'.format(
-                model_name=self.name,
-                model_version=self.version
-            ),
-            **fields_dict,
-            __base__=AbstractParameters,
-            __validators__=type_validators,
-        )
-
-        return m
-
-    def input_schema_definition(self) -> Dict[Text, Any]:
-        model: Type[BaseModel] = self.input_schema_t()
-        return get_model_definitions(
-            flat_models={model},
-            model_name_map={
-                model: '{model_name}-{model_version}'.format(
-                    model_name=self.name,
-                    model_version=self.version
-                )
-            }
-        )
 
     def get_ordered_column_name_vec(self) -> Sequence[Text]:
         return [item.get_name() for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
@@ -181,10 +155,11 @@ class Model(MetaMLModel):
         model_dir: Path = storage_root.joinpath(self.name).joinpath(self.version)
         model_dir.mkdir(parents=True, exist_ok=True)
 
+        # standard json library can not handle timestamp
         with model_dir.joinpath(MODEL_CONFIG_FILE_NAME).open(mode='w') as model_config_file:
             json.dump(
                 fp=model_config_file,
-                obj=self.dict()
+                obj=json.loads(self.json())
             )
 
         logger.info('Storied model to: {storage_root}/{model_name}/{model_version}'.format(
@@ -203,10 +178,8 @@ class Model(MetaMLModel):
         directory.mkdir(parents=True, exist_ok=True)
         zipfile_path: Path = directory.joinpath(zip_file_name)
 
-        conf: Dict = self.dict(exclude={'model'})  # in archive the model in storied in binary format
-
         model: bytes = base64.b64decode(self.model)
-        conf_encoded: bytes = json.dumps(conf).encode(encoding='utf8')
+        conf_encoded: bytes = self.json(exclude={'model'}).encode(encoding='utf8')
 
         with ZipFile(str(zipfile_path), 'w') as zipFile:
             zipFile.writestr(zinfo_or_arcname=pickle_file_name, data=model)

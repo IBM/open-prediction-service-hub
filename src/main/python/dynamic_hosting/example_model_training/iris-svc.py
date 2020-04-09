@@ -105,14 +105,16 @@ def main():
         ],
         output_schema=None,
         metadata={
-            'name': 'Loan payment classification',
+            'description': 'Iris classification',
             'author': 'ke',
-            'date': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
-            'metrics': {
-                'accuracy': res
-            }
+            'trained_at': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+            'metrics': [
+                {
+                    'name': 'accuracy',
+                    'value': res
+                }
+            ]
         }
-
     )
 
     internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='iris-svc.zip')

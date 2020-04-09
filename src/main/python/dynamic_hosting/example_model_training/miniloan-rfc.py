@@ -127,12 +127,15 @@ def main():
         ],
         output_schema=None,
         metadata={
-            'name': 'Loan payment classification',
+            'description': 'Loan approval',
             'author': 'ke',
-            'date': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
-            'metrics': {
-                'accuracy': res
-            }
+            'trained_at': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+            'metrics': [
+                {
+                    'name': 'accuracy',
+                    'value': res
+                }
+            ]
         }
 
     )

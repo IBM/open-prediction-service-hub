@@ -126,12 +126,15 @@ def main():
         ],
         output_schema=None,
         metadata={
-            'name': 'Loan payment classification',
+            'description': 'Evaluation of yearlyReimbursement',
             'author': 'ke',
-            'date': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
-            'metrics': {
-                'accuracy': res
-            }
+            'trained_at': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+            'metrics': [
+                {
+                    'name': 'r2',
+                    'value': res
+                }
+            ]
         }
 
     )
