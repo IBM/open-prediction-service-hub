@@ -62,5 +62,9 @@ public class TestGetModels extends AbstractAdminApiTest{
         Assert.assertEquals((new Feature().name("loanAmount").order(2).type("float64")), inputSchema.get(2));
         Assert.assertEquals((new Feature().name("monthDuration").order(3).type("float64")), inputSchema.get(3));
         Assert.assertEquals((new Feature().name("rate").order(4).type("float64")), inputSchema.get(4));
+
+        Assert.assertEquals("Loan approval", miniloanRfc.getMetadata().getDescription());
+        Assert.assertEquals("ke", miniloanRfc.getMetadata().getAuthor());
+        Assert.assertEquals("accuracy", miniloanRfc.getMetadata().getMetrics().get(0).getName());
     }
 }

@@ -1,13 +1,10 @@
 package com.ibm.aid.lml.openapi;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
-import org.openapitools.client.ApiClient;
 import org.openapitools.client.ApiException;
-import org.openapitools.client.Configuration;
-import org.openapitools.client.api.AdminApi;
 import org.openapitools.client.model.MetaMLModel;
 import org.openapitools.client.model.ServerStatus;
 
@@ -24,7 +21,7 @@ public class TestGetServerStatus extends AbstractAdminApiTest {
         Assert.assertEquals(0, (long) api.getServerStatusStatusGet().getCount());
 
         api.addModelArchivesPost(
-                new File(Objects.requireNonNull(getClass().getClassLoader().getResource( "miniloan-rfc.zip")).getFile()));
+                new File(Objects.requireNonNull(getClass().getClassLoader().getResource("miniloan-rfc.zip")).getFile()));
 
         Assert.assertEquals(1, (long) api.getServerStatusStatusGet().getCount());
     }
@@ -40,10 +37,7 @@ public class TestGetServerStatus extends AbstractAdminApiTest {
     /**
      * Get Server Status
      *
-     *
-     *
-     * @throws ApiException
-     *          if the Api call fails
+     * @throws ApiException if the Api call fails
      */
     @Test
     public void getServerStatusTest() throws ApiException {
