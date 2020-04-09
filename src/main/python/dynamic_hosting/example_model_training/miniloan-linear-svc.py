@@ -1,9 +1,11 @@
 import logging
 import sys
+from datetime import datetime
 from typing import Text
 
 import numpy as np
 import pandas as pd
+import pytz
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.svm import LinearSVC
 from pathlib import Path
@@ -130,7 +132,7 @@ def main():
         metadata={
             'description': 'Loan approval',
             'author': 'ke',
-            'trained_at': strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+            'trained_at': datetime.now(tz=pytz.utc),
             'metrics': [
                 {
                     'name': 'accuracy',
