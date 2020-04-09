@@ -38,7 +38,7 @@ class Metric(BaseModel):
 class Metadata(BaseModel):
     description: Text = Field(..., description='Description of model')
     author: Text = Field(..., description='Author of model')
-    trained_at: datetime = Field(..., description='Training date')
+    trained_at: str = Field(..., description='Training date')
     metrics: List[Metric] = Field(..., description='Metrics for model')
 
 
