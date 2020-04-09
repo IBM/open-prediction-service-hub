@@ -132,7 +132,7 @@ def main():
         metadata={
             'description': 'Loan approval',
             'author': 'ke',
-            'trained_at': datetime.now(tz=pytz.utc),
+            'trained_at': datetime.utcnow().isoformat(),
             'metrics': [
                 {
                     'name': 'accuracy',

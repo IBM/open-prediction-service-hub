@@ -109,7 +109,7 @@ def main():
         metadata={
             'description': 'Iris classification',
             'author': 'ke',
-            'trained_at': datetime.now(tz=pytz.utc),
+            'trained_at': datetime.utcnow().isoformat(),
             'metrics': [
                 {
                     'name': 'accuracy',
