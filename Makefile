@@ -9,11 +9,12 @@ example:
 
 
 # Container Image management
-IMAGE_REPO="mldecisions"
-IMAGE_NAME="mlservice"
-IMAGE_TAG="latest"
+IMAGE_REPO=mldecisions
+IMAGE_NAME=mlservice
+IMAGE_TAG=latest
 
 ibm_register_image:
+	ibmcloud cr image-rm us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
 	ibmcloud cr build -t us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} .
 
 tag_image:
@@ -24,9 +25,9 @@ push_to_ibm:
 
 
 # Kubernetes
-KUB_CLUSTER_NAME="MicroMLService"
-KUB_SERVICE_NAME="mlservice"
-KUB_DEPLOYMENT_NAME="mlservice-deployment"
+KUB_CLUSTER_NAME=MicroMLService
+KUB_SERVICE_NAME=mlservice
+KUB_DEPLOYMENT_NAME=mlservice-deployment
 
 get_servers:
 	ibmcloud ks workers --cluster ${KUB_CLUSTER_NAME}
