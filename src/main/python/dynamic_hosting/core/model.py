@@ -6,7 +6,6 @@ import base64
 import json
 import logging
 import pickle
-from datetime import datetime
 from enum import Enum
 from io import BytesIO
 from logging import Logger
@@ -38,11 +37,11 @@ class Metric(BaseModel):
 class Metadata(BaseModel):
     description: Text = Field(..., description='Description of model')
     author: Text = Field(..., description='Author of model')
-    trained_at: str = Field(..., description='Training date')
+    trained_at: Text = Field(..., description='Training date')
     metrics: List[Metric] = Field(..., description='Metrics for model')
 
 
-class MetaMLModel(BaseModel):
+class MLSchema(BaseModel):
     """Model independent information"""
     name: Text = Field(..., description='Name of model')
     version: Text = Field(..., description='Version of model')
@@ -53,7 +52,7 @@ class MetaMLModel(BaseModel):
     metadata: Metadata = Field(..., description='Additional information for ml model')
 
 
-class Model(MetaMLModel):
+class Model(MLSchema):
     """Internal representation of ML model"""
     model: Text = Field(..., description='Pickled model in base64 format')
 
@@ -206,4 +205,4 @@ class Model(MetaMLModel):
         )
 
     def get_meta_model(self):
-        return MetaMLModel(**self.dict())
+        return MLSchema(**self.dict())

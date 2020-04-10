@@ -2,13 +2,12 @@
 
 import logging
 import sys
-from datetime import datetime
 from logging import Logger
 from operator import itemgetter
-from typing import Text, Mapping, Any, List
+from typing import Text, Any, List
 
 import numpy as np
-from dynamic_hosting.core.model import Model, MetaMLModel
+from dynamic_hosting.core.model import Model, MLSchema
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.util import storage_root
 from dynamic_hosting.openapi.request import RequestBody
@@ -45,8 +44,8 @@ def get_server_status() -> ServerStatus:
     return ServerStatus(count=len(ms.ml_models))
 
 
-@app.get(tags=['Admin'], path='/models', response_model=List[MetaMLModel])
-def get_models() -> List[MetaMLModel]:
+@app.get(tags=['Admin'], path='/models', response_model=List[MLSchema])
+def get_models() -> List[MLSchema]:
     """Returns the list of ML models."""
     ms: ModelService = ModelService.load_from_disk(storage_root())
     return [
