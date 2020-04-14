@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 
 import logging
-import sys
 from logging import Logger
 from operator import itemgetter
 from typing import Text, Any, List
 
 import numpy as np
+from dynamic_hosting.core.configuration import ServerConfiguration
 from dynamic_hosting.core.model import Model, MLSchema
 from dynamic_hosting.core.model_service import ModelService
-from dynamic_hosting.core.util import storage_root
 from dynamic_hosting.openapi.request import RequestBody
 from dynamic_hosting.openapi.response import BaseResponseBody, PredictProbaResponse, \
     FeatProbaPair, ClassificationResponse, RegressionResponse, ServerStatus
@@ -40,14 +39,14 @@ def _predict(ml_req: RequestBody, ms: ModelService) -> Any:
 
 @app.get(tags=['Admin'], path='/status', response_model=ServerStatus)
 def get_server_status() -> ServerStatus:
-    ms: ModelService = ModelService.load_from_disk(storage_root())
+    ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
     return ServerStatus(count=len(ms.ml_models))
 
 
 @app.get(tags=['Admin'], path='/models', response_model=List[MLSchema])
 def get_models() -> List[MLSchema]:
     """Returns the list of ML models."""
-    ms: ModelService = ModelService.load_from_disk(storage_root())
+    ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
     return [
         model.get_meta_model() for model in ms.ml_models
     ]
@@ -63,12 +62,12 @@ def get_models() -> List[MLSchema]:
     }
 )
 def add_model(*, file: bytes = File(...)) -> None:
-    ModelService.load_from_disk(storage_root()).add_archive(file)
+    ModelService.load_from_disk(ServerConfiguration().model_storage).add_archive(file)
 
 
 @app.delete(tags=['Admin'], path='/models')
 def remove_model(*, model_name: Text, model_version: Text = None) -> None:
-    ModelService.load_from_disk(storage_root()).remove_model(model_name=model_name, model_version=model_version)
+    ModelService.load_from_disk(ServerConfiguration().model_storage).remove_model(model_name=model_name, model_version=model_version)
 
 
 @app.post(tags=['ML'], path='/classification',
@@ -81,7 +80,7 @@ def classification(
 
     logger.info('Received request: {r}'.format(r=ml_req))
 
-    ms: ModelService = ModelService.load_from_disk(storage_root())
+    ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
 
     res_data: Any = _predict(ml_req=ml_req, ms=ms)
 
@@ -106,7 +105,7 @@ def regression(
 
     logger.info('Received request: {r}'.format(r=ml_req))
 
-    ms: ModelService = ModelService.load_from_disk(storage_root())
+    ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
 
     res_data: Any = _predict(ml_req=ml_req, ms=ms)
 
@@ -131,7 +130,7 @@ def predict_proba(
 
     logger.info('Received request: {r}'.format(r=ml_req))
 
-    ms: ModelService = ModelService.load_from_disk(storage_root())
+    ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
 
     model: Model = ms.model_map()[ml_req.get_model_name()][ml_req.get_model_version()]
 
@@ -156,10 +155,3 @@ def predict_proba(
         raise ValueError('Model output can not be serialized, Raw output: {raw}'.format(raw=BaseResponseBody(
             raw_output=DataFrame(res_data).to_dict()
         )))
-
-
-if __name__ == '__main__':
-    import uvicorn
-
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-    uvicorn.run(app, host='127.0.0.1', port=8000, debug=True)

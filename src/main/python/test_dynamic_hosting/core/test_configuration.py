@@ -48,10 +48,10 @@ class TestServerConfiguration(unittest.TestCase):
 
     def test_env_not_exist(self):
         try:
-            del os.environ['MODEL_STORAGE']
+            del os.environ['model_storage']
         except KeyError:
             pass
-        self.assertRaises(ValueError, ServerConfiguration.from_env)
+        self.assertRaises(ValueError, ServerConfiguration)
 
     def test_valid_conf_file(self):
         with tempfile.TemporaryDirectory() as model_storage:
@@ -64,5 +64,5 @@ class TestServerConfiguration(unittest.TestCase):
 
     def test_valid_env(self):
         storage: Path = Path(__file__).resolve().parents[5].joinpath('runtime').joinpath('storage')
-        os.environ['MODEL_STORAGE'] = str(storage)
-        ServerConfiguration.from_env()
+        os.environ['model_storage'] = str(storage)
+        ServerConfiguration()

@@ -31,8 +31,7 @@ class Feature(BaseModel):
         """Feature is immutable inside model"""
         allow_mutation: bool = False
 
-    @classmethod
-    @validator('type', pre=False, always=True)
+    @validator('type', always=True)
     def type_check(cls, t) -> Type:
         if t in ('int', 'float', 'str'):
             return t
