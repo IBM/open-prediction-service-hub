@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field, validator
 
 
 class ServerStatus(BaseModel):
-    count: int = Field(..., description='Number of ml models in local provider')
+    model_count: int = Field(..., description='Number of ml models in local provider')
 
 
 class BaseResponseBody(BaseModel):

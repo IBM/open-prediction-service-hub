@@ -18,7 +18,7 @@ DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'example_models'
 DEFAULT_STORAGE_ROOT: Path = Path(__file__).resolve().parents[5].joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
 
 
-def main():
+def train() -> Path:
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
@@ -142,8 +142,8 @@ def main():
 
     )
 
-    internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='miniloan-rfc.zip')
+    return internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='miniloan-rfc.zip')
 
 
 if __name__ == '__main__':
-    main()
+    train()

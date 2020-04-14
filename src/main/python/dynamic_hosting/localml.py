@@ -16,7 +16,7 @@ from fastapi import FastAPI, File
 from pandas import DataFrame
 from pydantic import ValidationError
 
-app = FastAPI(
+app: FastAPI = FastAPI(
     version='0.0.0-SNAPSHOT',
     title='Local ml provider',
     description='A simple environment to test machine learning model',
@@ -40,7 +40,7 @@ def _predict(ml_req: RequestBody, ms: ModelService) -> Any:
 @app.get(tags=['Admin'], path='/status', response_model=ServerStatus)
 def get_server_status() -> ServerStatus:
     ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
-    return ServerStatus(count=len(ms.ml_models))
+    return ServerStatus(model_count=len(ms.ml_models))
 
 
 @app.get(tags=['Admin'], path='/models', response_model=List[MLSchema])

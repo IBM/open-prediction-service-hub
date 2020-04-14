@@ -170,7 +170,7 @@ class Model(MLSchema):
             metadata_file_name: Text = MODEL_CONFIG_FILE_NAME,
             pickle_file_name: Text = MODEL_PICKLE_FILE_NAME,
             zip_file_name: Text = MODEL_ARCHIVE_NAME
-    ) -> NoReturn:
+    ) -> Path:
 
         logger: Logger = logging.getLogger(__name__)
 
@@ -185,6 +185,8 @@ class Model(MLSchema):
             zipFile.writestr(zinfo_or_arcname=metadata_file_name, data=conf_encoded)
 
         logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
+
+        return zipfile_path
 
     @staticmethod
     def from_archive(
@@ -204,5 +206,5 @@ class Model(MLSchema):
             **conf
         )
 
-    def get_meta_model(self):
+    def get_meta_model(self) -> MLSchema:
         return MLSchema(**self.dict())

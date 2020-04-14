@@ -12,3 +12,4 @@ python-multipart  # file service
 uvicorn
 gunicorn
 # Optional:
+pytest
