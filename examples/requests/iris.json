@@ -1,0 +1,19 @@
+{
+  "model_name": "iris-svc",
+  "model_version": "v0",
+  "params": [
+    {
+      "name": "sepal_length",
+      "value": 5.9
+    },{
+      "name": "sepal_width",
+      "value":3.0
+    },{
+      "name": "petal_length",
+      "value": 5.1
+    },{
+      "name": "petal_width",
+      "value": 1.8
+    }
+  ]
+}
