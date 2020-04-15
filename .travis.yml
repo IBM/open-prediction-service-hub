@@ -1,0 +1,34 @@
+dist: bionic
+
+
+language: python
+
+
+python:
+  - "3.7"
+
+
+notifications:
+  email: false
+
+
+before_install:
+  - pip install -r requirements.txt
+
+
+install:
+  - python ./setup.py install
+
+
+script:
+  - python src/test/python/ripper/TestUCIParallel.py
+  - python src/test/python/ripper/TestMiniLoanParallel.py
+  - python src/test/python/ripper/TestUCISpark.py
+  - python src/test/python/ripper/TestMiniLoanSpark.py
+  - python src/test/python/ripper/TestStability.py
+  - python src/test/python/ripper/TestCensusIncomeMld.py
+  - python src/test/python/ripper/TestMiniLoanParallel-100K.py
+
+
+env:
+  - model_storage=runtime/storage

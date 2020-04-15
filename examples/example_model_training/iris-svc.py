@@ -1,22 +1,19 @@
 import logging
 import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Text
 
 import numpy as np
 import pandas as pd
-import pytz
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.svm import SVC
-from sklearn.datasets import load_iris
-from pathlib import Path
-from time import gmtime, strftime
-
 from dynamic_hosting.core.model import Model
 from dynamic_hosting.core.util import obj_to_base64
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.svm import SVC
 
-DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'example_models'
-DEFAULT_STORAGE_ROOT: Path = Path(__file__).resolve().parents[5].joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
+DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'examples'
+DEFAULT_STORAGE_ROOT: Path = Path(__file__).resolve().parents[4].joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
 
 
 def main():

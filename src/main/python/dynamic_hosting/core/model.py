@@ -10,7 +10,7 @@ from enum import Enum
 from io import BytesIO
 from logging import Logger
 from pathlib import Path
-from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDict, NoReturn, List
+from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDict, List
 from zipfile import ZipFile
 
 from dynamic_hosting.core.feature import Feature
@@ -62,6 +62,12 @@ class Model(MLSchema):
     def get_feat_type_map(self) -> Mapping[Text, Type]:
         return {item.get_name(): item.get_type() for item in self.input_schema}
 
+    def has_attr(self, attr: Text) -> bool:
+        return hasattr(base64_to_obj(self.model), attr)
+
+    def get_attr(self, attr: Text) -> Any:
+        return getattr(base64_to_obj(self.model), attr)
+
     def to_dataframe_compatible(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
         data_frame_compatible_dict: Dict = dict()
         feature_map = self.get_feat_type_map()
@@ -97,13 +103,6 @@ class Model(MLSchema):
             data_input: DataFrame
     ) -> Any:
         return getattr(base64_to_obj(self.model), self.method_name)(data_input)
-
-    def get_model_attr(self, attr: Text) -> Any:
-        model: Any = base64_to_obj(self.model)
-        if hasattr(model, attr):
-            return getattr(model, attr)
-        else:
-            TypeError('model dose not have attribute {att}'.format(att=attr))
 
     @staticmethod
     def load_from_disk(

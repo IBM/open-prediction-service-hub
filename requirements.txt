@@ -13,3 +13,4 @@ uvicorn
 gunicorn
 # Optional:
 pytest
+coverage
