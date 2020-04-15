@@ -1,8 +1,7 @@
 # Ignore everything
-*
+/*
 
-# Except
-!./requests
-!./requests/*.json
+# Except those two ignore files
 !.dockerignore
 !.gitignore
+
