@@ -14,3 +14,4 @@ gunicorn
 # Optional:
 pytest
 coverage
+requests
