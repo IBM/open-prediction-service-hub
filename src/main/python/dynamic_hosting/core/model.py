@@ -6,7 +6,6 @@ import base64
 import json
 import logging
 import pickle
-from enum import Enum
 from io import BytesIO
 from logging import Logger
 from pathlib import Path
@@ -21,12 +20,6 @@ from pydantic import BaseModel, Field
 MODEL_PICKLE_FILE_NAME: Text = 'archive.pkl'
 MODEL_ARCHIVE_NAME: Text = 'archive.zip'
 MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
-
-
-class MLType(str, Enum):
-    classification: Text = 'CLASSIFICATION'
-    regression: Text = 'REGRESSION'
-    predict_proba: Text = 'PREDICT_PROBA'
 
 
 class Metric(BaseModel):
@@ -46,7 +39,6 @@ class MLSchema(BaseModel):
     name: Text = Field(..., description='Name of model')
     version: Text = Field(..., description='Version of model')
     method_name: Text = Field(..., description='Name of method. (e.g predict, predict_proba)')
-    type: MLType = Field(..., description='Output type of ml model')
     input_schema: Sequence[Feature] = Field(..., description='Input schema of ml model')
     output_schema: Optional[Mapping[Text, Any]] = Field(..., description='Output schema of ml model')
     metadata: Metadata = Field(..., description='Additional information for ml model')

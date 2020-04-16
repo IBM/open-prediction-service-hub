@@ -101,7 +101,6 @@ def miniloan_lr() -> Path:
         name='miniloan-lr',
         version='v0',
         method_name='predict',
-        type='CLASSIFICATION',
         input_schema=[
             {
                 'name': "creditScore",
@@ -201,7 +200,6 @@ def miniloan_rfr() -> Path:
         name='miniloan-rfr',
         version='v0',
         method_name='predict',
-        type='REGRESSION',
         input_schema=[
             {
                 'name': "creditScore",
@@ -303,7 +301,6 @@ def miniloan_rfc() -> Path:
         name='miniloan-rfc',
         version='v0',
         method_name='predict_proba',
-        type='PREDICT_PROBA',
         input_schema=[
             {
                 'name': "creditScore",

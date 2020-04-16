@@ -69,7 +69,6 @@ class TestGetInfo(TestEmbeddedClient):
         self.assertEqual('miniloan-rfc', res_content['name'])
         self.assertEqual('v0', res_content['version'])
         self.assertEqual('predict_proba', res_content['method_name'])
-        self.assertEqual('PREDICT_PROBA', res_content['type'])
         self.assertEqual(
             [{'name': 'creditScore', 'order': 0, 'type': 'int64'},
              {'name': 'income', 'order': 1, 'type': 'float32'},
