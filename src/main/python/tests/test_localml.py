@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import ast
+import json
+import shutil
 import os
 import tempfile
 import unittest
@@ -17,6 +19,13 @@ from dynamic_hosting.core.configuration import ServerConfiguration
 from fastapi.testclient import TestClient
 from requests import Response
 from tests.models import miniloan_lr, miniloan_rfc, miniloan_rfr
+
+OPENAPI_RESOURCE: Path = Path(__file__).resolve().parents[2].joinpath('resources').joinpath('openapi.json')
+
+TEST_RES_DIR: Path = Path(__file__).resolve().parents[3].joinpath('test').joinpath('resources')
+MINILOAN_LR: Path = TEST_RES_DIR.joinpath('miniloan-lr.zip')
+MINILOAN_RFC: Path = TEST_RES_DIR.joinpath('miniloan-rfc.zip')
+MINILOAN_RFR: Path = TEST_RES_DIR.joinpath('miniloan-rfr.zip')
 
 
 class TestEmbeddedClient(unittest.TestCase):
@@ -39,6 +48,12 @@ class TestGetInfo(TestEmbeddedClient):
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
+
+    def test_openapi(self):
+        res: Response = self.client.get(url='/openapi.json')
+        openapi: Dict = res.json()
+        with OPENAPI_RESOURCE.open(mode='w') as fd:
+            json.dump(obj=openapi, fp=fd)
 
     def test_get_server_status(self):
         res: Response = self.client.get(url='/status')
@@ -132,19 +147,25 @@ class TestInvocation(TestEmbeddedClient):
 
     def setUp(self) -> None:
         super().setUp()
-        with miniloan_rfc().open(mode='rb') as fd:
+        shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
+
+        shutil.copy(src=str(miniloan_lr()), dst=str(MINILOAN_LR))
+
+        shutil.copy(src=str(miniloan_rfr()), dst=str(MINILOAN_RFR))
+
+        with MINILOAN_RFC.open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
-        with miniloan_rfr().open(mode='rb') as fd:
+        with MINILOAN_RFR.open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
-        with miniloan_lr().open(mode='rb') as fd:
+        with MINILOAN_LR.open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
