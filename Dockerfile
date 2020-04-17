@@ -1,7 +1,6 @@
 FROM python:3.7
 
 
-ENV ENVIRONMENT="local"
 ENV BUILD_DIR="/app/build"
 ENV RUNTIME_DIR="/app/runtime"
 ENV APP_USER="lml"

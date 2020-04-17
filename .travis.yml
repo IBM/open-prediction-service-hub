@@ -21,13 +21,7 @@ install:
 
 
 script:
-  - python src/test/python/ripper/TestUCIParallel.py
-  - python src/test/python/ripper/TestMiniLoanParallel.py
-  - python src/test/python/ripper/TestUCISpark.py
-  - python src/test/python/ripper/TestMiniLoanSpark.py
-  - python src/test/python/ripper/TestStability.py
-  - python src/test/python/ripper/TestCensusIncomeMld.py
-  - python src/test/python/ripper/TestMiniLoanParallel-100K.py
+ python3 -m pytest -v src/main/python/tests
 
 
 env:
