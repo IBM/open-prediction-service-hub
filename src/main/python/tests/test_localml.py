@@ -15,14 +15,19 @@ from typing import List
 from dynamic_hosting import app
 from fastapi.testclient import TestClient
 from requests import Response
-from tests.models import miniloan_lr, miniloan_rfc, miniloan_rfr
+from tests.prepare_models import miniloan_lr, miniloan_rfc, miniloan_rfr
 
 OPENAPI_RESOURCE: Path = Path(__file__).resolve().parents[2].joinpath('resources').joinpath('openapi.json')
 
 TEST_RES_DIR: Path = Path(__file__).resolve().parents[3].joinpath('test').joinpath('resources')
+
 MINILOAN_LR: Path = TEST_RES_DIR.joinpath('miniloan-lr.zip')
 MINILOAN_RFC: Path = TEST_RES_DIR.joinpath('miniloan-rfc.zip')
 MINILOAN_RFR: Path = TEST_RES_DIR.joinpath('miniloan-rfr.zip')
+
+shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
+shutil.copy(src=str(miniloan_lr()), dst=str(MINILOAN_LR))
+shutil.copy(src=str(miniloan_rfr()), dst=str(MINILOAN_RFR))
 
 
 class TestEmbeddedClient(unittest.TestCase):
@@ -37,10 +42,6 @@ class TestEmbeddedClient(unittest.TestCase):
 
 
 class TestGetInfo(TestEmbeddedClient):
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
 
     def setUp(self) -> None:
         super().setUp()
@@ -101,10 +102,6 @@ class TestAddModel(TestEmbeddedClient):
 
 class TestDeleteModel(TestEmbeddedClient):
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
-
     def setUp(self) -> None:
         super().setUp()
         with MINILOAN_RFC.open(mode='rb') as fd:
@@ -114,13 +111,21 @@ class TestDeleteModel(TestEmbeddedClient):
             )
         self.assertEqual(200, res.status_code)
 
-    def test_delete_model(self):
+    def test_delete_model_by_name_and_version(self):
+        res_delete: Response = self.client.delete(url='/models',
+                                                  params={'model_name': 'miniloan-rfc', 'model_version': 'v0'})
+        self.assertEqual(200, res_delete.status_code)
+
+        info_2: Response = self.client.get(url='/status')
+        self.assertEqual(200, info_2.status_code)
+        self.assertEqual(0, info_2.json().get('model_count'))
+
+    def test_delete_model_by_name(self):
         info_1: Response = self.client.get(url='/status')
         self.assertEqual(200, info_1.status_code)
         self.assertEqual(1, info_1.json().get('model_count'))
 
-        res_delete: Response = self.client.delete(url='/models',
-                                                  params={'model_name': 'miniloan-rfc', 'model_version': 'v0'})
+        res_delete: Response = self.client.delete(url='/models', params={'model_name': 'miniloan-rfc'})
         self.assertEqual(200, res_delete.status_code)
 
         info_2: Response = self.client.get(url='/status')
@@ -148,12 +153,6 @@ class TestInvocation(TestEmbeddedClient):
             "value": 2.0
         }
     ]
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
-        shutil.copy(src=str(miniloan_lr()), dst=str(MINILOAN_LR))
-        shutil.copy(src=str(miniloan_rfr()), dst=str(MINILOAN_RFR))
 
     def setUp(self) -> None:
         super().setUp()

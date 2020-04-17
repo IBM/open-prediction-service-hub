@@ -49,10 +49,10 @@ class Model(MLSchema):
     model: Text = Field(..., description='Pickled model in base64 format')
 
     def get_ordered_column_name_vec(self) -> Sequence[Text]:
-        return [item.get_name() for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
+        return [item.name for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
 
     def get_feat_type_map(self) -> Mapping[Text, Type]:
-        return {item.get_name(): item.get_type() for item in self.input_schema}
+        return {item.name: item.get_type() for item in self.input_schema}
 
     def has_attr(self, attr: Text) -> bool:
         return hasattr(base64_to_obj(self.model), attr)
@@ -128,6 +128,8 @@ class Model(MLSchema):
                 )
             )
             rmdir(storage_root.joinpath(model_name).joinpath(model_version))
+            if not any(storage_root.joinpath(model_name).iterdir()):
+                rmdir(storage_root.joinpath(model_name))
         else:
             logger.info(
                 'Deleting model: name <{model_name}> for all versions'.format(
@@ -185,15 +187,12 @@ class Model(MLSchema):
             model_file_name: Text = MODEL_PICKLE_FILE_NAME,
             conf_file_name: Text = MODEL_CONFIG_FILE_NAME
     ) -> Model:
-        zp: ZipFile = ZipFile(BytesIO(archive))
-
-        model_pkl: bytes = zp.read(name=model_file_name)
-
-        model: Any = pickle.loads(model_pkl)
-        conf: Dict = json.loads(zp.read(name=conf_file_name).decode(encoding='utf8'))
+        with ZipFile(BytesIO(archive)) as zp:
+            model_pkl: bytes = zp.read(name=model_file_name)
+            conf: Dict = json.loads(zp.read(name=conf_file_name).decode(encoding='utf8'))
 
         return Model(
-            model=obj_to_base64(model),
+            model=obj_to_base64(pickle.loads(model_pkl)),
             **conf
         )
 

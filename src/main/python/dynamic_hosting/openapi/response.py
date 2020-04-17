@@ -2,44 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Text, List, Dict
+from typing import Text, List, Dict, Optional, Union
 
 import numpy as np
 from pydantic import BaseModel, Field, validator
 
 
 class ServerStatus(BaseModel):
-    model_count: int = Field(..., description='Number of ml models in local provider')
-
-
-class BaseResponseBody(BaseModel):
-    """Ml output"""
-    raw_output: Dict = Field(
-        ...,
-        description=
-        'Data frame representation of result ndarray. '
-        'It should be used when the result of predictor can not be serialized by predefined output serializer',
-        example={'row_index': {'column_index': 'value'}}
-    )
-
-
-class ClassificationResponse(BaseModel):
-    """Ml output for the most common model.predict(array_like)"""
-    classification_output: Text = Field(
-        ...,
-        description=
-        'Classification output for model.predict(array_like)'
-    )
-
-
-class RegressionResponse(BaseModel):
-    """Ml output for the most common model.predict(array_like)"""
-    regression_output: float = Field(
-        ...,
-        description=
-        'Regression output for model.predict(array_like)'
-    )
+    model_count: np.long = Field(..., description='Number of ml models in local provider')
 
 
 class FeatProbaPair(BaseModel):
@@ -48,23 +18,16 @@ class FeatProbaPair(BaseModel):
     proba: np.float64
 
 
-class PredictProbaResponse(BaseModel):
-    """Ml output for the most common model.predict(array_like)"""
-    predict_output: Text = Field(
-        ...,
-        description=
-        'The classification result which maximize model.predict_proba(array_like)'
-    )
-    probabilities: List[FeatProbaPair] = Field(
-        ...,
-        description=
-        'Common output for model.predict_proba(array_like)'
-    )
+class Prediction(BaseModel):
+    """Ml output for model.predict(array_like) and model.predict_proba(array_like)"""
+    prediction: Text = Field(..., description='Model output for Classification/Regression')
+    probabilities: Optional[List[FeatProbaPair]] = Field(..., description='Probabilities for classification result')
 
-    @classmethod
-    @validator('probabilities', pre=False, always=True)
-    def probabilities_check(cls, probabilities: List[FeatProbaPair]) -> List[FeatProbaPair]:
-        if np.isclose(sum([pair.proba for pair in probabilities]), 1, rtol=1e-08, atol=1e-08, equal_nan=False):
+    @validator('probabilities', always=True)
+    def probabilities_check(cls, probabilities: Optional[List[FeatProbaPair]]) -> Optional[List[FeatProbaPair]]:
+        if probabilities is None:
+            return probabilities
+        if np.isclose(sum([pair.proba for pair in probabilities]), 1, rtol=1e-05, atol=1e-05, equal_nan=False):
             return probabilities
         else:
             raise ValueError('The sum of probabilities needs to be 1')

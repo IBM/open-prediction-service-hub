@@ -3,16 +3,15 @@
 import logging
 from logging import Logger
 from operator import itemgetter
-from typing import Text, Any, List, Optional
+from typing import Text, List
 
 import numpy as np
 from dynamic_hosting.core.configuration import ServerConfiguration
 from dynamic_hosting.core.model import Model, MLSchema
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.openapi.request import RequestBody
-from dynamic_hosting.openapi.response import FeatProbaPair, ServerStatus
+from dynamic_hosting.openapi.response import FeatProbaPair, ServerStatus, Prediction
 from fastapi import FastAPI, File
-from pydantic import BaseModel, Field
 
 app: FastAPI = FastAPI(
     version='0.0.0-SNAPSHOT',
@@ -22,13 +21,21 @@ app: FastAPI = FastAPI(
 )
 
 
-@app.get(tags=['Admin'], path='/status', response_model=ServerStatus)
+@app.get(
+    tags=['Admin'],
+    path='/status',
+    response_model=ServerStatus
+)
 def get_server_status() -> ServerStatus:
     ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
     return ServerStatus(model_count=len(ms.ml_models))
 
 
-@app.get(tags=['Admin'], path='/models', response_model=List[MLSchema])
+@app.get(
+    tags=['Admin'],
+    path='/models',
+    response_model=List[MLSchema]
+)
 def get_models() -> List[MLSchema]:
     """Returns the list of ML models."""
     ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
@@ -50,15 +57,13 @@ def add_model(*, file: bytes = File(...)) -> None:
     ModelService.load_from_disk(ServerConfiguration().model_storage).add_archive(file)
 
 
-@app.delete(tags=['Admin'], path='/models')
+@app.delete(
+    tags=['Admin'],
+    path='/models'
+)
 def remove_model(*, model_name: Text, model_version: Text = None) -> None:
     ModelService.load_from_disk(ServerConfiguration().model_storage).remove_model(model_name=model_name,
                                                                                   model_version=model_version)
-
-
-class Prediction(BaseModel):
-    prediction: Text = Field(..., description='Model output for Classification/Regression')
-    probabilities: Optional[List[FeatProbaPair]] = Field(..., description='Probabilities for classification result')
 
 
 @app.post(

@@ -5,7 +5,10 @@ launch:
 	docker run --rm -it -p 8080:8080 --name lml lml
 
 example:
-	python3 -m pytest -v src/main/python/tests/test_localml.py
+	python3 -m pytest -v src/main/python/tests
+
+coverage:
+	python3 pytest --cov=dynamic_hosting src/main/python/tests
 
 
 # Container Image management

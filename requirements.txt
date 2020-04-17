@@ -12,6 +12,8 @@ python-multipart  # file service
 uvicorn
 gunicorn
 # Optional:
+# Testing
+requests
 pytest
 coverage
-requests
+pytest-cov

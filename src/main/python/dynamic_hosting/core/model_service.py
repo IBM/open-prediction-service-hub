@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 import logging
 from pathlib import Path
-from typing import Mapping, Text, Any, Sequence, Dict, Type, Set, NoReturn
-
-from pydantic import BaseModel
+from typing import Mapping, Text, Any, Sequence, Dict, NoReturn
 
 from dynamic_hosting.core.model import Model
+from pydantic import BaseModel
 
 
 class ModelService(BaseModel):
@@ -21,17 +20,7 @@ class ModelService(BaseModel):
         logger = logging.getLogger(__name__)
         logger.debug('Invoke ml model <{name}> version <{version}>'.format(name=model_name, version=model_version))
 
-        model_map: Mapping[Text, Mapping[Text, Model]] = self.model_map()
-
-        if not model_map.get(model_name):
-            raise RuntimeError('Model <{name}> not found'.format(name=model_name))
-        if not model_map[model_name].get(model_version):
-            raise RuntimeError('Model <{name}> version  <{version}> not found'.format(
-                name=model_name,
-                version=model_version)
-            )
-
-        return model_map[model_name][model_version].invoke(data_input=data)
+        return self.model_map()[model_name][model_version].invoke(data_input=data)
 
     def add_model(
             self, model: Model
