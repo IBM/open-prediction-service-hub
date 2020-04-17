@@ -9,6 +9,7 @@ import numpy as np
 from dynamic_hosting.core.configuration import ServerConfiguration
 from dynamic_hosting.core.model import Model, MLSchema
 from dynamic_hosting.core.model_service import ModelService
+from dynamic_hosting.core.util import to_dataframe_compatible
 from dynamic_hosting.openapi.request import RequestBody
 from dynamic_hosting.openapi.response import FeatProbaPair, ServerStatus, Prediction
 from fastapi import FastAPI, File
@@ -86,7 +87,7 @@ def predict(
     res_matrix: np.ndarray = ms.invoke(
         model_name=ml_req.get_model_name(),
         model_version=ml_req.get_model_version(),
-        data=model.to_dataframe_compatible(ml_req.get_data())
+        data=to_dataframe_compatible(ml_req.get_data())
     )
 
     res = res_matrix[0]  # one input -> one output

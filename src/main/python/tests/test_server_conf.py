@@ -33,8 +33,9 @@ class TestServerConfiguration(unittest.TestCase):
         with tempfile.TemporaryDirectory() as test_env:
             test_env_path: Path = Path(test_env)
             model_storage: Path = test_env_path.joinpath('test_model_storage')
-            model_storage.mkdir(mode=0o500)
+            model_storage.mkdir(mode=0o100)
             self.assertRaises(PermissionError, ServerConfiguration, model_storage=model_storage)
+            model_storage.chmod(mode=0o700)  # help cleanup
 
     def test_conf_file_not_exist(self):
         not_existing_config_file: Path = Path('./not_exist.yaml')

@@ -9,7 +9,7 @@ import pickle
 from io import BytesIO
 from logging import Logger
 from pathlib import Path
-from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, OrderedDict, List
+from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
 from zipfile import ZipFile
 
 from dynamic_hosting.core.feature import Feature
@@ -59,14 +59,6 @@ class Model(MLSchema):
 
     def get_attr(self, attr: Text) -> Any:
         return getattr(base64_to_obj(self.model), attr)
-
-    def to_dataframe_compatible(self, kv_pair: OrderedDict[Text: Any]) -> Dict:
-        data_frame_compatible_dict: Dict = dict()
-        feature_map = self.get_feat_type_map()
-        for key, val in kv_pair.items():
-            if key in feature_map.keys():
-                data_frame_compatible_dict[key] = [val]
-        return data_frame_compatible_dict
 
     # TODO: better management for conversion error
     def invoke(

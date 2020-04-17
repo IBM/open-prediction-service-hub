@@ -15,7 +15,7 @@ from typing import List
 from dynamic_hosting import app
 from fastapi.testclient import TestClient
 from requests import Response
-from tests.prepare_models import miniloan_lr, miniloan_rfc, miniloan_rfr
+from .prepare_models import miniloan_lr, miniloan_rfc, miniloan_rfr
 
 OPENAPI_RESOURCE: Path = Path(__file__).resolve().parents[2].joinpath('resources').joinpath('openapi.json')
 

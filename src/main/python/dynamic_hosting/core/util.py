@@ -7,7 +7,7 @@ import logging
 import pickle
 from logging import Logger
 from pathlib import Path
-from typing import Text, Any
+from typing import Text, Any, Dict
 
 
 def rmdir(
@@ -30,3 +30,10 @@ def obj_to_base64(obj: Any) -> Text:
 
 def base64_to_obj(serialized: Text) -> Any:
     return pickle.loads(base64.b64decode(serialized))
+
+
+def to_dataframe_compatible(kv_pair: Dict[Text: Any]) -> Dict:
+    return {
+        key: [val]
+        for key, val in kv_pair.items()
+    }
