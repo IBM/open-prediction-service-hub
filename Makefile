@@ -8,7 +8,7 @@ example:
 	python3 -m pytest -v src/main/python/tests
 
 coverage:
-	python3 pytest --cov=dynamic_hosting src/main/python/tests
+	python3 -m pytest --cov=dynamic_hosting src/main/python/tests
 
 
 # Container Image management
