@@ -4,18 +4,15 @@ from __future__ import annotations
 
 import ast
 import json
-import shutil
 import os
-import tempfile
+import shutil
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Dict
 from typing import List
 
-import yaml
 from dynamic_hosting import app
-from dynamic_hosting.core.configuration import ServerConfiguration
 from fastapi.testclient import TestClient
 from requests import Response
 from tests.models import miniloan_lr, miniloan_rfc, miniloan_rfr
@@ -40,9 +37,14 @@ class TestEmbeddedClient(unittest.TestCase):
 
 
 class TestGetInfo(TestEmbeddedClient):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
+
     def setUp(self) -> None:
         super().setUp()
-        with miniloan_rfc().open(mode='rb') as fd:
+        with MINILOAN_RFC.open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
@@ -84,8 +86,9 @@ class TestGetInfo(TestEmbeddedClient):
 
 
 class TestAddModel(TestEmbeddedClient):
+
     def test_add_model(self):
-        with miniloan_rfr().open(mode='rb') as fd:
+        with MINILOAN_RFC.open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
@@ -97,9 +100,14 @@ class TestAddModel(TestEmbeddedClient):
 
 
 class TestDeleteModel(TestEmbeddedClient):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
+
     def setUp(self) -> None:
         super().setUp()
-        with miniloan_rfc().open(mode='rb') as fd:
+        with MINILOAN_RFC.open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
@@ -121,6 +129,7 @@ class TestDeleteModel(TestEmbeddedClient):
 
 
 class TestInvocation(TestEmbeddedClient):
+
     miniloan_input_params: List = [
         {
             "name": "creditScore",
@@ -142,15 +151,12 @@ class TestInvocation(TestEmbeddedClient):
 
     @classmethod
     def setUpClass(cls) -> None:
-        super(TestInvocation, cls).setUpClass()
+        shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
+        shutil.copy(src=str(miniloan_lr()), dst=str(MINILOAN_LR))
+        shutil.copy(src=str(miniloan_rfr()), dst=str(MINILOAN_RFR))
 
     def setUp(self) -> None:
         super().setUp()
-        shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
-
-        shutil.copy(src=str(miniloan_lr()), dst=str(MINILOAN_LR))
-
-        shutil.copy(src=str(miniloan_rfr()), dst=str(MINILOAN_RFR))
 
         with MINILOAN_RFC.open(mode='rb') as fd:
             res: Response = self.client.post(
@@ -199,55 +205,3 @@ class TestInvocation(TestEmbeddedClient):
         self.assertEqual(200, res.status_code)
         self.assertTrue(res.json()['prediction'] in ['true', 'false'])
         self.assertAlmostEqual(1.0, sum([f['proba'] for f in res.json()['probabilities']]))
-
-
-class TestServerConfiguration(unittest.TestCase):
-
-    def test_conf_file_not_readable(self):
-        with tempfile.NamedTemporaryFile(mode='x') as config_file:
-            # 'x' mode open for exclusive creation, failing if the file already exists
-            tmp_config_file_path: Path = Path(config_file.name)
-            tmp_config_file_path.chmod(0o100)
-            self.assertRaises(PermissionError, ServerConfiguration.from_yaml, tmp_config_file_path)
-
-    def test_model_storage_not_readable(self):
-        with tempfile.TemporaryDirectory() as test_env:
-            test_env_path: Path = Path(test_env)
-            model_storage: Path = test_env_path.joinpath('test_model_storage')
-            model_storage.mkdir(mode=0o300)
-            self.assertRaises(PermissionError, ServerConfiguration, model_storage=model_storage)
-            model_storage.chmod(mode=0o700)  # help cleanup
-
-    def test_model_storage_not_writable(self):
-        with tempfile.TemporaryDirectory() as test_env:
-            test_env_path: Path = Path(test_env)
-            model_storage: Path = test_env_path.joinpath('test_model_storage')
-            model_storage.mkdir(mode=0o500)
-            self.assertRaises(PermissionError, ServerConfiguration, model_storage=model_storage)
-
-    def test_conf_file_not_exist(self):
-        not_existing_config_file: Path = Path('./not_exist.yaml')
-        self.assertRaises(ValueError, ServerConfiguration.from_yaml, not_existing_config_file)
-
-    def test_model_storage_not_exist(self):
-        not_existing_model_storage: Path = Path('./not_exist')
-        self.assertRaises(ValueError, ServerConfiguration, model_storage=not_existing_model_storage)
-
-    def test_env_not_exist(self):
-        if os.environ.get('model_storage'):
-            del os.environ['model_storage']
-        self.assertRaises(ValueError, ServerConfiguration)
-
-    def test_valid_conf_file(self):
-        with tempfile.TemporaryDirectory() as model_storage:
-            with tempfile.NamedTemporaryFile(mode='x') as config_file:
-                conf: Dict = {'model_storage': model_storage}
-                conf_file_path: Path = Path(config_file.name)
-                with conf_file_path.open(mode='w') as fd:
-                    yaml.dump(conf, fd)
-                ServerConfiguration.from_yaml(conf_file_path)
-
-    def test_valid_env(self):
-        storage: Path = Path(__file__).resolve().parents[4].joinpath('runtime').joinpath('storage')
-        os.environ['model_storage'] = str(storage)
-        ServerConfiguration()
