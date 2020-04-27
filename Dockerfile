@@ -18,7 +18,10 @@ WORKDIR ${BUILD_DIR}
 COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
     python3 -m pip install -r requirements.txt && \
-    python3 setup.py install
+    python3 setup.py install  && \
+    python3 -m pytest -v src/main/python/tests/test_localml.py  && \
+    python3 runtime/init.py
+
 
 
 # Prepare runtime
@@ -34,7 +37,9 @@ EXPOSE ${SERVICE_PORT}
 #   Uvicorn worker class is required by Fastapi
 #   Container schedulers typically expect logs to come out on stdout/stderr, thus gunicorn is configured to do so
 #   Gunicorn needs to store its temporary file in memory (e.g. /dev/shm)
-ENTRYPOINT gunicorn --worker-class=uvicorn.workers.UvicornWorker --log-file=- --worker-tmp-dir=/dev/shm \
+ENTRYPOINT gunicorn --worker-class=uvicorn.workers.UvicornWorker \
+                    --log-file=- \
+                    --worker-tmp-dir=/dev/shm \
                     --chdir=${RUNTIME_DIR} \
                     --bind=:${SERVICE_PORT} \
                     --workers=${WORKER_NUM} asgi:app
