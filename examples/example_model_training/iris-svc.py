@@ -1,86 +1,81 @@
+#!/usr/bin/env python3
+
 import logging
+import pickle
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Text
 
 import numpy as np
 import pandas as pd
-from dynamic_hosting.core.model import Model
-from dynamic_hosting.core.util import obj_to_base64
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.svm import SVC
 
-DEFAULT_STORAGE_ROOT_DIR_NAME: Text = 'examples'
-DEFAULT_STORAGE_ROOT: Path = Path(__file__).resolve().parents[4].joinpath(DEFAULT_STORAGE_ROOT_DIR_NAME)
-
 
 def main():
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    col_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class_name']
-
-    iris = load_iris()
+    col_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'target']
 
     data = pd.DataFrame(
-        data=np.c_[iris['data'], iris['target']],
+        data=np.c_[load_iris()['data'], load_iris()['target']],
         columns=col_names
+    ).replace(
+        [np.inf, -np.inf],
+        np.nan
+    ).dropna().replace(
+        {
+            'target': {
+                i: val for i, val in enumerate(load_iris().target_names)
+            }
+        }
     )
 
-    data = data.replace([np.inf, -np.inf], np.nan).dropna()
+    train, test = train_test_split(data, random_state=7)
 
-    train, test = train_test_split(data, random_state=0)
+    logger.info(f'training size: {len(train)}')
+    logger.info(f'validation size: {len(test)}')
 
-    logger.info('training size: {size}'.format(size=len(train)))
-    logger.info('validation size: {size}'.format(size=len(test)))
-
-    grid = {
-        'C': [x for x in np.linspace(1e-5, 1.0, num=1000)],
-        'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
-        'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'rbf']
-    }
-
-    hyper_tuning_params = {
-        'estimator': SVC(random_state=0),
+    params = {
+        'estimator': SVC(random_state=42),
         'cv': 3,
-        'verbose': bool(__debug__),
-        'n_jobs': -1,
+        'random_state': 21,
+        'n_iter': 5e03,
         'scoring': 'accuracy',
-        'error_score': 'raise'
+        'error_score': 'raise',
+        'param_distributions': {
+            'C': [x for x in np.linspace(1e-5, 1.0, num=1000)],
+            'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
+            'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'rbf']
+        },
+        'verbose': bool(__debug__),
+        'n_jobs': -1
     }
 
-    random_search = {
-        'param_distributions': grid,
-        'random_state': 42,
-        'n_iter': 1000
-    }
+    parameter_estimator = RandomizedSearchCV(**params)
 
-    parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
+    x_train = train.loc[:, col_names[:-1]]
+    y_train = train.loc[:, col_names[-1]]
 
-    x = data.loc[:, col_names[:-1]]
-    y = data.loc[:, col_names[-1]]
-
-    parameter_estimator.fit(x, y)
+    parameter_estimator.fit(x_train, y_train)
     best_estimator = SVC(
-        random_state=0,
+        random_state=42,
         **parameter_estimator.best_params_
     )
 
-    best_estimator.fit(x, y)
+    best_estimator.fit(x_train, y_train)
 
-    res = best_estimator.score(test.loc[:, col_names[:-1]],
+    acc = best_estimator.score(test.loc[:, col_names[:-1]],
                                test.loc[:, col_names[-1]])
-    logger.info('accuracy: ' + str(res))
+    logger.info(f'accuracy: {acc}')
 
-    internal_model = Model(
-        model=obj_to_base64(best_estimator),
-        name='iris-svc',
-        version='v0',
-        method_name='predict',
-        type='CLASSIFICATION',
-        input_schema=[
+    conf = {
+        'name': 'iris-svc',
+        'version': 'v0',
+        'method_name': 'predict',
+        'input_schema': [
             {
                 'name': "sepal_length",
                 'order': 0,
@@ -102,21 +97,28 @@ def main():
                 'type': 'float64'
             }
         ],
-        output_schema=None,
-        metadata={
+        'output_schema': None,
+        'metadata': {
             'description': 'Iris classification',
             'author': 'ke',
             'trained_at': datetime.utcnow().isoformat(),
             'metrics': [
                 {
                     'name': 'accuracy',
-                    'value': res
+                    'value': acc
                 }
             ]
         }
-    )
+    }
 
-    internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='iris-svc.zip')
+    with Path(__file__).resolve().parent.joinpath(f'{conf["name"]}-{conf["version"]}.pkl').open(mode='wb') as fd:
+        pickle.dump(
+            obj={
+                'model': best_estimator,
+                'model_config': conf
+            },
+            file=fd
+        )
 
 
 if __name__ == '__main__':
