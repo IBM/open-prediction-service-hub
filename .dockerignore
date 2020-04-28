@@ -282,4 +282,9 @@ buildNumber.properties
 # ------- This project ----------------
 .idea
 *.iml
-#data
+
+!data/decision-on-spark/data/miniloan/miniloan-decisions-ls-10K.csv
+*.zip
+*.pkl
+runtime/storage/*
+src/test/resources/*

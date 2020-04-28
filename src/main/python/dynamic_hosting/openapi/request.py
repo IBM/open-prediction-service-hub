@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 # Union[int, float, str] The support of polymorphic input is not released
 # (https://github.com/OpenAPITools/openapi-generator/pull/5120)
-FEAT_VAL_T: Type = str
+FEAT_VAL_T: Type = Text
 
 
 class Parameter(BaseModel):

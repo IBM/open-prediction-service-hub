@@ -15,7 +15,7 @@ from zipfile import ZipFile
 from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.core.util import rmdir, base64_to_obj, obj_to_base64
 from pandas import DataFrame
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 MODEL_PICKLE_FILE_NAME: Text = 'archive.pkl'
 MODEL_ARCHIVE_NAME: Text = 'archive.zip'
@@ -47,6 +47,13 @@ class MLSchema(BaseModel):
 class Model(MLSchema):
     """Internal representation of ML model"""
     model: Text = Field(..., description='Pickled model in base64 format')
+
+    @validator('model', always=True)
+    def type_check(cls, m) -> Type:
+        if base64_to_obj(m) is not None:
+            return m
+        else:
+            raise ValueError(f'Model not supported: {m}')
 
     def get_ordered_column_name_vec(self) -> Sequence[Text]:
         return [item.name for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
@@ -86,24 +93,8 @@ class Model(MLSchema):
             self,
             data_input: DataFrame
     ) -> Any:
-        return getattr(base64_to_obj(self.model), self.method_name)(data_input)
-
-    @staticmethod
-    def load_from_disk(
-            storage_root: Path,
-            model_name: Text,
-            model_version: Text
-    ) -> Model:
-        logger: Logger = logging.getLogger(__name__)
-        model_dir: Path = storage_root.joinpath(model_name).joinpath(model_version)
-
-        with model_dir.joinpath(MODEL_CONFIG_FILE_NAME).open() as model_config_file:
-            model_config: Mapping[Text, Any] = json.load(model_config_file)
-
-            logger.info('Loaded model from: {storage_root}/{model_name}/{model_version}'.format(
-                storage_root=storage_root, model_name=model_name, model_version=model_version))
-            model: 'Model' = Model(**model_config)
-            return model
+        actual_model: Any = base64_to_obj(self.model)
+        return getattr(actual_model, self.method_name)(data_input)
 
     @staticmethod
     def remove_from_disk(
@@ -156,7 +147,6 @@ class Model(MLSchema):
             pickle_file_name: Text = MODEL_PICKLE_FILE_NAME,
             zip_file_name: Text = MODEL_ARCHIVE_NAME
     ) -> Path:
-
         logger: Logger = logging.getLogger(__name__)
 
         directory.mkdir(parents=True, exist_ok=True)
@@ -172,6 +162,37 @@ class Model(MLSchema):
         logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
 
         return zipfile_path
+
+    @staticmethod
+    def from_disk(
+            storage_root: Path,
+            model_name: Text,
+            model_version: Text
+    ) -> Model:
+        logger: Logger = logging.getLogger(__name__)
+        model_dir: Path = storage_root.joinpath(model_name).joinpath(model_version)
+
+        with model_dir.joinpath(MODEL_CONFIG_FILE_NAME).open() as model_config_file:
+            model_config: Mapping[Text, Any] = json.load(model_config_file)
+
+            logger.info('Loaded model from: {storage_root}/{model_name}/{model_version}'.format(
+                storage_root=storage_root, model_name=model_name, model_version=model_version))
+            model: 'Model' = Model(**model_config)
+            return model
+
+    @staticmethod
+    def from_pickle(
+            pickle_file: bytes,
+            model_name: Text = 'model',
+            metadata_name: Text = 'model_config'
+    ) -> Model:
+        archive: Dict = pickle.loads(pickle_file)
+        model: Model = archive.get(model_name)
+        conf: Dict = archive.get(metadata_name)
+        return Model(
+            model=obj_to_base64(model),
+            **conf
+        )
 
     @staticmethod
     def from_archive(

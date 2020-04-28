@@ -19,14 +19,14 @@ COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
     python3 -m pip install -r requirements.txt && \
     python3 setup.py install  && \
-    python3 -m pytest -v src/main/python/tests/test_localml.py  && \
-    python3 runtime/init.py
-
+    # use pickles
+    python3 -m pytest -v src/main/python/tests/test_localml.py && \
+    python3 runtime/init.py && \
+    cp -r runtime ${RUNTIME_DIR}
 
 
 # Prepare runtime
 WORKDIR ${RUNTIME_DIR}
-COPY ./runtime ${RUNTIME_DIR}
 RUN chown --recursive ${APP_USER}:${APP_USER} ${RUNTIME_DIR}/*
 
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import json
 import os
+import pickle
 import shutil
 import unittest
 from pathlib import Path
@@ -13,21 +14,20 @@ from typing import Dict
 from typing import List
 
 from dynamic_hosting import app
+from dynamic_hosting.core.util import base64_to_obj
 from fastapi.testclient import TestClient
 from requests import Response
-from .prepare_models import miniloan_lr, miniloan_rfc, miniloan_rfr
+from sklearn.linear_model import LogisticRegression
+
+from .prepare_models import miniloan_rfc_pickle, miniloan_lr_pickle, miniloan_rfr_pickle
 
 OPENAPI_RESOURCE: Path = Path(__file__).resolve().parents[2].joinpath('resources').joinpath('openapi.json')
 
 TEST_RES_DIR: Path = Path(__file__).resolve().parents[3].joinpath('test').joinpath('resources')
 
-MINILOAN_LR: Path = TEST_RES_DIR.joinpath('miniloan-lr.zip')
-MINILOAN_RFC: Path = TEST_RES_DIR.joinpath('miniloan-rfc.zip')
-MINILOAN_RFR: Path = TEST_RES_DIR.joinpath('miniloan-rfr.zip')
-
-shutil.copy(src=str(miniloan_rfc()), dst=str(MINILOAN_RFC))
-shutil.copy(src=str(miniloan_lr()), dst=str(MINILOAN_LR))
-shutil.copy(src=str(miniloan_rfr()), dst=str(MINILOAN_RFR))
+shutil.copy(src=str(miniloan_rfc_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-rfc.pkl')))
+shutil.copy(src=str(miniloan_lr_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-lr.pkl')))
+shutil.copy(src=str(miniloan_rfr_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-rfr.pkl')))
 
 
 class TestEmbeddedClient(unittest.TestCase):
@@ -45,7 +45,7 @@ class TestGetInfo(TestEmbeddedClient):
 
     def setUp(self) -> None:
         super().setUp()
-        with MINILOAN_RFC.open(mode='rb') as fd:
+        with miniloan_rfc_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
@@ -74,7 +74,7 @@ class TestGetInfo(TestEmbeddedClient):
         self.assertEqual('predict_proba', res_content['method_name'])
         self.assertEqual(
             [{'name': 'creditScore', 'order': 0, 'type': 'int64'},
-             {'name': 'income', 'order': 1, 'type': 'float32'},
+             {'name': 'income', 'order': 1, 'type': 'float64'},
              {'name': 'loanAmount', 'order': 2, 'type': 'float64'},
              {'name': 'monthDuration', 'order': 3, 'type': 'float64'},
              {'name': 'rate', 'order': 4, 'type': 'float64'}],
@@ -82,18 +82,21 @@ class TestGetInfo(TestEmbeddedClient):
         self.assertEqual('Loan approval', res_content['metadata']['description'])
         self.assertEqual('ke', res_content['metadata']['author'])
         self.assertIsNotNone(res_content['metadata']['trained_at'])
-        self.assertEqual([{'name': 'accuracy', 'value': '0.9843875100080064'}], res_content['metadata']['metrics'])
+        self.assertEqual(float, type(ast.literal_eval(res_content['metadata']['metrics'][0]['value'])))
         self.assertEqual(None, res_content['output_schema'])
 
 
 class TestAddModel(TestEmbeddedClient):
 
     def test_add_model(self):
-        with MINILOAN_RFC.open(mode='rb') as fd:
-            res: Response = self.client.post(
-                "/models",
-                files={'file': fd}
-            )
+        with miniloan_rfc_pickle().open(mode='rb') as fd:
+            contents: bytes = fd.read()
+
+        print(pickle.loads(contents))
+        res: Response = self.client.post(
+            "/models",
+            files={'file': contents}
+        )
         self.assertEqual(200, res.status_code)
         res: Response = self.client.get(url='/status')
         self.assertEqual(200, res.status_code)
@@ -104,7 +107,7 @@ class TestDeleteModel(TestEmbeddedClient):
 
     def setUp(self) -> None:
         super().setUp()
-        with MINILOAN_RFC.open(mode='rb') as fd:
+        with miniloan_rfc_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
@@ -157,19 +160,19 @@ class TestInvocation(TestEmbeddedClient):
     def setUp(self) -> None:
         super().setUp()
 
-        with MINILOAN_RFC.open(mode='rb') as fd:
+        with miniloan_rfc_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
-        with MINILOAN_RFR.open(mode='rb') as fd:
+        with miniloan_rfr_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
-        with MINILOAN_LR.open(mode='rb') as fd:
+        with miniloan_lr_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
                 "/models",
                 files={'file': fd}

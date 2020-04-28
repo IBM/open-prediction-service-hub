@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import logging
+import pickle
 from pathlib import Path
 from typing import Mapping, Text, Any, Sequence, Dict, NoReturn
 
@@ -32,10 +33,12 @@ class ModelService(BaseModel):
             self,
             archive: bytes
     ) -> NoReturn:
-        self.add_model(
-            Model.from_archive(
-                archive=archive
+        d = pickle.loads(archive)
+        model: Model = Model.from_pickle(
+                pickle_file=archive
             )
+        self.add_model(
+            model
         )
 
     def remove_model(
@@ -70,7 +73,7 @@ class ModelService(BaseModel):
             storage_root: Path
     ) -> Sequence[Model]:
         return [
-            Model.load_from_disk(
+            Model.from_disk(
                 storage_root=storage_root,
                 model_name=model_abspath.name,
                 model_version=versioned_model_abspath.name)

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-import os
-from pathlib import Path
-
 from dynamic_hosting import app
 
 # For debug
 if __name__ == "__main__":
+    import os
+    from pathlib import Path
+
     import uvicorn
 
     os.environ['model_storage'] = str(Path(__file__).resolve().parent.joinpath('storage'))
