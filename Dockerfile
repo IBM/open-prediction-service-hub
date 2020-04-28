@@ -19,9 +19,7 @@ COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
     python3 -m pip install -r requirements.txt && \
     python3 setup.py install  && \
-    # use pickles
-    python3 -m pytest -v src/main/python/tests/test_localml.py && \
-    python3 runtime/init.py && \
+    python3 src/main/python/tests/prepare_models.py && python3 runtime/init.py && \
     cp -r runtime ${RUNTIME_DIR}
 
 

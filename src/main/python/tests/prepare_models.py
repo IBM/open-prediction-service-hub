@@ -358,7 +358,7 @@ def miniloan_lr_pickle() -> Path:
     random_search = {
         'param_distributions': grid,
         'random_state': 42,
-        'n_iter': 500
+        'n_iter': 20
     }
 
     parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
@@ -516,7 +516,6 @@ def miniloan_rfc_pickle() -> Path:
 
 
 def miniloan_rfr_pickle() -> Path:
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
     des: Path = DEFAULT_STORAGE_ROOT.joinpath('miniloan-rfr.pkl')
@@ -549,7 +548,7 @@ def miniloan_rfr_pickle() -> Path:
     random_search = {
         'param_distributions': grid,
         'random_state': 42,
-        'n_iter': 20
+        'n_iter': 10
     }
 
     parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
@@ -599,3 +598,9 @@ def miniloan_rfr_pickle() -> Path:
         )
 
     return des
+
+
+if __name__ == '__main__':
+    miniloan_lr_pickle()
+    miniloan_rfc_pickle()
+    miniloan_rfr_pickle()

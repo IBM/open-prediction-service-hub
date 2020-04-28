@@ -13,6 +13,6 @@ uvicorn
 gunicorn
 # Testing
 requests
-pytest
-coverage
-pytest-cov
+#pytest
+#coverage
+#pytest-cov

@@ -283,8 +283,12 @@ buildNumber.properties
 .idea
 *.iml
 
-!data/decision-on-spark/data/miniloan/miniloan-decisions-ls-10K.csv
+
+
 *.zip
 *.pkl
 runtime/storage/*
 src/test/resources/*
+
+/data/decisions-on-spark/*
+!/data/decisions-on-spark/data/miniloan/miniloan-decisions-ls-10K.csv
