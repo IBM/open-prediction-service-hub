@@ -11,16 +11,18 @@ ENV SERVICE_PORT=8080
 
 # ENV variables used by server
 ENV model_storage=${RUNTIME_DIR}/storage
+# set EML_RETRAIN_MODELS to retrain all models
+# ENV EML_RETRAIN_MODELS=1
 
 
-# Install this project and prepare example for runtime
+# Install this project
 WORKDIR ${BUILD_DIR}
 COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
     python3 -m pip install -r requirements.txt && \
-    python3 setup.py install  && \
-    python3 src/main/python/tests/prepare_models.py && python3 runtime/init.py && \
-    cp -r runtime ${RUNTIME_DIR}
+    python3 setup.py install && \
+    # prepare example for runtime
+    python3 src/main/python/tests/prepare_models.py && python3 runtime/init.py && cp -r runtime ${RUNTIME_DIR}
 
 
 # Prepare runtime

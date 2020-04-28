@@ -1,7 +1,7 @@
 # Ignore everything
 /*
 
-# Except those two ignore files
-!.dockerignore
+# Except
+!*.pkl
 !.gitignore
 

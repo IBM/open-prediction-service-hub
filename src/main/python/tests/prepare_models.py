@@ -358,7 +358,7 @@ def miniloan_lr_pickle() -> Path:
     random_search = {
         'param_distributions': grid,
         'random_state': 42,
-        'n_iter': 20
+        'n_iter': 10
     }
 
     parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
@@ -601,6 +601,7 @@ def miniloan_rfr_pickle() -> Path:
 
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
     miniloan_lr_pickle()
     miniloan_rfc_pickle()
     miniloan_rfr_pickle()

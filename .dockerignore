@@ -283,10 +283,6 @@ buildNumber.properties
 .idea
 *.iml
 
-
-
-*.zip
-*.pkl
 runtime/storage/*
 src/test/resources/*
 
