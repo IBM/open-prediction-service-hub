@@ -2,40 +2,27 @@
 
 [![Build Status](https://travis.ibm.com/dba/ads-ml-service.svg?token=1gxxdyFN2gDs6CM3JxPc&branch=dev)](https://travis.ibm.com/dba/ads-ml-service)
 
-This repository includes sample material to show how IBM Decision Services can leverage ML predictive models hosted as micro services.
+This repository is part of ADS project.
 
-The technical proposal fits with a concept of operations based on 3 main roles and 4 steps:
- - Step 1: A Data scientist elaborates an ML model in a data science tool.
- - Step 2: A Data scientist exports an ML model serialized in pickle of joblib.
- - Step 3: A developer takes the serialized ML model and hosts it as a microservice
- - Step 4: A Business user creates a decision service in IBM Digital Business Automation that invokes the hosted ML model
- 
+## Usage
 
-The technologies selected here to fullfill a lightweight machine learning predictive model hosting are:
-- Docker, as a container standard, used here to easily build and deploy a Python environment,
-- Python, the de facto prefered language for ML,
-- Fastapi, the framework bringing web app and RESTfull APIs,
-- Pickle, the standard serialization library for Python,
-
-
-## Clone the project 
+To clone the project 
 ```shell script
 git clone --recurse-submodules git@github.ibm.com:dba/ads-ml-service.git ads-ml-service
 ```
-the `--recurse-submodules` option is needed to download training data for example models
 
-## Build the ML microservice
+To build the microservice image
 ```shell script
-make image
+docker build -t embedded_ml .
 ```
 
-## Run the ML microservice
+To run the microservice
 ```shell script
-make launch
+docker run --rm -it -p 8080:8080 --name lml embedded_ml
 ```
-Your predictive service is ready to predict on the 127.0.0.1:8080 port.
+Your predictive service is then ready at `http://127.0.0.1:8080`.
 
-## Usage
+
 
 ### Configuration example for miniloan classification
 
@@ -74,11 +61,15 @@ Your predictive service is ready to predict on the 127.0.0.1:8080 port.
   ],
   "output_schema": null,
   "metadata": {
-    "name": "Loan payment classification",
-    "date": "2020-03-17 13:25:23",
-    "metrics": {
-      "accuracy": 0.9471577261809447
-    }
+    "description": "Loan payment classification",
+    "trained_at": "2020-03-17 13:25:23",
+    "author": "Somebody",
+    "metrics": [
+      {
+        "name":  "accuracy",
+        "value": 0.9471577261809447
+      }
+    ]
   }
 }
 ```
@@ -97,29 +88,58 @@ in the current iteration and local provider gives formatted result for the most 
 cases (by using pre-configured output mapping).
 Now the local provider supports the default output of predict/predict_proba for scikit-learn.
 
-There is no constraint for `metadata`.
+`metadata` needs to have `description`, `trained_at`, `author` and associated `metrics`.
+
 
 ### Example for model invocation
 
+Request body
 ```json
 {
   "model_name": "miniloan-rfc-RandomizedSearchCV",
   "model_version": "v0",
   "params": {
-    "creditScore": 5.9,
-    "income": 3.0,
-    "loanAmount": 5.1,
-    "monthDuration": 1.8,
-    "rate": 1.8
+    "creditScore": 400.0,
+    "income": 44000.0,
+    "loanAmount": 32000,
+    "monthDuration": 24,
+    "rate": 2.0
   }
 }
 ```
 
-`model_name` and `model_version`are used to load ml model from disk. Parameters of ml
+`model_name` and `model_version`are used to load ml model from storage. Parameters of ml
 models are arranged in key-values pairs.
+
+Response body may looks like:
+```json
+{
+    "prediction": "true",
+    "probabilities": [
+        {
+          "name": "true",
+          "proba": 0.66
+        },
+        {
+          "name": "false",
+          "proba": 0.34
+        }
+    ]   
+}
+```
+when we want to determine whether accept such application. (the attribute `probabilities`
+may be null)
+
+or looks like:
+```json
+{
+    "prediction": "534"
+}
+```
+when we want to calculate some scores related to this application.
+
 
 ## Features to be added
 
 * Range support
 * Add format for numerical features
-* Individual output schema for each model
