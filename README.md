@@ -139,6 +139,9 @@ or looks like:
 when we want to calculate some scores related to this application.
 
 
+## Example of model creation
+[here](examples/model_training/README.md)
+
 ## Features to be added
 
 * Range support
