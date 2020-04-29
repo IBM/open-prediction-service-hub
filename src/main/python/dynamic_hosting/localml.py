@@ -14,12 +14,15 @@ from dynamic_hosting.openapi.request import RequestBody
 from dynamic_hosting.openapi.response import FeatProbaPair, ServerStatus, Prediction
 from fastapi import FastAPI, File
 
+from fastapi_versioning import VersionedFastAPI, version
+
 app: FastAPI = FastAPI(
     version='0.0.0-SNAPSHOT',
     title='Local ml provider',
-    description='A simple environment to test machine learning model',
-    docs_url='/'
+    description='A simple environment to test machine learning model'
 )
+
+VER: int = 1
 
 
 @app.get(
@@ -27,6 +30,7 @@ app: FastAPI = FastAPI(
     path='/status',
     response_model=ServerStatus
 )
+@version(major=VER)
 def get_server_status() -> ServerStatus:
     ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
     return ServerStatus(model_count=len(ms.ml_models))
@@ -37,6 +41,7 @@ def get_server_status() -> ServerStatus:
     path='/models',
     response_model=List[MLSchema]
 )
+@version(major=VER)
 def get_models() -> List[MLSchema]:
     """Returns the list of ML models."""
     ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
@@ -54,6 +59,7 @@ def get_models() -> List[MLSchema]:
         }
     }
 )
+@version(major=VER)
 def add_model(*, file: bytes = File(...)) -> None:
     ModelService.load_from_disk(ServerConfiguration().model_storage).add_archive(file)
 
@@ -62,6 +68,7 @@ def add_model(*, file: bytes = File(...)) -> None:
     tags=['Admin'],
     path='/models'
 )
+@version(major=VER)
 def remove_model(*, model_name: Text, model_version: Text = None) -> None:
     ModelService.load_from_disk(ServerConfiguration().model_storage).remove_model(model_name=model_name,
                                                                                   model_version=model_version)
@@ -72,6 +79,7 @@ def remove_model(*, model_name: Text, model_version: Text = None) -> None:
     path='/invocations',
     response_model=Prediction
 )
+@version(major=VER)
 def predict(
         *,
         ml_req: RequestBody
@@ -104,3 +112,6 @@ def predict(
         )
     else:
         return Prediction(prediction=res, probabilities=None)
+
+
+app = VersionedFastAPI(app, version_format='{major}', prefix_format='/v{major}')

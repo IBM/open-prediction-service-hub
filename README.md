@@ -20,7 +20,8 @@ To run the microservice
 ```shell script
 docker run --rm -it -p 8080:8080 --name lml embedded_ml
 ```
-Your predictive service is then ready at `http://127.0.0.1:8080`.
+Your predictive service is then ready at `http://localhost:8080/v1` and 
+its openapi docs is available at `http://localhost:8080/v1/docs`.
 
 
 

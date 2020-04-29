@@ -10,16 +10,16 @@ import shutil
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict
+from typing import Dict, Text
 from typing import List
 
 from dynamic_hosting import app
-from dynamic_hosting.core.util import base64_to_obj
 from fastapi.testclient import TestClient
 from requests import Response
-from sklearn.linear_model import LogisticRegression
 
 from .prepare_models import miniloan_rfc_pickle, miniloan_lr_pickle, miniloan_rfr_pickle
+
+from dynamic_hosting.localml import VER
 
 OPENAPI_RESOURCE: Path = Path(__file__).resolve().parents[2].joinpath('resources').joinpath('openapi.json')
 
@@ -28,6 +28,8 @@ TEST_RES_DIR: Path = Path(__file__).resolve().parents[3].joinpath('test').joinpa
 shutil.copy(src=str(miniloan_rfc_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-rfc.pkl')))
 shutil.copy(src=str(miniloan_lr_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-lr.pkl')))
 shutil.copy(src=str(miniloan_rfr_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-rfr.pkl')))
+
+API_VER: Text = f'/v{VER}'
 
 
 class TestEmbeddedClient(unittest.TestCase):
@@ -47,24 +49,24 @@ class TestGetInfo(TestEmbeddedClient):
         super().setUp()
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
-                "/models",
+                API_VER + "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
 
     def test_openapi(self):
-        res: Response = self.client.get(url='/openapi.json')
+        res: Response = self.client.get(url=API_VER + '/openapi.json')
         openapi: Dict = res.json()
         with OPENAPI_RESOURCE.open(mode='w') as fd:
             json.dump(obj=openapi, fp=fd)
 
     def test_get_server_status(self):
-        res: Response = self.client.get(url='/status')
+        res: Response = self.client.get(url=API_VER + '/status')
         self.assertEqual(200, res.status_code)
         self.assertEqual(1, res.json().get('model_count'))
 
     def test_get_models(self):
-        res: Response = self.client.get(url='/models')
+        res: Response = self.client.get(url=API_VER + '/models')
         self.assertEqual(200, res.status_code)
 
         res_content: Dict = res.json()[0]
@@ -94,11 +96,11 @@ class TestAddModel(TestEmbeddedClient):
 
         print(pickle.loads(contents))
         res: Response = self.client.post(
-            "/models",
+            API_VER + "/models",
             files={'file': contents}
         )
         self.assertEqual(200, res.status_code)
-        res: Response = self.client.get(url='/status')
+        res: Response = self.client.get(url=API_VER + '/status')
         self.assertEqual(200, res.status_code)
         self.assertEqual(1, res.json().get('model_count'))
 
@@ -109,35 +111,34 @@ class TestDeleteModel(TestEmbeddedClient):
         super().setUp()
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
-                "/models",
+                API_VER + "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
 
     def test_delete_model_by_name_and_version(self):
-        res_delete: Response = self.client.delete(url='/models',
+        res_delete: Response = self.client.delete(url=API_VER + '/models',
                                                   params={'model_name': 'miniloan-rfc', 'model_version': 'v0'})
         self.assertEqual(200, res_delete.status_code)
 
-        info_2: Response = self.client.get(url='/status')
+        info_2: Response = self.client.get(url=API_VER + '/status')
         self.assertEqual(200, info_2.status_code)
         self.assertEqual(0, info_2.json().get('model_count'))
 
     def test_delete_model_by_name(self):
-        info_1: Response = self.client.get(url='/status')
+        info_1: Response = self.client.get(url=API_VER + '/status')
         self.assertEqual(200, info_1.status_code)
         self.assertEqual(1, info_1.json().get('model_count'))
 
-        res_delete: Response = self.client.delete(url='/models', params={'model_name': 'miniloan-rfc'})
+        res_delete: Response = self.client.delete(url=API_VER + '/models', params={'model_name': 'miniloan-rfc'})
         self.assertEqual(200, res_delete.status_code)
 
-        info_2: Response = self.client.get(url='/status')
+        info_2: Response = self.client.get(url=API_VER + '/status')
         self.assertEqual(200, info_2.status_code)
         self.assertEqual(0, info_2.json().get('model_count'))
 
 
 class TestInvocation(TestEmbeddedClient):
-
     miniloan_input_params: List = [
         {
             "name": "creditScore",
@@ -162,25 +163,25 @@ class TestInvocation(TestEmbeddedClient):
 
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
-                "/models",
+                API_VER + "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
         with miniloan_rfr_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
-                "/models",
+                API_VER + "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
         with miniloan_lr_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
-                "/models",
+                API_VER + "/models",
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
 
     def test_classification(self):
-        res: Response = self.client.post(url='/invocations', json={
+        res: Response = self.client.post(url=API_VER + '/invocations', json={
             "model_name": "miniloan-lr",
             "model_version": "v0",
             "params": TestInvocation.miniloan_input_params})
@@ -188,7 +189,7 @@ class TestInvocation(TestEmbeddedClient):
         self.assertTrue(res.json()['prediction'] in ['true', 'false'])
 
     def test_regression(self):
-        res: Response = self.client.post(url='/invocations', json={
+        res: Response = self.client.post(url=API_VER + '/invocations', json={
             "model_name": "miniloan-rfr",
             "model_version": "v0",
             "params": TestInvocation.miniloan_input_params
@@ -198,7 +199,7 @@ class TestInvocation(TestEmbeddedClient):
         self.assertTrue(isinstance(ast.literal_eval(res.json()['prediction']), float))
 
     def test_predict_proba(self):
-        res: Response = self.client.post(url='/invocations', json={
+        res: Response = self.client.post(url=API_VER + '/invocations', json={
             "model_name": "miniloan-rfc",
             "model_version": "v0",
             "params": TestInvocation.miniloan_input_params

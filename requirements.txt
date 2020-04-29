@@ -7,6 +7,7 @@ pydantic
 scikit-learn
 ## Web interface
 fastapi
+fastapi-versioning
 pyyaml  # server configurations
 python-multipart  # file service
 uvicorn
