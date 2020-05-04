@@ -97,15 +97,26 @@ Now the local provider supports the default output of predict/predict_proba for 
 Request body
 ```json
 {
-  "model_name": "miniloan-rfc-RandomizedSearchCV",
+  "model_name": "miniloan-rfc",
   "model_version": "v0",
-  "params": {
-    "creditScore": 400.0,
-    "income": 44000.0,
-    "loanAmount": 32000,
-    "monthDuration": 24,
-    "rate": 2.0
-  }
+  "params": [
+        {
+            "name": "creditScore",
+            "value": 400
+        }, {
+            "name": "income",
+            "value": 45000
+        }, {
+            "name": "loanAmount",
+            "value": 100000
+        }, {
+            "name": "monthDuration",
+            "value": 24
+        }, {
+            "name": "rate",
+            "value": 2.0
+        }
+    ]
 }
 ```
 
