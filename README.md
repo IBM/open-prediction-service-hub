@@ -16,7 +16,7 @@ To build the microservice image
 docker build -t embedded_ml .
 ```
 
-To run the microservice
+To test the microservice
 ```shell script
 docker run --rm -it -p 8080:8080 --name lml embedded_ml
 ```
@@ -29,9 +29,8 @@ its openapi docs is available at `http://localhost:8080/v1/docs`.
 
 ```json
 {
-  "name": "miniloan-rfc-RandomizedSearchCV",
+  "name": "miniloan-rfc",
   "version": "v0",
-  "library": "scikit-learn",
   "method_name": "predict",
   "input_schema": [
     {
@@ -60,11 +59,26 @@ its openapi docs is available at `http://localhost:8080/v1/docs`.
       "type": "float64"
     }
   ],
-  "output_schema": null,
+  "output_schema": {
+        "attributes": [
+            {
+                "name": "prediction",
+                "type": "str"
+            },
+            {
+                "name": "probabilities",
+                "type": "[Probability]"
+            }
+        ]
+  },
   "metadata": {
     "description": "Loan payment classification",
-    "trained_at": "2020-03-17 13:25:23",
     "author": "Somebody",
+    "trained_at": "2020-03-17 13:25:23",
+    "class_names": {
+      "0": "false",
+      "1": "true"
+    },
     "metrics": [
       {
         "name":  "accuracy",
@@ -76,8 +90,6 @@ its openapi docs is available at `http://localhost:8080/v1/docs`.
 ```
 
 ML model is uniquely identified by its `name` and its `version`. 
-
-`library` will be used in next iteration (It is ignored in current version).
 
 ML models are python classes. Local provider needs to know the `method_name` of prediction method.
 
