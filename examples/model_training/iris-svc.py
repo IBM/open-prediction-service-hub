@@ -97,11 +97,21 @@ def main():
                 'type': 'float64'
             }
         ],
-        'output_schema': None,
+        'output_schema': {
+            'attributes': [
+                {
+                    'name': 'prediction',
+                    'type': 'str'
+                }
+            ]
+        },
         'metadata': {
             'description': 'Iris classification',
             'author': 'ke',
             'trained_at': datetime.utcnow().isoformat(),
+            'class_names': {
+                i: val for i, val in enumerate(best_estimator.classes_)
+            },
             'metrics': [
                 {
                     'name': 'accuracy',
