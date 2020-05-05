@@ -9,11 +9,11 @@ from pathlib import Path
 from dynamic_hosting.core import Model
 from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.core.util import base64_to_obj
-from dynamic_hosting.openapi.response import Prediction, FeatProbaPair
+from dynamic_hosting.openapi.response import Prediction, Probability
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-from tests.prepare_models import miniloan_rfc_pickle, miniloan_rfc_zip, miniloan_lr_pickle
+from tests.prepare_models import miniloan_rfc_zip, miniloan_lr_pickle
 
 
 class TestFeature(unittest.TestCase):
@@ -101,14 +101,14 @@ class TestFeature(unittest.TestCase):
 class TestPrediction(unittest.TestCase):
     def test_not_valid_predict_proba(self):
         self.assertRaises(ValueError, Prediction, prediction='error', probabilities=[
-            FeatProbaPair(name='n{i}'.format(i=i), proba=val) for i, val in enumerate(
+            Probability(class_name=f'n{i}', class_index=i, value=val) for i, val in enumerate(
                 np.random.dirichlet(np.ones(10), size=1)[0] / 2)
         ]
                           )
 
     def test_valid_predict_proba(self):
         Prediction(prediction='good', probabilities=[
-            FeatProbaPair(name='n{i}'.format(i=i), proba=val) for i, val in enumerate(
+            Probability(class_name=f'n{i}', class_index=i, value=val) for i, val in enumerate(
                 np.random.dirichlet(np.ones(10), size=1)[0])
         ]
                    )

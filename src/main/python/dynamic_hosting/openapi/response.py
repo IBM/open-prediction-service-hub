@@ -12,22 +12,22 @@ class ServerStatus(BaseModel):
     model_count: np.long = Field(..., description='Number of ml models in local provider')
 
 
-class FeatProbaPair(BaseModel):
-    """Pair of feature name and its corresponding probability"""
-    name: Text
-    proba: np.float64
+class Probability(BaseModel):
+    class_name: Optional[Text]
+    class_index: int
+    value: np.float64
 
 
 class Prediction(BaseModel):
     """Ml output for model.predict(array_like) and model.predict_proba(array_like)"""
     prediction: Text = Field(..., description='Model output for Classification/Regression')
-    probabilities: Optional[List[FeatProbaPair]] = Field(..., description='Probabilities for classification result')
+    probabilities: Optional[List[Probability]] = Field(None, description='Probabilities for classification result')
 
     @validator('probabilities', always=True)
-    def probabilities_check(cls, probabilities: Optional[List[FeatProbaPair]]) -> Optional[List[FeatProbaPair]]:
+    def probabilities_check(cls, probabilities: Optional[List[Probability]]) -> Optional[List[Probability]]:
         if probabilities is None:
             return probabilities
-        if np.isclose(sum([pair.proba for pair in probabilities]), 1, rtol=1e-05, atol=1e-05, equal_nan=False):
+        if np.isclose(sum([pair.value for pair in probabilities]), 1, rtol=1e-05, atol=1e-05, equal_nan=False):
             return probabilities
         else:
             raise ValueError('The sum of probabilities needs to be 1')

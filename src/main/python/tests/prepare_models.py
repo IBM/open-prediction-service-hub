@@ -127,7 +127,14 @@ def miniloan_lr_zip() -> Path:
         version='v0',
         method_name='predict',
         input_schema=INPUT_SCHEMA,
-        output_schema=None,
+        output_schema={
+            'attributes': [
+                {
+                    'name': 'prediction',
+                    'type': 'str'
+                }
+            ]
+        },
         metadata={
             'description': 'Loan approval',
             'author': 'ke',
@@ -204,7 +211,14 @@ def miniloan_rfr_zip() -> Path:
         version='v0',
         method_name='predict',
         input_schema=INPUT_SCHEMA,
-        output_schema=None,
+        output_schema={
+            'attributes': [
+                {
+                    'name': 'prediction',
+                    'type': 'float'
+                }
+            ]
+        },
         metadata={
             'description': 'Evaluation of yearlyReimbursement',
             'author': 'ke',
@@ -302,7 +316,14 @@ def miniloan_rfc_zip() -> Path:
                 'type': 'float64'
             }
         ],
-        'output_schema': None,
+        'output_schema': {
+            'attributes': [
+                {
+                    'name': 'prediction',
+                    'type': 'str'
+                }
+            ]
+        },
         'metadata': {
             'description': 'Loan approval',
             'author': 'ke',
@@ -383,7 +404,14 @@ def miniloan_lr_pickle() -> Path:
         'version': 'v0',
         'method_name': 'predict',
         'input_schema': INPUT_SCHEMA,
-        'output_schema': None,
+        'output_schema': {
+            'attributes': [
+                {
+                    'name': 'prediction',
+                    'type': 'str'
+                }
+            ]
+        },
         'metadata': {
             'description': 'Loan approval',
             'author': 'ke',
@@ -489,7 +517,138 @@ def miniloan_rfc_pickle() -> Path:
                 'type': 'float64'
             }
         ],
-        'output_schema': None,
+        'output_schema': {
+            'attributes': [
+                {
+                    'name': 'prediction',
+                    'type': 'str'
+                },
+                {
+                    'name': 'probabilities',
+                    'type': '[Probability]'
+                }
+            ]
+        },
+        'metadata': {
+            'description': 'Loan approval',
+            'author': 'ke',
+            'trained_at': datetime.utcnow().isoformat(),
+            'class_names': {
+                i: val for i, val in enumerate(best_estimator.classes_)
+            },
+            'metrics': [
+                {
+                    'name': 'accuracy',
+                    'value': acc
+                }
+            ]
+        }
+    }
+
+    with des.open(mode='wb') as fd:
+        pickle.dump(
+            obj={
+                'model': best_estimator,
+                'model_config': conf
+            },
+            file=fd
+        )
+
+    return des
+
+
+def miniloan_rfc_no_class_names_pickle() -> Path:
+    logger = logging.getLogger(__name__)
+
+    des: Path = DEFAULT_STORAGE_ROOT.joinpath('miniloan-rfc-no-output-schema.pkl')
+    if des.exists() and not os.getenv('EML_RETRAIN_MODELS'):
+        logger.debug(f'model {des} exists, set EML_RETRAIN_MODELS to retain')
+        return des
+
+    used_names = ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'approval']
+
+    train, test = train_test_split(DATA, random_state=7)
+
+    logger.info(f'training size: {len(train)}')
+    logger.info(f'validation size: {len(test)}')
+
+    params = {
+        'estimator': RandomForestClassifier(random_state=42),
+        'cv': 3,
+        'verbose': bool(__debug__),
+        'n_jobs': -1,
+        'random_state': 21,
+        'n_iter': 5,
+        'scoring': 'accuracy',
+        'error_score': 'raise',
+        'param_distributions': {
+            'criterion': ['gini'],
+            'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
+            'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
+            'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
+        }
+    }
+
+    parameter_estimator = RandomizedSearchCV(**params)
+
+    x_train = train.loc[:, used_names[:-1]]
+    y_train = train.loc[:, used_names[-1]]
+
+    parameter_estimator.fit(x_train, y_train)
+    best_estimator = RandomForestClassifier(
+        random_state=42,
+        **parameter_estimator.best_params_
+    )
+
+    best_estimator.fit(x_train, y_train)
+
+    acc = best_estimator.score(test.loc[:, used_names[:-1]],
+                               test.loc[:, used_names[-1]])
+    logger.info(f'accuracy: {acc}')
+
+    conf = {
+        'name': 'miniloan-rfc-no-output-schema',
+        'version': 'v0',
+        'method_name': 'predict_proba',
+        'input_schema': [
+            {
+                'name': "creditScore",
+                'order': 0,
+                'type': 'int64'
+            },
+            {
+                'name': "income",
+                'order': 1,
+                'type': 'float64'
+            },
+            {
+                'name': "loanAmount",
+                'order': 2,
+                'type': 'float64'
+            },
+            {
+                'name': "monthDuration",
+                'order': 3,
+                'type': 'float64'
+            },
+            {
+                'name': "rate",
+                'order': 4,
+                'type': 'float64'
+            }
+        ],
+        'output_schema': {
+            'attributes': [
+                {
+                    'name': 'prediction',
+                    'type': 'str'
+                },
+                {
+                    'name': 'probabilities',
+                    'type': '[Probability]'
+                }
+            ]
+        },
         'metadata': {
             'description': 'Loan approval',
             'author': 'ke',
@@ -573,7 +732,14 @@ def miniloan_rfr_pickle() -> Path:
         'version': 'v0',
         'method_name': 'predict',
         'input_schema': INPUT_SCHEMA,
-        'output_schema': None,
+        'output_schema': {
+            'attributes': [
+                {
+                    'name': 'prediction',
+                    'type': 'float'
+                }
+            ]
+        },
         'metadata': {
             'description': 'Evaluation of yearlyReimbursement',
             'author': 'ke',

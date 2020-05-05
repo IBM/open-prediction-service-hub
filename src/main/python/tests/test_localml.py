@@ -17,7 +17,8 @@ from dynamic_hosting import app
 from fastapi.testclient import TestClient
 from requests import Response
 
-from .prepare_models import miniloan_rfc_pickle, miniloan_lr_pickle, miniloan_rfr_pickle
+from .prepare_models import miniloan_rfc_pickle, miniloan_lr_pickle, miniloan_rfr_pickle, \
+    miniloan_rfc_no_class_names_pickle
 
 from dynamic_hosting.localml import VER
 
@@ -85,7 +86,9 @@ class TestGetInfo(TestEmbeddedClient):
         self.assertEqual('ke', res_content['metadata']['author'])
         self.assertIsNotNone(res_content['metadata']['trained_at'])
         self.assertEqual(float, type(ast.literal_eval(res_content['metadata']['metrics'][0]['value'])))
-        self.assertEqual(None, res_content['output_schema'])
+        self.assertEqual(
+            {'attributes': [{'name': 'prediction', 'type': 'str'}, {'name': 'probabilities', 'type': '[Probability]'}]},
+            res_content['output_schema'])
 
 
 class TestAddModel(TestEmbeddedClient):
@@ -179,6 +182,12 @@ class TestInvocation(TestEmbeddedClient):
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
+        with miniloan_rfc_no_class_names_pickle().open(mode='rb') as fd:
+            res: Response = self.client.post(
+                API_VER + "/models",
+                files={'file': fd}
+            )
+        self.assertEqual(200, res.status_code)
 
     def test_classification(self):
         res: Response = self.client.post(url=API_VER + '/invocations', json={
@@ -207,4 +216,15 @@ class TestInvocation(TestEmbeddedClient):
 
         self.assertEqual(200, res.status_code)
         self.assertTrue(res.json()['prediction'] in ['true', 'false'])
-        self.assertAlmostEqual(1.0, sum([f['proba'] for f in res.json()['probabilities']]))
+        self.assertAlmostEqual(1.0, sum([f['value'] for f in res.json()['probabilities']]))
+
+    def test_predict_proba_without_class_names(self):
+        res: Response = self.client.post(url=API_VER + '/invocations', json={
+            "model_name": "miniloan-rfc-no-output-schema",
+            "model_version": "v0",
+            "params": TestInvocation.miniloan_input_params
+        })
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue(res.json()['prediction'] in ["0", "1"])
+        self.assertAlmostEqual(1.0, sum([f['value'] for f in res.json()['probabilities']]))

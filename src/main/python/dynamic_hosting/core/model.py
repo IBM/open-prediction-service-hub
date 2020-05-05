@@ -14,6 +14,7 @@ from zipfile import ZipFile
 
 from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.core.util import rmdir, base64_to_obj, obj_to_base64
+from dynamic_hosting.openapi.output_schema import OutputSchema
 from pandas import DataFrame
 from pydantic import BaseModel, Field, validator
 
@@ -31,6 +32,9 @@ class Metadata(BaseModel):
     description: Text = Field(..., description='Description of model')
     author: Text = Field(..., description='Author of model')
     trained_at: Text = Field(..., description='Training date')
+    class_names: Optional[Dict[int, Text]] = Field(
+        None, description='Lookup table for class index <-> class name'
+    )
     metrics: List[Metric] = Field(..., description='Metrics for model')
 
 
@@ -40,7 +44,7 @@ class MLSchema(BaseModel):
     version: Text = Field(..., description='Version of model')
     method_name: Text = Field(..., description='Name of method. (e.g predict, predict_proba)')
     input_schema: Sequence[Feature] = Field(..., description='Input schema of ml model')
-    output_schema: Optional[Mapping[Text, Any]] = Field(..., description='Output schema of ml model')
+    output_schema: Optional[OutputSchema] = Field(..., description='Output schema of ml model')
     metadata: Metadata = Field(..., description='Additional information for ml model')
 
 
@@ -140,28 +144,28 @@ class Model(MLSchema):
         logger.info('Storied model to: {storage_root}/{model_name}/{model_version}'.format(
             storage_root=storage_root, model_name=self.name, model_version=self.version))
 
-    def to_archive(
-            self,
-            directory: Path,
-            metadata_file_name: Text = MODEL_CONFIG_FILE_NAME,
-            pickle_file_name: Text = MODEL_PICKLE_FILE_NAME,
-            zip_file_name: Text = MODEL_ARCHIVE_NAME
-    ) -> Path:
-        logger: Logger = logging.getLogger(__name__)
-
-        directory.mkdir(parents=True, exist_ok=True)
-        zipfile_path: Path = directory.joinpath(zip_file_name)
-
-        model: bytes = base64.b64decode(self.model)
-        conf_encoded: bytes = self.json(exclude={'model'}).encode(encoding='utf8')
-
-        with ZipFile(str(zipfile_path), 'w') as zipFile:
-            zipFile.writestr(zinfo_or_arcname=pickle_file_name, data=model)
-            zipFile.writestr(zinfo_or_arcname=metadata_file_name, data=conf_encoded)
-
-        logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
-
-        return zipfile_path
+    # def to_archive(
+    #         self,
+    #         directory: Path,
+    #         metadata_file_name: Text = MODEL_CONFIG_FILE_NAME,
+    #         pickle_file_name: Text = MODEL_PICKLE_FILE_NAME,
+    #         zip_file_name: Text = MODEL_ARCHIVE_NAME
+    # ) -> Path:
+    #     logger: Logger = logging.getLogger(__name__)
+    #
+    #     directory.mkdir(parents=True, exist_ok=True)
+    #     zipfile_path: Path = directory.joinpath(zip_file_name)
+    #
+    #     model: bytes = base64.b64decode(self.model)
+    #     conf_encoded: bytes = self.json(exclude={'model'}).encode(encoding='utf8')
+    #
+    #     with ZipFile(str(zipfile_path), 'w') as zipFile:
+    #         zipFile.writestr(zinfo_or_arcname=pickle_file_name, data=model)
+    #         zipFile.writestr(zinfo_or_arcname=metadata_file_name, data=conf_encoded)
+    #
+    #     logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
+    #
+    #     return zipfile_path
 
     @staticmethod
     def from_disk(

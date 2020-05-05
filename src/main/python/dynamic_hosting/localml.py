@@ -11,7 +11,7 @@ from dynamic_hosting.core.model import Model, MLSchema
 from dynamic_hosting.core.model_service import ModelService
 from dynamic_hosting.core.util import to_dataframe_compatible
 from dynamic_hosting.openapi.request import RequestBody
-from dynamic_hosting.openapi.response import FeatProbaPair, ServerStatus, Prediction
+from dynamic_hosting.openapi.response import Probability, ServerStatus, Prediction
 from fastapi import FastAPI, File
 
 from fastapi_versioning import VersionedFastAPI, version
@@ -98,15 +98,17 @@ def predict(
         data=to_dataframe_compatible(ml_req.get_data())
     )
 
-    res = res_matrix[0]  # one input -> one output
+    res: np.ndaary = res_matrix[0]  # one input -> one output
 
-    if model.method_name == 'predict_proba' and isinstance(res, np.ndarray) and model.has_attr('classes_'):
-        feature_names: List[Text] = model.get_attr('classes_')
+    if model.method_name == 'predict_proba' and isinstance(res, np.ndarray):
+        feature_names: List[Text] = [
+            class_name for class_name in sorted((v for i, v in model.metadata.class_names.items()), key=itemgetter(0))
+        ] if model.metadata.class_names is not None else list(range(len(res)))
 
         return Prediction(
             prediction=feature_names[max(enumerate(res), key=itemgetter(1))[0]],
             probabilities=[
-                FeatProbaPair(name=feature_names[i], proba=res[i])
+                Probability(class_name=feature_names[i], class_index=i, value=res[i])
                 for i in range(len(feature_names))
             ]
         )
