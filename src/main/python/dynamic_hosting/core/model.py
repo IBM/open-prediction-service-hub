@@ -144,28 +144,28 @@ class Model(MLSchema):
         logger.info('Storied model to: {storage_root}/{model_name}/{model_version}'.format(
             storage_root=storage_root, model_name=self.name, model_version=self.version))
 
-    # def to_archive(
-    #         self,
-    #         directory: Path,
-    #         metadata_file_name: Text = MODEL_CONFIG_FILE_NAME,
-    #         pickle_file_name: Text = MODEL_PICKLE_FILE_NAME,
-    #         zip_file_name: Text = MODEL_ARCHIVE_NAME
-    # ) -> Path:
-    #     logger: Logger = logging.getLogger(__name__)
-    #
-    #     directory.mkdir(parents=True, exist_ok=True)
-    #     zipfile_path: Path = directory.joinpath(zip_file_name)
-    #
-    #     model: bytes = base64.b64decode(self.model)
-    #     conf_encoded: bytes = self.json(exclude={'model'}).encode(encoding='utf8')
-    #
-    #     with ZipFile(str(zipfile_path), 'w') as zipFile:
-    #         zipFile.writestr(zinfo_or_arcname=pickle_file_name, data=model)
-    #         zipFile.writestr(zinfo_or_arcname=metadata_file_name, data=conf_encoded)
-    #
-    #     logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
-    #
-    #     return zipfile_path
+    def to_archive(
+            self,
+            directory: Path,
+            metadata_file_name: Text = MODEL_CONFIG_FILE_NAME,
+            pickle_file_name: Text = MODEL_PICKLE_FILE_NAME,
+            zip_file_name: Text = MODEL_ARCHIVE_NAME
+    ) -> Path:
+        logger: Logger = logging.getLogger(__name__)
+
+        directory.mkdir(parents=True, exist_ok=True)
+        zipfile_path: Path = directory.joinpath(zip_file_name)
+
+        model: bytes = base64.b64decode(self.model)
+        conf_encoded: bytes = self.json(exclude={'model'}).encode(encoding='utf8')
+
+        with ZipFile(str(zipfile_path), 'w') as zipFile:
+            zipFile.writestr(zinfo_or_arcname=pickle_file_name, data=model)
+            zipFile.writestr(zinfo_or_arcname=metadata_file_name, data=conf_encoded)
+
+        logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
+
+        return zipfile_path
 
     @staticmethod
     def from_disk(
