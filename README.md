@@ -141,12 +141,14 @@ Response body may looks like:
     "prediction": "true",
     "probabilities": [
         {
-          "name": "true",
-          "proba": 0.66
+          "class_name": "true",
+          "class_index": "0",
+          "value": 0.66
         },
         {
-          "name": "false",
-          "proba": 0.34
+          "class_name": "false",
+          "class_index": "0",
+          "value": 0.34
         }
     ]   
 }
