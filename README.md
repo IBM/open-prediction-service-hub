@@ -63,7 +63,7 @@ its openapi docs is available at `http://localhost:8080/v1/docs`.
         "attributes": [
             {
                 "name": "prediction",
-                "type": "str"
+                "type": "string"
             },
             {
                 "name": "probabilities",

@@ -146,7 +146,7 @@ def miniloan_lr_zip() -> Path:
             'attributes': [
                 {
                     'name': 'prediction',
-                    'type': 'str'
+                    'type': 'string'
                 }
             ]
         },
@@ -335,7 +335,7 @@ def miniloan_rfc_zip() -> Path:
             'attributes': [
                 {
                     'name': 'prediction',
-                    'type': 'str'
+                    'type': 'string'
                 }
             ]
         },
@@ -423,7 +423,7 @@ def miniloan_lr_pickle() -> Path:
             'attributes': [
                 {
                     'name': 'prediction',
-                    'type': 'str'
+                    'type': 'string'
                 }
             ]
         },
@@ -536,7 +536,7 @@ def miniloan_rfc_pickle() -> Path:
             'attributes': [
                 {
                     'name': 'prediction',
-                    'type': 'str'
+                    'type': 'string'
                 },
                 {
                     'name': 'probabilities',
@@ -656,7 +656,7 @@ def miniloan_rfc_no_class_names_pickle() -> Path:
             'attributes': [
                 {
                     'name': 'prediction',
-                    'type': 'str'
+                    'type': 'string'
                 },
                 {
                     'name': 'probabilities',

@@ -102,7 +102,7 @@ class TestGetInfo(TestEmbeddedClient):
         self.assertIsNotNone(res_content['metadata']['trained_at'])
         self.assertEqual(float, type(ast.literal_eval(res_content['metadata']['metrics'][0]['value'])))
         self.assertEqual(
-            {'attributes': [{'name': 'prediction', 'type': 'str'}, {'name': 'probabilities', 'type': '[Probability]'}]},
+            {'attributes': [{'name': 'prediction', 'type': 'string'}, {'name': 'probabilities', 'type': '[Probability]'}]},
             res_content['output_schema'])
 
 

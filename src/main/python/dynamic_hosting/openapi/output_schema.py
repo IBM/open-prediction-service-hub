@@ -27,8 +27,7 @@ from pydantic import BaseModel, Field
 class OutputType(str, Enum):
     INT: Text = 'int'
     FLOAT: Text = 'float'
-    BOOL: Text = 'bool'
-    STRING: Text = 'str'
+    STRING: Text = 'string'
     PROBABILITY_ARRAY: Text = "[Probability]"
 
 

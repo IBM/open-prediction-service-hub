@@ -116,7 +116,7 @@ def main():
             'attributes': [
                 {
                     'name': 'prediction',
-                    'type': 'str'
+                    'type': 'string'
                 }
             ]
         },
