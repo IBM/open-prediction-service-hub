@@ -12,11 +12,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <groupId>com.ibm.aid.lml</groupId>
-    <artifactId>embedded-provider-sdk</artifactId>
-    <version>0.0.0-SNAPSHOT</version>
-
-
+    <groupId>com.ibm.decision</groupId>
+    <artifactId>ads-ml-service-sdk</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <inceptionYear>2020</inceptionYear>
     <build>
         <plugins>
             <plugin>
@@ -72,6 +71,80 @@
                 <configuration>
                     <compilerArgument>-Xlint:deprecation</compilerArgument>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <!-- Bootstrapping, will generate missing headers: mvn license:format -N -->
+                <!-- Help mvn license:help -Ddetail=true -Dgoal=format -->
+                <!-- mvn license:check to check the license -->
+                <!-- see http://code.mycila.com/license-maven-plugin/ -->
+                <!-- see http://code.mycila.com/license-maven-plugin/#documentation -->
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <inlineHeader>
+                        <![CDATA[Copyright ${license.git.copyrightYears} IBM
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.IBM Confidential]]>
+                    </inlineHeader>
+                    <aggregate>true</aggregate>
+                    <includes>
+                        <include>src/**</include>
+                        <include>runtime/**</include>
+                        <include>examples/**</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/target/**</exclude>
+                        <exclude>**/__pycache__/**</exclude>
+                        <exclude>**/test/resources/**</exclude>
+                        <exclude>**.egg-info</exclude>
+                    </excludes>
+                    <strictCheck>true</strictCheck>
+                    <failIfMissing>true</failIfMissing>
+                    <failIfUnknown>true</failIfUnknown>
+                    <quiet>false</quiet>
+                    <!-- avoid having to change the year when a modified file was created the previous year -->
+                    <skipExistingHeaders>true</skipExistingHeaders>
+                    <mapping>
+                        <tsx>SLASHSTAR_STYLE</tsx>
+                        <ts>SLASHSTAR_STYLE</ts>
+                        <scss>SLASHSTAR_STYLE</scss>
+                        <conf>DOUBLESLASH_STYLE</conf>
+                        <less>DOUBLESLASH_STYLE</less>
+                        <proto>DOUBLESLASH_STYLE</proto>
+                        <jvm.options>SCRIPT_STYLE</jvm.options>
+                        <ltpa.keys>SCRIPT_STYLE</ltpa.keys>
+                    </mapping>
+                    <properties>
+                        <inceptionYear>${project.inceptionYear}</inceptionYear>
+                    </properties>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check-copyright-headers</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.mycila</groupId>
+                        <artifactId>license-maven-plugin-git</artifactId>
+                        <!-- make sure you use the same version as license-maven-plugin -->
+                        <version>3.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
