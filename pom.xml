@@ -107,7 +107,9 @@ limitations under the License.IBM Confidential]]>
                         <exclude>**/target/**</exclude>
                         <exclude>**/__pycache__/**</exclude>
                         <exclude>**/test/resources/**</exclude>
-                        <exclude>**.egg-info</exclude>
+                        <exclude>**/*.egg-info/**</exclude>
+                        <exclude>**/*.pkl</exclude>
+                        <exclude>**/.dockerignore</exclude>
                     </excludes>
                     <strictCheck>true</strictCheck>
                     <failIfMissing>true</failIfMissing>
