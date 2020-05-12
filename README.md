@@ -96,10 +96,96 @@ ML models are python classes. Local provider needs to know the `method_name` of 
 `input_schema` is used as lookup table which local provider use to find type/position of 
 each feature. `type` needs to be a type alias in `numpy`module.
 
-`output_schema` will be used in next iteration for parametric output mapping. It is ignored 
-in the current iteration and local provider gives formatted result for the most common use 
-cases (by using pre-configured output mapping).
-Now the local provider supports the default output of predict/predict_proba for scikit-learn.
+`output_schema` configures formatted result for the most common use cases.
+
+
+<table>
+    <tr>
+        <th>output type</th>
+        <th>format</th>
+        <th>example</th>
+    </tr>
+<tr>
+<td>
+regression
+</td>
+<td>
+<pre lang="json">
+[
+    {
+        "name": "prediction",
+        "type": "float"
+    }
+]
+</pre>
+</td>
+<td>
+<pre lang="json">
+{
+  "prediction": 128.0
+}
+</pre>
+</tr>
+<tr>
+<td>
+classification
+</td>
+<td>
+<pre lang="json">
+[
+    {
+        "name": "prediction",
+        "type": "string"
+    }
+]
+</pre>
+</td>
+<td>
+<pre lang="json">
+{
+  "prediction": "true"
+}
+</pre>
+</tr>
+<tr>
+<td>
+classification
+with probabilities
+</td>
+<td>
+<pre lang="json">
+[
+    {
+        "name": "prediction",
+        "type": "string"
+    },
+    {
+        "name": "probabilities",
+        "type": "[Probability]"
+    }
+]
+</pre>
+</td>
+<td>
+<pre lang="json">
+{
+    "prediction": "true",
+    "probabilities": [
+        {
+          "class_name": "true",
+          "class_index": "0",
+          "value": 0.66
+        },
+        {
+          "class_name": "false",
+          "class_index": "0",
+          "value": 0.34
+        }
+    ]   
+}
+</pre>
+</tr>
+</table>
 
 `metadata` needs to have `description`, `trained_at`, `author` and associated `metrics`.
 
@@ -163,6 +249,12 @@ or looks like:
 }
 ```
 when we want to calculate some scores related to this application.
+
+
+## ML model dependencies
+Dependencies for web service: `requirements.txt`
+
+Dependencies for ML model: `requirements-ml.txt`
 
 
 ## Example of model creation
