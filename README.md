@@ -103,7 +103,10 @@ each feature. `type` needs to be a type alias in `numpy`module.
     <tr>
         <th>output type</th>
         <th>format</th>
-        <th>example</th>
+        <th>
+            corresponding output 
+            example
+        </th>
     </tr>
 <tr>
 <td>
@@ -218,10 +221,10 @@ Request body
 }
 ```
 
-`model_name` and `model_version`are used to load ml model from storage. Parameters of ml
-models are arranged in key-values pairs.
+`model_name` and `model_version`are used to uniquely identify ml models. 
+Parameters of ml models are arranged in key-values pairs.
 
-Response body may looks like:
+Response body may look like:
 ```json
 {
     "prediction": "true",
@@ -239,28 +242,12 @@ Response body may looks like:
     ]   
 }
 ```
-when we want to determine whether accept such application. (the attribute `probabilities`
-may be null)
-
-or looks like:
-```json
-{
-    "prediction": "534"
-}
-```
-when we want to calculate some scores related to this application.
 
 
-## ML model dependencies
-Dependencies for web service: `requirements.txt`
+## Dependencies
+* Dependencies for web service: `requirements.txt`
+* Dependencies for ML model: `requirements-ml.txt`
 
-Dependencies for ML model: `requirements-ml.txt`
 
-
-## Example of model creation
-[here](examples/model_training/README.md)
-
-## Features to be added
-
-* Range support
-* Add format for numerical features
+## Model creation examples
+[model creation](examples/model_training/README.md)
