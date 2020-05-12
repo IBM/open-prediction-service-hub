@@ -236,12 +236,12 @@ Response body may look like:
     "probabilities": [
         {
           "class_name": "true",
-          "class_index": "0",
+          "class_index": 1,
           "value": 0.66
         },
         {
           "class_name": "false",
-          "class_index": "0",
+          "class_index": 0,
           "value": 0.34
         }
     ]   
@@ -252,6 +252,9 @@ Response body may look like:
 ## Dependencies
 * Dependencies for web service: `requirements.txt`
 * Dependencies for ML model: `requirements-ml.txt`
+
+Before adding new models, make sure that `requirements-ml.txt` already contains
+all necessary dependencies.
 
 
 ## Model creation examples
