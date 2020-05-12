@@ -12,8 +12,14 @@ notifications:
   email: false
 
 
+services:
+  - docker
+
+
 before_install:
-  - pip install -r requirements.txt
+  - pip install -r requirements.txt        # dependencies for server test
+  - pip install -r requirements-ml.txt     # dependencies for import and invocation test
+  - docker build -t lml:latest .
 
 
 install:
@@ -21,8 +27,4 @@ install:
 
 
 script:
- python3 -m pytest -v src/main/python/tests
-
-
-env:
-  - model_storage=runtime/storage
+  python3 -m pytest -v src/main/python/tests
