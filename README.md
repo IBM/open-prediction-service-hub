@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis.ibm.com/dba/ads-ml-service.svg?token=1gxxdyFN2gDs6CM3JxPc&branch=dev)](https://travis.ibm.com/dba/ads-ml-service)
 
-This repository is part of ADS project.
 
 ## Usage
 
@@ -25,7 +24,7 @@ its openapi docs is available at `http://localhost:8080/v1/docs`.
 
 
 
-### Configuration example for miniloan classification
+### Configuration example for miniloan fraud detection
 
 ```json
 {
@@ -96,7 +95,7 @@ ML models are python classes. Local provider needs to know the `method_name` of 
 `input_schema` is used as lookup table which local provider use to find type/position of 
 each feature. `type` needs to be a type alias in `numpy`module.
 
-`output_schema` configures formatted result for the most common use cases.
+`output_schema` configures result formats for the most common use cases.
 
 
 <table>
@@ -191,6 +190,12 @@ with probabilities
 </table>
 
 `metadata` needs to have `description`, `trained_at`, `author` and associated `metrics`.
+
+`class_names` is optional. It is a lookup table defined as class index <-> class name.
+It is used in classifications when the output relies on class index.
+
+Note: json does not support int as mapping key. For this reason,
+in the example we used `"0"` and `"1"` instead of `0` and `1`.
 
 
 ### Example for model invocation
