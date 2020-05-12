@@ -3,17 +3,15 @@
 numpy
 pandas
 pydantic
-## ML lib
-scikit-learn
 ## Web interface
 fastapi
 fastapi-versioning
-pyyaml  # server configurations
-python-multipart  # file service
+pyyaml                    # server configurations
+python-multipart          # file service
 uvicorn
 gunicorn
-# Testing
+# Test
 requests
-#pytest
-#coverage
-#pytest-cov
+pytest
+coverage
+pytest-cov

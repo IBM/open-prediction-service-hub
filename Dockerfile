@@ -19,6 +19,7 @@ ENV model_storage=${RUNTIME_DIR}/storage
 WORKDIR ${BUILD_DIR}
 COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
+    python3 -m pip install -r requirements-ml.txt && \
     python3 -m pip install -r requirements.txt && \
     python3 setup.py install && \
     # prepare example for runtime
