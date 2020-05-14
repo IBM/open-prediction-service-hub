@@ -5,8 +5,8 @@ ENV BUILD_DIR="/app/build"
 ENV RUNTIME_DIR="/app/runtime"
 ENV APP_USER="lml"
 
-# Suppose user have at least 2 cpu cores. The recommended number of gunicorn worker is ((2 x $num_cores) + 1) = 5
-ENV WORKER_NUM=5
+# Suppose server have 10 cpu cores. The recommended number of gunicorn worker is ((2 x $num_cores) + 1) = 21
+ENV WORKER_NUM=21
 ENV SERVICE_PORT=8080
 
 # ENV variables used by server
@@ -19,6 +19,7 @@ ENV model_storage=${RUNTIME_DIR}/storage
 WORKDIR ${BUILD_DIR}
 COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
+    python3 -m pip install --upgrade pip && \
     python3 -m pip install -r requirements-ml.txt && \
     python3 -m pip install -r requirements.txt && \
     python3 setup.py install && \
