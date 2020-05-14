@@ -28,7 +28,7 @@ from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
 from zipfile import ZipFile
 
 from dynamic_hosting.core.feature import Feature
-from dynamic_hosting.core.util import rmdir, base64_to_obj, obj_to_base64
+from dynamic_hosting.core.util import base64_to_obj, obj_to_base64
 from dynamic_hosting.openapi.output_schema import OutputSchema
 from pandas import DataFrame
 from pydantic import BaseModel, Field, validator
@@ -115,50 +115,6 @@ class Model(MLSchema):
         actual_model: Any = base64_to_obj(self.model)
         return getattr(actual_model, self.method_name)(data_input)
 
-    @staticmethod
-    def remove_from_disk(
-            storage_root: Path,
-            model_name: Text,
-            model_version: Text = None
-    ) -> None:
-        logger: Logger = logging.getLogger(__name__)
-        if model_version:
-            logger.info(
-                'Deleting model: name <{model_name}> version <{model_version}>'.format(
-                    model_name=model_name,
-                    model_version=model_version
-                )
-            )
-            rmdir(storage_root.joinpath(model_name).joinpath(model_version))
-            if not any(storage_root.joinpath(model_name).iterdir()):
-                rmdir(storage_root.joinpath(model_name))
-        else:
-            logger.info(
-                'Deleting model: name <{model_name}> for all versions'.format(
-                    model_name=model_name
-                )
-            )
-            rmdir(storage_root.joinpath(model_name))
-
-    def save_to_disk(
-            self,
-            storage_root: Path
-    ) -> None:
-        logger: Logger = logging.getLogger(__name__)
-
-        model_dir: Path = storage_root.joinpath(self.name).joinpath(self.version)
-        model_dir.mkdir(parents=True, exist_ok=True)
-
-        # standard json library can not handle timestamp
-        with model_dir.joinpath(MODEL_CONFIG_FILE_NAME).open(mode='w') as model_config_file:
-            json.dump(
-                fp=model_config_file,
-                obj=json.loads(self.json())
-            )
-
-        logger.info('Storied model to: {storage_root}/{model_name}/{model_version}'.format(
-            storage_root=storage_root, model_name=self.name, model_version=self.version))
-
     def to_archive(
             self,
             directory: Path,
@@ -181,23 +137,6 @@ class Model(MLSchema):
         logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
 
         return zipfile_path
-
-    @staticmethod
-    def from_disk(
-            storage_root: Path,
-            model_name: Text,
-            model_version: Text
-    ) -> Model:
-        logger: Logger = logging.getLogger(__name__)
-        model_dir: Path = storage_root.joinpath(model_name).joinpath(model_version)
-
-        with model_dir.joinpath(MODEL_CONFIG_FILE_NAME).open() as model_config_file:
-            model_config: Mapping[Text, Any] = json.load(model_config_file)
-
-            logger.info('Loaded model from: {storage_root}/{model_name}/{model_version}'.format(
-                storage_root=storage_root, model_name=model_name, model_version=model_version))
-            model: 'Model' = Model(**model_config)
-            return model
 
     @staticmethod
     def from_pickle(

@@ -18,18 +18,23 @@
 import logging
 from logging import Logger
 from operator import itemgetter
-from typing import Text, List
+from typing import Text, List, Optional
 
 import numpy as np
 from dynamic_hosting.core.configuration import ServerConfiguration
 from dynamic_hosting.core.model import Model, MLSchema
-from dynamic_hosting.core.model_service import ModelService
+from dynamic_hosting.open_predict_service import PredictionService
 from dynamic_hosting.core.util import to_dataframe_compatible
+from dynamic_hosting.db import models
 from dynamic_hosting.openapi.request import RequestBody
 from dynamic_hosting.openapi.response import Probability, ServerStatus, Prediction
-from fastapi import FastAPI, File
+from fastapi import FastAPI, File, Depends
 
 from fastapi_versioning import VersionedFastAPI, version
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 
 app: FastAPI = FastAPI(
     version='0.0.0-SNAPSHOT',
@@ -38,6 +43,29 @@ app: FastAPI = FastAPI(
 )
 
 VER: int = 1
+DATABASE_NAME: Text = 'EML.db'
+
+
+# Dependency
+def get_ml_service() -> PredictionService:
+    logger: Logger = logging.getLogger(__name__)
+    engine: Engine = create_engine(
+        f'sqlite:///{ServerConfiguration().model_storage.joinpath(DATABASE_NAME)}',
+        connect_args={"check_same_thread": False}
+    )
+    models.Base.metadata.create_all(bind=engine)
+    sm_instance: sessionmaker = sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine
+    )
+    db = None
+    try:
+        db = sm_instance()
+        mls: PredictionService = PredictionService(db=db)
+        yield mls
+    finally:
+        db.close()
 
 
 @app.get(
@@ -46,9 +74,8 @@ VER: int = 1
     response_model=ServerStatus
 )
 @version(major=VER)
-def get_server_status() -> ServerStatus:
-    ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
-    return ServerStatus(model_count=len(ms.ml_models))
+def get_server_status(mls: PredictionService = Depends(get_ml_service)) -> ServerStatus:
+    return ServerStatus(model_count=len(mls.get_models()))
 
 
 @app.get(
@@ -57,11 +84,10 @@ def get_server_status() -> ServerStatus:
     response_model=List[MLSchema]
 )
 @version(major=VER)
-def get_models() -> List[MLSchema]:
+def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[MLSchema]:
     """Returns the list of ML models."""
-    ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
     return [
-        model.get_meta_model() for model in ms.ml_models
+        model.get_meta_model() for model in mls.get_models()
     ]
 
 
@@ -75,8 +101,8 @@ def get_models() -> List[MLSchema]:
     }
 )
 @version(major=VER)
-def add_model(*, file: bytes = File(...)) -> None:
-    ModelService.load_from_disk(ServerConfiguration().model_storage).add_archive(file)
+def add_model(*, file: bytes = File(...), mls: PredictionService = Depends(get_ml_service)) -> None:
+    mls.add_archive(file)
 
 
 @app.delete(
@@ -84,9 +110,8 @@ def add_model(*, file: bytes = File(...)) -> None:
     path='/models'
 )
 @version(major=VER)
-def remove_model(*, model_name: Text, model_version: Text = None) -> None:
-    ModelService.load_from_disk(ServerConfiguration().model_storage).remove_model(model_name=model_name,
-                                                                                  model_version=model_version)
+def remove_model(*, model_name: Text, model_version: Text = None, mls: PredictionService = Depends(get_ml_service)) -> None:
+    mls.remove_model(model_name=model_name, model_version=model_version)
 
 
 @app.post(
@@ -97,17 +122,16 @@ def remove_model(*, model_name: Text, model_version: Text = None) -> None:
 @version(major=VER)
 def predict(
         *,
-        ml_req: RequestBody
+        ml_req: RequestBody,
+        mls: PredictionService = Depends(get_ml_service)
 ) -> Prediction:
     logger: Logger = logging.getLogger(__name__)
 
     logger.debug('Received request: {r}'.format(r=ml_req))
 
-    ms: ModelService = ModelService.load_from_disk(ServerConfiguration().model_storage)
+    model: Model = mls.get_model(model_name=ml_req.get_model_name(), model_version=ml_req.get_model_version())
 
-    model: Model = ms.model_map()[ml_req.get_model_name()][ml_req.get_model_version()]
-
-    res_matrix: np.ndarray = ms.invoke(
+    res_matrix: np.ndarray = mls.invoke(
         model_name=ml_req.get_model_name(),
         model_version=ml_req.get_model_version(),
         data=to_dataframe_compatible(ml_req.get_data())
