@@ -10,6 +10,7 @@ pyyaml                    # server configurations
 python-multipart          # file service
 uvicorn
 gunicorn
+sqlalchemy
 # Test
 requests
 pytest

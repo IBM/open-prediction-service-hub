@@ -111,8 +111,6 @@ class TestAddModel(TestEmbeddedClient):
     def test_add_model(self):
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             contents: bytes = fd.read()
-
-        print(pickle.loads(contents))
         res: Response = self.client.post(
             API_VER + "/models",
             files={'file': contents}
