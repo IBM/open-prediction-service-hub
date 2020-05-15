@@ -175,12 +175,12 @@ with probabilities
     "probabilities": [
         {
           "class_name": "true",
-          "class_index": "0",
+          "class_index": 1,
           "value": 0.66
         },
         {
           "class_name": "false",
-          "class_index": "0",
+          "class_index": 0,
           "value": 0.34
         }
     ]   
