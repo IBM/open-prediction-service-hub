@@ -17,13 +17,14 @@ services:
 
 
 before_install:
-  - pip install -r requirements.txt        # dependencies for server test
-  - pip install -r requirements-ml.txt     # dependencies for import and invocation test
+  - python3 -m pip install --upgrade pip
+  - python3 -m pip install -r requirements-ml.txt
+  - python3 -m pip install -r requirements.txt
   - docker build -t lml:latest .
 
 
 install:
-  - python ./setup.py install
+  - python3 ./setup.py install
 
 
 script:
