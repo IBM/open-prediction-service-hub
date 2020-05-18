@@ -17,14 +17,14 @@ services:
 
 
 before_install:
-  - python3 -m pip install --upgrade pip
-  - python3 -m pip install -r requirements-ml.txt
-  - python3 -m pip install -r requirements.txt
+  - python3 -m pip install --quiet --upgrade pip
+  - python3 -m pip install --quiet -r requirements-ml.txt
+  - python3 -m pip install --quiet -r requirements.txt
   - docker build -t lml:latest .
 
 
 install:
-  - python3 ./setup.py install
+  - python3 ./setup.py install --quiet
 
 
 script:

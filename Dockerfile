@@ -15,14 +15,18 @@ ENV model_storage=${RUNTIME_DIR}/storage
 # ENV EML_RETRAIN_MODELS=1
 
 
-# Install this project
+# Install dependences
 WORKDIR ${BUILD_DIR}
+COPY requirements.txt requirements-ml.txt ${BUILD_DIR}/
+RUN python3 -m pip install --quiet --upgrade pip && \
+    python3 -m pip install --quiet -r requirements-ml.txt && \
+    python3 -m pip install --quiet -r requirements.txt
+
+
+# Install this project
 COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
-    python3 -m pip install --upgrade pip && \
-    python3 -m pip install -r requirements-ml.txt && \
-    python3 -m pip install -r requirements.txt && \
-    python3 setup.py install && \
+    python3 setup.py install --quiet && \
     # prepare example for runtime
     python3 src/main/python/tests/prepare_models.py && python3 runtime/init.py && cp -r runtime ${RUNTIME_DIR}
 
