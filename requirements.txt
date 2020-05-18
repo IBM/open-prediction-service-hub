@@ -1,16 +1,19 @@
-# Required:
+#  Dependences for web service
+
 ## Data structure
 numpy
 pandas
 pydantic
+
 ## Web interface
-fastapi
-fastapi-versioning
 pyyaml                    # server configurations
 python-multipart          # file service
+fastapi
+fastapi-versioning
 uvicorn
 gunicorn
 sqlalchemy
+
 # Test
 requests
 pytest

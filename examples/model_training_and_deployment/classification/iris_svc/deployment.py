@@ -21,13 +21,13 @@ from pathlib import Path
 
 
 def iris_archive():
-    with Path(__file__).resolve().parent.joinpath('iris.json').open(mode='r') as fd:
+    with Path(__file__).resolve().parent.joinpath('deployment_conf.json').open(mode='r') as fd:
         conf = json.load(fd)
-    with Path(__file__).resolve().parent.joinpath('iris-model.pkl').open(mode='rb') as fd:
+    with Path(__file__).resolve().parent.joinpath('iris-svc-model.pkl').open(mode='rb') as fd:
         estimator = pickle.load(
             file=fd
         )
-    with Path(__file__).resolve().parent.joinpath('iris-archive.pkl').open(mode='wb') as fd:
+    with Path(__file__).resolve().parent.joinpath('iris-svc-archive.pkl').open(mode='wb') as fd:
         pickle.dump(
             obj={
                 'model': estimator,

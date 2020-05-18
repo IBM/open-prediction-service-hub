@@ -21,7 +21,7 @@ from pathlib import Path
 
 
 def miniloan_xgb():
-    with Path(__file__).resolve().parent.joinpath('miniloan-xgb.json').open(mode='r') as fd:
+    with Path(__file__).resolve().parent.joinpath('deployment_conf.json').open(mode='r') as fd:
         conf = json.load(fd)
     with Path(__file__).resolve().parent.joinpath('miniloan-xgb-model.pkl').open(mode='rb') as fd:
         estimator = pickle.load(
