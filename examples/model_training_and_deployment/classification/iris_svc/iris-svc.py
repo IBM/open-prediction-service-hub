@@ -18,7 +18,6 @@
 import logging
 import pickle
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -47,6 +46,8 @@ def main():
             }
         }
     )
+
+    print(load_iris().target_names)
 
     train, test = train_test_split(data, random_state=7)
 
@@ -86,62 +87,9 @@ def main():
                                test.loc[:, col_names[-1]])
     logger.info(f'accuracy: {acc}')
 
-    conf = {
-        'name': 'iris-svc',
-        'version': 'v0',
-        'method_name': 'predict',
-        'input_schema': [
-            {
-                'name': "sepal_length",
-                'order': 0,
-                'type': 'float64'
-            },
-            {
-                'name': "sepal_width",
-                'order': 1,
-                'type': 'float64'
-            },
-            {
-                'name': "petal_length",
-                'order': 2,
-                'type': 'float64'
-            },
-            {
-                'name': "petal_width",
-                'order': 3,
-                'type': 'float64'
-            }
-        ],
-        'output_schema': {
-            'attributes': [
-                {
-                    'name': 'prediction',
-                    'type': 'string'
-                }
-            ]
-        },
-        'metadata': {
-            'description': 'Iris classification',
-            'author': 'ke',
-            'trained_at': datetime.utcnow().isoformat(),
-            'class_names': {
-                i: val for i, val in enumerate(best_estimator.classes_)
-            },
-            'metrics': [
-                {
-                    'name': 'accuracy',
-                    'value': acc
-                }
-            ]
-        }
-    }
-
-    with Path(__file__).resolve().parent.joinpath(f'{conf["name"]}-{conf["version"]}.pkl').open(mode='wb') as fd:
+    with Path(__file__).resolve().parent.joinpath('iris-model.pkl').open(mode='wb') as fd:
         pickle.dump(
-            obj={
-                'model': best_estimator,
-                'model_config': conf
-            },
+            obj=best_estimator,
             file=fd
         )
 

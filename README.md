@@ -258,4 +258,4 @@ all necessary dependencies.
 
 
 ## Model creation examples
-[model creation](examples/model_training/README.md)
+[model creation](examples/model_training_and_deployment/README.md)
