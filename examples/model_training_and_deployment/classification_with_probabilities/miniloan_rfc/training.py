@@ -22,8 +22,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.svm import LinearSVC
 
 
 def main():
@@ -62,20 +62,20 @@ def main():
     logger.debug(f'validation size: {len(test)}')
 
     params = {
-        'estimator': LinearSVC(random_state=42, dual=False),
+        'estimator': RandomForestClassifier(random_state=42),
         'cv': 3,
         'verbose': 0,
         'n_jobs': -1,
         'random_state': 21,
-        'n_iter': 5e03,
+        'n_iter': 5,
         'scoring': 'accuracy',
         'error_score': 'raise',
         'param_distributions': {
-            'penalty': ['l1'],
-            'loss': ['squared_hinge'],
-            'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
-            'C': [x for x in np.linspace(1e-5, 1.0, num=1000)]
-        },
+            'criterion': ['gini'],
+            'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
+            'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
+            'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
+        }
     }
 
     parameter_estimator = RandomizedSearchCV(**params)
@@ -84,9 +84,8 @@ def main():
     y_train = train.loc[:, used_names[-1]]
 
     parameter_estimator.fit(x_train, y_train)
-    best_estimator = LinearSVC(
+    best_estimator = RandomForestClassifier(
         random_state=42,
-        dual=False,
         **parameter_estimator.best_params_
     )
 
@@ -96,7 +95,7 @@ def main():
                                test.loc[:, used_names[-1]])
     logger.debug(f'accuracy: {acc}')
 
-    with Path(__file__).resolve().parent.joinpath('miniloan-linear-svc-model.pkl').open(mode='wb') as fd:
+    with Path(__file__).resolve().parent.joinpath('miniloan-rfc-model.pkl').open(mode='wb') as fd:
         pickle.dump(
             obj=best_estimator,
             file=fd

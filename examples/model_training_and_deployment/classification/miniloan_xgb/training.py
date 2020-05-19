@@ -29,7 +29,7 @@ from sklearn.model_selection import train_test_split, RandomizedSearchCV
 
 
 def main():
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     logger = logging.getLogger(__name__)
 
     names = ['name', 'creditScore', 'income', 'loanAmount', 'monthDuration', 'approval', 'rate', 'yearlyReimbursement']
@@ -60,13 +60,13 @@ def main():
 
     train, test = train_test_split(data, random_state=7)
 
-    logger.info(f'training size: {len(train)}')
-    logger.info(f'validation size: {len(test)}')
+    logger.debug(f'training size: {len(train)}')
+    logger.debug(f'validation size: {len(test)}')
 
     params = {
         'estimator': xgboost.XGBClassifier(random_state=42),
         'cv': 3,
-        'verbose': bool(__debug__),
+        'verbose': 0,
         'n_jobs': -1,
         'random_state': 21,
         'n_iter': 5e02,
@@ -94,7 +94,7 @@ def main():
 
     acc = best_estimator.score(test.loc[:, used_names[:-1]],
                                test.loc[:, used_names[-1]])
-    logger.info(f'accuracy: {acc}')
+    logger.debug(f'accuracy: {acc}')
 
     with Path(__file__).resolve().parent.joinpath('miniloan-xgb-model.pkl').open(mode='wb') as fd:
         pickle.dump(

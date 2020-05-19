@@ -47,12 +47,10 @@ def main():
         }
     )
 
-    print(load_iris().target_names)
-
     train, test = train_test_split(data, random_state=7)
 
-    logger.info(f'training size: {len(train)}')
-    logger.info(f'validation size: {len(test)}')
+    logger.debug(f'training size: {len(train)}')
+    logger.debug(f'validation size: {len(test)}')
 
     params = {
         'estimator': SVC(random_state=42),
@@ -66,7 +64,7 @@ def main():
             'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
             'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'rbf']
         },
-        'verbose': bool(__debug__),
+        'verbose': 0,
         'n_jobs': -1
     }
 
@@ -85,7 +83,7 @@ def main():
 
     acc = best_estimator.score(test.loc[:, col_names[:-1]],
                                test.loc[:, col_names[-1]])
-    logger.info(f'accuracy: {acc}')
+    logger.debug(f'accuracy: {acc}')
 
     with Path(__file__).resolve().parent.joinpath('iris-svc-model.pkl').open(mode='wb') as fd:
         pickle.dump(
