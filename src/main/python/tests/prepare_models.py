@@ -18,6 +18,7 @@
 import logging
 import os
 import pickle
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -26,7 +27,6 @@ from typing import List, Any
 import numpy as np
 import pandas as pd
 from dynamic_hosting.core.model import Model
-from dynamic_hosting.core.util import obj_to_base64
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
@@ -137,7 +137,7 @@ def miniloan_lr_zip() -> Path:
     logger.info('accuracy: ' + str(res))
 
     internal_model = Model(
-        model=obj_to_base64(best_estimator),
+        model=pickle.dumps(best_estimator),
         name='miniloan-lr',
         version='v0',
         method_name='predict',
@@ -221,7 +221,7 @@ def miniloan_rfr_zip() -> Path:
     logger.info('score: ' + str(res))
 
     internal_model = Model(
-        model=obj_to_base64(best_estimator),
+        model=pickle.dumps(best_estimator),
         name='miniloan-rfr',
         version='v0',
         method_name='predict',
@@ -353,223 +353,11 @@ def miniloan_rfc_zip() -> Path:
     }
 
     internal_model = Model(
-        model=obj_to_base64(best_estimator),
+        model=pickle.dumps(best_estimator),
         **conf
     )
 
     return internal_model.to_archive(directory=DEFAULT_STORAGE_ROOT, zip_file_name='miniloan-rfc.zip')
-
-
-def miniloan_lr_pickle() -> Path:
-    logger = logging.getLogger(__name__)
-
-    des: Path = DEFAULT_STORAGE_ROOT.joinpath('miniloan-lr.pkl')
-    if des.exists() and not os.getenv('EML_RETRAIN_MODELS'):
-        logger.debug(f'model {des} exists, set EML_RETRAIN_MODELS to retain')
-        return des
-
-    data = DATA.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'approval']]
-
-    train, test = train_test_split(data, random_state=0)
-
-    logger.info('training size: {size}'.format(size=len(train)))
-    logger.info('validation size: {size}'.format(size=len(test)))
-
-    grid = {
-        'penalty': ['l2'],
-        'dual': [False],
-        'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
-        'C': [x for x in np.linspace(1e-5, 1.0, num=1000)]
-    }
-
-    hyper_tuning_params = {
-        'estimator': LogisticRegression(random_state=0),
-        'cv': 3,
-        'verbose': bool(__debug__),
-        'n_jobs': -1,
-        'scoring': 'accuracy',
-        'error_score': 'raise'
-    }
-
-    random_search = {
-        'param_distributions': grid,
-        'random_state': 42,
-        'n_iter': 10
-    }
-
-    parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
-
-    x = train.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate']]
-    y = train.loc[:, 'approval']
-
-    parameter_estimator.fit(x, y)
-    best_estimator = LogisticRegression(
-        random_state=0,
-        **parameter_estimator.best_params_
-    )
-
-    best_estimator.fit(x, y)
-
-    res = best_estimator.score(test.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate']],
-                               test.loc[:, 'approval'])
-    logger.info('accuracy: ' + str(res))
-
-    conf = {
-        'name': 'miniloan-lr',
-        'version': 'v0',
-        'method_name': 'predict',
-        'input_schema': INPUT_SCHEMA,
-        'output_schema': {
-            'attributes': [
-                {
-                    'name': 'prediction',
-                    'type': 'string'
-                }
-            ]
-        },
-        'metadata': {
-            'description': 'Loan approval',
-            'author': 'ke',
-            'trained_at': datetime.utcnow().isoformat(),
-            'metrics': [
-                {
-                    'name': 'accuracy',
-                    'value': res
-                }
-            ]
-        }
-    }
-
-    with des.open(mode='wb') as fd:
-        pickle.dump(
-            obj={
-                'model': best_estimator,
-                'model_config': conf
-            },
-            file=fd
-        )
-
-    return des
-
-
-def miniloan_rfc_pickle() -> Path:
-    logger = logging.getLogger(__name__)
-
-    des: Path = DEFAULT_STORAGE_ROOT.joinpath('miniloan-rfc.pkl')
-    if des.exists() and not os.getenv('EML_RETRAIN_MODELS'):
-        logger.debug(f'model {des} exists, set EML_RETRAIN_MODELS to retain')
-        return des
-
-    used_names = ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'approval']
-
-    train, test = train_test_split(DATA, random_state=7)
-
-    logger.info(f'training size: {len(train)}')
-    logger.info(f'validation size: {len(test)}')
-
-    params = {
-        'estimator': RandomForestClassifier(random_state=42),
-        'cv': 3,
-        'verbose': bool(__debug__),
-        'n_jobs': -1,
-        'random_state': 21,
-        'n_iter': 5,
-        'scoring': 'accuracy',
-        'error_score': 'raise',
-        'param_distributions': {
-            'criterion': ['gini'],
-            'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
-            'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
-            'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
-        }
-    }
-
-    parameter_estimator = RandomizedSearchCV(**params)
-
-    x_train = train.loc[:, used_names[:-1]]
-    y_train = train.loc[:, used_names[-1]]
-
-    parameter_estimator.fit(x_train, y_train)
-    best_estimator = RandomForestClassifier(
-        random_state=42,
-        **parameter_estimator.best_params_
-    )
-
-    best_estimator.fit(x_train, y_train)
-
-    acc = best_estimator.score(test.loc[:, used_names[:-1]],
-                               test.loc[:, used_names[-1]])
-    logger.info(f'accuracy: {acc}')
-
-    conf = {
-        'name': 'miniloan-rfc',
-        'version': 'v0',
-        'method_name': 'predict_proba',
-        'input_schema': [
-            {
-                'name': "creditScore",
-                'order': 0,
-                'type': 'int64'
-            },
-            {
-                'name': "income",
-                'order': 1,
-                'type': 'float64'
-            },
-            {
-                'name': "loanAmount",
-                'order': 2,
-                'type': 'float64'
-            },
-            {
-                'name': "monthDuration",
-                'order': 3,
-                'type': 'float64'
-            },
-            {
-                'name': "rate",
-                'order': 4,
-                'type': 'float64'
-            }
-        ],
-        'output_schema': {
-            'attributes': [
-                {
-                    'name': 'prediction',
-                    'type': 'string'
-                },
-                {
-                    'name': 'probabilities',
-                    'type': '[Probability]'
-                }
-            ]
-        },
-        'metadata': {
-            'description': 'Loan approval',
-            'author': 'ke',
-            'trained_at': datetime.utcnow().isoformat(),
-            'class_names': {
-                i: val for i, val in enumerate(best_estimator.classes_)
-            },
-            'metrics': [
-                {
-                    'name': 'accuracy',
-                    'value': acc
-                }
-            ]
-        }
-    }
-
-    with des.open(mode='wb') as fd:
-        pickle.dump(
-            obj={
-                'model': best_estimator,
-                'model_config': conf
-            },
-            file=fd
-        )
-
-    return des
 
 
 def miniloan_rfc_no_class_names_pickle() -> Path:
@@ -689,100 +477,51 @@ def miniloan_rfc_no_class_names_pickle() -> Path:
     return des
 
 
-def miniloan_rfr_pickle() -> Path:
+def __deploy(directory: Path, archive: Path) -> Path:
     logger = logging.getLogger(__name__)
 
-    des: Path = DEFAULT_STORAGE_ROOT.joinpath('miniloan-rfr.pkl')
-    if des.exists() and not os.getenv('EML_RETRAIN_MODELS'):
-        logger.debug(f'model {des} exists, set EML_RETRAIN_MODELS to retain')
-        return des
+    if archive.exists() and not os.getenv('EML_RETRAIN_MODELS'):
+        logger.info(f'model {archive} exists. set EML_RETRAIN_MODELS to re-train')
+        return archive
 
-    data = DATA.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'yearlyReimbursement']]
-
-    train, test = train_test_split(data, random_state=0)
-
-    logger.info('training size: {size}'.format(size=len(train)))
-    logger.info('validation size: {size}'.format(size=len(test)))
-
-    grid = {
-        'criterion': ['mse'],
-        'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
-        'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
-        'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
-    }
-
-    hyper_tuning_params = {
-        'estimator': RandomForestRegressor(random_state=0),
-        'cv': 3,
-        'verbose': bool(__debug__),
-        'n_jobs': -1,
-        'error_score': 'raise'
-    }
-
-    random_search = {
-        'param_distributions': grid,
-        'random_state': 42,
-        'n_iter': 10
-    }
-
-    parameter_estimator = RandomizedSearchCV(**{**hyper_tuning_params, **random_search})
-
-    x = train.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate']]
-    y = train.loc[:, 'yearlyReimbursement']
-
-    parameter_estimator.fit(x, y)
-    best_estimator = RandomForestRegressor(
-        random_state=0,
-        **parameter_estimator.best_params_
+    subprocess.run(
+        ['python3', str(directory.joinpath('training.py'))], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+    )
+    subprocess.run(
+        ['python3', str(directory.joinpath('deployment.py'))], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
 
-    best_estimator.fit(x, y)
+    return archive
 
-    res = best_estimator.score(test.loc[:, ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate']],
-                               test.loc[:, 'yearlyReimbursement'])
-    logger.info('score: ' + str(res))
 
-    conf = {
-        'name': 'miniloan-rfr',
-        'version': 'v0',
-        'method_name': 'predict',
-        'input_schema': INPUT_SCHEMA,
-        'output_schema': {
-            'attributes': [
-                {
-                    'name': 'prediction',
-                    'type': 'float'
-                }
-            ]
-        },
-        'metadata': {
-            'description': 'Evaluation of yearlyReimbursement',
-            'author': 'ke',
-            'trained_at': datetime.utcnow().isoformat(),
-            'metrics': [
-                {
-                    'name': 'r2',
-                    'value': res
-                }
-            ]
-        }
+EXAMPLES_ROOT = Path(__file__).resolve().parents[4].joinpath('examples')
 
-    }
 
-    with des.open(mode='wb') as fd:
-        pickle.dump(
-            obj={
-                'model': best_estimator,
-                'model_config': conf
-            },
-            file=fd
-        )
+def miniloan_lr_pickle() -> Path:
+    directory = EXAMPLES_ROOT.joinpath(
+        'model_training_and_deployment', 'classification', 'miniloan_linear_svc')
+    archive = directory.joinpath('miniloan-linear-svc-archive.pkl')
 
-    return des
+    return __deploy(directory, archive)
+
+
+def miniloan_rfc_pickle() -> Path:
+    directory = EXAMPLES_ROOT.joinpath(
+        'model_training_and_deployment', 'classification_with_probabilities', 'miniloan_rfc')
+    archive = directory.joinpath('miniloan-rfc-archive.pkl')
+
+    return __deploy(directory, archive)
+
+
+def miniloan_rfr_pickle() -> Path:
+    directory = EXAMPLES_ROOT.joinpath('model_training_and_deployment', 'regression', 'miniloan_rfr')
+    archive = directory.joinpath('miniloan-rfr-archive.pkl')
+
+    return __deploy(directory, archive)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     miniloan_lr_pickle()
     miniloan_rfc_pickle()
     miniloan_rfr_pickle()

@@ -28,7 +28,6 @@ from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
 from zipfile import ZipFile
 
 from dynamic_hosting.core.feature import Feature
-from dynamic_hosting.core.util import base64_to_obj, obj_to_base64
 from dynamic_hosting.openapi.output_schema import OutputSchema
 from pandas import DataFrame
 from pydantic import BaseModel, Field, validator
@@ -65,11 +64,11 @@ class MLSchema(BaseModel):
 
 class Model(MLSchema):
     """Internal representation of ML model"""
-    model: Text = Field(..., description='Pickled model in base64 format')
+    model: bytes = Field(..., description='Pickled model in base64 format')
 
     @validator('model', always=True)
     def type_check(cls, m) -> Type:
-        if base64_to_obj(m) is not None:
+        if pickle.loads(m) is not None:
             return m
         else:
             raise ValueError(f'Model not supported: {m}')
@@ -81,10 +80,10 @@ class Model(MLSchema):
         return {item.name: item.get_type() for item in self.input_schema}
 
     def has_attr(self, attr: Text) -> bool:
-        return hasattr(base64_to_obj(self.model), attr)
+        return hasattr(pickle.loads(self.model), attr)
 
     def get_attr(self, attr: Text) -> Any:
-        return getattr(base64_to_obj(self.model), attr)
+        return getattr(pickle.loads(self.model), attr)
 
     # TODO: better management for conversion error
     def invoke(
@@ -112,7 +111,7 @@ class Model(MLSchema):
             self,
             data_input: DataFrame
     ) -> Any:
-        actual_model: Any = base64_to_obj(self.model)
+        actual_model: Any = pickle.loads(self.model)
         return getattr(actual_model, self.method_name)(data_input)
 
     def to_archive(
@@ -148,7 +147,7 @@ class Model(MLSchema):
         model: Model = archive.get(model_name)
         conf: Dict = archive.get(metadata_name)
         return Model(
-            model=obj_to_base64(model),
+            model=pickle.dumps(model),
             **conf
         )
 
@@ -163,7 +162,7 @@ class Model(MLSchema):
             conf: Dict = json.loads(zp.read(name=conf_file_name).decode(encoding='utf8'))
 
         return Model(
-            model=obj_to_base64(pickle.loads(model_pkl)),
+            model=model_pkl,
             **conf
         )
 

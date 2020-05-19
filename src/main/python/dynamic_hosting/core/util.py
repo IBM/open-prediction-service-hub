@@ -17,7 +17,6 @@
 
 from __future__ import annotations
 
-import base64
 import logging
 import pickle
 from logging import Logger
@@ -37,14 +36,6 @@ def rmdir(
             item.unlink()
     directory.rmdir()
     logger.info('Removed directory: <{directory}>'.format(directory=directory))
-
-
-def obj_to_base64(obj: Any) -> Text:
-    return base64.b64encode(pickle.dumps(obj)).decode('ascii')
-
-
-def base64_to_obj(serialized: Text) -> Any:
-    return pickle.loads(base64.b64decode(serialized))
 
 
 def to_dataframe_compatible(kv_pair: Dict[Text: Any]) -> Dict:

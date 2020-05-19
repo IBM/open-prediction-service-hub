@@ -204,7 +204,7 @@ class TestInvocation(TestEmbeddedClient):
 
     def test_classification(self):
         res: Response = self.client.post(url=API_VER + '/invocations', json={
-            "model_name": "miniloan-lr",
+            "model_name": "miniloan-linear-svc",
             "model_version": "v0",
             "params": TestInvocation.miniloan_input_params})
         self.assertEqual(200, res.status_code)

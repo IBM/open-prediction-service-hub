@@ -17,17 +17,16 @@
 
 from __future__ import annotations
 
+import pickle
 import unittest
-from typing import List, Text
 from pathlib import Path
-
-from dynamic_hosting.core import Model
-from dynamic_hosting.core.feature import Feature
-from dynamic_hosting.core.util import base64_to_obj
-from dynamic_hosting.openapi.response import Prediction, Probability
+from typing import List, Text
 
 import numpy as np
-from sklearn.linear_model import LogisticRegression
+from dynamic_hosting.core import Model
+from dynamic_hosting.core.feature import Feature
+from dynamic_hosting.openapi.response import Prediction, Probability
+from sklearn.svm import LinearSVC
 from tests.prepare_models import miniloan_rfc_zip, miniloan_lr_pickle
 
 
@@ -144,7 +143,7 @@ class TestFromPickle(unittest.TestCase):
                 metadata_name='model_config'
             )
 
-        self.assertEqual(LogisticRegression, type(base64_to_obj(model.model)))
+        self.assertEqual(LinearSVC, type(pickle.loads(model.model)))
 
 
 class TestFromZip(unittest.TestCase):

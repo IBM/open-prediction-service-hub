@@ -7,7 +7,6 @@ from typing import Dict, Text, Any
 
 from dynamic_hosting.core import Model as MLModel
 from dynamic_hosting.core.configuration import ServerConfiguration
-from dynamic_hosting.core.util import obj_to_base64
 from dynamic_hosting.db import models
 from dynamic_hosting.db.crud import create_model, delete_model, read_models, read_model
 from sqlalchemy import create_engine
@@ -39,7 +38,7 @@ class TestDatabase(unittest.TestCase):
     def test_add_model(self):
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             contents: Dict[Text, Any] = pickle.loads(fd.read())
-        m: MLModel = MLModel(model=obj_to_base64(contents.get('model')), **contents.get('model_config'))
+        m: MLModel = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
         create_model(self.db, m)
 
         self.assertEqual(1, len(read_models(self.db)))
@@ -49,7 +48,7 @@ class TestDatabase(unittest.TestCase):
 
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             contents: Dict[Text, Any] = pickle.loads(fd.read())
-        m: MLModel = MLModel(model=obj_to_base64(contents.get('model')), **contents.get('model_config'))
+        m: MLModel = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
         create_model(self.db, m)
 
         self.assertEqual(1, len(read_models(self.db)))
@@ -57,7 +56,7 @@ class TestDatabase(unittest.TestCase):
     def test_get_model(self):
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             contents: Dict[Text, Any] = pickle.loads(fd.read())
-        m1 = MLModel(model=obj_to_base64(contents.get('model')), **contents.get('model_config'))
+        m1 = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
 
         create_model(self.db, m1)
 
@@ -69,13 +68,13 @@ class TestDatabase(unittest.TestCase):
 
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             contents: Dict[Text, Any] = pickle.loads(fd.read())
-        m1 = MLModel(model=obj_to_base64(contents.get('model')), **contents.get('model_config'))
+        m1 = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
         with miniloan_lr_pickle().open(mode='rb') as fd:
             contents: Dict[Text, Any] = pickle.loads(fd.read())
-        m2 = MLModel(model=obj_to_base64(contents.get('model')), **contents.get('model_config'))
+        m2 = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
         with miniloan_rfr_pickle().open(mode='rb') as fd:
             contents: Dict[Text, Any] = pickle.loads(fd.read())
-        m3 = MLModel(model=obj_to_base64(contents.get('model')), **contents.get('model_config'))
+        m3 = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
 
         create_model(self.db, m1)
         create_model(self.db, m2)
