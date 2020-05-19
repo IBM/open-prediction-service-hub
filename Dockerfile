@@ -28,7 +28,8 @@ COPY . ${BUILD_DIR}
 RUN adduser --system --no-create-home --group ${APP_USER} && \
     python3 setup.py install --quiet && \
     # prepare example for runtime
-    python3 src/main/python/tests/prepare_models.py && python3 runtime/init.py && cp -r runtime ${RUNTIME_DIR}
+    echo "Preparing examples. This may take up to 5 minutes" && \
+    python3 runtime/init.py && cp -r runtime ${RUNTIME_DIR}
 
 
 # Prepare runtime

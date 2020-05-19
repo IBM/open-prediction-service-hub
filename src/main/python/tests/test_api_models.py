@@ -27,7 +27,7 @@ from dynamic_hosting.core import Model
 from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.openapi.response import Prediction, Probability
 from sklearn.svm import LinearSVC
-from dynamic_hosting.core.prepare_models import miniloan_linear_svc_pickle
+from .prepare_models import miniloan_linear_svc_pickle
 
 
 class TestFeature(unittest.TestCase):

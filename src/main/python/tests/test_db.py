@@ -11,7 +11,7 @@ from dynamic_hosting.db import models
 from dynamic_hosting.db.crud import create_model, delete_model, read_models, read_model
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from dynamic_hosting.core.prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle
+from .prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle
 
 
 class TestDatabase(unittest.TestCase):

@@ -16,33 +16,38 @@
 
 
 import os
+import subprocess
 from pathlib import Path
-from typing import Text
+from typing import Text, List
 
 from dynamic_hosting import app
 from dynamic_hosting.localml import VER
 from fastapi.testclient import TestClient
 from requests import Response
 
-from ..src.main.python.tests.prepare_models import miniloan_linear_svc_pickle, miniloan_xgb_pickle, miniloan_rfc_pickle, miniloan_rfr_pickle
-
-EXAMPLE_DIR: Path = Path(__file__).resolve().parents[1].joinpath('examples').joinpath('models')
-
 API_VER: Text = f'/v{VER}'
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def init():
     os.environ['model_storage'] = str(Path(__file__).resolve().parent.joinpath('storage'))
     client: TestClient = TestClient(app)
 
-    results = []
-    for fun in [miniloan_linear_svc_pickle, miniloan_xgb_pickle, miniloan_rfc_pickle, miniloan_rfr_pickle]:
+    subprocess.run(
+        ['python3', str(PROJECT_ROOT.joinpath('src', 'main', 'python', 'tests', 'prepare_models.py'))],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+    )
 
-        with fun().open(mode='rb') as fd:
-            res_miniloan_rfc: Response = client.post(
+
+    models = PROJECT_ROOT.joinpath('examples').rglob('miniloan-*-archive.pkl')
+    results = []
+    for p in models:
+        with p.open(mode='rb') as fd:
+            res: Response = client.post(
                 API_VER + "/models",
                 files={'file': fd}
             )
+        results.append(res)
 
     assert (all([res.status_code == 200 for res in results]))
 

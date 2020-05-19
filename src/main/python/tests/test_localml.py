@@ -20,7 +20,6 @@ from __future__ import annotations
 import ast
 import json
 import os
-import shutil
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -32,7 +31,7 @@ from dynamic_hosting.localml import VER
 from fastapi.testclient import TestClient
 from requests import Response
 
-from dynamic_hosting.core.prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle
+from .prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle
 
 OPENAPI_RESOURCE: Path = Path(__file__).resolve().parents[2].joinpath('resources').joinpath('openapi.json')
 
