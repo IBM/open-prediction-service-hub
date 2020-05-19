@@ -20,7 +20,6 @@ from __future__ import annotations
 import ast
 import json
 import os
-import pickle
 import shutil
 import unittest
 from pathlib import Path
@@ -29,21 +28,14 @@ from typing import Dict, Text
 from typing import List
 
 from dynamic_hosting import app
+from dynamic_hosting.localml import VER
 from fastapi.testclient import TestClient
 from requests import Response
 
-from .prepare_models import miniloan_rfc_pickle, miniloan_lr_pickle, miniloan_rfr_pickle, \
-    miniloan_rfc_no_class_names_pickle
-
-from dynamic_hosting.localml import VER
+from dynamic_hosting.core.prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle
 
 OPENAPI_RESOURCE: Path = Path(__file__).resolve().parents[2].joinpath('resources').joinpath('openapi.json')
 
-TEST_RES_DIR: Path = Path(__file__).resolve().parents[3].joinpath('test').joinpath('resources')
-
-shutil.copy(src=str(miniloan_rfc_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-rfc.pkl')))
-shutil.copy(src=str(miniloan_lr_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-lr.pkl')))
-shutil.copy(src=str(miniloan_rfr_pickle()), dst=str(TEST_RES_DIR.joinpath('miniloan-rfr.pkl')))
 
 API_VER: Text = f'/v{VER}'
 
@@ -189,13 +181,7 @@ class TestInvocation(TestEmbeddedClient):
                 files={'file': fd}
             )
         self.assertEqual(200, res.status_code)
-        with miniloan_lr_pickle().open(mode='rb') as fd:
-            res: Response = self.client.post(
-                API_VER + "/models",
-                files={'file': fd}
-            )
-        self.assertEqual(200, res.status_code)
-        with miniloan_rfc_no_class_names_pickle().open(mode='rb') as fd:
+        with miniloan_linear_svc_pickle().open(mode='rb') as fd:
             res: Response = self.client.post(
                 API_VER + "/models",
                 files={'file': fd}
@@ -229,15 +215,4 @@ class TestInvocation(TestEmbeddedClient):
 
         self.assertEqual(200, res.status_code)
         self.assertTrue(res.json()['prediction'] in ['true', 'false'])
-        self.assertAlmostEqual(1.0, sum([f['value'] for f in res.json()['probabilities']]))
-
-    def test_predict_proba_without_class_names(self):
-        res: Response = self.client.post(url=API_VER + '/invocations', json={
-            "model_name": "miniloan-rfc-no-output-schema",
-            "model_version": "v0",
-            "params": TestInvocation.miniloan_input_params
-        })
-
-        self.assertEqual(200, res.status_code)
-        self.assertTrue(res.json()['prediction'] in ["0", "1"])
         self.assertAlmostEqual(1.0, sum([f['value'] for f in res.json()['probabilities']]))

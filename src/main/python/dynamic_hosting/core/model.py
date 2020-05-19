@@ -17,24 +17,15 @@
 
 from __future__ import annotations
 
-import base64
-import json
 import logging
 import pickle
-from io import BytesIO
 from logging import Logger
-from pathlib import Path
 from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
-from zipfile import ZipFile
 
 from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.openapi.output_schema import OutputSchema
 from pandas import DataFrame
 from pydantic import BaseModel, Field, validator
-
-MODEL_PICKLE_FILE_NAME: Text = 'archive.pkl'
-MODEL_ARCHIVE_NAME: Text = 'archive.zip'
-MODEL_CONFIG_FILE_NAME: Text = 'conf.json'
 
 
 class Metric(BaseModel):
@@ -114,29 +105,6 @@ class Model(MLSchema):
         actual_model: Any = pickle.loads(self.model)
         return getattr(actual_model, self.method_name)(data_input)
 
-    def to_archive(
-            self,
-            directory: Path,
-            metadata_file_name: Text = MODEL_CONFIG_FILE_NAME,
-            pickle_file_name: Text = MODEL_PICKLE_FILE_NAME,
-            zip_file_name: Text = MODEL_ARCHIVE_NAME
-    ) -> Path:
-        logger: Logger = logging.getLogger(__name__)
-
-        directory.mkdir(parents=True, exist_ok=True)
-        zipfile_path: Path = directory.joinpath(zip_file_name)
-
-        model: bytes = base64.b64decode(self.model)
-        conf_encoded: bytes = self.json(exclude={'model'}).encode(encoding='utf8')
-
-        with ZipFile(str(zipfile_path), 'w') as zipFile:
-            zipFile.writestr(zinfo_or_arcname=pickle_file_name, data=model)
-            zipFile.writestr(zinfo_or_arcname=metadata_file_name, data=conf_encoded)
-
-        logger.info('Added model archive: {archive}'.format(archive=zipfile_path))
-
-        return zipfile_path
-
     @staticmethod
     def from_pickle(
             pickle_file: bytes,
@@ -148,21 +116,6 @@ class Model(MLSchema):
         conf: Dict = archive.get(metadata_name)
         return Model(
             model=pickle.dumps(model),
-            **conf
-        )
-
-    @staticmethod
-    def from_archive(
-            archive: bytes,
-            model_file_name: Text = MODEL_PICKLE_FILE_NAME,
-            conf_file_name: Text = MODEL_CONFIG_FILE_NAME
-    ) -> Model:
-        with ZipFile(BytesIO(archive)) as zp:
-            model_pkl: bytes = zp.read(name=model_file_name)
-            conf: Dict = json.loads(zp.read(name=conf_file_name).decode(encoding='utf8'))
-
-        return Model(
-            model=model_pkl,
             **conf
         )
 

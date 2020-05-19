@@ -11,7 +11,7 @@ from dynamic_hosting.db import models
 from dynamic_hosting.db.crud import create_model, delete_model, read_models, read_model
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from tests.prepare_models import miniloan_rfc_pickle, miniloan_lr_pickle, miniloan_rfr_pickle
+from dynamic_hosting.core.prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle
 
 
 class TestDatabase(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestDatabase(unittest.TestCase):
         with miniloan_rfc_pickle().open(mode='rb') as fd:
             contents: Dict[Text, Any] = pickle.loads(fd.read())
         m1 = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
-        with miniloan_lr_pickle().open(mode='rb') as fd:
+        with miniloan_linear_svc_pickle().open(mode='rb') as fd:
             contents: Dict[Text, Any] = pickle.loads(fd.read())
         m2 = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
         with miniloan_rfr_pickle().open(mode='rb') as fd:

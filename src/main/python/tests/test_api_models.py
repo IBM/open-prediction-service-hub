@@ -27,7 +27,7 @@ from dynamic_hosting.core import Model
 from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.openapi.response import Prediction, Probability
 from sklearn.svm import LinearSVC
-from tests.prepare_models import miniloan_rfc_zip, miniloan_lr_pickle
+from dynamic_hosting.core.prepare_models import miniloan_linear_svc_pickle
 
 
 class TestFeature(unittest.TestCase):
@@ -131,7 +131,7 @@ class TestPrediction(unittest.TestCase):
 class TestFromPickle(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.pkl: Path = miniloan_lr_pickle()
+        self.pkl: Path = miniloan_linear_svc_pickle()
 
     def test_import(self):
         with self.pkl.open(mode='rb') as fd:
@@ -144,19 +144,3 @@ class TestFromPickle(unittest.TestCase):
             )
 
         self.assertEqual(LinearSVC, type(pickle.loads(model.model)))
-
-
-class TestFromZip(unittest.TestCase):
-
-    def setUp(self) -> None:
-        self.zp: Path = miniloan_rfc_zip()
-
-    def test_import(self):
-        with self.zp.open(mode='rb') as fd:
-            content: bytes = fd.read()
-
-        self.assertIsNotNone(
-            Model.from_archive(
-                archive=content
-            )
-        )
