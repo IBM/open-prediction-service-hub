@@ -18,7 +18,7 @@
 import logging
 from logging import Logger
 from operator import itemgetter
-from typing import Text, List, Optional
+from typing import Text, List, Dict
 
 import numpy as np
 from dynamic_hosting.core.configuration import ServerConfiguration
@@ -33,7 +33,6 @@ from fastapi import FastAPI, File, Depends
 from fastapi_versioning import VersionedFastAPI, version
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
 app: FastAPI = FastAPI(
@@ -48,7 +47,6 @@ DATABASE_NAME: Text = 'EML.db'
 
 # Dependency
 def get_ml_service() -> PredictionService:
-    logger: Logger = logging.getLogger(__name__)
     engine: Engine = create_engine(
         f'sqlite:///{ServerConfiguration().model_storage.joinpath(DATABASE_NAME)}',
         connect_args={"check_same_thread": False}
@@ -75,7 +73,7 @@ def get_ml_service() -> PredictionService:
 )
 @version(major=VER)
 def get_server_status(mls: PredictionService = Depends(get_ml_service)) -> ServerStatus:
-    return ServerStatus(model_count=len(mls.get_models()))
+    return ServerStatus(model_count=mls.count_models())
 
 
 @app.get(
@@ -84,11 +82,9 @@ def get_server_status(mls: PredictionService = Depends(get_ml_service)) -> Serve
     response_model=List[MLSchema]
 )
 @version(major=VER)
-def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[MLSchema]:
+def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[Dict]:
     """Returns the list of ML models."""
-    return [
-        model.get_meta_model() for model in mls.get_models()
-    ]
+    return mls.get_model_metadata()
 
 
 @app.post(

@@ -17,6 +17,10 @@ def read_models(db: Session) -> List[models.Model]:
     return db.query(models.Model).all()
 
 
+def count_models(db: Session) -> int:
+    return db.query(models.Model).count()
+
+
 def create_model(db: Session, ml_model: model.Model) -> NoReturn:
     db.add(
         models.Model(

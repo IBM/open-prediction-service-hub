@@ -17,8 +17,8 @@
 import logging
 from typing import Text, Any, Dict, NoReturn, Optional, List
 
-from dynamic_hosting.core.model import Model
-from dynamic_hosting.db.crud import create_model, delete_model, read_model, read_models
+from dynamic_hosting.core.model import Model, MLSchema
+from dynamic_hosting.db.crud import create_model, delete_model, read_model, read_models, count_models
 from sqlalchemy.orm import Session
 
 
@@ -47,11 +47,20 @@ class PredictionService:
         item = read_model(self.db, model_name=model_name, model_version=model_version)
         return Model(model=item.model_b64, **item.configuration)
 
+    def get_model_metadata(self) -> List[MLSchema]:
+        return [
+            MLSchema(**i.configuration)
+            for i in read_models(self.db)
+        ]
+
     def get_models(self) -> List[Model]:
         return [
             Model(model=i.model_b64, **i.configuration)
             for i in read_models(self.db)
         ]
+
+    def count_models(self) -> int:
+        return count_models(self.db)
 
     def invoke(
             self,

@@ -2,8 +2,8 @@ FROM python:3.7
 
 
 ARG BUILD_DIR="/app/build"
-# set EML_RETRAIN_MODELS to retrain all example models
-ARG EML_RETRAIN_MODELS=1
+# set EML_RETRAIN_MODELS to always retrain all example models
+# ARG EML_RETRAIN_MODELS=1
 # Message color
 ARG YELLOW='\033[1;33m'
 ARG NC='\033[0m'
@@ -12,8 +12,8 @@ ARG NC='\033[0m'
 ENV RUNTIME_DIR="/app/runtime"
 ENV APP_USER="lml"
 ENV SERVICE_PORT=8080
-# Suppose server have 10 cpu cores. The recommended number of gunicorn worker is ((2 x $num_cores) + 1) = 21
-ENV WORKER_NUM=21
+# Suppose server have 6 cpu cores. The recommended number of gunicorn worker is ((2 x $num_cores) + 1) = 21
+ENV WORKER_NUM=13
 # ENV variables used by server
 ENV model_storage=${RUNTIME_DIR}/storage
 

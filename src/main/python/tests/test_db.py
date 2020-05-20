@@ -8,7 +8,7 @@ from typing import Dict, Text, Any
 from dynamic_hosting.core import Model as MLModel
 from dynamic_hosting.core.configuration import ServerConfiguration
 from dynamic_hosting.db import models
-from dynamic_hosting.db.crud import create_model, delete_model, read_models, read_model
+from dynamic_hosting.db.crud import create_model, delete_model, read_models, read_model, count_models
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from .prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle
@@ -42,6 +42,14 @@ class TestDatabase(unittest.TestCase):
         create_model(self.db, m)
 
         self.assertEqual(1, len(read_models(self.db)))
+
+    def test_count_models(self):
+        with miniloan_rfc_pickle().open(mode='rb') as fd:
+            contents: Dict[Text, Any] = pickle.loads(fd.read())
+        m: MLModel = MLModel(model=pickle.dumps(contents.get('model')), **contents.get('model_config'))
+        create_model(self.db, m)
+
+        self.assertEqual(1, count_models(db=self.db))
 
     def test_get_models(self):
         self.assertEqual(0, len(read_models(self.db)))

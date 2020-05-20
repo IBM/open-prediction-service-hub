@@ -10,6 +10,9 @@ example:
 coverage:
 	python3 -m pytest --cov=dynamic_hosting src/main/python/tests
 
+lucast:
+	python3 -m locust -f src/main/python/stress_test/locustfile.py
+
 
 # Container Image management
 IMAGE_REPO=mldecisions
