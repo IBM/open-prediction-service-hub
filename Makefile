@@ -1,5 +1,8 @@
-image:
-	docker build -t lml .
+image_dev:
+	docker build -t op_dev -f docker/develop/Dockerfile .
+
+image_master:
+	docker build -t op_master -f docker/master/Dockerfile .
 
 launch:
 	docker run --rm -it -p 8080:8080 --name lml lml

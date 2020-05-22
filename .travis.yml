@@ -20,7 +20,7 @@ before_install:
   - python3 -m pip install --quiet --upgrade pip
   - python3 -m pip install --quiet -r requirements-ml.txt
   - python3 -m pip install --quiet -r requirements.txt
-  - docker build -t lml:latest .
+  - docker build -t op:latest -f docker/master/Dockerfile .
 
 
 install:
