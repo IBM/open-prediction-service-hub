@@ -35,8 +35,7 @@ def main():
     names = ['name', 'creditScore', 'income', 'loanAmount', 'monthDuration', 'approval', 'rate', 'yearlyReimbursement']
     used_names = ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'approval']
 
-    miniloan_file = Path(__file__).resolve().parents[4].joinpath(
-        'data', 'decisions-on-spark', 'data', 'miniloan').joinpath('miniloan-decisions-ls-10K.csv')
+    miniloan_file = Path(__file__).resolve().parents[4].joinpath('data').joinpath('miniloan-decisions-ls-10K.csv')
 
     data = pd.read_csv(
         miniloan_file,
