@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open-prediction-deployment
+spec:
+  selector:
+    matchLabels:
+      run: open-prediction
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        run: open-prediction
+    spec:
+      containers:
+      - name: open-prediction
+        image: "us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+        ports:
+        - containerPort: 80

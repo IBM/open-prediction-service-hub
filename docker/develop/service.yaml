@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open-prediction-service
+  labels:
+    run: open-prediction
+spec:
+  type: NodePort
+  selector:
+    run: open-prediction
+  ports:
+    - name: restful-interface
+      protocol: TCP
+      targetPort: 80
+      port: 8000
+      nodePort: 30000
