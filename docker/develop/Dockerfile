@@ -1,8 +1,6 @@
 FROM python:3.7
 
 
-VOLUME /app
-
 # set EML_RETRAIN_MODELS to always retrain all example models
 # ARG EML_RETRAIN_MODELS=1
 # Message color
@@ -28,12 +26,13 @@ RUN \
 # Install this project
 COPY . /tmp/repo/
 RUN \
+    mkdir /app  && \
     cd /tmp/repo && \
     python3 setup.py --quiet install -O2 && \
     python3 -m pip cache purge --quiet && \
     echo "${YELLOW}[INFO] Preparing examples.${NC}" && \
     python3 runtime/init.py && \
-    cp -r runtime /app && \
+    cp -a /tmp/repo/runtime/. /app/ && \
     rm -rf /tmp/repo && \
     adduser --quiet --system --no-create-home --group lml && \
     chown --recursive lml:lml /app
@@ -53,6 +52,6 @@ ENTRYPOINT gunicorn \
             --log-file=- \
             --worker-tmp-dir=/dev/shm \
             --chdir=/app \
-            --bind=:${SERVICE_PORT} \
+            --bind=:8080 \
             --workers=${WORKER_NUM} \
             asgi:app
