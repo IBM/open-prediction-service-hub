@@ -5,7 +5,7 @@ image_master:
 	docker build -t op_master -f docker/master/Dockerfile .
 
 launch:
-	docker run --rm -it -p 8080:8080 --name lml lml
+	docker run --rm -it -p 8080:8080 --name open-prediction op_master
 
 example:
 	python3 -m pytest -v src/main/python/tests
@@ -23,8 +23,8 @@ IMAGE_NAME=mlservice
 IMAGE_TAG=latest
 
 ibm_register_image:
-	ibmcloud cr image-rm us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
-	ibmcloud cr build -t us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} .
+	ibmcloud cr image-rm us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} || echo "Image not exist"
+	ibmcloud cr build -t us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} -f docker/master/Dockerfile .
 
 tag_image:
 	docker tag lml us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
@@ -38,7 +38,7 @@ KUB_CLUSTER_NAME=MicroMLService
 KUB_SERVICE_NAME=mlservice
 KUB_DEPLOYMENT_NAME=mlservice-deployment
 
-get_servers:
+get_cluster:
 	ibmcloud ks workers --cluster ${KUB_CLUSTER_NAME}
 
 get_services:
@@ -49,10 +49,19 @@ kub_clean:
 	kubectl delete deployment ${KUB_DEPLOYMENT_NAME}
 
 kub_deploy:
-	kubectl run ${KUB_DEPLOYMENT_NAME} --image=us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} --image-pull-policy Always
+	cat docker/develop/deployment.yaml \
+		| sed \
+			-e "s/{{KUB_DEPLOYMENT_NAME}}/${KUB_DEPLOYMENT_NAME}/g" \
+			-e "s/{{IMAGE_REPO}}/${IMAGE_REPO}/g" \
+			-e "s/{{IMAGE_NAME}}/${IMAGE_NAME}/g" \
+			-e "s/{{IMAGE_TAG}}/${IMAGE_TAG}/g" \
+		| kubectl apply -f -
 
 kub_service:
-	kubectl expose deployment/${KUB_DEPLOYMENT_NAME} --type=NodePort --name=${KUB_SERVICE_NAME} --target-port=8080 --port 8080
+		cat docker/develop/service.yaml \
+		| sed \
+			-e "s/{{KUB_SERVICE_NAME}}/${KUB_SERVICE_NAME}/g" \
+		| kubectl apply -f -
 
 kub: ibm_register_image kub_clean kub_deploy kub_service
 	echo "Service ready"

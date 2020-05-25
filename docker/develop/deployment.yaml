@@ -1,19 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: open-prediction-deployment
+  name: {{KUB_DEPLOYMENT_NAME}}
 spec:
   selector:
     matchLabels:
       run: open-prediction
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
         run: open-prediction
     spec:
       containers:
-      - name: open-prediction
-        image: "us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+      - name: "open-prediction"
+        imagePullPolicy: Always
+        image: "us.icr.io/{{IMAGE_REPO}}/{{IMAGE_NAME}}:{{IMAGE_TAG}}"
         ports:
-        - containerPort: 80
+        - containerPort: 8080
