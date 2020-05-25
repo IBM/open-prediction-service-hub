@@ -37,7 +37,7 @@ from sqlalchemy.orm import sessionmaker
 
 app: FastAPI = FastAPI(
     version='0.0.0-SNAPSHOT',
-    title='Local ml provider',
+    title='Open Prediction',
     description='A simple environment to test machine learning model'
 )
 
