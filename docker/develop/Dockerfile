@@ -10,7 +10,7 @@ ARG NC='\033[0m'
 # Suppose server have 6 cpu cores. The recommended number of gunicorn worker is ((2 x $num_cores) + 1) = 13
 ENV WORKER_NUM=13
 # ENV variables used by server
-ENV model_storage=/app
+ENV model_storage=/app/storage
 
 
 # Install dependences
