@@ -1,3 +1,9 @@
+open-prediction (0.0.2) unstable; urgency=low
+
+  * RTC-130175 Reduce the docker image size of the ads-ml-service
+
+ -- Ke Li <Ke.Li@ibm.com>  Tue, 26 May 2020 16:26:40 +0200
+
 open-prediction (0.0.1) unstable; urgency=low
 
   * Add changelog
