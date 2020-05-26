@@ -32,7 +32,7 @@ RUN \
     python3 setup.py --quiet install -O2 && \
     echo "${YELLOW}[INFO] Preparing examples.${NC}" && \
     python3 runtime/init.py && \
-    cp -a /tmp/repo/runtime/. ${APP_HOME}/ && \
+    cp -a /tmp/repo/runtime/. ${APP_HOME} && \
     rm -rf /tmp/repo && \
     adduser --quiet --system --no-create-home --group lml && \
     chown --recursive lml:lml ${APP_HOME}
