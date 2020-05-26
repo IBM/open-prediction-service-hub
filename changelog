@@ -1,0 +1,6 @@
+open-prediction (0.0.1) unstable; urgency=low
+
+  * Add changelog
+  * Makefile test use dev image instead of master
+
+ -- Ke Li <Ke.Li@ibm.com>  Tue, 26 May 2020 10:04:25 +0200

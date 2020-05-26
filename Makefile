@@ -5,7 +5,7 @@ image_master:
 	docker build -t op_master -f docker/master/Dockerfile .
 
 launch:
-	docker run --rm -it -p 8080:8080 --name open-prediction op_master
+	docker run --rm -it -p 8080:8080 --name open-prediction op_dev
 
 example:
 	python3 -m pytest -v src/main/python/tests
