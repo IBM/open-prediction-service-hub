@@ -6,11 +6,12 @@ FROM python:3.7
 # Message color
 ARG YELLOW='\033[1;33m'
 ARG NC='\033[0m'
+ARG APP_HOME="/app"
 
 # Suppose server have 6 cpu cores. The recommended number of gunicorn worker is ((2 x $num_cores) + 1) = 13
 ENV WORKER_NUM=13
 # ENV variables used by server
-ENV model_storage=/app/storage
+ENV model_storage=${APP_HOME}/storage
 
 
 # Install dependences
@@ -18,28 +19,27 @@ COPY requirements.txt requirements-ml.txt /tmp/repo/
 RUN \
     echo "${YELLOW}[INFO] Preparing installation.${NC}" && \
     cd /tmp/repo && \
-    python3 -m pip install --quiet --upgrade pip && \
-    python3 -m pip install --quiet -r requirements-ml.txt && \
-    python3 -m pip install --quiet -r requirements.txt
+    pip3 install --no-cache-dir --quiet --upgrade pip && \
+    pip3 install --no-cache-dir --quiet --requirement requirements-ml.txt && \
+    pip3 install --no-cache-dir --quiet --requirement requirements.txt
 
 
 # Install this project
 COPY . /tmp/repo/
 RUN \
-    mkdir /app  && \
+    mkdir ${APP_HOME}  && \
     cd /tmp/repo && \
     python3 setup.py --quiet install -O2 && \
-    python3 -m pip cache purge --quiet && \
     echo "${YELLOW}[INFO] Preparing examples.${NC}" && \
     python3 runtime/init.py && \
-    cp -a /tmp/repo/runtime/. /app/ && \
+    cp -a /tmp/repo/runtime/. ${APP_HOME}/ && \
     rm -rf /tmp/repo && \
     adduser --quiet --system --no-create-home --group lml && \
-    chown --recursive lml:lml /app
+    chown --recursive lml:lml ${APP_HOME}
 
 
 USER lml
-WORKDIR /app
+WORKDIR ${APP_HOME}
 EXPOSE 8080
 
 
@@ -51,7 +51,7 @@ ENTRYPOINT gunicorn \
             --worker-class=uvicorn.workers.UvicornWorker \
             --log-file=- \
             --worker-tmp-dir=/dev/shm \
-            --chdir=/app \
+            --chdir=${APP_HOME} \
             --bind=:8080 \
             --workers=${WORKER_NUM} \
             asgi:app

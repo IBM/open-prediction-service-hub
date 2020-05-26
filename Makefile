@@ -1,8 +1,5 @@
 image_dev:
-	docker build -t op_dev -f docker/develop/Dockerfile .
-
-image_master:
-	docker build -t op_master -f docker/master/Dockerfile .
+	docker build -t op_dev -f docker/Dockerfile .
 
 launch:
 	docker run --rm -it -p 8080:8080 --name open-prediction op_dev
@@ -23,8 +20,8 @@ IMAGE_NAME=mlservice
 IMAGE_TAG=latest
 
 ibm_register_image:
-	ibmcloud cr image-rm us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} || echo "Image not exist"
-	ibmcloud cr build -t us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} -f docker/master/Dockerfile .
+	ibmcloud cr image-rm us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} || echo "Not need to delete image"
+	ibmcloud cr build -t us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} -f docker/Dockerfile .
 
 tag_image:
 	docker tag lml us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG}
@@ -49,7 +46,7 @@ kub_clean:
 	kubectl delete deployment ${KUB_DEPLOYMENT_NAME}
 
 kub_deploy:
-	cat docker/develop/deployment.yaml \
+	cat docker/deployment.yaml \
 		| sed \
 			-e "s/{{KUB_DEPLOYMENT_NAME}}/${KUB_DEPLOYMENT_NAME}/g" \
 			-e "s/{{IMAGE_REPO}}/${IMAGE_REPO}/g" \
@@ -58,7 +55,7 @@ kub_deploy:
 		| kubectl apply -f -
 
 kub_service:
-		cat docker/develop/service.yaml \
+		cat docker/service.yaml \
 		| sed \
 			-e "s/{{KUB_SERVICE_NAME}}/${KUB_SERVICE_NAME}/g" \
 		| kubectl apply -f -
