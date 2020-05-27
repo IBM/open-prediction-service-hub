@@ -1,8 +1,8 @@
-image_dev:
-	docker build -t op_dev -f docker/Dockerfile .
+image:
+	docker build -t open-prediction -f docker/Dockerfile .
 
 launch:
-	docker run --rm -it -p 8080:8080 --name open-prediction op_dev
+	docker run --rm -it -p 8080:8080 --name open-prediction open-prediction
 
 example:
 	python3 src/main/python/tests/prepare_models.py

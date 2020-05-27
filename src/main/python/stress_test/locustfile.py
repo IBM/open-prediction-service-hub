@@ -11,7 +11,7 @@ class AdminApiUser(HttpUser):
     read_server_status is more used
     read_models is the most used
     """
-    wait_time = between(0.5, 1.0)
+    wait_time = between(2, 5)
 
     @task(1)
     def get_server_status(self):
@@ -23,7 +23,7 @@ class AdminApiUser(HttpUser):
 
 
 class MlApiUser(HttpUser):
-    wait_time = between(0.01, 0.05)
+    wait_time = between(0.1, 1)
 
     @task(1)
     def invocation(self):

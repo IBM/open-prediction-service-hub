@@ -8,8 +8,6 @@ ARG YELLOW='\033[1;33m'
 ARG NC='\033[0m'
 ARG APP_HOME="/app"
 
-# Suppose server have 6 cpu cores. The recommended number of gunicorn worker is ((2 x $num_cores) + 1) = 13
-ENV WORKER_NUM=13
 # ENV variables used by server
 ENV model_storage=${APP_HOME}/storage
 
@@ -53,5 +51,5 @@ ENTRYPOINT gunicorn \
             --worker-tmp-dir=/dev/shm \
             --chdir=${APP_HOME} \
             --bind=:8080 \
-            --workers=${WORKER_NUM} \
+            --config=file:gunicorn.init.py \
             asgi:app
