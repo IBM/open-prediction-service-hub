@@ -1,6 +1,7 @@
 # Model deployment
 
-Open prediction service can serve classifiers/regressors that follow the scikit learn predictor API. As 
+Open prediction service can serve classifiers/regressors that follow the 
+[scikit learn predictor API](https://scikit-learn.org/stable/developers/develop.html#apis-of-scikit-learn-objects). As 
 predictor API is not an abstract interface but a widely used convention, this web service can be
 used for a much richer range of libraries(e.g xgboost). To use libraries other than scikit-learn 
 and xgboost, user only needs to add dependencies into `requirements-ml.txt` before building 
@@ -9,17 +10,16 @@ docker image.
 ## getting started
 
 For each type of machine learning (classification/regression), examples are 
-given in `examples/model_training_and_deployment/<type>`.Each project 
+given in `examples/model_training_and_deployment/<type>`. Each project 
 inside `<type>/` is a separate deployment project.
 
-### deployment project
+### deployment projects
 
-Each project contains 2 python script and 1 example deployment 
-configuration file. 
+Each project contains 2 python scripts and 1 example configuration file. 
 
 project structure:
 ```
-<type>/project
+**/<type>/project
     └── training.py
     ├── deployment.py
     └── deployment_conf.json
@@ -40,4 +40,4 @@ Structure of archive file:
 ```
 
 Documents for `deployment_conf.json` can be found:
-[Configuration](../../README.md#Configuration-example-for-miniloan-classification)
+[Configuration](../../README.md#Configuration example for miniloan fraud detection)
