@@ -7,13 +7,13 @@ used for a much richer range of libraries(e.g xgboost). To use libraries other t
 and xgboost, user only needs to add dependencies into `requirements-ml.txt` before building 
 docker image. 
 
-## getting started
+## Getting started
 
 For each type of machine learning (classification/regression), examples are 
 given in `examples/model_training_and_deployment/<type>`. Each project 
 inside `<type>/` is a separate deployment project.
 
-### deployment projects
+### Deployment projects
 
 Each project contains 2 python scripts and 1 example configuration file. 
 
