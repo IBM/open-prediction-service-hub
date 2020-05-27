@@ -1,14 +1,43 @@
-# Machine Learning model creation
+# Model deployment
 
-Two examples are given for model generation, `iris-svc.py` and `miniloan-linear-svc.py`.
+Open prediction service can serve classifiers/regressors that follow the scikit learn predictor API. As 
+predictor API is not an abstract interface but a widely used convention, this web service can be
+used for a much richer range of libraries(e.g xgboost). To use libraries other than scikit-learn 
+and xgboost, user only needs to add dependencies into `requirements-ml.txt` before building 
+docker image. 
 
-Structure of ml model:
+## getting started
+
+For each type of machine learning (classification/regression), examples are 
+given in `examples/model_training_and_deployment/<type>`.Each project 
+inside `<type>/` is a separate deployment project.
+
+### deployment project
+
+Each project contains 2 python script and 1 example deployment 
+configuration file. 
+
+project structure:
 ```
-ml_model.pkl
-    └── python dict
-        ├── ML model
-        └── model configurations
+<type>/project
+    └── training.py
+    ├── deployment.py
+    └── deployment_conf.json
 ```
 
-For instance, `ML model` can be a trained classifier and `model configurations` contains
-associated configuration(e.g like [this](../../README.md#Configuration-example-for-miniloan-classification)) 
+`training.py` trains an example ML model and stores the model in
+`<dataset>-<algo>-model.pkl`. `deployment.py` uses trained model and
+`deployment_conf.json` to generated an archive `<dataset>-<algo>-archive.pkl`. 
+This archive can be later uploaded to the web service.
+ 
+
+Structure of archive file:
+```
+<dataset>-<algo>-archive.pkl
+    └── Dict
+        ├── 'model': ml_model
+        └── 'model_config': configurations
+```
+
+Documents for `deployment_conf.json` can be found:
+[Configuration](../../README.md#Configuration-example-for-miniloan-classification)
