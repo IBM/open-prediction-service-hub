@@ -29,6 +29,8 @@ after_success:
   - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f docker/Dockerfile .
   - scripts/ibm_image_registry.sh
 
+# Needed to install IBM cloud cli
+sudo: required
 
 deploy:
   - provider: script
