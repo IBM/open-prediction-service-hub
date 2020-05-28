@@ -15,34 +15,35 @@ IMAGE_TAG="${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}"
 
 
 install_ibm_cloud_cli() {
-  echo "${YELLOW}[INFO] Installing CLI tools${NC}"
+  echo -e "${YELLOW}[INFO] Installing CLI tools${NC}"
   curl -sL https://ibm.biz/idt-installer | bash
 }
 
 ibm_cloud_login() {
-  echo "${YELLOW}[INFO] Authenticating ibm cloud${NC}"
+  echo -e "${YELLOW}[INFO] Authenticating ibm cloud${NC}"
   ibmcloud login -a https://api.ng.bluemix.net --apikey "${IBMCLOUD_API_KEY}"
 }
 
 ibm_container_registry_login() {
-  echo "${YELLOW}[INFO] Authenticating ibm container registry${NC}"
+  echo -e "${YELLOW}[INFO] Authenticating ibm container registry${NC}"
   ibmcloud cr login
 }
 
 tag_image() {
-  echo "${YELLOW}[INFO] Tagging image${NC}"
+  echo -e "${YELLOW}[INFO] Tagging image${NC}"
   docker tag open-prediction:"${IMAGE_TAG}" us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}"
   docker tag open-prediction:latest us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest
 }
 
 push_image() {
-  echo "${YELLOW}[INFO] Pushing image${NC}"
+  echo -e "${YELLOW}[INFO] Pushing image${NC}"
+  ibmcloud cr image-rm us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest || echo -e "Not need to remove image"
   docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}"
   docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest
 }
 
 deploy() {
-  echo "${YELLOW}[INFO] Begin deployment${NC}"
+  echo -e "${YELLOW}[INFO] Begin deployment${NC}"
   install_ibm_cloud_cli
   ibm_cloud_login
   ibm_container_registry_login
