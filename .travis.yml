@@ -1,16 +1,10 @@
 dist: bionic
-
-
 language: python
-
-
 python:
   - "3.7"
 
-
 notifications:
   email: false
-
 
 services:
   - docker
@@ -20,12 +14,24 @@ before_install:
   - python3 -m pip install --quiet --upgrade pip
   - python3 -m pip install --quiet -r requirements-ml.txt
   - python3 -m pip install --quiet -r requirements.txt
-  - docker build -t op:latest -f docker/Dockerfile .
-
 
 install:
   - python3 ./setup.py install --quiet
 
-
 script:
   python3 -m pytest -v src/main/python/tests
+
+
+after_success:
+  - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+  # example: demo:20190405-171003-4-master
+  - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH} -t open-prediction:latest -f docker/Dockerfile .
+
+
+#deploy:
+#  - provider: script
+#    skip_cleanup: true
+#    # script: chmod +x ./scripts/* && ./scripts/execute.sh <Cluster Namespace> <Container Registry Namespace>
+#    script: chmod +x ./scripts/* && ./scripts/execute.sh demo-namespace-prod demo-production
+#    on:
+#      branch: develop
