@@ -35,6 +35,6 @@ sudo: required
 deploy:
   - provider: script
     skip_cleanup: true
-    script: scripts/ibm_image_registry.sh
+    script: chmod +x ./scripts/* && scripts/ibm_image_registry.sh
 #    on:
 #      branch: develop
