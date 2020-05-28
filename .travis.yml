@@ -27,7 +27,6 @@ after_success:
   # example: demo:20190405-171003-4-master
   # '/' is replaces by -
   - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f docker/Dockerfile .
-  - chmod +x ./scripts/* && scripts/ibm_image_registry.sh
 
 # Needed to install IBM cloud cli
 sudo: required
@@ -36,5 +35,5 @@ deploy:
   - provider: script
     skip_cleanup: true
     script: chmod +x ./scripts/* && scripts/ibm_image_registry.sh
-#    on:
-#      branch: develop
+    on:
+      branch: develop
