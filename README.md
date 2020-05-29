@@ -1,7 +1,5 @@
 # Decision automation on machine learning
 
-[![Build Status](https://travis.ibm.com/dba/ads-ml-service.svg?token=1gxxdyFN2gDs6CM3JxPc&branch=dev)](https://travis.ibm.com/dba/ads-ml-service)
-
 
 ## Usage
 

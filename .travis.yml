@@ -22,7 +22,7 @@ script:
   python3 -m pytest -v src/main/python/tests
 
 
-after_success:
+before_deploy:
   - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
   # example: demo:20190405-171003-4-master
   # '/' is replaces by -
@@ -36,4 +36,4 @@ deploy:
     skip_cleanup: true
     script: chmod +x ./scripts/* && scripts/ibm_image_registry.sh
     on:
-      branch: develop
+      branch =~ /^release.*$/
