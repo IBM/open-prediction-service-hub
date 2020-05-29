@@ -36,4 +36,5 @@ deploy:
     skip_cleanup: true
     script: chmod +x ./scripts/* && scripts/ibm_image_registry.sh
     on:
-      ${TRAVIS_BRANCH} =~ /^release.*$/
+      all_branches: true
+      condition: ${TRAVIS_BRANCH} =~ /^release.*$/
