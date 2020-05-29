@@ -37,4 +37,4 @@ deploy:
     script: chmod +x ./scripts/* && scripts/ibm_image_registry.sh
     on:
       all_branches: true
-      condition: ${TRAVIS_BRANCH} =~ /^release.*$/
+      condition: ${TRAVIS_BRANCH} =~ ^release.*$
