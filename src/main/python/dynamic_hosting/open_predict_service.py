@@ -15,6 +15,7 @@
 #
 
 import logging
+import pickle
 from typing import Text, Any, Dict, NoReturn, Optional, List
 
 from dynamic_hosting.core.model import Model, MLSchema
@@ -24,7 +25,7 @@ from sqlalchemy.orm import Session
 
 class PredictionService:
 
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, cache_ttl: int = 10):
         self.db: Session = db
 
     def add_model(
@@ -45,17 +46,11 @@ class PredictionService:
             model_version: Text
     ) -> Model:
         item = read_model(self.db, model_name=model_name, model_version=model_version)
-        return Model(model=item.model_b64, **item.configuration)
+        return Model(model=pickle.loads(item.model_b64), info=MLSchema(**item.configuration))
 
     def get_model_metadata(self) -> List[MLSchema]:
         return [
             MLSchema(**i.configuration)
-            for i in read_models(self.db)
-        ]
-
-    def get_models(self) -> List[Model]:
-        return [
-            Model(model=i.model_b64, **i.configuration)
             for i in read_models(self.db)
         ]
 

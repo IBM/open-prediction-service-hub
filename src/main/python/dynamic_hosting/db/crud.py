@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-
-
+import pickle
 from typing import Text, List, Optional, NoReturn
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from . import models
@@ -24,8 +24,10 @@ def count_models(db: Session) -> int:
 def create_model(db: Session, ml_model: model.Model) -> NoReturn:
     db.add(
         models.Model(
-            name=ml_model.name, version=ml_model.version,
-            configuration=ml_model.get_meta_model().dict(), model_b64=ml_model.model)
+            name=ml_model.info.name,
+            version=ml_model.info.version,
+            configuration=ml_model.info.dict(),
+            model_b64=pickle.dumps(ml_model.model))
     )
     db.commit()
 
@@ -34,5 +36,6 @@ def delete_model(db: Session, model_name: Text, model_version: Optional[Text] = 
     if model_version is None:
         db.query(models.Model).filter(models.Model.name == model_name).delete()
     else:
-        db.query(models.Model).filter(models.Model.name == model_name, models.Model.version == model_version).delete()
+        tmp = db.query(models.Model).filter(and_(models.Model.name == model_name, models.Model.version == model_version))
+        tmp.delete()
     db.commit()

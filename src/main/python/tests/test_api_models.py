@@ -143,4 +143,4 @@ class TestFromPickle(unittest.TestCase):
                 metadata_name='model_config'
             )
 
-        self.assertEqual(LinearSVC, type(pickle.loads(model.model)))
+        self.assertEqual(LinearSVC, type(model.model))

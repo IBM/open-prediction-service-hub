@@ -135,10 +135,10 @@ def predict(
 
     res: np.ndaary = res_matrix[0]  # one input -> one output
 
-    if model.method_name == 'predict_proba' and isinstance(res, np.ndarray):
+    if model.info.method_name == 'predict_proba' and isinstance(res, np.ndarray):
         feature_names: List[Text] = [
-            class_name for class_name in sorted((v for i, v in model.metadata.class_names.items()), key=itemgetter(0))
-        ] if model.metadata.class_names is not None else list(range(len(res)))
+            class_name for class_name in sorted((v for i, v in model.info.metadata.class_names.items()), key=itemgetter(0))
+        ] if model.info.metadata.class_names is not None else list(range(len(res)))
 
         return Prediction(
             prediction=feature_names[max(enumerate(res), key=itemgetter(1))[0]],
