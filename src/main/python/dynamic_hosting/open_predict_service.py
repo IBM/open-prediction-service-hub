@@ -16,6 +16,7 @@
 
 import logging
 import pickle
+from functools import lru_cache
 from typing import Text, Any, Dict, NoReturn, Optional, List
 
 from dynamic_hosting.core.model import Model, MLSchema
@@ -40,6 +41,7 @@ class PredictionService:
     ) -> None:
         delete_model(self.db, model_name=model_name, model_version=model_version)
 
+    @lru_cache(maxsize=16)
     def get_model(
             self,
             model_name: Text,
