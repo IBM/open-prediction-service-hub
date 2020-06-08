@@ -18,7 +18,7 @@
 import logging
 from logging import Logger
 from operator import itemgetter
-from typing import Text, List, Dict
+from typing import Text, List
 
 import numpy as np
 from dynamic_hosting.core.configuration import ServerConfiguration
@@ -82,9 +82,9 @@ def get_server_status(mls: PredictionService = Depends(get_ml_service)) -> Serve
     response_model=List[MLSchema]
 )
 @version(major=VER)
-def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[Dict]:
+def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[MLSchema]:
     """Returns the list of ML models."""
-    return mls.get_model_metadata()
+    return mls.get_model_configs()
 
 
 @app.post(
