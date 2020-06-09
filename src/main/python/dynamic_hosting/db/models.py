@@ -2,7 +2,7 @@
 
 
 from sqlalchemy import Column, String, JSON, LargeBinary, Integer, ForeignKey
-# from sqlalchemy import UniqueConstraint, Index
+from sqlalchemy import UniqueConstraint, Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -11,10 +11,6 @@ Base = declarative_base()
 
 class Model(Base):
     __tablename__ = "model"
-    # __table_args__ = (
-    #     UniqueConstraint('_unique_name_ver_combination', 'model.name', 'model.version'),
-    #     Index('_model_name_ver_index', 'model.name', 'model.version')
-    # )
 
     id = Column(Integer, nullable=False, primary_key=True, index=True)
     name = Column(String, nullable=False)
@@ -23,6 +19,11 @@ class Model(Base):
 
     binary_id = Column(Integer, ForeignKey('binary_ml_model.id'))
     binary = relationship('BinaryMLModel', back_populates='model_metadata', uselist=False)
+
+    __table_args__ = (
+        UniqueConstraint('name', 'version', name='_unique_name_ver_combination'),
+        Index('_name_ver_composite_index', 'name', 'version'),
+    )
 
 
 class BinaryMLModel(Base):
