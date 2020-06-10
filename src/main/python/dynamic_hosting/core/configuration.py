@@ -14,11 +14,12 @@
 # limitations under the License.IBM Confidential
 #
 
-# Python 3.6+
 
 from __future__ import annotations
 
 import os
+from functools import lru_cache
+from typing import Optional
 
 import yaml
 from pydantic import Field, validator, BaseSettings
@@ -27,11 +28,13 @@ from pathlib import Path
 
 class ServerConfiguration(BaseSettings):
     """
-    Embedded machine learning provider configuration
+    Open Prediction Service configuration
     """
-    model_storage: Path = Field(..., description='Directory where the server store ml models')
+    MODEL_STORAGE: Path = Field(..., description='Directory where OPS store ml models')
+    MODEL_CACHE_SIZE: int = Field(16, description='The number of ml models cached in service')
+    CACHE_TTL: int = Field(20, description='TTL of cache')
 
-    @validator('model_storage', always=True)
+    @validator('MODEL_STORAGE', always=True)
     def storage_check(cls: ServerConfiguration, p: Path) -> Path:
         if not p.exists() or not p.is_dir():
             raise ValueError('{dir} is not a directory'.format(dir=p))
@@ -47,3 +50,9 @@ class ServerConfiguration(BaseSettings):
             raise PermissionError('R permission needed'.format(dir=conf))
         with conf.open(mode='r') as fd:
             return ServerConfiguration(**yaml.safe_load(fd))
+
+
+@lru_cache()
+def get_config(config_file: Optional[Path] = None) -> ServerConfiguration:
+    return ServerConfiguration() if config_file is None else ServerConfiguration.from_yaml(config_file)
+

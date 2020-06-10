@@ -19,9 +19,9 @@ class TestDatabase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.tmp_dir: TemporaryDirectory = TemporaryDirectory()
-        os.environ['model_storage'] = str(self.tmp_dir.name)
+        os.environ['MODEL_STORAGE'] = str(self.tmp_dir.name)
         engine = create_engine(
-                f'sqlite:///{ServerConfiguration().model_storage.joinpath("EML.db")}',
+                f'sqlite:///{ServerConfiguration().MODEL_STORAGE.joinpath("EML.db")}',
                 connect_args={"check_same_thread": False}
         )
         SessionLocal = sessionmaker(

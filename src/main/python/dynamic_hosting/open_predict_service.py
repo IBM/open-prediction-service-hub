@@ -17,21 +17,24 @@
 import logging
 from typing import Text, Any, Dict, NoReturn, Optional, List, Tuple
 
-from dynamic_hosting.core.model import Model, MLSchema
-from dynamic_hosting.db.crud import create_model, delete_model, read_model, read_model_schemas, count_models
 from sqlalchemy.orm import Session
-
 from expiringdict import ExpiringDict
 
-
-MODEL_CACHE: ExpiringDict = ExpiringDict(max_len=16, max_age_seconds=60)
-MODEL_CONFIGS_CACHE: ExpiringDict = ExpiringDict(max_len=1, max_age_seconds=60)
+from .core.model import Model, MLSchema
+from .db.crud import create_model, delete_model, read_model, read_model_schemas, count_models
 
 
 class PredictionService:
+    # Cache need to be global to all service instances
+    MODEL_CACHE: ExpiringDict = None
+    MODEL_CONFIGS_CACHE: ExpiringDict = None
 
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, model_cache_size: int, cache_ttl: int):
         self.db: Session = db
+        if PredictionService.MODEL_CACHE is None:
+            PredictionService.MODEL_CACHE = ExpiringDict(max_len=model_cache_size, max_age_seconds=cache_ttl)
+        if PredictionService.MODEL_CONFIGS_CACHE is None:
+            PredictionService.MODEL_CONFIGS_CACHE = ExpiringDict(max_len=1, max_age_seconds=cache_ttl)
 
     def add_model(
             self, m: Model
@@ -53,23 +56,23 @@ class PredictionService:
         logger = logging.getLogger(__name__)
         key: Tuple[Text, Text] = (model_name, model_version)
         m: Model
-        if MODEL_CACHE.__contains__(key=key):
-            m = MODEL_CACHE[key]
-        else:
+        try:
+            m = PredictionService.MODEL_CACHE[key]
+        except KeyError:
             logger.debug(f'model {key} cache miss')
             m = read_model(self.db, model_name=model_name, model_version=model_version)
-            MODEL_CACHE.__setitem__(key=key, value=m)
+            PredictionService.MODEL_CACHE.__setitem__(key=key, value=m)
         return m
 
     def get_model_configs(self) -> List[MLSchema]:
         logger = logging.getLogger(__name__)
         configs: List[MLSchema]
         try:
-            configs = MODEL_CONFIGS_CACHE['model_configs']
+            configs = PredictionService.MODEL_CONFIGS_CACHE['model_configs']
         except KeyError:
             logger.debug('model_configs cache miss')
             configs = read_model_schemas(self.db)
-            MODEL_CONFIGS_CACHE['model_configs'] = configs
+            PredictionService.MODEL_CONFIGS_CACHE.__setitem__(key='model_configs', value=configs)
         return configs
 
     def count_models(self) -> int:
@@ -93,6 +96,4 @@ class PredictionService:
         model: Model = Model.from_pickle(
             pickle_file=archive
         )
-        self.add_model(
-            model
-        )
+        self.add_model(model)

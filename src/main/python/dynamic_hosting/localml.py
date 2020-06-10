@@ -21,19 +21,19 @@ from operator import itemgetter
 from typing import Text, List
 
 import numpy as np
-from dynamic_hosting.core.configuration import ServerConfiguration
-from dynamic_hosting.core.model import Model, MLSchema
-from dynamic_hosting.open_predict_service import PredictionService
-from dynamic_hosting.core.util import to_dataframe_compatible
-from dynamic_hosting.db import models
-from dynamic_hosting.openapi.request import RequestBody
-from dynamic_hosting.openapi.response import Probability, ServerStatus, Prediction
 from fastapi import FastAPI, File, Depends
-
 from fastapi_versioning import VersionedFastAPI, version
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
+
+from .core.configuration import ServerConfiguration, get_config
+from .core.model import Model, MLSchema
+from .core.util import to_dataframe_compatible
+from .db import models
+from .open_predict_service import PredictionService
+from .openapi.request import RequestBody
+from .openapi.response import Probability, ServerStatus, Prediction
 
 app: FastAPI = FastAPI(
     version='0.0.0-SNAPSHOT',
@@ -48,7 +48,7 @@ DATABASE_NAME: Text = 'EML.db'
 # Dependency
 def get_ml_service() -> PredictionService:
     engine: Engine = create_engine(
-        f'sqlite:///{ServerConfiguration().model_storage.joinpath(DATABASE_NAME)}',
+        f'sqlite:///{ServerConfiguration().MODEL_STORAGE.joinpath(DATABASE_NAME)}',
         connect_args={"check_same_thread": False}
     )
     models.Base.metadata.create_all(bind=engine)
@@ -60,7 +60,11 @@ def get_ml_service() -> PredictionService:
     db = None
     try:
         db = sm_instance()
-        mls: PredictionService = PredictionService(db=db)
+        mls: PredictionService = PredictionService(
+            db=db,
+            model_cache_size=get_config().MODEL_CACHE_SIZE,
+            cache_ttl=get_config().CACHE_TTL
+        )
         yield mls
     finally:
         db.close()
@@ -106,7 +110,8 @@ def add_model(*, file: bytes = File(...), mls: PredictionService = Depends(get_m
     path='/models'
 )
 @version(major=VER)
-def remove_model(*, model_name: Text, model_version: Text = None, mls: PredictionService = Depends(get_ml_service)) -> None:
+def remove_model(*, model_name: Text, model_version: Text = None,
+                 mls: PredictionService = Depends(get_ml_service)) -> None:
     mls.remove_model(model_name=model_name, model_version=model_version)
 
 
@@ -137,7 +142,8 @@ def predict(
 
     if model.info.method_name == 'predict_proba' and isinstance(res, np.ndarray):
         feature_names: List[Text] = [
-            class_name for class_name in sorted((v for i, v in model.info.metadata.class_names.items()), key=itemgetter(0))
+            class_name for class_name in
+            sorted((v for i, v in model.info.metadata.class_names.items()), key=itemgetter(0))
         ] if model.info.metadata.class_names is not None else list(range(len(res)))
 
         return Prediction(
