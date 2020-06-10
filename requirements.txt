@@ -12,6 +12,7 @@ fastapi
 fastapi-versioning
 uvicorn
 gunicorn
+expiringdict
 sqlalchemy
 
 

@@ -25,7 +25,7 @@ from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
 from dynamic_hosting.core.feature import Feature
 from dynamic_hosting.openapi.output_schema import OutputSchema
 from pandas import DataFrame
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 
 class Metric(BaseModel):
@@ -53,28 +53,16 @@ class MLSchema(BaseModel):
     metadata: Metadata = Field(..., description='Additional information for ml model')
 
 
-class Model(MLSchema):
-    """Internal representation of ML model"""
-    model: bytes = Field(..., description='Pickled model in base64 format')
+class Model(object):
+    def __init__(self, info: MLSchema, model: Any):
+        self.info: MLSchema = info
+        self.model: Any = model
 
-    @validator('model', always=True)
-    def type_check(cls, m) -> Type:
-        if pickle.loads(m) is not None:
-            return m
-        else:
-            raise ValueError(f'Model not supported: {m}')
+    def __get_ordered_column_name_vec(self) -> Sequence[Text]:
+        return [item.name for item in sorted(self.info.input_schema, key=lambda e: getattr(e, 'order'))]
 
-    def get_ordered_column_name_vec(self) -> Sequence[Text]:
-        return [item.name for item in sorted(self.input_schema, key=lambda e: getattr(e, 'order'))]
-
-    def get_feat_type_map(self) -> Mapping[Text, Type]:
-        return {item.name: item.get_type() for item in self.input_schema}
-
-    def has_attr(self, attr: Text) -> bool:
-        return hasattr(pickle.loads(self.model), attr)
-
-    def get_attr(self, attr: Text) -> Any:
-        return getattr(pickle.loads(self.model), attr)
+    def __get_feat_type_map(self) -> Mapping[Text, Type]:
+        return {item.name: item.get_type() for item in self.info.input_schema}
 
     # TODO: better management for conversion error
     def invoke(
@@ -90,20 +78,13 @@ class Model(MLSchema):
             orient='columns'
         ). \
             reindex(
-            columns=self.get_ordered_column_name_vec()
+            columns=self.__get_ordered_column_name_vec()
         ). \
             astype(
-            dtype=self.get_feat_type_map(),
+            dtype=self.__get_feat_type_map(),
             errors='ignore'
         )
-        return self.__invoke__(data)
-
-    def __invoke__(
-            self,
-            data_input: DataFrame
-    ) -> Any:
-        actual_model: Any = pickle.loads(self.model)
-        return getattr(actual_model, self.method_name)(data_input)
+        return getattr(self.model, self.info.method_name)(data)
 
     @staticmethod
     def from_pickle(
@@ -115,9 +96,6 @@ class Model(MLSchema):
         model: Model = archive.get(model_name)
         conf: Dict = archive.get(metadata_name)
         return Model(
-            model=pickle.dumps(model),
-            **conf
+            info=MLSchema(**conf),
+            model=model,
         )
-
-    def get_meta_model(self) -> MLSchema:
-        return MLSchema(**self.dict())

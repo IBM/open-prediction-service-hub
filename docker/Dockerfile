@@ -9,7 +9,9 @@ ARG NC='\033[0m'
 ARG APP_HOME="/app"
 
 # ENV variables used by server
-ENV model_storage=${APP_HOME}/storage
+ENV MODEL_STORAGE=${APP_HOME}/storage
+ENV MODEL_CACHE_SIZE=16
+ENV CACHE_TTL=20
 
 
 # Install dependences

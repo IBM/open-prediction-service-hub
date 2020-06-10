@@ -41,7 +41,7 @@ class TestServerConfiguration(unittest.TestCase):
             test_env_path: Path = Path(test_env)
             model_storage: Path = test_env_path.joinpath('test_model_storage')
             model_storage.mkdir(mode=0o300)
-            self.assertRaises(PermissionError, ServerConfiguration, model_storage=model_storage)
+            self.assertRaises(PermissionError, ServerConfiguration, MODEL_STORAGE=model_storage)
             model_storage.chmod(mode=0o700)  # help cleanup
 
     def test_model_storage_not_writable(self):
@@ -49,7 +49,7 @@ class TestServerConfiguration(unittest.TestCase):
             test_env_path: Path = Path(test_env)
             model_storage: Path = test_env_path.joinpath('test_model_storage')
             model_storage.mkdir(mode=0o100)
-            self.assertRaises(PermissionError, ServerConfiguration, model_storage=model_storage)
+            self.assertRaises(PermissionError, ServerConfiguration, MODEL_STORAGE=model_storage)
             model_storage.chmod(mode=0o700)  # help cleanup
 
     def test_conf_file_not_exist(self):
@@ -58,17 +58,17 @@ class TestServerConfiguration(unittest.TestCase):
 
     def test_model_storage_not_exist(self):
         not_existing_model_storage: Path = Path('./not_exist')
-        self.assertRaises(ValueError, ServerConfiguration, model_storage=not_existing_model_storage)
+        self.assertRaises(ValueError, ServerConfiguration, MODEL_STORAGE=not_existing_model_storage)
 
     def test_env_not_exist(self):
-        if os.environ.get('model_storage'):
-            del os.environ['model_storage']
+        if os.environ.get('MODEL_STORAGE'):
+            del os.environ['MODEL_STORAGE']
         self.assertRaises(ValueError, ServerConfiguration)
 
     def test_valid_conf_file(self):
         with tempfile.TemporaryDirectory() as model_storage:
             with tempfile.NamedTemporaryFile(mode='x') as config_file:
-                conf: Dict = {'model_storage': model_storage}
+                conf: Dict = {'MODEL_STORAGE': model_storage}
                 conf_file_path: Path = Path(config_file.name)
                 with conf_file_path.open(mode='w') as fd:
                     yaml.dump(conf, fd)
@@ -76,5 +76,5 @@ class TestServerConfiguration(unittest.TestCase):
 
     def test_valid_env(self):
         storage: Path = Path(__file__).resolve().parents[4].joinpath('runtime').joinpath('storage')
-        os.environ['model_storage'] = str(storage)
+        os.environ['MODEL_STORAGE'] = str(storage)
         ServerConfiguration()

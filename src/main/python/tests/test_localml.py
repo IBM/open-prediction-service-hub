@@ -43,7 +43,7 @@ class TestEmbeddedClient(unittest.TestCase):
 
     def setUp(self) -> None:
         self.tmp_dir: TemporaryDirectory = TemporaryDirectory()
-        os.environ['model_storage'] = str(self.tmp_dir.name)
+        os.environ['MODEL_STORAGE'] = str(self.tmp_dir.name)
         self.client: TestClient = TestClient(app)
 
     def tearDown(self) -> None:

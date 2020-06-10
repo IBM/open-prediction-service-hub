@@ -15,17 +15,26 @@
 #
 
 import logging
-from typing import Text, Any, Dict, NoReturn, Optional, List
+from typing import Text, Any, Dict, NoReturn, Optional, List, Tuple
 
-from dynamic_hosting.core.model import Model, MLSchema
-from dynamic_hosting.db.crud import create_model, delete_model, read_model, read_models, count_models
 from sqlalchemy.orm import Session
+from expiringdict import ExpiringDict
+
+from .core.model import Model, MLSchema
+from .db.crud import create_model, delete_model, read_model, read_model_schemas, count_models
 
 
 class PredictionService:
+    # Cache need to be global to all service instances
+    MODEL_CACHE: ExpiringDict = None
+    MODEL_CONFIGS_CACHE: ExpiringDict = None
 
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, model_cache_size: int, cache_ttl: int):
         self.db: Session = db
+        if PredictionService.MODEL_CACHE is None:
+            PredictionService.MODEL_CACHE = ExpiringDict(max_len=model_cache_size, max_age_seconds=cache_ttl)
+        if PredictionService.MODEL_CONFIGS_CACHE is None:
+            PredictionService.MODEL_CONFIGS_CACHE = ExpiringDict(max_len=1, max_age_seconds=cache_ttl)
 
     def add_model(
             self, m: Model
@@ -44,20 +53,27 @@ class PredictionService:
             model_name: Text,
             model_version: Text
     ) -> Model:
-        item = read_model(self.db, model_name=model_name, model_version=model_version)
-        return Model(model=item.model_b64, **item.configuration)
+        logger = logging.getLogger(__name__)
+        key: Tuple[Text, Text] = (model_name, model_version)
+        m: Model
+        try:
+            m = PredictionService.MODEL_CACHE[key]
+        except KeyError:
+            logger.debug(f'model {key} cache miss')
+            m = read_model(self.db, model_name=model_name, model_version=model_version)
+            PredictionService.MODEL_CACHE.__setitem__(key=key, value=m)
+        return m
 
-    def get_model_metadata(self) -> List[MLSchema]:
-        return [
-            MLSchema(**i.configuration)
-            for i in read_models(self.db)
-        ]
-
-    def get_models(self) -> List[Model]:
-        return [
-            Model(model=i.model_b64, **i.configuration)
-            for i in read_models(self.db)
-        ]
+    def get_model_configs(self) -> List[MLSchema]:
+        logger = logging.getLogger(__name__)
+        configs: List[MLSchema]
+        try:
+            configs = PredictionService.MODEL_CONFIGS_CACHE['model_configs']
+        except KeyError:
+            logger.debug('model_configs cache miss')
+            configs = read_model_schemas(self.db)
+            PredictionService.MODEL_CONFIGS_CACHE.__setitem__(key='model_configs', value=configs)
+        return configs
 
     def count_models(self) -> int:
         return count_models(self.db)
@@ -80,6 +96,4 @@ class PredictionService:
         model: Model = Model.from_pickle(
             pickle_file=archive
         )
-        self.add_model(
-            model
-        )
+        self.add_model(model)
