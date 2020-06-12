@@ -18,7 +18,6 @@
 from __future__ import annotations
 
 import logging
-import pickle
 from logging import Logger
 from pathlib import Path
 from typing import Text, Any, Dict

@@ -13,6 +13,6 @@
 # limitations under the License.IBM Confidential
 #
 
-from dynamic_hosting.core.model import Model
+from .model import Model
 
 __all__ = ['Model']

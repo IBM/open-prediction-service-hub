@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Dict
 
 import yaml
-from dynamic_hosting.core.configuration import ServerConfiguration
+from predictions.core.configuration import ServerConfiguration
 
 
 class TestServerConfiguration(unittest.TestCase):
@@ -75,6 +75,6 @@ class TestServerConfiguration(unittest.TestCase):
                 ServerConfiguration.from_yaml(conf_file_path)
 
     def test_valid_env(self):
-        storage: Path = Path(__file__).resolve().parents[4].joinpath('runtime').joinpath('storage')
+        storage: Path = Path(__file__).resolve().parents[1].joinpath('runtime').joinpath('storage')
         os.environ['model_storage'] = str(storage)
         ServerConfiguration()

@@ -21,7 +21,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-EXAMPLES_ROOT = Path(__file__).resolve().parents[4].joinpath('examples')
+EXAMPLES_ROOT = Path(__file__).resolve().parents[1].joinpath('examples')
 
 
 def __deploy(directory: Path, archive: Path) -> Path:

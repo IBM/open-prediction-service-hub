@@ -20,8 +20,8 @@ import subprocess
 from pathlib import Path
 from typing import Text, List
 
-from dynamic_hosting import app
-from dynamic_hosting.localml import VER
+from predictions import app
+from predictions.localml import VER
 from fastapi.testclient import TestClient
 from requests import Response
 

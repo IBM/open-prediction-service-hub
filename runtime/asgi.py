@@ -15,7 +15,7 @@
 #
 
 
-from dynamic_hosting import app
+from predictions import app
 
 # For debug
 if __name__ == "__main__":

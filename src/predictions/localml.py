@@ -21,13 +21,13 @@ from operator import itemgetter
 from typing import Text, List, Dict
 
 import numpy as np
-from dynamic_hosting.core.configuration import ServerConfiguration
-from dynamic_hosting.core.model import Model, MLSchema
-from dynamic_hosting.open_predict_service import PredictionService
-from dynamic_hosting.core.util import to_dataframe_compatible
-from dynamic_hosting.db import models
-from dynamic_hosting.openapi.request import RequestBody
-from dynamic_hosting.openapi.response import Probability, ServerStatus, Prediction
+from .core.configuration import ServerConfiguration
+from .core.model import Model, MLSchema
+from .open_predict_service import PredictionService
+from .core.util import to_dataframe_compatible
+from .db import models
+from .openapi.request import RequestBody
+from .openapi.response import Probability, ServerStatus, Prediction
 from fastapi import FastAPI, File, Depends
 
 from fastapi_versioning import VersionedFastAPI, version

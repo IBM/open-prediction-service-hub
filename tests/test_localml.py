@@ -18,23 +18,18 @@
 from __future__ import annotations
 
 import ast
-import json
 import os
 import unittest
-from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Dict, Text
 from typing import List
 
-from dynamic_hosting import app
-from dynamic_hosting.localml import VER
 from fastapi.testclient import TestClient
+from predictions import app
+from predictions.localml import VER
 from requests import Response
 
 from .prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle
-
-OPENAPI_RESOURCE: Path = Path(__file__).resolve().parents[2].joinpath('resources').joinpath('openapi.json')
-
 
 API_VER: Text = f'/v{VER}'
 
@@ -63,9 +58,7 @@ class TestGetInfo(TestEmbeddedClient):
 
     def test_openapi(self):
         res: Response = self.client.get(url=API_VER + '/openapi.json')
-        openapi: Dict = res.json()
-        with OPENAPI_RESOURCE.open(mode='w') as fd:
-            json.dump(obj=openapi, fp=fd)
+        self.assertEqual(200, res.status_code)
 
     def test_get_server_status(self):
         res: Response = self.client.get(url=API_VER + '/status')
@@ -93,7 +86,8 @@ class TestGetInfo(TestEmbeddedClient):
         self.assertIsNotNone(res_content['metadata']['trained_at'])
         self.assertEqual(float, type(ast.literal_eval(res_content['metadata']['metrics'][0]['value'])))
         self.assertEqual(
-            {'attributes': [{'name': 'prediction', 'type': 'string'}, {'name': 'probabilities', 'type': '[Probability]'}]},
+            {'attributes': [{'name': 'prediction', 'type': 'string'},
+                            {'name': 'probabilities', 'type': '[Probability]'}]},
             res_content['output_schema'])
 
 

@@ -17,8 +17,8 @@
 import logging
 from typing import Text, Any, Dict, NoReturn, Optional, List
 
-from dynamic_hosting.core.model import Model, MLSchema
-from dynamic_hosting.db.crud import create_model, delete_model, read_model, read_models, count_models
+from .core.model import Model, MLSchema
+from .db.crud import create_model, delete_model, read_model, read_models, count_models
 from sqlalchemy.orm import Session
 
 

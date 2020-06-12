@@ -14,7 +14,7 @@
 #
 
 """
-The :mod:`dynamic_hosting.app` module includes flask based local ml provider.
+The :mod:`predictions.app` module includes flask based local ml provider.
 """
 from .localml import app
 
