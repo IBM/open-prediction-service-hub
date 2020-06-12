@@ -11,15 +11,15 @@ services:
 
 
 before_install:
-  - python3 -m pip install --quiet --upgrade pip
-  - python3 -m pip install --quiet -r requirements-ml.txt
-  - python3 -m pip install --quiet -r requirements.txt
+  - pip3 install --quiet --upgrade pip
+  - pip3 install --quiet -r requirements-ml.txt
+  - pip3 install --quiet -r requirements.txt
 
 install:
   - python3 ./setup.py install --quiet
 
 script:
-  python3 -m pytest -v src/main/python/tests
+  python3 -m pytest -v tests
 
 
 before_deploy:
