@@ -7,8 +7,8 @@ launch:
 
 
 # Test
-coverage:
-	python3 -m pytest --cov=dynamic_hosting src/main/python/tests
+test:
+	python3 -m pytest --cov=src tests
 
-lucast:
-	python3 -m locust -f src/main/python/stress_test/locustfile.py
+locust:
+	python3 -m locust -f tests/stress_test/locustfile.py

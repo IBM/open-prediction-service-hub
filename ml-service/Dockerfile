@@ -32,11 +32,11 @@ RUN \
     python3 runtime/init.py && \
     cp -a /tmp/repo/runtime/. ${APP_HOME} && \
     rm -rf /tmp/repo && \
-    adduser --quiet --system --no-create-home --group lml && \
-    chown --recursive lml:lml ${APP_HOME}
+    adduser --quiet --system --no-create-home --group ops && \
+    chown --recursive ops:ops ${APP_HOME}
 
 
-USER lml
+USER ops
 WORKDIR ${APP_HOME}
 EXPOSE 8080
 
