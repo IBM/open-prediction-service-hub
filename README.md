@@ -1,25 +1,31 @@
-# Decision automation on machine learning
+# Open Prediction Service
 
+/!\ TODO use @Greger's and @Pierre's slides to illustrate OPS and defer the rest into `ml-service` subdirectory
+
+# Decision automation on machine learning
 
 ## Usage
 
-To clone the project 
-```shell script
+To clone the project
+
+```sh
 git clone --recurse-submodules git@github.ibm.com:dba/ads-ml-service.git ads-ml-service
 ```
 
 To build the microservice image
-```shell script
+
+```sh
 docker build -t embedded_ml .
 ```
 
 To test the microservice
-```shell script
+
+```sh
 docker run --rm -it -p 8080:8080 --name lml embedded_ml
 ```
+
 Your predictive service is then ready at `http://localhost:8080/v1` and 
 its openapi docs is available at `http://localhost:8080/v1/docs`.
-
 
 
 ### Configuration example for miniloan fraud detection

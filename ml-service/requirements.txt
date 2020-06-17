@@ -1,0 +1,26 @@
+#  Dependences for web service
+
+## Data structure
+numpy
+pandas
+pydantic
+
+## Web interface
+pyyaml                    # server configurations
+python-multipart          # file service
+fastapi
+fastapi-versioning
+uvicorn
+gunicorn
+sqlalchemy
+
+
+# Load pre-trained model
+requests~=2.23.0
+
+
+# # Test
+# pytest
+# coverage
+# pytest-cov
+# locust
