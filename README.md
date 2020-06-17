@@ -1,6 +1,6 @@
 # Open Prediction Service
 
-The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decisiom Runtime.
+The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 
 ![OPS](ops.png)
 
