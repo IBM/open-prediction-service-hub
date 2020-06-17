@@ -2,9 +2,13 @@
 Add short description
 
 1. [Getting Started](#getting-started)
+
 2. [Open Prediction Service](#open-prediction-service)
+
 3. [Additional Dependencies](#additional-dependencies)
+
 4. [Model Examples](#model-examples)
+
 
 ## Getting Started
 
@@ -30,9 +34,9 @@ To check that you have a running container
 docker ps open-prediction-service
 ```
 
-Your predictive service is then ready at [http://localhost:8080/v1](http://localhost:8080/v1).
+> Your predictive service is available at [http://localhost:8080/v1](http://localhost:8080/v1).
 
-Swagger UI documentation is available at [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs).
+> Swagger UI documentation is available at [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs).
 
 ### Stop the microservice
 To stop the container
