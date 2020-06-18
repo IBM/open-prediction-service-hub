@@ -34,7 +34,7 @@ def init():
     client: TestClient = TestClient(app)
 
     subprocess.run(
-        ['python3', str(PROJECT_ROOT.joinpath('src', 'main', 'python', 'tests', 'prepare_models.py'))],
+        ['python3', str(PROJECT_ROOT.joinpath('tests', 'prepare_models.py'))],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
 

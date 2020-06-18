@@ -36,9 +36,9 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 
 app: FastAPI = FastAPI(
-    version='0.0.0-SNAPSHOT',
-    title='Open Prediction',
-    description='A simple environment to test machine learning model'
+    version='0.0.1',
+    title='Open Prediction Service',
+    description='A simple Machine Learning serving environment for tests'
 )
 
 VER: int = 1

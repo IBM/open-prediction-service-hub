@@ -14,6 +14,7 @@ setup(
     version='2020.6.10.dev0',
     description='A simple ML model hosting service for rule based systems',
     url='https://github.ibm.com/dba/ads-ml-service',
+    package_dir={'': 'src'},
     packages=find_packages(where='src'),
     install_requires=installation_dependencies,
     long_description=long_description,

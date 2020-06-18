@@ -1,4 +1,7 @@
+
+
 # OPS with scikit and xgboost sample
+
 Add short description
 
 1. [Getting Started](#getting-started)
@@ -20,18 +23,18 @@ Docker ?
 To build the microservice image
 
 ```sh
-docker build -t open-prediction-service
+docker build -t ml-service .
 ```
 
 To run the microservice
 
 ```sh
-docker run --rm -it -p 8080:8080 --name open-prediction-service open-prediction-service
+docker run --rm -it -p 8080:8080 --name ml-service ml-service
 ```
 
 To check that you have a running container
 ```sh
-docker ps open-prediction-service
+docker ps ml-service
 ```
 
 > Your predictive service is available at [http://localhost:8080/v1](http://localhost:8080/v1).
@@ -41,14 +44,14 @@ docker ps open-prediction-service
 ### Stop the microservice
 To stop the container
 ```sh
-docker stop open-prediction-service
+docker stop ml-service
 ```
 
 ## Open Prediction Service
 
 Different endpoints are available and documented at [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs).
 
-TODO ADD SCREENSHOTS
+![OpenApi](doc/OPS-OpenApi.jpg)
 
 For example you can list all added models by running:
 ```sh
@@ -356,3 +359,4 @@ If new dependencies are added, you need to stop the running container and build 
 
 You can find examples of models ready to be added to your OPS instance in 
 [examples/model_training_and_deployment/](examples/model_training_and_deployment/README.md) folder.
+

@@ -1,9 +1,9 @@
 # Example service
-image:
-	docker build -t open-prediction-service
+default:
+	docker build -t ml-service .
 
-launch:
-	docker run --rm -it -p 8080:8080 --name open-prediction-service open-prediction-service
+launch: default
+	docker run --rm -it -p 8080:8080 --name ml-service ml-service
 
 
 # Test
