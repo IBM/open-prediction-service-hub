@@ -27,9 +27,14 @@ EXAMPLES_ROOT = Path(__file__).resolve().parents[1].joinpath('examples')
 def __deploy(directory: Path, archive: Path) -> Path:
     logger = logging.getLogger(__name__)
 
-    if archive.exists() and not os.getenv('EML_RETRAIN_MODELS'):
-        logger.info(f'model {archive} exists. set EML_RETRAIN_MODELS to re-train')
-        return archive
+    if archive.exists():
+        if not os.getenv('EML_RETRAIN_MODELS'):
+            logger.info(f'model {archive} exists. set EML_RETRAIN_MODELS to re-train.')
+            return archive
+        else:
+            logger.info(f'model {archive} exists, re-training it'.)
+    else:
+        logger.info(f'model {archive} doesn\'t exists, training it.')
 
     subprocess.run(
         ['python3', str(directory.joinpath('training.py'))], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True

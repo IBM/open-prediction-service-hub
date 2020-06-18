@@ -26,7 +26,7 @@ from fastapi.testclient import TestClient
 from requests import Response
 
 API_VER: Text = f'/v{VER}'
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def init():
