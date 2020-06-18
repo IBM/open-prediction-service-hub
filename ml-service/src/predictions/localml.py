@@ -29,6 +29,7 @@ from .db import models
 from .openapi.request import RequestBody
 from .openapi.response import Probability, ServerStatus, Prediction
 from fastapi import FastAPI, File, Depends
+from starlette.responses import RedirectResponse
 
 from fastapi_versioning import VersionedFastAPI, version
 from sqlalchemy import create_engine
@@ -38,7 +39,8 @@ from sqlalchemy.orm import sessionmaker
 app: FastAPI = FastAPI(
     version='0.0.1',
     title='Open Prediction Service',
-    description='A simple Machine Learning serving environment for tests'
+    description='A simple Machine Learning serving environment for tests',
+    openapi_url="/open-prediction-service.json"
 )
 
 VER: int = 1
@@ -150,5 +152,12 @@ def predict(
     else:
         return Prediction(prediction=res, probabilities=None)
 
+
+@app.get(
+    path='/', include_in_schema=False
+)
+@version(major=VER)
+def redirect_docs():
+    return RedirectResponse(url='docs')
 
 app = VersionedFastAPI(app, version_format='{major}', prefix_format='/v{major}')
