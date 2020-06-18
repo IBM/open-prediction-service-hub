@@ -161,3 +161,11 @@ def redirect_docs():
     return RedirectResponse(url='docs')
 
 app = VersionedFastAPI(app, version_format='{major}', prefix_format='/v{major}')
+
+
+@app.get(
+    path='/', include_in_schema=False
+)
+@version(major=VER)
+def redirect_v1():
+    return RedirectResponse(url='/v1')
