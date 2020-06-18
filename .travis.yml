@@ -12,21 +12,21 @@ services:
 
 before_install:
   - pip3 install --quiet --upgrade pip
-  - pip3 install --quiet -r requirements-ml.txt
-  - pip3 install --quiet -r requirements.txt
+  - pip3 install --quiet -r ml-service/requirements-ml.txt
+  - pip3 install --quiet -r ml-service/requirements.txt
 
 install:
-  - python3 ./setup.py install --quiet
+  - cd ml-service && python3 ./setup.py install --quiet
 
 script:
-  python3 -m pytest -v tests
+  python3 -m pytest -v ml-service/src/tests
 
 
 before_deploy:
   - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
   # example: demo:20190405-171003-4-master
   # '/' is replaces by -
-  - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f docker/Dockerfile .
+  - cd ml-service && docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f docker/Dockerfile .
 
 # Needed to install IBM cloud cli
 sudo: required

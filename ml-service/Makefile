@@ -8,7 +8,7 @@ launch: default
 
 # Test
 test:
-	python3 -m pytest --cov=src tests
+	python3 -m pytest --cov=src src/tests
 
 locust:
 	python3 -m locust -f tests/stress_test/locustfile.py

@@ -21,7 +21,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-EXAMPLES_ROOT = Path(__file__).resolve().parents[1].joinpath('examples')
+EXAMPLES_ROOT = Path(__file__).resolve().parents[2].joinpath('examples')
 
 
 def __deploy(directory: Path, archive: Path) -> Path:
@@ -32,7 +32,7 @@ def __deploy(directory: Path, archive: Path) -> Path:
             logger.info(f'model {archive} exists. set EML_RETRAIN_MODELS to re-train.')
             return archive
         else:
-            logger.info(f'model {archive} exists, re-training it'.)
+            logger.info(f'model {archive} exists, re-training it.')
     else:
         logger.info(f'model {archive} doesn\'t exists, training it.')
 
