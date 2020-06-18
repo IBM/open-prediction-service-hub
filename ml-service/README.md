@@ -39,7 +39,7 @@ docker ps ml-service
 
 > Your predictive service is available at [http://localhost:8080/v1](http://localhost:8080/v1).
 
-> Swagger UI documentation is available at [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs).
+> Swagger UI documentation is available at [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs) or [http://0.0.0.0:8080/v1/redoc](http://0.0.0.0:8080/v1/redoc)
 
 ### Stop the microservice
 To stop the container
