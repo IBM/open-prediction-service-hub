@@ -5,7 +5,6 @@ default:
 launch: default
 	docker run --rm -it -p 8080:8080 --name ads-ml-service ads-ml-service
 
-
 # Test
 test:
 	python3 -m pytest --cov=src src/tests
