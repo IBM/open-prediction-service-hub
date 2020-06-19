@@ -23,18 +23,18 @@ Docker ?
 To build the microservice image
 
 ```sh
-docker build -t ml-service .
+docker build -t ads-ml-service .
 ```
 
 To run the microservice
 
 ```sh
-docker run --rm -it -p 8080:8080 --name ml-service ml-service
+docker run --rm -it -p 8080:8080 --name ads-ml-service ads-ml-service
 ```
 
 To check that you have a running container
 ```sh
-docker ps ml-service
+docker ps ads-ml-service
 ```
 
 > Your predictive service is available at [http://localhost:8080/v1](http://localhost:8080/v1).
@@ -44,7 +44,7 @@ docker ps ml-service
 ### Stop the microservice
 To stop the container
 ```sh
-docker stop ml-service
+docker stop ads-ml-service
 ```
 
 ## Open Prediction Service

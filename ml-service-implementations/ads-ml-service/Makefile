@@ -1,9 +1,9 @@
 # Example service
 default:
-	docker build -t ml-service .
+	docker build -t ads-ml-service .
 
 launch: default
-	docker run --rm -it -p 8080:8080 --name ml-service ml-service
+	docker run --rm -it -p 8080:8080 --name ads-ml-service ads-ml-service
 
 
 # Test

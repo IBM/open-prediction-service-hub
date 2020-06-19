@@ -50,11 +50,13 @@ This endpoint will remove a given model.
 
 ##### Call prediction `/v1/invocations` `POST`
 
-![ops-post-invocations](ops-post-invocations.jpg)
+![ops-post-invocations](doc/ops-post-invocations.jpg)
 
-## ML Service
+## ML Service Implementations
 
-Instructions to build an use are inside the [ml-service](ml-service) folder.
+We provide a reference implementation called `ads-ml-service`.
+
+Instructions to build an use are inside the [ml-service-implementations/ads-ml-service](ml-service-implementations/ads-ml-service) folder.
 
 ## Open Prediction Service Java Client SDK
 
