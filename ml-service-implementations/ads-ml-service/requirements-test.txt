@@ -1,0 +1,5 @@
+# Test dependencies
+pytest
+coverage
+pytest-cov
+locust

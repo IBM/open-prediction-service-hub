@@ -17,10 +17,3 @@ sqlalchemy
 
 # Load pre-trained model
 requests~=2.23.0
-
-
-# # Test
-# pytest
-# coverage
-# pytest-cov
-# locust
