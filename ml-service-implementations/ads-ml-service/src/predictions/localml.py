@@ -34,14 +34,14 @@ app.include_router(api_router, prefix=PREFIX)
 
 
 @app.get(
-    path='/', include_in_schema=False
-)
-def redirect_docs():
-    return RedirectResponse(url='docs')
-
-
-@app.get(
     path=f'{PREFIX}/docs', include_in_schema=False
 )
 def redirect_docs():
-    return RedirectResponse(url='docs')
+    return RedirectResponse(url='/docs')
+
+
+@app.get(
+    path='/', include_in_schema=False
+)
+def redirect_docs():
+    return RedirectResponse(url='/docs')
