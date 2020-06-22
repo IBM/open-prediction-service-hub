@@ -23,7 +23,7 @@ from sqlalchemy.orm import sessionmaker
 
 from ..core.configuration import ServerConfiguration
 from ..db import models
-from ..open_predict_service import PredictionService
+from ..core.open_predict_service import PredictionService
 
 DATABASE_NAME: Text = 'EML.db'
 

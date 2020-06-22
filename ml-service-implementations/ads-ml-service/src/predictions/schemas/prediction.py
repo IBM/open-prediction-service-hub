@@ -17,7 +17,7 @@
 
 from __future__ import annotations
 
-from typing import Text, List, Dict, Optional, Union
+from typing import Text, List, Optional
 
 import numpy as np
 from pydantic import BaseModel, Field, validator

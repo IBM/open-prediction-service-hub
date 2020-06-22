@@ -25,8 +25,8 @@ from typing import Dict, Text
 from typing import List
 
 from fastapi.testclient import TestClient
-from predictions.localml import app
-from predictions.localml import VER
+from predictions.main import app
+from predictions.main import VER
 from requests import Response
 
 from .prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle

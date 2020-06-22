@@ -23,9 +23,9 @@ from pathlib import Path
 from typing import List, Text
 
 import numpy as np
-from predictions.core import Model
+from predictions.schemas.model import Model
 from predictions.core.feature import Feature
-from predictions.openapi.response import Prediction, Probability
+from predictions.schemas.prediction import Prediction, Probability
 from sklearn.svm import LinearSVC
 from .prepare_models import miniloan_linear_svc_pickle
 

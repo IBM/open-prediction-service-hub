@@ -22,11 +22,11 @@ import numpy as np
 from fastapi import APIRouter, Depends
 
 from ...deps import get_ml_service
-from ....core.model import Model
+from ....schemas.model import Model
 from ....core.util import to_dataframe_compatible
-from ....open_predict_service import PredictionService
-from ....openapi.request import RequestBody
-from ....openapi.response import Probability, Prediction
+from ....core.open_predict_service import PredictionService
+from ....schemas.request import RequestBody
+from ....schemas.prediction import Probability, Prediction
 
 router = APIRouter()
 

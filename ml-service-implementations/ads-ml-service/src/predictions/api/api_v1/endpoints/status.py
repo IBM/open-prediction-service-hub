@@ -17,8 +17,8 @@
 from fastapi import APIRouter, Depends
 
 from ...deps import get_ml_service
-from ....open_predict_service import PredictionService
-from ....openapi.response import ServerStatus
+from ....core.open_predict_service import PredictionService
+from ....schemas.prediction import ServerStatus
 
 router = APIRouter()
 

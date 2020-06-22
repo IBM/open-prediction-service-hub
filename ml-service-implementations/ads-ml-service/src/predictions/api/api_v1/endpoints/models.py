@@ -18,8 +18,8 @@ from typing import List, Dict, Text
 from fastapi import APIRouter, Depends, File
 
 from ...deps import get_ml_service
-from ....open_predict_service import PredictionService
-from ....core.model import MLSchema
+from ....core.open_predict_service import PredictionService
+from ....schemas.model import MLSchema
 
 router = APIRouter()
 

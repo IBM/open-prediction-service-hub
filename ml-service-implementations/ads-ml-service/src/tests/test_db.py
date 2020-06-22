@@ -5,7 +5,7 @@ import unittest
 from tempfile import TemporaryDirectory
 from typing import Dict, Text, Any
 
-from predictions.core import Model as MLModel
+from predictions.schemas.model import Model as MLModel
 from predictions.core.configuration import ServerConfiguration
 from predictions.db import models
 from predictions.db.crud import create_model, delete_model, read_models, read_model, count_models

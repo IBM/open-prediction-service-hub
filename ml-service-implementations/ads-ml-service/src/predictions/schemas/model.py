@@ -23,7 +23,7 @@ from logging import Logger
 from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
 
 from ..core.feature import Feature
-from ..openapi.output_schema import OutputSchema
+from ..schemas.output_schema import OutputSchema
 from pandas import DataFrame
 from pydantic import BaseModel, Field, validator
 
@@ -69,12 +69,6 @@ class Model(MLSchema):
 
     def get_feat_type_map(self) -> Mapping[Text, Type]:
         return {item.name: item.get_type() for item in self.input_schema}
-
-    def has_attr(self, attr: Text) -> bool:
-        return hasattr(pickle.loads(self.model), attr)
-
-    def get_attr(self, attr: Text) -> Any:
-        return getattr(pickle.loads(self.model), attr)
 
     # TODO: better management for conversion error
     def invoke(

@@ -6,7 +6,7 @@ from typing import Text, List, Optional, NoReturn
 from sqlalchemy.orm import Session
 
 from . import models
-from ..core import model
+from ..schemas import model
 
 
 def read_model(db: Session, model_name: Text, model_version: Text) -> Optional[models.Model]:
