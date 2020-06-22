@@ -17,11 +17,9 @@ before_install:
   - pip3 install --quiet -r requirements.txt
 
 install:
-  - cd ml-service-implementations/ads-ml-service
   - python3 setup.py install --quiet
 
 script:
-  - cd ml-service-implementations/ads-ml-service
   - python3 -m pytest -v src/tests
 
 
