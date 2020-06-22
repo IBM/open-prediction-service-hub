@@ -1,6 +1,5 @@
 # Test dependencies
-pytest
-coverage
 pytest-cov
+coverage
 locust
 scikit-learn~=0.22.0

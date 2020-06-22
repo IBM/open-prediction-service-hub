@@ -12,8 +12,8 @@ services:
 before_install:
   - cd ml-service-implementations/ads-ml-service
   - pip3 install --quiet --upgrade pip
-  - pip3 install --quiet -r requirements-ml.txt
   - pip3 install --quiet -r requirements-test.txt
+  - pip3 install --quiet -r requirements-ml.txt
   - pip3 install --quiet -r requirements.txt
 
 install:
