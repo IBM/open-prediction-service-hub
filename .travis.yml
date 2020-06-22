@@ -24,7 +24,6 @@ script:
 
 
 before_deploy:
-  - cd ml-service-implementations/ads-ml-service
   - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
   # example: demo:20190405-171003-4-master
   # '/' is replaces by -
@@ -36,7 +35,7 @@ sudo: required
 deploy:
   - provider: script
     skip_cleanup: true
-    script: chmod +x ./scripts/* && scripts/ibm_image_registry.sh
+    script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
     on:
       all_branches: true
       condition: ${TRAVIS_BRANCH} =~ /^release.*$/
