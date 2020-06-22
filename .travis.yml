@@ -10,10 +10,11 @@ services:
   - docker
 
 before_install:
+  - cd ml-service-implementations/ads-ml-service
   - pip3 install --quiet --upgrade pip
-  - pip3 install --quiet -r ml-service-implementations/ads-ml-service/requirements-ml.txt
-  - pip3 install --quiet -r ml-service-implementations/ads-ml-service/requirements-test.txt
-  - pip3 install --quiet -r ml-service-implementations/ads-ml-service/requirements.txt
+  - pip3 install --quiet -r requirements-ml.txt
+  - pip3 install --quiet -r requirements-test.txt
+  - pip3 install --quiet -r requirements.txt
 
 install:
   - python3 ml-service-implementations/ads-ml-service/setup.py install --quiet
