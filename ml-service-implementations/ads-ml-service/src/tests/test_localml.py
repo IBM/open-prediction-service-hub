@@ -25,7 +25,7 @@ from typing import Dict, Text
 from typing import List
 
 from fastapi.testclient import TestClient
-from predictions import app
+from predictions.localml import app
 from predictions.localml import VER
 from requests import Response
 
@@ -57,7 +57,7 @@ class TestGetInfo(TestEmbeddedClient):
         self.assertEqual(200, res.status_code)
 
     def test_openapi(self):
-        res: Response = self.client.get(url=API_VER + '/openapi.json')
+        res: Response = self.client.get(url='/open-prediction-service.json')
         self.assertEqual(200, res.status_code)
 
     def test_get_server_status(self):

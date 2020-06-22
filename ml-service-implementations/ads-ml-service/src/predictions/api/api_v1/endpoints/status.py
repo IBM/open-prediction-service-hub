@@ -14,16 +14,19 @@
 # limitations under the License.IBM Confidential
 #
 
+from fastapi import APIRouter, Depends
 
-from predictions.localml import app
+from ...deps import get_ml_service
+from ....open_predict_service import PredictionService
+from ....openapi.response import ServerStatus
 
-# For debug
-if __name__ == "__main__":
-    import os
-    from pathlib import Path
+router = APIRouter()
 
-    import uvicorn
 
-    os.environ['model_storage'] = str(Path(__file__).resolve().parent.joinpath('storage'))
-
-    uvicorn.run(app, host='127.0.0.1', port=8080, log_level='debug', debug=True)
+@router.get(
+    tags=['Admin'],
+    path='/status',
+    response_model=ServerStatus
+)
+def get_server_status(mls: PredictionService = Depends(get_ml_service)) -> ServerStatus:
+    return ServerStatus(model_count=mls.count_models())

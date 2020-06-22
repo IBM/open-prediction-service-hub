@@ -14,16 +14,12 @@
 # limitations under the License.IBM Confidential
 #
 
+from fastapi import APIRouter
+from starlette.responses import RedirectResponse
 
-from predictions.localml import app
+from .endpoints import status, models, invocations
 
-# For debug
-if __name__ == "__main__":
-    import os
-    from pathlib import Path
-
-    import uvicorn
-
-    os.environ['model_storage'] = str(Path(__file__).resolve().parent.joinpath('storage'))
-
-    uvicorn.run(app, host='127.0.0.1', port=8080, log_level='debug', debug=True)
+api_router: APIRouter = APIRouter()
+api_router.include_router(status.router, tags=['Admin'])
+api_router.include_router(models.router, tags=['Admin'])
+api_router.include_router(invocations.router, tags=['ML'])

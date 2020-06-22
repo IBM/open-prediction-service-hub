@@ -13,28 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.IBM Confidential
 #
+from typing import Text
 
-
-import logging
-from logging import Logger
-from operator import itemgetter
-from typing import Text, List, Dict
-
-import numpy as np
-from .core.configuration import ServerConfiguration
-from .core.model import Model, MLSchema
-from .open_predict_service import PredictionService
-from .core.util import to_dataframe_compatible
-from .db import models
-from .openapi.request import RequestBody
-from .openapi.response import Probability, ServerStatus, Prediction
-from fastapi import FastAPI, File, Depends
+from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
-from fastapi_versioning import VersionedFastAPI, version
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import sessionmaker
+from .api.api_v1.api import api_router
 
 app: FastAPI = FastAPI(
     version='0.0.1',
@@ -44,128 +28,20 @@ app: FastAPI = FastAPI(
 )
 
 VER: int = 1
-DATABASE_NAME: Text = 'EML.db'
+PREFIX: Text = f'/v{VER}'
 
-
-# Dependency
-def get_ml_service() -> PredictionService:
-    engine: Engine = create_engine(
-        f'sqlite:///{ServerConfiguration().model_storage.joinpath(DATABASE_NAME)}',
-        connect_args={"check_same_thread": False}
-    )
-    models.Base.metadata.create_all(bind=engine)
-    sm_instance: sessionmaker = sessionmaker(
-        autocommit=False,
-        autoflush=False,
-        bind=engine
-    )
-    db = None
-    try:
-        db = sm_instance()
-        mls: PredictionService = PredictionService(db=db)
-        yield mls
-    finally:
-        db.close()
-
-
-@app.get(
-    tags=['Admin'],
-    path='/status',
-    response_model=ServerStatus
-)
-@version(major=VER)
-def get_server_status(mls: PredictionService = Depends(get_ml_service)) -> ServerStatus:
-    return ServerStatus(model_count=mls.count_models())
-
-
-@app.get(
-    tags=['Admin'],
-    path='/models',
-    response_model=List[MLSchema]
-)
-@version(major=VER)
-def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[Dict]:
-    """Returns the list of ML models."""
-    return mls.get_model_metadata()
-
-
-@app.post(
-    tags=['Admin'],
-    path='/models',
-    responses={
-        200: {
-            'description': 'Model has been uploaded successfully',
-        }
-    }
-)
-@version(major=VER)
-def add_model(*, file: bytes = File(...), mls: PredictionService = Depends(get_ml_service)) -> None:
-    mls.add_archive(file)
-
-
-@app.delete(
-    tags=['Admin'],
-    path='/models'
-)
-@version(major=VER)
-def remove_model(*, model_name: Text, model_version: Text = None, mls: PredictionService = Depends(get_ml_service)) -> None:
-    mls.remove_model(model_name=model_name, model_version=model_version)
-
-
-@app.post(
-    tags=['ML'],
-    path='/invocations',
-    response_model=Prediction
-)
-@version(major=VER)
-def predict(
-        *,
-        ml_req: RequestBody,
-        mls: PredictionService = Depends(get_ml_service)
-) -> Prediction:
-    logger: Logger = logging.getLogger(__name__)
-
-    logger.debug('Received request: {r}'.format(r=ml_req))
-
-    model: Model = mls.get_model(model_name=ml_req.get_model_name(), model_version=ml_req.get_model_version())
-
-    res_matrix: np.ndarray = mls.invoke(
-        model_name=ml_req.get_model_name(),
-        model_version=ml_req.get_model_version(),
-        data=to_dataframe_compatible(ml_req.get_data())
-    )
-
-    res: np.ndaary = res_matrix[0]  # one input -> one output
-
-    if model.method_name == 'predict_proba' and isinstance(res, np.ndarray):
-        feature_names: List[Text] = [
-            class_name for class_name in sorted((v for i, v in model.metadata.class_names.items()), key=itemgetter(0))
-        ] if model.metadata.class_names is not None else list(range(len(res)))
-
-        return Prediction(
-            prediction=feature_names[max(enumerate(res), key=itemgetter(1))[0]],
-            probabilities=[
-                Probability(class_name=feature_names[i], class_index=i, value=res[i])
-                for i in range(len(feature_names))
-            ]
-        )
-    else:
-        return Prediction(prediction=res, probabilities=None)
+app.include_router(api_router, prefix=PREFIX)
 
 
 @app.get(
     path='/', include_in_schema=False
 )
-@version(major=VER)
 def redirect_docs():
     return RedirectResponse(url='docs')
 
-app = VersionedFastAPI(app, version_format='{major}', prefix_format='/v{major}')
-
 
 @app.get(
-    path='/', include_in_schema=False
+    path=f'{PREFIX}/docs', include_in_schema=False
 )
-@version(major=VER)
-def redirect_v1():
-    return RedirectResponse(url='/v1')
+def redirect_docs():
+    return RedirectResponse(url='docs')

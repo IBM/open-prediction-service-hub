@@ -9,7 +9,6 @@ pydantic
 pyyaml                    # server configurations
 python-multipart          # file service
 fastapi
-fastapi-versioning
 uvicorn
 gunicorn
 sqlalchemy
