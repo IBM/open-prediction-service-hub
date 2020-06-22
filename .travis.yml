@@ -17,17 +17,20 @@ before_install:
   - pip3 install --quiet -r requirements.txt
 
 install:
-  - python3 ml-service-implementations/ads-ml-service/setup.py install --quiet
+  - cd ml-service-implementations/ads-ml-service
+  - python3 setup.py install --quiet
 
 script:
-  - python3 -m pytest -v ml-service-implementations/ads-ml-service/src/tests
+  - cd ml-service-implementations/ads-ml-service
+  - python3 -m pytest -v src/tests
 
 
 before_deploy:
+  - cd ml-service-implementations/ads-ml-service
   - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
   # example: demo:20190405-171003-4-master
   # '/' is replaces by -
-  - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f ml-service-implementations/ads-ml-service/Dockerfile .
+  - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f Dockerfile .
 
 # Needed to install IBM cloud cli
 sudo: required
