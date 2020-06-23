@@ -21,20 +21,11 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
-from typing import Dict
 
-import yaml
 from predictions.core.configuration import ServerConfiguration
 
 
 class TestServerConfiguration(unittest.TestCase):
-
-    def test_conf_file_not_readable(self):
-        with tempfile.NamedTemporaryFile(mode='x') as config_file:
-            # 'x' mode open for exclusive creation, failing if the file already exists
-            tmp_config_file_path: Path = Path(config_file.name)
-            tmp_config_file_path.chmod(0o100)
-            self.assertRaises(PermissionError, ServerConfiguration.from_yaml, tmp_config_file_path)
 
     def test_model_storage_not_readable(self):
         with tempfile.TemporaryDirectory() as test_env:
@@ -52,10 +43,6 @@ class TestServerConfiguration(unittest.TestCase):
             self.assertRaises(PermissionError, ServerConfiguration, MODEL_STORAGE=model_storage)
             model_storage.chmod(mode=0o700)  # help cleanup
 
-    def test_conf_file_not_exist(self):
-        not_existing_config_file: Path = Path('./not_exist.yaml')
-        self.assertRaises(ValueError, ServerConfiguration.from_yaml, not_existing_config_file)
-
     def test_model_storage_not_exist(self):
         not_existing_model_storage: Path = Path('./not_exist')
         self.assertRaises(ValueError, ServerConfiguration, MODEL_STORAGE=not_existing_model_storage)
@@ -64,15 +51,6 @@ class TestServerConfiguration(unittest.TestCase):
         if os.environ.get('MODEL_STORAGE'):
             del os.environ['MODEL_STORAGE']
         self.assertRaises(ValueError, ServerConfiguration)
-
-    def test_valid_conf_file(self):
-        with tempfile.TemporaryDirectory() as model_storage:
-            with tempfile.NamedTemporaryFile(mode='x') as config_file:
-                conf: Dict = {'MODEL_STORAGE': model_storage}
-                conf_file_path: Path = Path(config_file.name)
-                with conf_file_path.open(mode='w') as fd:
-                    yaml.dump(conf, fd)
-                ServerConfiguration.from_yaml(conf_file_path)
 
     def test_valid_env(self):
         storage: Path = Path(__file__).resolve().parents[1].joinpath('runtime').joinpath('storage')

@@ -19,11 +19,9 @@ from __future__ import annotations
 
 import os
 from functools import lru_cache
-from typing import Optional
-
-import yaml
-from pydantic import Field, validator, BaseSettings
 from pathlib import Path
+
+from pydantic import Field, validator, BaseSettings
 
 
 class ServerConfiguration(BaseSettings):
@@ -42,17 +40,7 @@ class ServerConfiguration(BaseSettings):
             raise PermissionError('R/W permission needed')
         return p
 
-    @classmethod
-    def from_yaml(cls, conf: Path) -> ServerConfiguration:
-        if not conf.exists() or not conf.is_file():
-            raise ValueError(f'{conf} is not a file')
-        if not os.access(path=str(conf.resolve()), mode=os.R_OK):
-            raise PermissionError('R permission needed'.format(dir=conf))
-        with conf.open(mode='r') as fd:
-            return ServerConfiguration(**yaml.safe_load(fd))
-
 
 @lru_cache()
-def get_config(config_file: Optional[Path] = None) -> ServerConfiguration:
-    return ServerConfiguration() if config_file is None else ServerConfiguration.from_yaml(config_file)
-
+def get_config() -> ServerConfiguration:
+    return ServerConfiguration()
