@@ -17,7 +17,7 @@
 from fastapi import APIRouter, Depends
 
 from ...deps import get_ml_service
-from ....core.open_predict_service import PredictionService
+from ....core.open_prediction_service import OpenPredictionService
 from ....schemas.prediction import ServerStatus
 
 router = APIRouter()
@@ -28,5 +28,5 @@ router = APIRouter()
     path='/status',
     response_model=ServerStatus
 )
-def get_server_status(mls: PredictionService = Depends(get_ml_service)) -> ServerStatus:
+def get_server_status(mls: OpenPredictionService = Depends(get_ml_service)) -> ServerStatus:
     return ServerStatus(model_count=mls.count_models())

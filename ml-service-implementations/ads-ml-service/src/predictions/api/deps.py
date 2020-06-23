@@ -23,13 +23,13 @@ from sqlalchemy.orm import sessionmaker
 
 from ..core.configuration import ServerConfiguration, get_config
 from ..db import models
-from ..core.open_predict_service import PredictionService
+from ..core.open_prediction_service import OpenPredictionService
 
 DATABASE_NAME: Text = 'EML.db'
 
 
 # Dependency
-def get_ml_service() -> PredictionService:
+def get_ml_service() -> OpenPredictionService:
     engine: Engine = create_engine(
         f'sqlite:///{ServerConfiguration().MODEL_STORAGE.joinpath(DATABASE_NAME)}',
         connect_args={"check_same_thread": False}
@@ -43,7 +43,7 @@ def get_ml_service() -> PredictionService:
     db = None
     try:
         db = sm_instance()
-        mls: PredictionService = PredictionService(
+        mls: OpenPredictionService = OpenPredictionService(
             db=db,
             model_cache_size=get_config().MODEL_CACHE_SIZE,
             cache_ttl=get_config().CACHE_TTL

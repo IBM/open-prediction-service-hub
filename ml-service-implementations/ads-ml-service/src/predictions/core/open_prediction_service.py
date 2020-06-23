@@ -14,27 +14,32 @@
 # limitations under the License.IBM Confidential
 #
 
+
 import logging
 from typing import Text, Any, Dict, NoReturn, Optional, List, Tuple
+from threading import Lock
 
-from sqlalchemy.orm import Session
 from expiringdict import ExpiringDict
+from sqlalchemy.orm import Session
 
-from ..schemas.model import Model, MLSchema
 from ..db.crud import create_model, delete_model, read_model, read_model_schemas, count_models
+from ..schemas.model import Model, MLSchema
 
 
-class PredictionService:
+class OpenPredictionService:
     # Cache need to be global to all service instances
     MODEL_CACHE: ExpiringDict = None
     MODEL_CONFIGS_CACHE: ExpiringDict = None
+    # Cache needs to be initiated once per worker
+    lock = Lock()
 
     def __init__(self, db: Session, model_cache_size: int, cache_ttl: int):
         self.db: Session = db
-        if PredictionService.MODEL_CACHE is None:
-            PredictionService.MODEL_CACHE = ExpiringDict(max_len=model_cache_size, max_age_seconds=cache_ttl)
-        if PredictionService.MODEL_CONFIGS_CACHE is None:
-            PredictionService.MODEL_CONFIGS_CACHE = ExpiringDict(max_len=1, max_age_seconds=cache_ttl)
+        with OpenPredictionService.lock:
+            if OpenPredictionService.MODEL_CACHE is None:
+                OpenPredictionService.MODEL_CACHE = ExpiringDict(max_len=model_cache_size, max_age_seconds=cache_ttl)
+            if OpenPredictionService.MODEL_CONFIGS_CACHE is None:
+                OpenPredictionService.MODEL_CONFIGS_CACHE = ExpiringDict(max_len=1, max_age_seconds=cache_ttl)
 
     def add_model(
             self, m: Model
@@ -57,22 +62,22 @@ class PredictionService:
         key: Tuple[Text, Text] = (model_name, model_version)
         m: Model
         try:
-            m = PredictionService.MODEL_CACHE[key]
+            m = OpenPredictionService.MODEL_CACHE[key]
         except KeyError:
             logger.debug(f'model {key} cache miss')
             m = read_model(self.db, model_name=model_name, model_version=model_version)
-            PredictionService.MODEL_CACHE.__setitem__(key=key, value=m)
+            OpenPredictionService.MODEL_CACHE.__setitem__(key=key, value=m)
         return m
 
     def get_model_configs(self) -> List[MLSchema]:
         logger = logging.getLogger(__name__)
         configs: List[MLSchema]
         try:
-            configs = PredictionService.MODEL_CONFIGS_CACHE['model_configs']
+            configs = OpenPredictionService.MODEL_CONFIGS_CACHE['model_configs']
         except KeyError:
             logger.debug('model_configs cache miss')
             configs = read_model_schemas(self.db)
-            PredictionService.MODEL_CONFIGS_CACHE.__setitem__(key='model_configs', value=configs)
+            OpenPredictionService.MODEL_CONFIGS_CACHE.__setitem__(key='model_configs', value=configs)
         return configs
 
     def count_models(self) -> int:
