@@ -14,6 +14,7 @@
 # limitations under the License.IBM Confidential
 #
 
-from . import model
 
-__all__ = [model]
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()

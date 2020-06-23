@@ -6,7 +6,6 @@ pandas
 pydantic
 
 ## Web interface
-pyyaml                    # server configurations
 python-multipart          # file service
 fastapi
 uvicorn

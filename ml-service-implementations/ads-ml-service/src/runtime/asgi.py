@@ -15,7 +15,7 @@
 #
 
 
-from predictions.localml import app
+from predictions.main import app
 
 # For debug
 if __name__ == "__main__":

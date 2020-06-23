@@ -22,7 +22,7 @@ import pickle
 from logging import Logger
 from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
 
-from ..core.feature import Feature
+from .feature import Feature
 from .output_schema import OutputSchema
 from pandas import DataFrame
 from pydantic import BaseModel, Field
@@ -51,51 +51,3 @@ class MLSchema(BaseModel):
     input_schema: Sequence[Feature] = Field(..., description='Input schema of ml model')
     output_schema: Optional[OutputSchema] = Field(..., description='Output schema of ml model')
     metadata: Metadata = Field(..., description='Additional information for ml model')
-
-
-class Model(object):
-    def __init__(self, info: MLSchema, model: Any):
-        self.info: MLSchema = info
-        self.model: Any = model
-
-    def __get_ordered_column_name_vec(self) -> Sequence[Text]:
-        return [item.name for item in sorted(self.info.input_schema, key=lambda e: getattr(e, 'order'))]
-
-    def __get_feat_type_map(self) -> Mapping[Text, Type]:
-        return {item.name: item.get_type() for item in self.info.input_schema}
-
-    # TODO: better management for conversion error
-    def invoke(
-            self,
-            data_input: Dict
-    ) -> Any:
-        logger: Logger = logging.getLogger(__name__)
-
-        logger.debug('Received input dict <{input_dict}>'.format(input_dict=data_input))
-
-        data: DataFrame = DataFrame.from_dict(
-            data=data_input,
-            orient='columns'
-        ). \
-            reindex(
-            columns=self.__get_ordered_column_name_vec()
-        ). \
-            astype(
-            dtype=self.__get_feat_type_map(),
-            errors='ignore'
-        )
-        return getattr(self.model, self.info.method_name)(data)
-
-    @staticmethod
-    def from_pickle(
-            pickle_file: bytes,
-            model_name: Text = 'model',
-            metadata_name: Text = 'model_config'
-    ) -> Model:
-        archive: Dict = pickle.loads(pickle_file)
-        model: Model = archive.get(model_name)
-        conf: Dict = archive.get(metadata_name)
-        return Model(
-            info=MLSchema(**conf),
-            model=model,
-        )

@@ -18,7 +18,7 @@ from typing import List, Dict, Text
 from fastapi import APIRouter, Depends, File
 
 from ...deps import get_ml_service
-from ....core.open_predict_service import PredictionService
+from ....core.open_prediction_service import OpenPredictionService
 from ....schemas.model import MLSchema
 
 router = APIRouter()
@@ -28,7 +28,7 @@ router = APIRouter()
     path='/models',
     response_model=List[MLSchema]
 )
-def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[MLSchema]:
+def get_models(mls: OpenPredictionService = Depends(get_ml_service)) -> List[MLSchema]:
     """Returns the list of ML models."""
     return mls.get_model_configs()
 
@@ -41,7 +41,7 @@ def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[MLSchem
         }
     }
 )
-def add_model(*, file: bytes = File(...), mls: PredictionService = Depends(get_ml_service)) -> None:
+def add_model(*, file: bytes = File(...), mls: OpenPredictionService = Depends(get_ml_service)) -> None:
     mls.add_archive(file)
 
 
@@ -49,5 +49,5 @@ def add_model(*, file: bytes = File(...), mls: PredictionService = Depends(get_m
     tags=['Admin'],
     path='/models'
 )
-def remove_model(*, model_name: Text, model_version: Text = None, mls: PredictionService = Depends(get_ml_service)) -> None:
+def remove_model(*, model_name: Text, model_version: Text = None, mls: OpenPredictionService = Depends(get_ml_service)) -> None:
     mls.remove_model(model_name=model_name, model_version=model_version)

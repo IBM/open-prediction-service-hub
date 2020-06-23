@@ -14,6 +14,17 @@
 # limitations under the License.IBM Confidential
 #
 
-from . import model
 
-__all__ = [model]
+from sqlalchemy import Column, LargeBinary, Integer
+from sqlalchemy.orm import relationship
+
+from ..db.base_class import Base
+
+
+class BinaryMLModel(Base):
+    __tablename__ = "binary_ml_model"
+
+    id = Column(Integer, nullable=False, primary_key=True, index=True)
+    model_b64 = Column(LargeBinary, nullable=False)
+
+    model_metadata = relationship('ModelConfig', back_populates='binary', uselist=False)

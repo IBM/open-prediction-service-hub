@@ -22,9 +22,9 @@ import numpy as np
 from fastapi import APIRouter, Depends
 
 from ...deps import get_ml_service
-from ....schemas.model import Model
+from ....core.model import Model
 from ....core.util import to_dataframe_compatible
-from ....core.open_predict_service import PredictionService
+from ....core.open_prediction_service import OpenPredictionService
 from ....schemas.request import RequestBody
 from ....schemas.prediction import Probability, Prediction
 
@@ -39,7 +39,7 @@ router = APIRouter()
 def predict(
         *,
         ml_req: RequestBody,
-        mls: PredictionService = Depends(get_ml_service)
+        mls: OpenPredictionService = Depends(get_ml_service)
 ) -> Prediction:
     logger: Logger = logging.getLogger(__name__)
 
