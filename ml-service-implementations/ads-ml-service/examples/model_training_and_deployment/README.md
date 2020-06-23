@@ -40,4 +40,4 @@ Structure of archive file:
 ```
 
 Documents for `deployment_conf.json` can be found:
-[Configuration](../../README.md#Configuration-example-for-miniloan-fraud-detection)
+[Configuration](../../README.md#Open-Prediction-Service)
