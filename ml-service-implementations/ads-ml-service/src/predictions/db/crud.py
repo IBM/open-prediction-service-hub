@@ -31,8 +31,8 @@ def read_model(
     m: models.model_config.ModelConfig = db \
         .query(models.model_config.ModelConfig) \
         .filter(
-        models.model_config.ModelConfig.name == model_name,
-        models.model_config.ModelConfig.version == model_version) \
+            models.model_config.ModelConfig.name == model_name,
+            models.model_config.ModelConfig.version == model_version) \
         .first()
     return schemas.model.Model(model=pickle.loads(m.binary.model_b64), info=schemas.model.MLSchema(**m.configuration))
 
@@ -68,7 +68,7 @@ def delete_model(db: Session, model_name: Text, model_version: Optional[Text] = 
         db \
             .query(models.model_config.ModelConfig) \
             .filter(
-            models.model_config.ModelConfig.name == model_name,
-            models.model_config.ModelConfig.version == model_version) \
+                models.model_config.ModelConfig.name == model_name,
+                models.model_config.ModelConfig.version == model_version) \
             .delete()
     db.commit()
