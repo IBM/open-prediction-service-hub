@@ -28,9 +28,9 @@ router = APIRouter()
     path='/models',
     response_model=List[MLSchema]
 )
-def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[Dict]:
+def get_models(mls: PredictionService = Depends(get_ml_service)) -> List[MLSchema]:
     """Returns the list of ML models."""
-    return mls.get_model_metadata()
+    return mls.get_model_configs()
 
 
 @router.post(

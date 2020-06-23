@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from . import models as db_model
-from ..core import model as ops_model
+from ..schemas import model as ops_model
 
 
 def read_model(db: Session, model_name: Text, model_version: Text) -> Optional[ops_model.Model]:

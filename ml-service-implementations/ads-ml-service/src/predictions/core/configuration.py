@@ -37,15 +37,15 @@ class ServerConfiguration(BaseSettings):
     @validator('MODEL_STORAGE', always=True)
     def storage_check(cls: ServerConfiguration, p: Path) -> Path:
         if not p.exists() or not p.is_dir():
-            raise ValueError('{dir} is not a directory'.format(dir=p))
+            raise ValueError(f'{p} is not a directory')
         if not os.access(path=str(p.resolve()), mode=os.R_OK) or not os.access(path=str(p.resolve()), mode=os.W_OK):
-            raise PermissionError('R/W permission needed'.format(dir=p))
+            raise PermissionError('R/W permission needed')
         return p
 
     @classmethod
     def from_yaml(cls, conf: Path) -> ServerConfiguration:
         if not conf.exists() or not conf.is_file():
-            raise ValueError('{conf} is not a file'.format(conf=conf))
+            raise ValueError(f'{conf} is not a file')
         if not os.access(path=str(conf.resolve()), mode=os.R_OK):
             raise PermissionError('R permission needed'.format(dir=conf))
         with conf.open(mode='r') as fd:

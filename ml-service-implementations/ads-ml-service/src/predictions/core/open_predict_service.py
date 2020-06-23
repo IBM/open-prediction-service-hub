@@ -20,8 +20,8 @@ from typing import Text, Any, Dict, NoReturn, Optional, List, Tuple
 from sqlalchemy.orm import Session
 from expiringdict import ExpiringDict
 
-from .core.model import Model, MLSchema
-from .db.crud import create_model, delete_model, read_model, read_model_schemas, count_models
+from ..schemas.model import Model, MLSchema
+from ..db.crud import create_model, delete_model, read_model, read_model_schemas, count_models
 
 
 class PredictionService:

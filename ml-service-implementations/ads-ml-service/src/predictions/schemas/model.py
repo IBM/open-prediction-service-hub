@@ -22,8 +22,8 @@ import pickle
 from logging import Logger
 from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
 
-from dynamic_hosting.core.feature import Feature
-from dynamic_hosting.openapi.output_schema import OutputSchema
+from ..core.feature import Feature
+from .output_schema import OutputSchema
 from pandas import DataFrame
 from pydantic import BaseModel, Field
 

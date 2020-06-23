@@ -5,11 +5,11 @@ import unittest
 from tempfile import TemporaryDirectory
 from typing import Dict, Text, Any
 
-from dynamic_hosting.core import Model as MLModel
-from dynamic_hosting.core.configuration import ServerConfiguration
-from dynamic_hosting.core.model import MLSchema
-from dynamic_hosting.db import models
-from dynamic_hosting.db.crud import create_model, delete_model, read_model_schemas, read_model, count_models
+from predictions.schemas.model import Model as MLModel
+from predictions.core.configuration import ServerConfiguration
+from predictions.schemas.model import MLSchema
+from predictions.db import models
+from predictions.db.crud import create_model, delete_model, read_model_schemas, read_model, count_models
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from .prepare_models import miniloan_rfc_pickle, miniloan_linear_svc_pickle, miniloan_rfr_pickle

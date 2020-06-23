@@ -21,7 +21,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 
-from ..core.configuration import ServerConfiguration
+from ..core.configuration import ServerConfiguration, get_config
 from ..db import models
 from ..core.open_predict_service import PredictionService
 
@@ -31,7 +31,7 @@ DATABASE_NAME: Text = 'EML.db'
 # Dependency
 def get_ml_service() -> PredictionService:
     engine: Engine = create_engine(
-        f'sqlite:///{ServerConfiguration().model_storage.joinpath(DATABASE_NAME)}',
+        f'sqlite:///{ServerConfiguration().MODEL_STORAGE.joinpath(DATABASE_NAME)}',
         connect_args={"check_same_thread": False}
     )
     models.Base.metadata.create_all(bind=engine)
@@ -43,7 +43,11 @@ def get_ml_service() -> PredictionService:
     db = None
     try:
         db = sm_instance()
-        mls: PredictionService = PredictionService(db=db)
+        mls: PredictionService = PredictionService(
+            db=db,
+            model_cache_size=get_config().MODEL_CACHE_SIZE,
+            cache_ttl=get_config().CACHE_TTL
+        )
         yield mls
     finally:
         db.close()
