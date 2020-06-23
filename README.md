@@ -1,259 +1,63 @@
-# Decision automation on machine learning
+# Open Prediction Service
 
+The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 
-## Usage
+![OPS](doc/ops.png)
 
-To clone the project 
-```shell script
-git clone --recurse-submodules git@github.ibm.com:dba/ads-ml-service.git ads-ml-service
-```
+We provide an Open Source implementation of this service based on two well known python Machine Learning SDK : [scikit-learn](https://scikit-learn.org/) and [XGBoost](https://xgboost.ai/) based on a docker container for easier deployments.
 
-To build the microservice image
-```shell script
-docker build -t embedded_ml .
-```
+We also provide a Java SDK based on the Open Prediction Service API to enable any java based application to use this Open architecture.
 
-To test the microservice
-```shell script
-docker run --rm -it -p 8080:8080 --name lml embedded_ml
-```
-Your predictive service is then ready at `http://localhost:8080/v1` and 
-its openapi docs is available at `http://localhost:8080/v1/docs`.
+## Open API specification
 
+![OpenAPI](doc/ops-OpenApi.jpg)
 
+The Open Prediction Service is available as an [Open API v3 specification](open-prediction-service.json). The specification has three sections:
 
-### Configuration example for miniloan fraud detection
+- *Admin* section for describing endpoints for uploading, getting or deleting models into the the server.
+- *ML* section that covers the prediction call endpoint
+- *Schemas* section for describing all the types manipulated byt the previous endpoints.
 
-```json
-{
-  "name": "miniloan-rfc",
-  "version": "v0",
-  "method_name": "predict",
-  "input_schema": [
-    {
-      "name": "creditScore",
-      "order": 0,
-      "type": "float64"
-    },
-    {
-      "name": "income",
-      "order": 1,
-      "type": "float64"
-    },
-    {
-      "name": "loanAmount",
-      "order": 2,
-      "type": "float64"
-    },
-    {
-      "name": "monthDuration",
-      "order": 3,
-      "type": "float64"
-    },
-    {
-      "name": "rate",
-      "order": 4,
-      "type": "float64"
-    }
-  ],
-  "output_schema": {
-        "attributes": [
-            {
-                "name": "prediction",
-                "type": "string"
-            },
-            {
-                "name": "probabilities",
-                "type": "[Probability]"
-            }
-        ]
-  },
-  "metadata": {
-    "description": "Loan payment classification",
-    "author": "Somebody",
-    "trained_at": "2020-03-17 13:25:23",
-    "class_names": {
-      "0": "false",
-      "1": "true"
-    },
-    "metrics": [
-      {
-        "name":  "accuracy",
-        "value": 0.9471577261809447
-      }
-    ]
-  }
-}
-```
+### *Admin* section
 
-ML model is uniquely identified by its `name` and its `version`. 
+#### Status `/v1/status` `GET`
 
-ML models are python classes. Local provider needs to know the `method_name` of prediction method.
+![status](doc/ops-status.jpg)
 
-`input_schema` is used as lookup table which local provider use to find type/position of 
-each feature. `type` needs to be a type alias in `numpy`module.
+This endpoint can be used to test the availability of the service. It returns the number of models it is serving.
 
-`output_schema` configures result formats for the most common use cases.
+#### Models `/v1/models`
 
+##### Retrieve `GET` 
 
-<table>
-    <tr>
-        <th>output type</th>
-        <th>format</th>
-        <th>
-            corresponding output 
-            example
-        </th>
-    </tr>
-<tr>
-<td>
-regression
-</td>
-<td>
-<pre lang="json">
-[
-    {
-        "name": "prediction",
-        "type": "float"
-    }
-]
-</pre>
-</td>
-<td>
-<pre lang="json">
-{
-  "prediction": 128.0
-}
-</pre>
-</tr>
-<tr>
-<td>
-classification
-</td>
-<td>
-<pre lang="json">
-[
-    {
-        "name": "prediction",
-        "type": "string"
-    }
-]
-</pre>
-</td>
-<td>
-<pre lang="json">
-{
-  "prediction": "true"
-}
-</pre>
-</tr>
-<tr>
-<td>
-classification
-with probabilities
-</td>
-<td>
-<pre lang="json">
-[
-    {
-        "name": "prediction",
-        "type": "string"
-    },
-    {
-        "name": "probabilities",
-        "type": "[Probability]"
-    }
-]
-</pre>
-</td>
-<td>
-<pre lang="json">
-{
-    "prediction": "true",
-    "probabilities": [
-        {
-          "class_name": "true",
-          "class_index": 1,
-          "value": 0.66
-        },
-        {
-          "class_name": "false",
-          "class_index": 0,
-          "value": 0.34
-        }
-    ]   
-}
-</pre>
-</tr>
-</table>
+![ops-get-models](doc/ops-get-models.jpg)
 
-`metadata` needs to have `description`, `trained_at`, `author` and associated `metrics`.
+This endpoint will return the list of the models it is serving.
 
-`class_names` is optional. It is a lookup table defined as class index <-> class name.
-It is used in classifications when the output relies on class index.
+##### Upload `POST`
 
-Note: json does not support int as mapping key. For this reason,
-in the example we used `"0"` and `"1"` instead of `0` and `1`.
+![ops-post-models](doc/ops-post-models.jpg)
 
+This endpoint will allow to upload a pickle file as a new serving model.
 
-### Example for model invocation
+##### Remove `DELETE`
 
-Request body
-```json
-{
-  "model_name": "miniloan-rfc",
-  "model_version": "v0",
-  "params": [
-        {
-            "name": "creditScore",
-            "value": 400
-        }, {
-            "name": "income",
-            "value": 45000
-        }, {
-            "name": "loanAmount",
-            "value": 100000
-        }, {
-            "name": "monthDuration",
-            "value": 24
-        }, {
-            "name": "rate",
-            "value": 2.0
-        }
-    ]
-}
-```
+##### ![ops-delete-models](doc/ops-delete-models.jpg)
 
-`model_name` and `model_version`are used to uniquely identify ml models. 
-Parameters of ml models are arranged in key-values pairs.
+This endpoint will remove a given model.
 
-Response body may look like:
-```json
-{
-    "prediction": "true",
-    "probabilities": [
-        {
-          "class_name": "true",
-          "class_index": 1,
-          "value": 0.66
-        },
-        {
-          "class_name": "false",
-          "class_index": 0,
-          "value": 0.34
-        }
-    ]   
-}
-```
+#### *ML* section
 
+##### Call prediction `/v1/invocations` `POST`
 
-## Dependencies
-* Dependencies for web service: `requirements.txt`
-* Dependencies for ML model: `requirements-ml.txt`
+![ops-post-invocations](doc/ops-post-invocations.jpg)
 
-Before adding new models, make sure that `requirements-ml.txt` already contains
-all necessary dependencies.
+## ML Service Implementations
 
+We provide a reference implementation called `ads-ml-service`.
 
-## Model creation examples
-[model creation](examples/model_training_and_deployment/README.md)
+Instructions to build an use are inside the [ml-service-implementations/ads-ml-service](ml-service-implementations/ads-ml-service) folder.
+
+## Open Prediction Service Java Client SDK
+
+Instructions to build an use are inside the [ops-client-sdk](ops-client-sdk) folder.
