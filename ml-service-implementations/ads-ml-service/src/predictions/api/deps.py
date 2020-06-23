@@ -22,7 +22,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 
 from ..core.configuration import ServerConfiguration, get_config
-from ..db import models
+from ..db.base import Base
 from ..core.open_prediction_service import OpenPredictionService
 
 DATABASE_NAME: Text = 'EML.db'
@@ -34,7 +34,7 @@ def get_ml_service() -> OpenPredictionService:
         f'sqlite:///{ServerConfiguration().MODEL_STORAGE.joinpath(DATABASE_NAME)}',
         connect_args={"check_same_thread": False}
     )
-    models.Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     sm_instance: sessionmaker = sessionmaker(
         autocommit=False,
         autoflush=False,

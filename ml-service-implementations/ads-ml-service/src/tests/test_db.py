@@ -8,7 +8,7 @@ from typing import Dict, Text, Any
 from predictions.schemas.model import Model as MLModel
 from predictions.core.configuration import ServerConfiguration
 from predictions.schemas.model import MLSchema
-from predictions.db import models
+from predictions.db.base import Base
 from predictions.db.crud import create_model, delete_model, read_model_schemas, read_model, count_models
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -30,7 +30,7 @@ class TestDatabase(unittest.TestCase):
             bind=engine
         )
         self.db = SessionLocal()
-        models.Base.metadata.create_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
 
     def tearDown(self) -> None:
         self.db.close()
