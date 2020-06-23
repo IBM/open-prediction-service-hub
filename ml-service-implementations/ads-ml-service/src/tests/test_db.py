@@ -5,7 +5,7 @@ import unittest
 from tempfile import TemporaryDirectory
 from typing import Dict, Text, Any
 
-from predictions.schemas.model import Model as MLModel
+from predictions.core.model import Model as MLModel
 from predictions.core.configuration import ServerConfiguration
 from predictions.schemas.model import MLSchema
 from predictions.db.base import Base

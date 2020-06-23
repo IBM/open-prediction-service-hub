@@ -23,7 +23,8 @@ from expiringdict import ExpiringDict
 from sqlalchemy.orm import Session
 
 from ..db.crud import create_model, delete_model, read_model, read_model_schemas, count_models
-from ..schemas.model import Model, MLSchema
+from ..schemas.model import MLSchema
+from ..core.model import Model
 
 
 class OpenPredictionService:

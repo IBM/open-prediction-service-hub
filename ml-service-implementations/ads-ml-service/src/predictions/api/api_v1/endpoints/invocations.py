@@ -22,7 +22,7 @@ import numpy as np
 from fastapi import APIRouter, Depends
 
 from ...deps import get_ml_service
-from ....schemas.model import Model
+from ....core.model import Model
 from ....core.util import to_dataframe_compatible
 from ....core.open_prediction_service import OpenPredictionService
 from ....schemas.request import RequestBody

@@ -21,20 +21,21 @@ from typing import Text, List, Optional, NoReturn
 from sqlalchemy.orm import Session
 
 from .. import models
+from ..core.model import Model
 from .. import schemas
 
 
 def read_model(
         db: Session, model_name: Text,
         model_version: Text
-) -> Optional[schemas.model.Model]:
+) -> Optional[Model]:
     m: models.model_config.ModelConfig = db \
         .query(models.model_config.ModelConfig) \
         .filter(
             models.model_config.ModelConfig.name == model_name,
             models.model_config.ModelConfig.version == model_version) \
         .first()
-    return schemas.model.Model(model=pickle.loads(m.binary.model_b64), info=schemas.model.MLSchema(**m.configuration))
+    return Model(model=pickle.loads(m.binary.model_b64), info=schemas.model.MLSchema(**m.configuration))
 
 
 def read_model_schemas(db: Session) -> List[schemas.model.MLSchema]:
@@ -47,7 +48,7 @@ def count_models(db: Session) -> int:
     return db.query(models.model_config.ModelConfig).count()
 
 
-def create_model(db: Session, ml_model: schemas.model.Model) -> NoReturn:
+def create_model(db: Session, ml_model: Model) -> NoReturn:
     db.add(
         models.model_config.ModelConfig(
             name=ml_model.info.name,
