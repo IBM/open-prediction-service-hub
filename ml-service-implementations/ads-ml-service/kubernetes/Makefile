@@ -2,12 +2,12 @@
 # Register imgge
 ibm_register_image:
 	ibmcloud cr image-rm us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} || echo "Not need to delete image"
-	ibmcloud cr build -t us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} -f docker/Dockerfile .
+	ibmcloud cr build -t us.icr.io/${IMAGE_REPO}/${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
 
 
 # Deploy service
 kub_deploy:
-	cat docker/deployment.yaml \
+	cat deployment.yaml \
 		| sed \
 			-e "s/{{KUB_DEPLOYMENT_NAME}}/${KUB_DEPLOYMENT_NAME}/g" \
 			-e "s/{{IMAGE_REPO}}/${IMAGE_REPO}/g" \
@@ -16,7 +16,7 @@ kub_deploy:
 		| kubectl apply -f -
 
 kub_service:
-		cat docker/service.yaml \
+		cat service.yaml \
 		| sed \
 			-e "s/{{KUB_SERVICE_NAME}}/${KUB_SERVICE_NAME}/g" \
 		| kubectl apply -f -
