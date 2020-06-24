@@ -37,12 +37,13 @@ tag_image() {
 
 push_image() {
   echo -e "${YELLOW}[INFO] Pushing image${NC}"
-  ibmcloud cr image-rm us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest || echo -e "Not need to remove image"
   docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}"
   docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest
 }
 
 ibm_cloud_specific(){
+  # Free version of register have limited size
+  ibmcloud cr image-rm us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest || echo -e "Not need to remove image"
   ibmcloud cr build \
     -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}" \
     -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest \
