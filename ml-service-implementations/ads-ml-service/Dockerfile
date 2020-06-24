@@ -29,7 +29,7 @@ COPY . /tmp/repo/
 RUN \
     mkdir ${APP_HOME}  && \
     cd /tmp/repo && \
-    python3 setup.py install -O2 && \
+    python3 setup.py --quiet install -O2 && \
     echo "${YELLOW}[INFO] Preparing examples.${NC}" && \
     python3 src/runtime/init.py && \
     cp -a /tmp/repo/src/runtime/. ${APP_HOME} && \
