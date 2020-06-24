@@ -7,7 +7,8 @@ with PROJECT_ROOT.joinpath('requirements.txt').open(mode='r', encoding='utf-8') 
     installation_dependencies = [i.strip() for i in fd.readlines()]
 
 setup(
+    zip_safe=True,
     package_dir={'': 'src'},
     packages=find_packages(where='src'),
-    install_requires=installation_dependencies,
+    install_requires=installation_dependencies
 )
