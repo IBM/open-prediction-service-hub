@@ -42,13 +42,22 @@ push_image() {
   docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest
 }
 
+ibm_cloud_specific(){
+  ibmcloud cr build \
+    -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}" \
+    -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest \
+    -f docker/Dockerfile .
+}
+
 deploy() {
   echo -e "${YELLOW}[INFO] Begin deployment${NC}"
   install_ibm_cloud_cli
   ibm_cloud_login
   ibm_container_registry_login
-  tag_image
-  push_image
+  # tag_image
+  # push_image
+  # images in free registry cannot surpass 500MB except build by ibmcloud tools
+  ibm_cloud_specific
 }
 
 deploy
