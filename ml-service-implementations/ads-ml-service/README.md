@@ -17,7 +17,7 @@ Add short description
 
 ### Prerequisites
 
-Docker ?
+Docker
 
 ### Run the microservice
 To build the microservice image
