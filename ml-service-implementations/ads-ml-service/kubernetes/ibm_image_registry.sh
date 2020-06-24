@@ -46,7 +46,7 @@ ibm_cloud_specific(){
   ibmcloud cr build \
     -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}" \
     -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest \
-    -f docker/Dockerfile .
+    -f Dockerfile .
 }
 
 deploy() {
