@@ -18,7 +18,7 @@
 import os
 import subprocess
 from pathlib import Path
-from typing import Text, List
+from typing import Text
 
 from predictions.main import app
 from predictions.main import VER
@@ -34,10 +34,9 @@ def init():
     client: TestClient = TestClient(app)
 
     subprocess.run(
-        ['python3', str(PROJECT_ROOT.joinpath('tests', 'prepare_models.py'))],
+        ['python3', str(PROJECT_ROOT.joinpath('src', 'tests', 'prepare_models.py'))],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
     )
-
 
     models = PROJECT_ROOT.joinpath('examples').rglob('miniloan-*-archive.pkl')
     results = []
