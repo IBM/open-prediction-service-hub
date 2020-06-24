@@ -37,9 +37,17 @@ tag_image() {
 
 push_image() {
   echo -e "${YELLOW}[INFO] Pushing image${NC}"
-  ibmcloud cr image-rm us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest || echo -e "Not need to remove image"
   docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}"
   docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest
+}
+
+ibm_cloud_specific(){
+  # Free version of register have limited size
+  ibmcloud cr image-rm us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest || echo -e "Not need to remove image"
+  ibmcloud cr build \
+    -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}" \
+    -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest \
+    -f Dockerfile .
 }
 
 deploy() {
@@ -47,8 +55,10 @@ deploy() {
   install_ibm_cloud_cli
   ibm_cloud_login
   ibm_container_registry_login
-  tag_image
-  push_image
+  # tag_image
+  # push_image
+  # images in free registry cannot surpass 500MB except build by ibmcloud tools
+  ibm_cloud_specific
 }
 
 deploy
