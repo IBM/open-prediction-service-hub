@@ -24,6 +24,13 @@ docker images | grep open-prediction
 and you will see:
 ![OpenApi](installation_success.png)
 
-## Register image to image registry (optional)
+## Register image to image registry (optional for local deployment)
+
+Suppose you have a docker hub account (username: `fake_username`, email: `fake_email`)
+
+```shell script
+docker tag open-prediction:0.1.0 fake_username/open-prediction:0.1.0
+docker tag open-prediction:latest fake_username/open-prediction:latest
+```
 
 ## Create service
