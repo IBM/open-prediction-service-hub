@@ -15,6 +15,15 @@ git clone git@github.ibm.com:dba/automation-decision-services-extensions.git aut
 cd automation-decision-services-extensions/open-prediction-service/ml-service-implementations/ads-ml-service
 docker build -t open-prediction:0.1.0 -t open-prediction:latest -f Dockerfile .
 ```
-The image is then built and can be identified by two tags: `0.1.0` and `latest`. 
+The image is then built and can be identified by two tags: `0.1.0` and `latest`.
+
+To verify, tap
+```shell script
+docker images | grep open-prediction
+```
+and you will see:
+![OpenApi](installation_success.png)
+
+## Register image to image registry (optional)
 
 ## Create service
