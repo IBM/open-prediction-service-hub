@@ -20,10 +20,11 @@ from typing import Text
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
+from . import __version__
 from .api.api_v1.api import api_router
 
 app: FastAPI = FastAPI(
-    version='0.0.1',
+    version=__version__,
     title='Open Prediction Service',
     description='A simple Machine Learning serving environment for tests',
     openapi_url="/open-prediction-service.json"
