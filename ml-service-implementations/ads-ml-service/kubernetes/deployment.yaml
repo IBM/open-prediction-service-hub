@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{KUB_DEPLOYMENT_NAME}}
+  name: ads-ml-service-deployment
 spec:
   selector:
     matchLabels:
@@ -15,6 +15,6 @@ spec:
       containers:
       - name: "open-prediction"
         imagePullPolicy: Always
-        image: "us.icr.io/{{IMAGE_REPO}}/{{IMAGE_NAME}}:{{IMAGE_TAG}}"
+        image: "{{IMAGE_URL}}"
         ports:
         - containerPort: 8080
