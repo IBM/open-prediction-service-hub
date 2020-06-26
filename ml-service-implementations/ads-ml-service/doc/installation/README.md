@@ -41,7 +41,8 @@ To verify, tap
 docker images | grep open-prediction
 ```
 
-and you will see:
+Then you will see some thing like
+
 ![OpenApi](add_new_tag.png)
 
 Login your docker hub account
@@ -67,3 +68,23 @@ docker push fake_username/open-prediction:latest
 Your image is now available for non local environments 
 
 ## Create service
+
+### 1. Local service
+
+As you expect, simply run the image
+
+```shell script
+docker run --detach --restart=always \
+  --publish 80:8080 \
+  --name open-prediction \
+  open-prediction:latest
+```
+
+To verify, tap
+```shell script
+docker ps | grep open-prediction
+```
+
+Then you will see some thing like
+
+![OpenApi](ops_docker.png)
