@@ -100,4 +100,4 @@ properly. To verify that, tap `kubectl cluster-info` and your nodes should be li
 `deployment.yaml` and `service.yaml` are offered in `ads-ml-service/kubernetes`. There is one
 remaining configuration to be done: `{{IMAGE_URL}}` inside `deployment.yaml` has not been
 configured yet. Replace it by the image URL you get in the section 
-[register image](#Register-image-to-image-registry-(Optional for local deployment))
+[register image](#register-image-to-image-registry-optional-for-local-deployment)
