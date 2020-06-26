@@ -88,3 +88,11 @@ docker ps | grep open-prediction
 Then you will see some thing like
 
 ![OpenApi](ops_docker.png)
+
+### 2. Kubernetes cluster
+
+This part is not designed to offer a fine tuned ops cluster in kubernetes, but
+a minimum example of working ops instance.
+
+Suppose you have a working kubernetes cluster and the have configured kubectl
+properly. To verify that, tap `kubectl cluster-info` and your nodes should be listed.
