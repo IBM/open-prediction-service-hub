@@ -101,3 +101,22 @@ properly. To verify that, tap `kubectl cluster-info` and your nodes should be li
 remaining configuration to be done: `{{IMAGE_URL}}` inside `deployment.yaml` has not been
 configured yet. Replace it by the image URL you get in the section 
 [register image](#register-image-to-image-registry-optional-for-local-deployment)
+
+After replacing `{{IMAGE_URL}}`, apply configurations:
+
+```shell script
+kubectl apply -f kubernetes/deployment.yaml
+kubectl apply -f kubernetes/service.yaml
+```
+
+Find service address by:
+
+```shell script
+kubectl get service ads-ml-service-service
+```
+
+Then you will see some thing like
+
+![OpenApi](get_service.png)
+
+The and-ml-service is available at `<none>` (replace it by your cluster address) with port `30000`.
