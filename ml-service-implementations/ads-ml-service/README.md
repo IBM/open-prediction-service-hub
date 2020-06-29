@@ -2,7 +2,7 @@
 
 # OPS with scikit and xgboost sample
 
-Add short description
+0. [Installation](doc/installation/README.md)
 
 1. [Getting Started](#getting-started)
 

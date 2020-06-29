@@ -56,7 +56,7 @@ This endpoint will remove a given model.
 
 We provide a reference implementation called `ads-ml-service`.
 
-Instructions to build an use are inside the [ml-service-implementations/ads-ml-service](ml-service-implementations/ads-ml-service) folder.
+Instructions to build an use are inside the [ml-service-implementations/ads-ml-service](ml-service-implementations/ads-ml-service/README.md) folder.
 
 ## Open Prediction Service Java Client SDK
 
