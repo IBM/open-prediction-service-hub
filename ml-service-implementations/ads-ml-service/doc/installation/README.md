@@ -6,10 +6,10 @@ OPS is a containerized service. Installation consist of two steps:
 
 ## Build image
 
-Build the image in 3 lines:
+Build the image in 3 lines. Click the clone button on github page to find `PROJECT_URL` 
 ```shell script
 # Clone the project
-git clone git@github.ibm.com:dba/automation-decision-services-extensions.git automation-decision-services-extensions
+git clone PROJECT_URL automation-decision-services-extensions
 
 # Build image
 cd automation-decision-services-extensions/open-prediction-service/ml-service-implementations/ads-ml-service
