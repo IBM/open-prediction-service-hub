@@ -85,10 +85,12 @@ docker ps | grep open-prediction
 Then you will see some thing like
 ![OpenApi](ops_docker.png)
 
-### 2. Kubernetes cluster
+### 2. Kubernetes/OpenShift cluster
 
-This part is not designed to offer a fine tuned ops cluster in kubernetes, but
+This part is not designed to offer a fine tuned ops cluster, but
 a minimum example of working ops instance.
+
+#### 2.1 kubernetes
 
 Suppose you have a working kubernetes cluster and have configured kubectl
 properly. To verify that, run `kubectl cluster-info`, your nodes should be listed.
@@ -114,3 +116,24 @@ Then you will see some thing like
 ![OpenApi](get_service.png)
 
 ads-ml-service is available at `<none>` (replace it by your cluster address) on port `30000`.
+
+#### 2.1 OpenShift
+
+Although instances can be created in exactly the same way as using kubectl, 
+the cli tool offered by OpenShift really simplifies the entire workflow.
+
+Create a working instance in 3 lines:
+```shell script
+# 1.1 Create kubernetes namespace for OPS
+oc new-project ads-ml-service
+# 1.2 If namespace already exists
+oc project ads-ml-service
+
+# 2. Create kubernetes service and associated deployment for OPS
+oc new-app --name ads-ml-service {{IMAGE_URL}}
+
+# Expose service to external clients (If ADS client is not in the same cluster)
+oc expose service/ads-ml-service
+```
+
+{{IMAGE_URL}} is the same as [kubernetes](#2.1-kubernetes)
