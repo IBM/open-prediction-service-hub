@@ -115,7 +115,17 @@ kubectl get service ads-ml-service-service
 Then you will see some thing like
 ![OpenApi](get_service.png)
 
-ads-ml-service is available at `<none>` (replace it by your cluster address) on port `30000`.
+ads-ml-service is available at `<none>` (if it works, `<none>` is replaced by a valid IP address) on port `30000`.
+
+If that does not work, try `kubectl get nodes -o yaml | grep external-ip`
+
+you will get something like:
+
+```shell script
+ibm-cloud.kubernetes.io/external-ip: xxx.xxx.xxx.xxx
+```
+
+ads-ml-service is available at `xxx.xxx.xxx.xxx` on port `30000`.
 
 #### 2.1 OpenShift
 
