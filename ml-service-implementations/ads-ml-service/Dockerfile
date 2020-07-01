@@ -33,9 +33,15 @@ RUN \
     echo "${YELLOW}[INFO] Preparing examples.${NC}" && \
     python3 src/runtime/init.py && \
     cp -a /tmp/repo/src/runtime/. ${APP_HOME} && \
-    rm -rf /tmp/repo && \
-    adduser --quiet --system --no-create-home --group ops && \
-    chown --recursive ops:ops ${APP_HOME}
+    rm -rf /tmp/repo
+
+
+# Security settings
+# OpenShift inserted users is in root group (gid=0)
+RUN \
+    adduser --quiet --shell /bin/false --gid 0 --system ops && \
+    chown --recursive ops:root ${APP_HOME} && \
+    chmod --recursive g=u ${APP_HOME}
 
 
 USER ops
