@@ -146,4 +146,4 @@ oc new-app --name ads-ml-service {{IMAGE_URL}}
 oc expose service/ads-ml-service
 ```
 
-`{{IMAGE_URL}} is the same as [kubernetes](#21-kubernetes)
+`{{IMAGE_URL}}` is the same as [kubernetes](#21-kubernetes)
