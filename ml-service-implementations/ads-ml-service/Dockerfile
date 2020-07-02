@@ -33,9 +33,17 @@ RUN \
     echo "${YELLOW}[INFO] Preparing examples.${NC}" && \
     python3 src/runtime/init.py && \
     cp -a /tmp/repo/src/runtime/. ${APP_HOME} && \
-    rm -rf /tmp/repo && \
-    adduser --quiet --system --no-create-home --group ops && \
-    chown --recursive ops:ops ${APP_HOME}
+    cd ${APP_HOME} && \
+    rm -rf /tmp/repo
+
+
+# Security settings
+# OpenShift inserted users is in root group (gid=0)
+RUN \
+    adduser --quiet --shell /bin/false --gid 0 --system ops && \
+    chown --recursive ops:root ${APP_HOME} && \
+    # Give inserted user permissions
+    chmod --recursive g=u ${APP_HOME}
 
 
 USER ops
@@ -47,11 +55,15 @@ EXPOSE 8080
 #   Uvicorn worker class is required by Fastapi
 #   Container schedulers typically expect logs to come out on stdout/stderr, thus gunicorn is configured to do so
 #   Gunicorn needs to store its temporary file in memory (e.g. /dev/shm)
-ENTRYPOINT gunicorn \
-            --worker-class=uvicorn.workers.UvicornWorker \
-            --log-file=- \
-            --worker-tmp-dir=/dev/shm \
-            --chdir=${APP_HOME} \
-            --bind=:8080 \
-            --config=file:gunicorn.init.py \
-            asgi:app
+ENTRYPOINT \
+    [ \
+        "gunicorn", \
+            "--worker-class=uvicorn.workers.UvicornWorker", \
+            "--log-file=-", \
+            "--worker-tmp-dir=/dev/shm", \
+            "--config=file:gunicorn.init.py", \
+            "asgi:app" \
+    ]
+
+# Default port is 8080
+CMD ["--bind=:8080"]
