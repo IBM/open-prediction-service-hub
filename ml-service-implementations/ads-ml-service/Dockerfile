@@ -34,7 +34,8 @@ RUN \
     python3 src/runtime/init.py && \
     cp -a /tmp/repo/src/runtime/. ${APP_HOME} && \
     cd ${APP_HOME} && \
-    rm -rf /tmp/repo
+    rm -rf /tmp/repo && \
+    rm -rf /etc/mysql
 
 
 # Security settings
