@@ -29,12 +29,12 @@ and you will see:
 ## Register image to image registry (Optional for local deployment)
 
 Suppose you have a docker hub account 
-(e.g. username: `fake_username`, email: `fake_email@example.com`)
+(e.g. username: `your_username`, email: `your_email@example.com`)
 
 Images in public registry need to contain user name. Add new tags for the image.
 ```shell script
-docker tag open-prediction:0.1.0 fake_username/open-prediction:0.1.0
-docker tag open-prediction:latest fake_username/open-prediction:latest
+docker tag open-prediction:0.1.0 your_username/open-prediction:0.1.0
+docker tag open-prediction:latest your_username/open-prediction:latest
 ```
 
 To verify, run
@@ -47,7 +47,7 @@ Then you will see some thing like
 
 Login your docker hub account
 ```shell script
-docker login --username=fake_username --email=fake_email@example.com
+docker login --username=your_username --email=your_email@example.com
 ```
 
 Then you will see some thing like
@@ -58,8 +58,8 @@ Login Succeeded
 
 Finally, push image to docker hub.
 ```shell script
-docker push fake_username/open-prediction:0.1.0
-docker push fake_username/open-prediction:latest
+docker push your_username/open-prediction:0.1.0
+docker push your_username/open-prediction:latest
 ```
 
 Your image is now available for non local environments.
