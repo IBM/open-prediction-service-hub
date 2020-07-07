@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM debian:buster-backports
 
 
 # set EML_RETRAIN_MODELS to always retrain all example models
@@ -15,13 +15,18 @@ ENV CACHE_TTL=20
 
 
 # Install dependences
+# python3 -m pip is recommanded way of using pip
 COPY requirements.txt requirements-ml.txt /tmp/repo/
 RUN \
     echo "${YELLOW}[INFO] Preparing installation.${NC}" && \
     cd /tmp/repo && \
-    pip3 install --no-cache-dir --quiet --upgrade pip && \
-    pip3 install --no-cache-dir --quiet --requirement requirements-ml.txt && \
-    pip3 install --no-cache-dir --quiet --requirement requirements.txt
+    apt-get -qq update && \
+    apt-get -qq install -y python3.7 && \
+    apt-get -qq install -y python3-pip && \
+    rm -rf /var/lib/apt/lists/* && \
+    python3 -m pip install --no-cache-dir --quiet --upgrade pip && \
+    python3 -m pip install --no-cache-dir --quiet --requirement requirements-ml.txt && \
+    python3 -m pip install --no-cache-dir --quiet --requirement requirements.txt
 
 
 # Install this project
