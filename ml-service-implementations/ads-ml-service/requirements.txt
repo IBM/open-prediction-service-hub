@@ -6,7 +6,8 @@ pandas
 pydantic
 
 ## Web interface
-python-multipart          # file service
+python-multipart          # File service
+bcrypt                    # Password hash
 fastapi
 uvicorn
 gunicorn
