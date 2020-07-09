@@ -21,11 +21,13 @@ import pytest
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from ..db.base import Base
+from ..utils.utils import random_string
+from ...db.base import Base
+from ...schemas.user import UserCreate
 
 
-# prepare in memory sqlite database for testing
-@pytest.fixture(scope='session')
+# In memory sqlite database for testing
+@pytest.fixture(scope='module')
 def db() -> Generator:
     engine = create_engine('sqlite://', connect_args={"check_same_thread": False})
     Base.metadata.create_all(bind=engine)
@@ -39,3 +41,11 @@ def db() -> Generator:
         yield db
     finally:
         db.close()
+
+
+# Data for user create
+@pytest.fixture
+def random_user() -> UserCreate:
+    username = random_string()
+    password = random_string()
+    return UserCreate(username=username, password=password)
