@@ -1,0 +1,612 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Open Prediction Service",
+    "version": "v1"
+  },
+  "paths": {
+    "/status": {
+      "get": {
+        "tags": [
+          "Status"
+        ],
+        "summary": "Get Server Status",
+        "operationId": "get_server_status",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models": {
+      "get": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Get Models (REQUIRED)",
+        "description": "Returns the list of ML models.",
+        "operationId": "get_models",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Models"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Add Model",
+        "operationId": "add_model",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/ModelFile"
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/HTTPValidationError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Models"
+        ],
+        "summary": "Delete Model",
+        "operationId": "delete_model",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ModelName"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Model Version",
+              "type": "string"
+            },
+            "name": "model_version",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/HTTPValidationError"
+          }
+        }
+      }
+    },
+    "/invocations": {
+      "post": {
+        "tags": [
+          "Runtime"
+        ],
+        "summary": "Predict (REQUIRED)",
+        "operationId": "post_invocations",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Invocation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Prediction"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/HTTPValidationError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ServerStatus": {
+        "title": "ServerStatus",
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string",
+            "description": "Status of the service",
+            "enum": [
+              "OK",
+              "ERROR"
+            ]
+          },
+          "error": {
+            "title": "Error Message",
+            "type": "string",
+            "description": "Error if status in error"
+          }
+        }
+      },
+      "Models": {
+        "title": "Models",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ModelSchema"
+        }
+      },
+      "ModelSchema": {
+        "title": "ModelSchema",
+        "description": "Model independent information",
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of model"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string",
+            "description": "Version of model"
+          },
+          "deployments": {
+            "title": "Deployments",
+            "description": "List of Deployments if required",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Deployment"
+            }
+          },
+          "method_name": {
+            "title": "Method Name",
+            "type": "string",
+            "description": "Name of method. (e.g predict, predict_proba)"
+          },
+          "input_schema": {
+            "title": "Input Schema",
+            "description": "Input schema of ml model",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            }
+          },
+          "output_schema": {
+            "$ref": "#/components/schemas/OutputSchema"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          }
+        }
+      },
+      "Deployment": {
+        "title": "Deployment",
+        "description": "Deployment of a model",
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Deployment name that could be used for prediction (can be an url)"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string",
+            "description": "Deployment status"
+          },
+          "createdAt": {
+            "title": "Type",
+            "type": "string",
+            "description": "Deployment creation date"
+          },
+          "lastUpdatedAt": {
+            "title": "Type",
+            "type": "string",
+            "description": "Deployment last updated date"
+          }
+        }
+      },
+      "Feature": {
+        "title": "Feature",
+        "required": [
+          "name",
+          "order",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Feature name"
+          },
+          "order": {
+            "title": "Order",
+            "type": "integer",
+            "description": "Position of feature"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string",
+            "description": "Numpy type of feature"
+          }
+        },
+        "description": "Feature of machine learning model\n:param name: name of the feature\n:param order: the position of the feature in method signature\n:param type: type of feature. Can be python type or numpy type"
+      },
+      "OutputSchema": {
+        "title": "Output Schema",
+        "description": "Output schema of ml model",
+        "required": [
+          "attributes"
+        ],
+        "type": "object",
+        "properties": {
+          "attributes": {
+            "title": "Attributes",
+            "type": "array",
+            "items": {
+              "required": [
+                "name",
+                "type"
+              ],
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Name",
+                  "description": "Attribute name",
+                  "type": "string"
+                },
+                "type": {
+                  "title": "Type",
+                  "description": "Attribute type",
+                  "enum": [
+                    "int",
+                    "float",
+                    "string",
+                    "[Probability]"
+                  ],
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Metadata": {
+        "title": "Metadata",
+        "description": "Additional information for ml model",
+        "required": [
+          "description",
+          "author",
+          "trained_at",
+          "metrics"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string",
+            "description": "Description of model"
+          },
+          "author": {
+            "title": "Author",
+            "type": "string",
+            "description": "Author of model"
+          },
+          "trained_at": {
+            "title": "Trained At",
+            "type": "string",
+            "description": "Training date"
+          },
+          "class_names": {
+            "title": "Class Names",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Lookup table for class index <-> class name"
+          },
+          "metrics": {
+            "title": "Metrics",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Metric"
+            },
+            "description": "Metrics for model"
+          }
+        }
+      },
+      "Metric": {
+        "title": "Metric",
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of metric"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string",
+            "description": "Value of metric"
+          }
+        }
+      },
+      "ModelFile": {
+        "title": "ModelFile",
+        "required": [
+          "file"
+        ],
+        "type": "object",
+        "properties": {
+          "file": {
+            "title": "File",
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "Invocation": {
+        "title": "Invocation",
+        "description": "Invocation captures all information needed for service invocation",
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ModelInvocation"
+              },
+              {
+                "$ref": "#/components/schemas/DeploymentInvocation"
+              }
+            ]
+          },
+          {
+            "type": "object",
+            "required": [
+              "params"
+            ],
+            "properties": {
+              "params": {
+                "title": "Params",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Parameter"
+                },
+                "description": "Model parameters"
+              }
+            }
+          }
+        ],
+        "example": {
+          "deployment_name": "example deployment name",
+          "params": [
+            {
+              "name": "sepal_length",
+              "value": 5
+            },
+            {
+              "name": "sepal_width",
+              "value": 3
+            }
+          ]
+        }
+      },
+      "ModelInvocation": {
+        "title": "Model Invocation",
+        "description": "Invocation via a model name",
+        "required": [
+          "model_name"
+        ],
+        "type": "object",
+        "properties": {
+          "model_name": {
+            "title": "Model Name",
+            "type": "string",
+            "description": "Name of model"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string",
+            "description": "Version of model"
+          }
+        }
+      },
+      "DeploymentInvocation": {
+        "title": "Deployment Invocation",
+        "description": "Invocation via a model name",
+        "required": [
+          "deployment_name"
+        ],
+        "type": "object",
+        "properties": {
+          "deployment_name": {
+            "title": "Model Name",
+            "type": "string",
+            "description": "Name of model"
+          }
+        }
+      },
+      "Parameter": {
+        "title": "Parameter",
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of the feature"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string",
+            "description": "Value of the feature"
+          }
+        },
+        "description": "Parameter for ml model invocation"
+      },
+      "Prediction": {
+        "title": "Prediction",
+        "required": [
+          "prediction"
+        ],
+        "type": "object",
+        "properties": {
+          "prediction": {
+            "title": "Prediction",
+            "type": "string",
+            "description": "Model output for Classification/Regression"
+          },
+          "probabilities": {
+            "title": "Probabilities",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Probability"
+            },
+            "description": "Probabilities for classification result"
+          }
+        },
+        "description": "Ml output for model.predict(array_like) and model.predict_proba(array_like)"
+      },
+      "Probability": {
+        "title": "Probability",
+        "required": [
+          "class_index",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "class_name": {
+            "title": "Class Name",
+            "type": "string"
+          },
+          "class_index": {
+            "title": "Class Index",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "ModelName": {
+        "required": true,
+        "schema": {
+          "title": "Model Name",
+          "type": "string"
+        },
+        "name": "model_name",
+        "in": "query"
+      }
+    },
+    "requestBodies": {
+      "ModelFile": {
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "$ref": "#/components/schemas/ModelFile"
+            }
+          }
+        },
+        "required": true
+      }
+    },
+    "responses": {
+      "HTTPValidationError": {
+        "description": "Validation Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "title": "HTTPValidationError",
+              "type": "object",
+              "properties": {
+                "detail": {
+                  "title": "Detail",
+                  "type": "array",
+                  "items": {
+                    "title": "ValidationError",
+                    "required": [
+                      "loc",
+                      "msg",
+                      "type"
+                    ],
+                    "type": "object",
+                    "properties": {
+                      "loc": {
+                        "title": "Location",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "msg": {
+                        "title": "Message",
+                        "type": "string"
+                      },
+                      "type": {
+                        "title": "Error Type",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
