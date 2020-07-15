@@ -14,12 +14,17 @@ ENV MODEL_STORAGE=${APP_HOME}/storage
 ENV MODEL_CACHE_SIZE=16
 ENV CACHE_TTL=20
 
+RUN \
+    echo "Acquire::http::Pipeline-Depth 0; \
+Acquire::http::No-Cache true; \
+Acquire::BrokenProxy    true;" > /etc/apt/apt.conf.d/99fixbadproxy
 
 # Prepare python env
 RUN \
+    rm -rf /var/lib/apt/lists/* && \
     apt-get -qq update && \
-    apt-get -qq --assume-yes install python3.7-dev && \
-    apt-get -qq --assume-yes install python3-pip && \
+    apt-get -qq --assume-yes --fix-missing install python3.7-dev && \
+    apt-get -qq --assume-yes --fix-missing install python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
 
