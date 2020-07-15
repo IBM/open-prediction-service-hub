@@ -2,7 +2,7 @@
   "openapi": "3.0.2",
   "info": {
     "title": "Open Prediction Service",
-    "version": "1"
+    "version": "v1"
   },
   "paths": {
     "/status": {
@@ -489,7 +489,33 @@
             "description": "Model parameters"
           }
         },
-        "description": "RequestBody captures all information needed for model invocation"
+        "description": "RequestBody captures all information needed for model invocation",
+        "example": {
+          "model_name": "miniloan-linear-svc",
+          "model_version": "v0",
+          "params": [
+            {
+                "name": "creditScore",
+                "value": "5"
+            },
+            {
+                "name": "income",
+                "value": "5"
+            },
+            {
+                "name": "loanAmount",
+                "value": "5"
+            },
+            {
+                "name": "monthDuration",
+                "value": "5"
+            },
+            {
+                "name": "rate",
+                "value": "3"
+            }
+          ]
+        }
       },
       "ServerStatus": {
         "title": "ServerStatus",
