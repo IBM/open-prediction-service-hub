@@ -6,7 +6,7 @@ import os
 import json
 from jsonschema import validate
 
-SPEC_RELATIVE_PATH = './../openapi.json'
+SPEC_RELATIVE_PATH = './../open-prediction-service.json'
 
 class TestOPSApi():
 
@@ -27,7 +27,6 @@ class TestOPSApi():
 
         response = requests.get(request_url, verify=False)
         data = response.json()
-        print(data)
 
         spec = self.get_spec()
 
@@ -49,7 +48,7 @@ class TestOPSApi():
         body_filename = os.path.join(current_path,'./resources/post_invocation_body.json')
         if not os.path.exists(os.path.dirname(body_filename)):
             os.makedirs(os.path.dirname(body_filename), exist_ok=True)
-            example_data = spec["components"]["schemas"]["Invocation"]["example"]
+            example_data = spec["components"]["schemas"]["RequestBody"]["example"]
             with open(body_filename, "w") as f:
                 f.write(json.dumps(example_data, indent=4))
             
@@ -61,6 +60,8 @@ class TestOPSApi():
 
             input_schema = spec["paths"]["/invocations"]["post"]["requestBody"]["content"]["application/json"]["schema"]
             input_schema["components"] = spec["components"]
+
+            validate(instance = data, schema = input_schema)
 
             response = requests.post(request_url, data=json.dumps(data), verify=False)
             data = response.json()
