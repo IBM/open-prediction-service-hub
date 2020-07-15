@@ -2,16 +2,16 @@
   "openapi": "3.0.2",
   "info": {
     "title": "Open Prediction Service",
-    "version": "1"
+    "version": "2"
   },
   "paths": {
     "/status": {
       "get": {
         "tags": [
-          "Admin"
+          "Discovery"
         ],
         "summary": "Get Server Status",
-        "operationId": "get_server_status_status_get",
+        "operationId": "get_status",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -29,106 +29,18 @@
     "/models": {
       "get": {
         "tags": [
-          "Admin"
+          "Discovery"
         ],
-        "summary": "Get Models",
+        "summary": "List Models",
         "description": "Returns the list of ML models.",
-        "operationId": "get_models_models_get",
+        "operationId": "list_models",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Get Models Models Get",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MLSchema"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "summary": "Add Model",
-        "operationId": "add_model_models_post",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_add_model_models_post"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Admin"
-        ],
-        "summary": "Remove Model",
-        "operationId": "remove_model_models_delete",
-        "parameters": [
-          {
-            "required": true,
-            "schema": {
-              "title": "Model Name",
-              "type": "string"
-            },
-            "name": "model_name",
-            "in": "query"
-          },
-          {
-            "required": false,
-            "schema": {
-              "title": "Model Version",
-              "type": "string"
-            },
-            "name": "model_version",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/MachineLearningModels"
                 }
               }
             }
@@ -136,13 +48,13 @@
         }
       }
     },
-    "/invocations": {
+    "/prediction": {
       "post": {
         "tags": [
-          "ML"
+          "Runtime"
         ],
         "summary": "Predict",
-        "operationId": "predict_invocations_post",
+        "operationId": "prediction",
         "requestBody": {
           "content": {
             "application/json": {
@@ -159,7 +71,8 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Prediction"
+                  "type": "object",
+                  "additionalProperties": true
                 }
               }
             }
@@ -180,17 +93,61 @@
   },
   "components": {
     "schemas": {
-      "Body_add_model_models_post": {
-        "title": "Body_add_model_models_post",
+      "MachineLearningModels": {
+        "title": "List of Machine Learning Models",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MachineLearningModel"
+        }
+      },
+      "MachineLearningModel": {
+        "title": "Machine Learning Model",
         "required": [
-          "file"
+          "id",
+          "name",
+          "input_schema",
+          "output_schema",
+          "created_at",
+          "modified_at"
         ],
         "type": "object",
         "properties": {
-          "file": {
-            "title": "File",
+          "id": {
+            "title": "ID",
             "type": "string",
-            "format": "binary"
+            "description": "ID of model"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of model"
+          },
+          "input_schema": {
+            "title": "Input Schema",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            },
+            "description": "Input schema of ml model"
+          },
+          "output_schema": {
+            "title": "Output Schema",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OutputSchema"
+              }
+            ],
+            "description": "Output schema of ml model"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "date of the creation of the model"
+          },
+          "modified_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "date of the update of the model"
           }
         }
       },
@@ -234,166 +191,43 @@
           }
         }
       },
-      "MLSchema": {
-        "title": "MLSchema",
-        "required": [
-          "name",
-          "version",
-          "method_name",
-          "input_schema",
-          "output_schema",
-          "metadata"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "title": "Name",
-            "type": "string",
-            "description": "Name of model"
-          },
-          "version": {
-            "title": "Version",
-            "type": "string",
-            "description": "Version of model"
-          },
-          "method_name": {
-            "title": "Method Name",
-            "type": "string",
-            "description": "Name of method. (e.g predict, predict_proba)"
-          },
-          "input_schema": {
-            "title": "Input Schema",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Feature"
-            },
-            "description": "Input schema of ml model"
-          },
-          "output_schema": {
-            "title": "Output Schema",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/OutputSchema"
-              }
-            ],
-            "description": "Output schema of ml model"
-          },
-          "metadata": {
-            "title": "Metadata",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Metadata"
-              }
-            ],
-            "description": "Additional information for ml model"
-          }
-        },
-        "description": "Model independent information"
-      },
-      "Metadata": {
-        "title": "Metadata",
-        "required": [
-          "description",
-          "author",
-          "trained_at",
-          "metrics"
-        ],
-        "type": "object",
-        "properties": {
-          "description": {
-            "title": "Description",
-            "type": "string",
-            "description": "Description of model"
-          },
-          "author": {
-            "title": "Author",
-            "type": "string",
-            "description": "Author of model"
-          },
-          "trained_at": {
-            "title": "Trained At",
-            "type": "string",
-            "description": "Training date"
-          },
-          "class_names": {
-            "title": "Class Names",
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Lookup table for class index <-> class name"
-          },
-          "metrics": {
-            "title": "Metrics",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Metric"
-            },
-            "description": "Metrics for model"
-          }
-        }
-      },
-      "Metric": {
-        "title": "Metric",
-        "required": [
-          "name",
-          "value"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "title": "Name",
-            "type": "string",
-            "description": "Name of metric"
-          },
-          "value": {
-            "title": "Value",
-            "type": "string",
-            "description": "Value of metric"
-          }
-        }
-      },
-      "OutputAttr": {
-        "title": "OutputAttr",
-        "required": [
-          "name",
-          "type"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "title": "Name",
-            "type": "string",
-            "description": "Attribute name"
-          },
-          "type": {
-            "title": "Type",
-            "enum": [
-              "int",
-              "float",
-              "string",
-              "[Probability]"
-            ],
-            "type": "string",
-            "description": "Attribute type"
-          }
-        }
-      },
       "OutputSchema": {
         "title": "OutputSchema",
+        "type": "object",
+        "additionalProperties": true,
+        "example": {
+          "prediction": {
+            "type": "string"
+          },
+          "probability": {
+            "type": "array",
+            "items": "double"
+          }
+        }
+      },
+      "RequestBody": {
+        "title": "RequestBody",
         "required": [
-          "attributes"
+          "deployment_id",
+          "params"
         ],
         "type": "object",
         "properties": {
-          "attributes": {
-            "title": "Attributes",
+          "deployment_id": {
+            "title": "deployment id",
+            "type": "string",
+            "description": "id of the deployment to call"
+          },
+          "params": {
+            "title": "Params",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/OutputAttr"
-            }
+              "$ref": "#/components/schemas/Parameter"
+            },
+            "description": "Model parameters"
           }
-        }
+        },
+        "description": "RequestBody captures all information needed for model invocation"
       },
       "Parameter": {
         "title": "Parameter",
@@ -416,92 +250,26 @@
         },
         "description": "Parameter for ml model invocation"
       },
-      "Prediction": {
-        "title": "Prediction",
-        "required": [
-          "prediction"
-        ],
-        "type": "object",
-        "properties": {
-          "prediction": {
-            "title": "Prediction",
-            "type": "string",
-            "description": "Model output for Classification/Regression"
-          },
-          "probabilities": {
-            "title": "Probabilities",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Probability"
-            },
-            "description": "Probabilities for classification result"
-          }
-        },
-        "description": "Ml output for model.predict(array_like) and model.predict_proba(array_like)"
-      },
-      "Probability": {
-        "title": "Probability",
-        "required": [
-          "class_index",
-          "value"
-        ],
-        "type": "object",
-        "properties": {
-          "class_name": {
-            "title": "Class Name",
-            "type": "string"
-          },
-          "class_index": {
-            "title": "Class Index",
-            "type": "integer"
-          },
-          "value": {
-            "title": "Value",
-            "type": "number"
-          }
-        }
-      },
-      "RequestBody": {
-        "title": "RequestBody",
-        "required": [
-          "model_name",
-          "model_version",
-          "params"
-        ],
-        "type": "object",
-        "properties": {
-          "model_name": {
-            "title": "Model Name",
-            "type": "string",
-            "description": "Name of model"
-          },
-          "model_version": {
-            "title": "Model Version",
-            "type": "string",
-            "description": "Version of model"
-          },
-          "params": {
-            "title": "Params",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Parameter"
-            },
-            "description": "Model parameters"
-          }
-        },
-        "description": "RequestBody captures all information needed for model invocation"
-      },
       "ServerStatus": {
         "title": "ServerStatus",
         "required": [
-          "model_count"
+          "status"
         ],
         "type": "object",
         "properties": {
-          "model_count": {
-            "title": "Model Count",
-            "type": "integer",
-            "description": "Number of ml models in local provider"
+          "status": {
+            "title": "Status",
+            "type": "string",
+            "description": "Status of the service",
+            "enum": [
+              "OK",
+              "ERROR"
+            ]
+          },
+          "error": {
+            "title": "Error Message",
+            "type": "string",
+            "description": "Error if status in error"
           }
         }
       },
