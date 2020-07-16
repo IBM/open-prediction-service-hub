@@ -5,6 +5,27 @@
     "version": "2"
   },
   "paths": {
+    "/capabilities": {
+      "get": {
+        "tags": [
+          "Discovery"
+        ],
+        "summary": "Get Server Capabilities",
+        "operationId": "get_capabilities",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/status": {
       "get": {
         "tags": [
@@ -46,14 +67,73 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Manage"
+        ],
+        "summary": "Add a trained Model",
+        "description": "Adds a trained mode in the form of a trained model file",
+        "operationId": "add_model",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningModel"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Manage"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          }
+        }
       }
     },
-    "/prediction": {
+    "/train/{model_id}": {
+      "post": {
+        "tags": [
+          "Train"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "model_id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningDeployment"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predict": {
       "post": {
         "tags": [
           "Runtime"
         ],
-        "summary": "Predict",
+        "summary": "Call Prediction of specified deployment",
         "operationId": "prediction",
         "requestBody": {
           "content": {
@@ -93,6 +173,39 @@
   },
   "components": {
     "schemas": {
+      "MachineLearningDeployment": {
+        "title": "Machine Learning Deployment",
+        "required": [
+          "id",
+          "name",
+          "status",
+          "model_id",
+          "deployed_at"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "ID",
+            "type": "string",
+            "description": "ID of Deployment"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of Deployment"
+          },
+          "model_id": {
+            "title": "Name",
+            "type": "string",
+            "description": "Id of Model this Deployment is from"
+          },
+          "deployed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "date of the deployment"
+          }
+        }
+      },
       "MachineLearningModels": {
         "title": "List of Machine Learning Models",
         "type": "array",
@@ -105,8 +218,6 @@
         "required": [
           "id",
           "name",
-          "input_schema",
-          "output_schema",
           "created_at",
           "modified_at"
         ],
@@ -270,6 +381,25 @@
             "title": "Error Message",
             "type": "string",
             "description": "Error if status in error"
+          }
+        }
+      },
+      "Capabilities": {
+        "title": "Capabilities",
+        "required": [
+          "capabilities"
+        ],
+        "type": "object",
+        "properties": {
+          "capabilities": {
+            "title": "Capabilities",
+            "type": "string",
+            "description": "Capabilities of the service",
+            "enum": [
+              "CONSUME",
+              "MANAGE",
+              "TRAIN"
+            ]
           }
         }
       },
