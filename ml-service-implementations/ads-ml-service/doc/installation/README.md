@@ -3,7 +3,7 @@
 OPS is a containerized service. Installation consist of three steps: 
 1. Building an image from source code.
 2. Registering image to image registry (Optional for local deployment).
-3. Create-ing services using registered/local image.
+3. Creating services using registered/local image.
 
 ## Build image
 
