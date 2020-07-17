@@ -9,6 +9,9 @@ notifications:
 services:
   - docker
 
+env:
+  - MODEL_STORAGE=/tmp
+
 before_install:
   - cd ml-service-implementations/ads-ml-service
   - python3 -m pip install --quiet --upgrade pip
