@@ -20,6 +20,7 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 from pathlib import Path
+from typing import Text
 
 from pydantic import Field, validator, BaseSettings
 
@@ -28,6 +29,13 @@ class ServerConfiguration(BaseSettings):
     """
     Open Prediction Service configuration
     """
+    API_VI_STR: Text = Field('v1')
+    SECRET_KEY: Text = Field('74df9eed3d485bc2c08e4bd0b68ffa776f448be669f2e4891a50b9cc87f75b54')
+    DATABASE_NAME: Text = Field('EML.db')
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(120)
+
+    RETRAIN_MODELS: bool = False  # retrain example models
+
     MODEL_STORAGE: Path = Field(..., description='Directory where OPS store ml models')
     MODEL_CACHE_SIZE: int = Field(16, description='The number of ml models cached in service')
     CACHE_TTL: int = Field(20, description='TTL of cache')
