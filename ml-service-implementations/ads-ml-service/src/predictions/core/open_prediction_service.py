@@ -16,15 +16,18 @@
 
 
 import logging
+import pickle
 from typing import Text, Any, Dict, NoReturn, Optional, List, Tuple
 from threading import Lock
 
 from expiringdict import ExpiringDict
+from predictions.schemas.binary_ml_model import BinaryMLModelCreate
+from predictions.schemas.model_config import ModelConfigCreate
 from sqlalchemy.orm import Session
 
-from ..db.crud import create_model, delete_model, read_model, read_model_schemas, count_models
-from ..schemas.model import MLSchema
+from ..schemas.model import MLSchema, ModelCreate
 from ..core.model import Model
+from .. import crud
 
 
 class OpenPredictionService:
@@ -45,14 +48,26 @@ class OpenPredictionService:
     def add_model(
             self, m: Model
     ) -> None:
-        create_model(self.db, m)
+        binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(m.model))
+        config_in = ModelConfigCreate(**m.info.dict())
+        model_in = ModelCreate(binary=binary_in, config=config_in, name=m.info.name, version=m.info.version)
+        crud.crud_model.model.create(self.db, obj_in=model_in)
 
     def remove_model(
             self,
             model_name: Text,
             model_version: Optional[Text] = None
     ) -> None:
-        delete_model(self.db, model_name=model_name, model_version=model_version)
+        if model_version is not None:
+            m = crud.model.get_by_name_and_ver(self.db, name=model_name, version=model_version)
+            if m is not None:
+                crud.model.delete(self.db, id=m.id)
+        else:
+            # Delete all versions of this model
+            models = crud.model.get_all(self.db)
+            for m in models:
+                if m.name == model_name:
+                    crud.model.delete(self.db, id=m.id)
 
     def get_model(
             self,
@@ -66,7 +81,9 @@ class OpenPredictionService:
             m = OpenPredictionService.MODEL_CACHE[key]
         except KeyError:
             logger.debug(f'model {key} cache miss')
-            m = read_model(self.db, model_name=model_name, model_version=model_version)
+            model = crud.model.get_by_name_and_ver(
+                self.db, name=model_name, version=model_version)
+            m = Model(model=pickle.loads(model.binary.model_b64), info=MLSchema(**model.config.configuration))
             OpenPredictionService.MODEL_CACHE.__setitem__(key=key, value=m)
         return m
 
@@ -77,12 +94,12 @@ class OpenPredictionService:
             configs = OpenPredictionService.MODEL_CONFIGS_CACHE['model_configs']
         except KeyError:
             logger.debug('model_configs cache miss')
-            configs = read_model_schemas(self.db)
+            configs = [config.configuration for config in crud.model_config.get_all(self.db)]
             OpenPredictionService.MODEL_CONFIGS_CACHE.__setitem__(key='model_configs', value=configs)
         return configs
 
     def count_models(self) -> int:
-        return count_models(self.db)
+        return crud.model_config.count(self.db)
 
     def invoke(
             self,
