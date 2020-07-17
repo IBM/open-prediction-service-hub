@@ -15,39 +15,58 @@
 #
 
 
-from typing import Text
+from typing import Generator
 
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import sessionmaker
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
 
-from ..core.configuration import ServerConfiguration, get_config
-from ..db.base import Base
+from ..core.configuration import get_config
 from ..core.open_prediction_service import OpenPredictionService
+from ..db.session import SessionLocal
 
-DATABASE_NAME: Text = 'EML.db'
+# reusable_oauth2: OAuth2PasswordBearer = OAuth2PasswordBearer(
+#     tokenUrl=f'{get_config().API_VI_STR}/login/access-token'
+# )
+
+reusable_oauth2: OAuth2PasswordBearer = OAuth2PasswordBearer(
+    tokenUrl=f'v1/login/access-token'
+)
+
+
+def get_db() -> Generator[Session, None , None]:
+    db = None
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()
 
 
 # Dependency
-def get_ml_service() -> OpenPredictionService:
-    engine: Engine = create_engine(
-        f'sqlite:///{ServerConfiguration().MODEL_STORAGE.joinpath(DATABASE_NAME)}',
-        connect_args={"check_same_thread": False}
+def get_ml_service(db: Session = Depends(get_db)) -> OpenPredictionService:
+    mls: OpenPredictionService = OpenPredictionService(
+        db=db,
+        model_cache_size=get_config().MODEL_CACHE_SIZE,
+        cache_ttl=get_config().CACHE_TTL
     )
-    Base.metadata.create_all(bind=engine)
-    sm_instance: sessionmaker = sessionmaker(
-        autocommit=False,
-        autoflush=False,
-        bind=engine
-    )
-    db = None
-    try:
-        db = sm_instance()
-        mls: OpenPredictionService = OpenPredictionService(
-            db=db,
-            model_cache_size=get_config().MODEL_CACHE_SIZE,
-            cache_ttl=get_config().CACHE_TTL
-        )
-        yield mls
-    finally:
-        db.close()
+    yield mls
+
+
+# def get_current_user(
+#     db: Session = Depends(get_db), token: Text = Depends(reusable_oauth2)
+# ):
+#     try:
+#         payload = jwt.decode(
+#             token, get_config().SECRET_KEY, algorithms=[security.ALGORITHM]
+#         )
+#         username: str = payload.get('sub')
+#         if username is None:
+#             raise credentials_exception
+#         token_data = TokenData(username=username)
+#     except PyJWTError:
+#         raise credentials_exception
+#     user = get_user(fake_users_db, username=token_data.username)
+#     if user is None:
+#         raise credentials_exception
+#     return user
