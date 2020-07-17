@@ -15,5 +15,4 @@
 #
 
 
-from .main import app
-from .main import __version__
+from .version import __version__

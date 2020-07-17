@@ -23,7 +23,7 @@ from starlette.responses import RedirectResponse
 from predictions.api.api_v1.api import api_router
 
 
-__version__: str = '0.1.0'
+from predictions.version import __version__
 
 app: FastAPI = FastAPI(
     version=__version__,
