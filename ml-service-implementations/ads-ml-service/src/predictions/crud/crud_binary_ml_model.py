@@ -15,7 +15,23 @@
 #
 
 
-from .crud_user import user
-from .crud_model_config import model_config
-from .crud_binary_ml_model import binary_ml_model
-from .crud_model import model
+from sqlalchemy.orm import Session
+
+from .base import CRUDBase
+from ..models.binary_ml_model import BinaryMLModel
+from ..schemas.binary_ml_model import BinaryMLModelCreate, BinaryMLModelUpdate
+
+
+class CRUDBinaryMLModel(CRUDBase[BinaryMLModel, BinaryMLModelCreate, BinaryMLModelUpdate]):
+
+    def create(self, db: Session, *, obj_in: BinaryMLModelCreate) -> BinaryMLModel:
+        db_obj = BinaryMLModel(
+           model_b64=obj_in.model_b64
+        )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+
+binary_ml_model = CRUDBinaryMLModel(BinaryMLModel)

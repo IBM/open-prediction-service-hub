@@ -15,7 +15,19 @@
 #
 
 
-from .crud_user import user
-from .crud_model_config import model_config
-from .crud_binary_ml_model import binary_ml_model
-from .crud_model import model
+from sqlalchemy import Column, String, Integer
+from sqlalchemy.orm import relationship
+
+from ..db.base_class import Base
+
+
+class Model(Base):
+    __tablename__ = "model"
+
+    id = Column(Integer, nullable=False, primary_key=True, index=True)
+
+    name = Column(String, nullable=False)
+    version = Column(String, nullable=False)
+
+    binary = relationship('BinaryMLModel', back_populates='model', uselist=False)
+    config = relationship('ModelConfig', back_populates='model', uselist=False)

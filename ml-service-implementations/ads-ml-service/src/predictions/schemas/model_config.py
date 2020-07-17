@@ -15,39 +15,52 @@
 #
 
 
-from typing import Text, Optional
+from typing import Text, Optional, List, Dict
 
 from pydantic import BaseModel
 
+from .feature import Feature
+from .metadata import Metadata
+from .output_schema import OutputSchema
+
 
 # Shared properties
-class UserBase(BaseModel):
-    username: Optional[Text] = None
+class ModelConfigBase(BaseModel):
+    name: Optional[Text]
+    version: Optional[Text]
+    method_name: Optional[Text]
+    input_schema: Optional[List[Feature]]
+    output_schema: Optional[OutputSchema]
+    metadata: Optional[Metadata]
 
 
 # Properties to receive via API on creation
-class UserCreate(UserBase):
-    username: Text
-    password: Text
+class ModelConfigCreate(ModelConfigBase):
+    name: Text
+    version: Text
+    method_name: Text
+    input_schema: List[Feature]
+    metadata: Metadata
 
 
 # Properties to receive via API on update
-class UserUpdate(UserBase):
-    password: Optional[Text] = None
+class ModelConfigUpdate(ModelConfigBase):
+    pass
 
 
-class UserInDBBase(UserBase):
-    id: Optional[int]  # Not known during creation
+class ModelConfigInDBBase(ModelConfigBase):
+    id: Optional[int]
+    configuration: Dict
 
     class Config:
         orm_mode = True
 
 
 # Additional properties to return via API
-class User(UserInDBBase):
+class ModelConfig(ModelConfigInDBBase):
     pass
 
 
 # Additional properties to be storied in DB
-class UserInDB(UserInDBBase):
-    hashed_password: Text
+class ModelConfigInDB(ModelConfigInDBBase):
+    pass

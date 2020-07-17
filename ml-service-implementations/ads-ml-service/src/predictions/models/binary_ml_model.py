@@ -15,7 +15,7 @@
 #
 
 
-from sqlalchemy import Column, LargeBinary, Integer
+from sqlalchemy import Column, LargeBinary, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
 from ..db.base_class import Base
@@ -27,4 +27,5 @@ class BinaryMLModel(Base):
     id = Column(Integer, nullable=False, primary_key=True, index=True)
     model_b64 = Column(LargeBinary, nullable=False)
 
-    model_metadata = relationship('ModelConfig', back_populates='binary', uselist=False)
+    model_id = Column(Integer, ForeignKey('model.id'))
+    model = relationship('Model', back_populates='binary', uselist=False)

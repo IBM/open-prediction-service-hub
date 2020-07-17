@@ -14,6 +14,6 @@
 # limitations under the License.IBM Confidential
 #
 
-from . import binary_ml_model, model_config
+from . import binary_ml_model, model_config, model
 
-__all__ = [binary_ml_model, model_config]
+__all__ = [binary_ml_model, model_config, model]

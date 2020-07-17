@@ -21,33 +21,32 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class UserBase(BaseModel):
-    username: Optional[Text] = None
+class BinaryMLModelBase(BaseModel):
+    model_b64: Optional[bytes] = None
 
 
 # Properties to receive via API on creation
-class UserCreate(UserBase):
-    username: Text
-    password: Text
+class BinaryMLModelCreate(BinaryMLModelBase):
+    model_b64: bytes
 
 
 # Properties to receive via API on update
-class UserUpdate(UserBase):
-    password: Optional[Text] = None
+class BinaryMLModelUpdate(BinaryMLModelBase):
+    pass
 
 
-class UserInDBBase(UserBase):
-    id: Optional[int]  # Not known during creation
+class BinaryMLModelInDBBase(BinaryMLModelBase):
+    id: int
 
     class Config:
         orm_mode = True
 
 
 # Additional properties to return via API
-class User(UserInDBBase):
+class BinaryMLModel(BinaryMLModelInDBBase):
     pass
 
 
 # Additional properties to be storied in DB
-class UserInDB(UserInDBBase):
-    hashed_password: Text
+class BinaryMLModelInDB(BinaryMLModelInDBBase):
+    pass

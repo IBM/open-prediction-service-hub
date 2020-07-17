@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright 2020 IBM
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,3 +14,16 @@
 # limitations under the License.IBM Confidential
 #
 
+
+from typing import Text
+
+from pydantic.main import BaseModel, Optional
+
+
+class Token(BaseModel):
+    access_token: Text
+    token_type: Text
+
+
+class TokenData(BaseModel):
+    sub: Optional[int] = None

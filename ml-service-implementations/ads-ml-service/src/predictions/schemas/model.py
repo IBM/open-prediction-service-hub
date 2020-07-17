@@ -17,30 +17,15 @@
 
 from __future__ import annotations
 
-import logging
-import pickle
-from logging import Logger
-from typing import Mapping, Text, Optional, Sequence, Any, Dict, Type, List
+from typing import Text, Optional, Sequence, Dict
 
-from .feature import Feature
-from .output_schema import OutputSchema
-from pandas import DataFrame
 from pydantic import BaseModel, Field
 
-
-class Metric(BaseModel):
-    name: Text = Field(..., description='Name of metric')
-    value: Text = Field(..., description='Value of metric')
-
-
-class Metadata(BaseModel):
-    description: Text = Field(..., description='Description of model')
-    author: Text = Field(..., description='Author of model')
-    trained_at: Text = Field(..., description='Training date')
-    class_names: Optional[Dict[int, Text]] = Field(
-        None, description='Lookup table for class index <-> class name'
-    )
-    metrics: List[Metric] = Field(..., description='Metrics for model')
+from .feature import Feature
+from .metadata import Metadata
+from .output_schema import OutputSchema
+from ..schemas.binary_ml_model import BinaryMLModelBase, BinaryMLModelCreate
+from ..schemas.model_config import ModelConfigBase, ModelConfigCreate
 
 
 class MLSchema(BaseModel):
@@ -51,3 +36,41 @@ class MLSchema(BaseModel):
     input_schema: Sequence[Feature] = Field(..., description='Input schema of ml model')
     output_schema: Optional[OutputSchema] = Field(..., description='Output schema of ml model')
     metadata: Metadata = Field(..., description='Additional information for ml model')
+
+
+# Shared properties
+class ModelBase(BaseModel):
+    name: Optional[Text] = None
+    version: Optional[Text] = None
+    binary: Optional[BinaryMLModelBase] = None
+    config: Optional[ModelConfigBase] = None
+
+
+# Properties to receive via API on creation
+class ModelCreate(ModelBase):
+    name: Text
+    version: Text
+    binary: Optional[BinaryMLModelCreate] = None
+    config: Optional[ModelConfigCreate] = None
+
+
+# Properties to receive via API on update
+class ModelUpdate(ModelBase):
+    pass
+
+
+class ModelInDBBase(ModelBase):
+    id: Optional[int]
+
+    class Config:
+        orm_mode = True
+
+
+# Additional properties to return via API
+class Model(ModelInDBBase):
+    pass
+
+
+# Additional properties to be storied in DB
+class ModelInDB(ModelInDBBase):
+    pass

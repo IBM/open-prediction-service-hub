@@ -46,6 +46,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[ModelType]:
         return db.query(self.model).offset(skip).limite(limit).all()
 
+    def count(self, db: Session) -> int:
+        return db.query(self.model).count()
+
+    def get_all(self, db: Session) -> List[ModelType]:
+        return db.query(self.model).all()
+
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
         data_in = jsonable_encoder(obj_in)
         db_obj = self.model(**data_in)

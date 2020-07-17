@@ -30,8 +30,8 @@ class ModelConfig(Base):
     version = Column(String, nullable=False)
     configuration = Column(JSON, nullable=False)
 
-    binary_id = Column(Integer, ForeignKey('binary_ml_model.id'))
-    binary = relationship('BinaryMLModel', back_populates='model_metadata', uselist=False)
+    model_id = Column(Integer, ForeignKey('model.id'))
+    model = relationship('Model', back_populates='config', uselist=False)
 
     __table_args__ = (
         UniqueConstraint('name', 'version', name='_unique_name_ver_combination'),
