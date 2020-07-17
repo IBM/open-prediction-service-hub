@@ -15,4 +15,5 @@
 #
 
 
-__version__: str = '0.1.0'
+from .main import app
+from .main import __version__

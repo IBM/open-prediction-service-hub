@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright 2020 IBM
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,3 +14,28 @@
 # limitations under the License.IBM Confidential
 #
 
+
+import logging
+from typing import NoReturn
+
+from predictions.db.init_db import init_db
+from predictions.db.session import SessionLocal
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def init() -> NoReturn:
+    db = SessionLocal()
+    init_db(db)
+
+
+def main() -> NoReturn:
+    logger.info('Database init starting')
+    init()
+    logger.info('Database init finished')
+
+
+if __name__ == '__main__':
+    main()

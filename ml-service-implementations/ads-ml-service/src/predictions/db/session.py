@@ -15,15 +15,20 @@
 #
 
 
-from predictions.main import app
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-# For debug
-if __name__ == "__main__":
-    import os
-    from pathlib import Path
 
-    import uvicorn
+from ..core.configuration import get_config
 
-    os.environ['model_storage'] = str(Path(__file__).resolve().parent.joinpath('storage'))
 
-    uvicorn.run(app, host='127.0.0.1', port=8080, log_level='debug', debug=True)
+engine = create_engine(
+    f'sqlite:///{get_config().MODEL_STORAGE.joinpath(get_config().DATABASE_NAME)}',
+    connect_args={"check_same_thread": False}
+)
+
+SessionLocal = sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine
+)

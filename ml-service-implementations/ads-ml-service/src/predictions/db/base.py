@@ -19,3 +19,4 @@ from .base_class import Base
 from ..models.model_config import ModelConfig
 from ..models.binary_ml_model import BinaryMLModel
 from ..models.user import User
+from ..models.model import Model

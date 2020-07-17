@@ -20,8 +20,10 @@ from typing import Text
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse
 
-from . import __version__
-from .api.api_v1.api import api_router
+from predictions.api.api_v1.api import api_router
+
+
+__version__: str = '0.1.0'
 
 app: FastAPI = FastAPI(
     version=__version__,
