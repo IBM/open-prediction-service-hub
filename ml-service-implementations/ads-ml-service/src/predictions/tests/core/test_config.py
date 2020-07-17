@@ -57,6 +57,5 @@ def test_env_not_exist():
 
 
 def test_valid_env():
-    storage: Path = Path(__file__).resolve().parents[3].joinpath('runtime').joinpath('storage')
-    os.environ['MODEL_STORAGE'] = str(storage)
+    os.environ['MODEL_STORAGE'] = str('/tmp')
     ServerConfiguration()
