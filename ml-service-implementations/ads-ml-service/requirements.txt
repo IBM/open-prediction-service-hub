@@ -6,8 +6,10 @@ pandas
 pydantic
 
 ## Web interface
+pyjwt
+tenacity
 python-multipart          # File service
-bcrypt                    # Password hash
+passlib[bcrypt]           # Password hash
 fastapi
 uvicorn
 gunicorn
