@@ -177,7 +177,7 @@ def classification_prob_config(base_config: Dict) -> Dict:
 
 
 @pytest.fixture
-def db(tmp_path) -> Generator[Session, None, NoReturn]:
+def db(tmp_path) -> Generator[Session, None, None]:
     engine = create_engine(
         f'sqlite:///{tmp_path.resolve().joinpath("test.db")}', connect_args={"check_same_thread": False})
     Base.metadata.create_all(bind=engine)
@@ -194,7 +194,7 @@ def db(tmp_path) -> Generator[Session, None, NoReturn]:
 
 
 @pytest.fixture
-def client(db, tmp_path) -> Generator[TestClient, None, NoReturn]:
+def client(db, tmp_path) -> Generator[TestClient, None, None]:
     os.environ['MODEL_STORAGE'] = str(tmp_path.resolve())
 
     def _db_override():
