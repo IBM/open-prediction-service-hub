@@ -15,32 +15,10 @@
 #
 
 
-from typing import Generator
-
 import pytest
-from sqlalchemy.engine import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from ..utils.utils import random_string
-from ...db.base import Base
 from ...schemas.user import UserCreate
-
-
-# In memory sqlite database for testing
-@pytest.fixture(scope='module')
-def db() -> Generator:
-    engine = create_engine('sqlite://', connect_args={"check_same_thread": False})
-    Base.metadata.create_all(bind=engine)
-    sm_instance = sessionmaker(
-        autocommit=False,
-        autoflush=False,
-        bind=engine
-    )
-    db = sm_instance()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 # Data for user create
