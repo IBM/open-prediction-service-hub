@@ -8,19 +8,19 @@
   "tags": [
     {
       "name": "Discovery",
-      "description": "endpoints related to the discovery of machine learning models and deployments"
+      "description": "Endpoints related to the discovery of machine learning models and deployments"
     },
     {
       "name": "Manage",
-      "description": "endpoints related to the management of machine learning models and deployments"
+      "description": "Endpoints related to the management of machine learning models and deployments"
     },
     {
       "name": "Train",
-      "description": "endpoints related to the taining of machine learning models"
+      "description": "Endpoints related to the taining of machine learning models"
     },
     {
       "name": "Runtime",
-      "description": "endpoints to run deployed models"
+      "description": "Endpoints to run deployed models"
     }
   ],
   "paths": {
@@ -41,6 +41,16 @@
                 }
               }
             }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -51,10 +61,11 @@
           "Discovery"
         ],
         "summary": "Get Server Status",
+        "description": "Returns a health check on underlying services availability",
         "operationId": "get_status",
         "responses": {
-          "200": {
-            "description": "Successful Response",
+          "default": {
+            "description": "Health Check",
             "content": {
               "application/json": {
                 "schema": {
@@ -84,6 +95,16 @@
                 }
               }
             }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       },
@@ -104,6 +125,16 @@
                 }
               }
             }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       },
@@ -114,6 +145,56 @@
         "responses": {
           "200": {
             "description": "Successful Response"
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{model_id}/versions": {
+      "get": {
+        "tags": [
+          "Discovery"
+        ],
+        "summary": "List Endpoints",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "model_id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningModelVersion"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -139,7 +220,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningDeployment"
+                  "$ref": "#/components/schemas/MachineLearningModelVersion"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -158,7 +249,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RequestBody"
+                "$ref": "#/components/schemas/Prediction"
               }
             }
           },
@@ -176,7 +267,7 @@
               }
             }
           },
-          "422": {
+          "default": {
             "description": "Error",
             "content": {
               "application/json": {
@@ -192,8 +283,8 @@
   },
   "components": {
     "schemas": {
-      "MachineLearningDeployment": {
-        "title": "Machine Learning Deployment",
+      "MachineLearningModelVersion": {
+        "title": "Machine Learning Model Version",
         "required": [
           "id",
           "name",
@@ -206,22 +297,22 @@
           "id": {
             "title": "ID",
             "type": "string",
-            "description": "ID of Deployment"
+            "description": "ID of Version"
           },
           "name": {
             "title": "Name",
             "type": "string",
-            "description": "Name of Deployment"
+            "description": "Name of Version"
           },
           "model_id": {
             "title": "Name",
             "type": "string",
-            "description": "Id of Model this Deployment is from"
+            "description": "Id of Model this Version is from"
           },
           "deployed_at": {
             "type": "string",
             "format": "date-time",
-            "description": "date of the deployment"
+            "description": "date of the Version"
           }
         }
       },
@@ -331,56 +422,6 @@
           }
         }
       },
-      "RequestBody": {
-        "title": "RequestBody",
-        "required": [
-          "deployment_id",
-          "params"
-        ],
-        "type": "object",
-        "properties": {
-          "deployment_id": {
-            "title": "deployment id",
-            "type": "string",
-            "description": "id of the deployment to call"
-          },
-          "model_id": {
-            "title": "model id",
-            "type": "string",
-            "description": "optionnal id of the model id corresponding to this deployment (in case deployments have multiple models for example)"
-          },
-          "params": {
-            "title": "Params",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Parameter"
-            },
-            "description": "Model parameters"
-          }
-        },
-        "description": "RequestBody captures all information needed for model invocation"
-      },
-      "Parameter": {
-        "title": "Parameter",
-        "required": [
-          "name",
-          "value"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "title": "Name",
-            "type": "string",
-            "description": "Name of the feature"
-          },
-          "value": {
-            "title": "Value",
-            "type": "string",
-            "description": "Value of the feature"
-          }
-        },
-        "description": "Parameter for ml model invocation"
-      },
       "ServerStatus": {
         "title": "ServerStatus",
         "required": [
@@ -422,6 +463,56 @@
             ]
           }
         }
+      },
+      "Parameter": {
+        "title": "Parameter",
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of the feature"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string",
+            "description": "Value of the feature"
+          }
+        },
+        "description": "Parameter for ml model invocation"
+      },
+      "Prediction": {
+        "title": "Prediction Payload",
+        "required": [
+          "deployment_id",
+          "params"
+        ],
+        "type": "object",
+        "properties": {
+          "deployment_id": {
+            "title": "deployment id",
+            "type": "string",
+            "description": "id of the deployment to call"
+          },
+          "model_id": {
+            "title": "model id",
+            "type": "string",
+            "description": "optionnal id of the model id corresponding to this deployment (in case deployments have multiple models for example)"
+          },
+          "params": {
+            "title": "Params",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Parameter"
+            },
+            "description": "Model parameters"
+          }
+        },
+        "description": "All information needed for model invocation"
       }
     }
   }
