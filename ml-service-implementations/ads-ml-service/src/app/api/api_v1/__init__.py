@@ -14,6 +14,5 @@
 # limitations under the License.IBM Confidential
 #
 
-from . import model
 
-__all__ = [model]
+from . import api

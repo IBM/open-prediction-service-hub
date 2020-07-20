@@ -15,7 +15,6 @@
 #
 
 from fastapi import APIRouter
-from starlette.responses import RedirectResponse
 
 from .endpoints import status, models, invocations
 
