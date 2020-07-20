@@ -23,7 +23,7 @@ install:
   - python3 setup.py install --quiet
 
 script:
-  - python3 -m pytest -v src/predictions/tests
+  - python3 -m pytest -v src/app/tests
 
 
 before_deploy:
