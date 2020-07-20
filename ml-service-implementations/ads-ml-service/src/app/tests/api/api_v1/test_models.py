@@ -22,6 +22,7 @@ from fastapi.encoders import jsonable_encoder
 from ....schemas.binary_ml_model import BinaryMLModelCreate
 from ....schemas.model import ModelCreate
 from ....schemas.model_config import ModelConfigCreate
+from ....core.configuration import get_config
 from .... import crud
 
 API_VER = '/v1'
@@ -33,7 +34,7 @@ def test_open_api_doc(client):
 
 
 def test_get_server_status(client):
-    response = client.get(url=API_VER + '/status')
+    response = client.get(url=get_config().API_V1_STR + '/status')
     assert response.status_code == 200
     assert response.json().get('model_count') == 0
 
@@ -51,7 +52,7 @@ def test_get_models(db, classification_predictor, classification_config, client)
 
     model = crud.crud_model.model.create(db, obj_in=model_in)
 
-    response = client.get(url=API_VER + '/models')
+    response = client.get(url=get_config().API_V1_STR + '/models')
 
     assert response.status_code == 200
     assert response.json() is not None
@@ -64,7 +65,7 @@ def test_add_models(db, classification_predictor, classification_config, client)
         'model_config': classification_config
     }
     response = client.post(
-        API_VER + "/models",
+        get_config().API_V1_STR + '/models',
         files={'file': pickle.dumps(archive)}
     )
 
@@ -89,7 +90,7 @@ def test_delete_model(db, classification_predictor, classification_config, clien
     model = crud.crud_model.model.create(db, obj_in=model_in)
 
     client.delete(
-        url=API_VER + '/models',
+        url=get_config().API_V1_STR + '/models',
         params={'model_name': model.name, 'model_version': model.version}
     )
 

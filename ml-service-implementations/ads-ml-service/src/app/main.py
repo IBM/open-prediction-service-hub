@@ -15,15 +15,15 @@
 #
 
 
-from typing import Text
-
 from fastapi import FastAPI
-from starlette.responses import RedirectResponse
+from fastapi.responses import RedirectResponse
 
-from predictions.api.api_v1.api import api_router
+from app.api import api_v1
+from app.api import api_v2
+from app.core.configuration import get_config
 
 
-from predictions.version import __version__
+from app.version import __version__
 
 app: FastAPI = FastAPI(
     version=__version__,
@@ -32,14 +32,19 @@ app: FastAPI = FastAPI(
     openapi_url="/open-prediction-service.json"
 )
 
-VER: int = 1
-PREFIX: Text = f'/v{VER}'
-
-app.include_router(api_router, prefix=PREFIX)
+app.include_router(api_v1.api.api_router, prefix=get_config().API_V1_STR)
+app.include_router(api_v2.api.api_router, prefix=get_config().API_V2_STR)
 
 
 @app.get(
-    path=f'{PREFIX}/docs', include_in_schema=False
+    path=f'{get_config().API_V1_STR}/docs', include_in_schema=False
+)
+def redirect_docs():
+    return RedirectResponse(url='/docs')
+
+
+@app.get(
+    path=f'{get_config().API_V2_STR}/docs', include_in_schema=False
 )
 def redirect_docs():
     return RedirectResponse(url='/docs')

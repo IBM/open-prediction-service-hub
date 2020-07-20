@@ -20,7 +20,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from predictions.core.configuration import ServerConfiguration
+from app.core.configuration import ServerConfiguration
 
 
 def test_model_storage_not_readable():

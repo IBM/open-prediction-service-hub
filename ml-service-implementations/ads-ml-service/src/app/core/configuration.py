@@ -18,29 +18,33 @@
 from __future__ import annotations
 
 import os
+import secrets
 from functools import lru_cache
 from pathlib import Path
 from typing import Text
 
-from pydantic import Field, validator, BaseSettings
+from pydantic import validator, BaseSettings
 
 
 class ServerConfiguration(BaseSettings):
     """
-    Open Prediction Service configuration
+    ads-ml-service configuration
     """
-    API_VI_STR: Text = Field('v1')
-    SECRET_KEY: Text = Field('74df9eed3d485bc2c08e4bd0b68ffa776f448be669f2e4891a50b9cc87f75b54')
-    DATABASE_NAME: Text = Field('EML.db')
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(120)
+    API_V1_STR: Text = '/v1'
+    API_V2_STR: Text = '/v2'
 
-    RETRAIN_MODELS: bool = False  # retrain example models
+    SECRET_KEY: Text = secrets.token_urlsafe(32)
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
+    DEFAULT_USER: Text = 'admin'
+    DEFAULT_USER_PWD: Text = 'password'
 
-    MODEL_STORAGE: Path = Field(..., description='Directory where OPS store ml models')
-    MODEL_CACHE_SIZE: int = Field(16, description='The number of ml models cached in service')
-    CACHE_TTL: int = Field(20, description='TTL of cache')
+    DATABASE_NAME: Text = 'EML.db'
+    RETRAIN_MODELS: bool = False
+    MODEL_CACHE_SIZE: int = 16
+    CACHE_TTL: int = 20
+    MODEL_STORAGE: Path
 
-    @validator('MODEL_STORAGE', always=True)
+    @validator('MODEL_STORAGE')
     def storage_check(cls: ServerConfiguration, p: Path) -> Path:
         if not p.exists() or not p.is_dir():
             raise ValueError(f'{p} is not a directory')

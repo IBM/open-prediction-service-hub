@@ -20,7 +20,7 @@ from typing import NoReturn, Dict, Generator
 import numpy as np
 import pytest
 from fastapi.testclient import TestClient
-from predictions.db.base import Base
+from app.db.base import Base
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sqlalchemy import create_engine
@@ -196,6 +196,8 @@ def db(tmp_path) -> Generator[Session, None, None]:
 @pytest.fixture
 def client(db, tmp_path) -> Generator[TestClient, None, None]:
     os.environ['MODEL_STORAGE'] = str(tmp_path.resolve())
+    os.environ['DEFAULT_USER'] = 'admin'
+    os.environ['DEFAULT_USER_PWD'] = 'admin'
 
     def _db_override():
         return db

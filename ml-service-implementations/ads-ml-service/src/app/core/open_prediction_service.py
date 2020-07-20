@@ -17,39 +17,39 @@
 
 import logging
 import pickle
-from typing import Text, Any, Dict, NoReturn, Optional, List, Tuple
 from threading import Lock
+from typing import Text, Any, Dict, NoReturn, Optional, List, Tuple
 
 from expiringdict import ExpiringDict
-from predictions.schemas.binary_ml_model import BinaryMLModelCreate
-from predictions.schemas.model_config import ModelConfigCreate
 from sqlalchemy.orm import Session
 
-from ..schemas.model import MLSchema, ModelCreate
-from ..core.model import Model
 from .. import crud
+from .. import schemas
+from ..core.configuration import get_config
+from ..core.model import Model
+from ..schemas.model import MLSchema, ModelCreate
 
 
 class OpenPredictionService:
     # Cache need to be global to all service instances
     MODEL_CACHE: ExpiringDict = None
-    MODEL_CONFIGS_CACHE: ExpiringDict = None
     # Cache needs to be initiated once per worker
     lock = Lock()
 
-    def __init__(self, db: Session, model_cache_size: int, cache_ttl: int):
+    def __init__(self, db: Session):
         self.db: Session = db
         with OpenPredictionService.lock:
             if OpenPredictionService.MODEL_CACHE is None:
-                OpenPredictionService.MODEL_CACHE = ExpiringDict(max_len=model_cache_size, max_age_seconds=cache_ttl)
-            if OpenPredictionService.MODEL_CONFIGS_CACHE is None:
-                OpenPredictionService.MODEL_CONFIGS_CACHE = ExpiringDict(max_len=1, max_age_seconds=cache_ttl)
+                OpenPredictionService.MODEL_CACHE = ExpiringDict(
+                    max_len=get_config().MODEL_CACHE_SIZE,
+                    max_age_seconds=get_config().CACHE_TTL
+                )
 
     def add_model(
             self, m: Model
     ) -> None:
-        binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(m.model))
-        config_in = ModelConfigCreate(**m.info.dict())
+        binary_in = schemas.binary_ml_model.BinaryMLModelCreate(model_b64=pickle.dumps(m.model))
+        config_in = schemas.model_config.ModelConfigCreate(**m.info.dict())
         model_in = ModelCreate(binary=binary_in, config=config_in, name=m.info.name, version=m.info.version)
         crud.crud_model.model.create(self.db, obj_in=model_in)
 
@@ -88,15 +88,7 @@ class OpenPredictionService:
         return m
 
     def get_model_configs(self) -> List[MLSchema]:
-        logger = logging.getLogger(__name__)
-        configs: List[MLSchema]
-        try:
-            configs = OpenPredictionService.MODEL_CONFIGS_CACHE['model_configs']
-        except KeyError:
-            logger.debug('model_configs cache miss')
-            configs = [config.configuration for config in crud.model_config.get_all(self.db)]
-            OpenPredictionService.MODEL_CONFIGS_CACHE.__setitem__(key='model_configs', value=configs)
-        return configs
+        return [config.configuration for config in crud.model_config.get_all(self.db)]
 
     def count_models(self) -> int:
         return crud.model_config.count(self.db)

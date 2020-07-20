@@ -19,7 +19,7 @@ from typing import Text, Type
 
 import numpy as np
 import pytest
-from predictions.schemas.prediction import Prediction, Probability
+from app.schemas.prediction import Prediction, Probability
 
 from ...schemas.feature import Feature
 
