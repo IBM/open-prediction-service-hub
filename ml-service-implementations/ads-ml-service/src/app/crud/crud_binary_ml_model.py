@@ -18,15 +18,15 @@
 from sqlalchemy.orm import Session
 
 from .base import CRUDBase
-from ..models.binary_ml_model import BinaryMLModel
-from ..schemas.binary_ml_model import BinaryMLModelCreate, BinaryMLModelUpdate
+from ..models import BinaryMLModel
+from ..schemas import BinaryMLModelCreate, BinaryMLModelUpdate
 
 
 class CRUDBinaryMLModel(CRUDBase[BinaryMLModel, BinaryMLModelCreate, BinaryMLModelUpdate]):
 
     def create(self, db: Session, *, obj_in: BinaryMLModelCreate) -> BinaryMLModel:
         db_obj = BinaryMLModel(
-           model_b64=obj_in.model_b64
+            model_b64=obj_in.model_b64
         )
         db.add(db_obj)
         db.commit()

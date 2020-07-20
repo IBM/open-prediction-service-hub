@@ -62,7 +62,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def update(
             self, db: Session, *, db_obj: ModelType, obj_in: Union[UpdateSchemaType, Dict[Text, Any]]
-    ):
+    ) -> ModelType:
         original = jsonable_encoder(db_obj)
         update_data = obj_in if isinstance(obj_in, Dict) else obj_in.dict(exclude_unset=True)
         for field in original:

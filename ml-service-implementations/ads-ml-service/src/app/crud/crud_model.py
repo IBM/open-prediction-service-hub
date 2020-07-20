@@ -13,15 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.IBM Confidential
 #
+
+
 from typing import Text
 
 from sqlalchemy.orm import Session
 
 from .base import CRUDBase, IdType
-from ..models.model import Model
-from ..schemas.model import ModelCreate, ModelUpdate
 from .crud_binary_ml_model import binary_ml_model
 from .crud_model_config import model_config
+from ..models import Model
+from ..schemas import ModelCreate, ModelUpdate
 
 
 class CRUDModel(CRUDBase[Model, ModelCreate, ModelUpdate]):
@@ -51,7 +53,6 @@ class CRUDModel(CRUDBase[Model, ModelCreate, ModelUpdate]):
         model_1.binary = binary
         model_1.config = config
         return model_1
-
 
 
 model = CRUDModel(Model)

@@ -21,8 +21,8 @@ from sqlalchemy.orm import Session
 
 from .base import CRUDBase
 from ..core.security import get_pwd_hash, verify_pwd
-from ..models.user import User
-from ..schemas.user import UserCreate, UserUpdate
+from ..models import User
+from ..schemas import UserCreate, UserUpdate
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):

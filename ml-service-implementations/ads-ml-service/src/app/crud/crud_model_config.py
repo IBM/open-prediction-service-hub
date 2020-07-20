@@ -15,14 +15,12 @@
 #
 
 
-from typing import Text, Optional, List
-
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from .base import CRUDBase
-from ..models.model_config import ModelConfig
-from ..schemas.model_config import ModelConfigCreate, ModelConfigUpdate
+from .base import CRUDBase, IdType
+from ..models import ModelConfig
+from ..schemas import ModelConfigCreate, ModelConfigUpdate
 
 
 class CRUDModelConfig(CRUDBase[ModelConfig, ModelConfigCreate, ModelConfigUpdate]):
@@ -38,7 +36,7 @@ class CRUDModelConfig(CRUDBase[ModelConfig, ModelConfigCreate, ModelConfigUpdate
         db.refresh(db_obj)
         return db_obj
 
-    def create_with_model(self, db: Session, *, obj_in: ModelConfigCreate, model_id: int) -> ModelConfig:
+    def create_with_model(self, db: Session, *, obj_in: ModelConfigCreate, model_id: IdType) -> ModelConfig:
         db_obj = ModelConfig(
             model_id=model_id,
             name=obj_in.name,
