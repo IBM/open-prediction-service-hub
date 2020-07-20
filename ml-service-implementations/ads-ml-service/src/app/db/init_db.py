@@ -25,6 +25,7 @@ from sqlalchemy.orm import Session
 from .base import Base
 from .session import engine
 from .. import crud
+from .. import schemas
 from ..core.configuration import get_config
 from ..schemas.binary_ml_model import BinaryMLModelCreate
 from ..schemas.model import ModelCreate
@@ -124,3 +125,11 @@ def init_db(db: Session):
 
     # load example ml model
     __load_models(db)
+
+    user = crud.user.get_by_username(db, username=get_config().DEFAULT_USER)
+    if user is None:
+        user_in = schemas.user.UserCreate(
+            username=get_config().DEFAULT_USER,
+            password=get_config().DEFAULT_USER_PWD
+        )
+        user = crud.user.create(db, obj_in=user_in)
