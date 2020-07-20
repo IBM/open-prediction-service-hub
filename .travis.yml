@@ -19,8 +19,6 @@ before_install:
   - python3 -m pip install --quiet -r requirements-ml.txt
   - python3 -m pip install --quiet -r requirements.txt
 
-install:
-  - python3 setup.py install --quiet
 
 script:
   - python3 -m pytest -v src/app/tests
