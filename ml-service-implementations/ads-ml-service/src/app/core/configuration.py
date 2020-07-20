@@ -35,6 +35,7 @@ class ServerConfiguration(BaseSettings):
 
     SECRET_KEY: Text = secrets.token_urlsafe(32)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
+    USERNAME_TEST_USER: Text = 'test-user'
     DEFAULT_USER: Text = 'admin'
     DEFAULT_USER_PWD: Text = 'password'
 

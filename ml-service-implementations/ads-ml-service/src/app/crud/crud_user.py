@@ -43,7 +43,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[Text, Any]]
     ) -> User:
         update_data = obj_in if isinstance(obj_in, Dict) else obj_in.dict(exclude_unset=True)
-        if update_data['password']:
+        if update_data['password'] is not None:
             hashed_password = get_pwd_hash(update_data['password'])
             del update_data['password']
             update_data['hashed_password'] = hashed_password

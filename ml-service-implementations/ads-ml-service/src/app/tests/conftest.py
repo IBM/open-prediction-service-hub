@@ -13,20 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.IBM Confidential
 #
+
+
 import os
 import random
-from typing import NoReturn, Dict, Generator
+from typing import NoReturn, Dict, Generator, Text
 
 import numpy as np
 import pytest
+
 from fastapi.testclient import TestClient
-from app.db.base import Base
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from .utils.utils import random_string
+from .utils.user import auth_token_from_username
+from ..core.configuration import get_config
+from .. import crud
+from ..db.base import Base
+from ..schemas import UserCreate
 
 
 class DummyRegressor(BaseEstimator, RegressorMixin):
@@ -196,8 +203,12 @@ def db(tmp_path) -> Generator[Session, None, None]:
 @pytest.fixture
 def client(db, tmp_path) -> Generator[TestClient, None, None]:
     os.environ['MODEL_STORAGE'] = str(tmp_path.resolve())
-    os.environ['DEFAULT_USER'] = 'admin'
-    os.environ['DEFAULT_USER_PWD'] = 'admin'
+    os.environ['DEFAULT_USER'] = get_config().DEFAULT_USER
+    os.environ['DEFAULT_USER_PWD'] = get_config().DEFAULT_USER
+
+    user = crud.user.create(db, obj_in=UserCreate(
+        username=get_config().DEFAULT_USER, password=get_config().DEFAULT_USER_PWD))
+    assert user is not None, 'Default user can not be created'
 
     def _db_override():
         return db
@@ -209,3 +220,8 @@ def client(db, tmp_path) -> Generator[TestClient, None, None]:
 
     with TestClient(app) as c:
         yield c
+
+
+@pytest.fixture
+def user_token_header(client, db) -> Dict[Text, Text]:
+    return auth_token_from_username(client=client, db=db, username=get_config().USERNAME_TEST_USER)

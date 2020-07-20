@@ -13,24 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.IBM Confidential
 #
+
+
 from typing import Text, Dict
 
 from fastapi.testclient import TestClient
-from ...schemas.user import UserCreate, UserUpdate
-from ... import crud
+from sqlalchemy.orm import Session
 
 from .utils import random_string
-from sqlalchemy.orm import Session
+from ... import crud
+from ...schemas import UserCreate, UserUpdate
+from ...core.configuration import get_config
 
 
 def user_auth_header(
-    *, client: TestClient, username: Text, password: Text, auth_url: Text
+    *, client: TestClient, username: Text, password: Text
 ) -> Dict[Text, Text]:
     login = {
         'username': username,
         'password': password
     }
-    response = client.post(auth_url, data=login)
+    response = client.post(f'{get_config().API_V2_STR}/login/access-token', data=login)
     token = response.json()['access_token']
     header = {'Authorization': f'Bearer {token}'}
     return header
@@ -44,7 +47,7 @@ def create_random_user(db: Session):
     return user
 
 
-def auth_token_from_email(
+def auth_token_from_username(
     *, client: TestClient, username: Text, db: Session
 ):
     """
@@ -54,8 +57,8 @@ def auth_token_from_email(
     user = crud.user.get_by_username(db, username=username)
     if user is None:
         user_create = UserCreate(username=username, password=password)
-        crud.user.update(db, db_obj=user_create)
+        crud.user.create(db, obj_in=user_create)
     else:
         user_update = UserUpdate(password=password)
-        crud.user.update(db, db_obj=user_update)
+        crud.user.update(db, db_obj=user, obj_in=user_update)
     return user_auth_header(client=client, username=username, password=password)
