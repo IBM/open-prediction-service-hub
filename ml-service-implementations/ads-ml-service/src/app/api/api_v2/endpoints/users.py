@@ -31,7 +31,7 @@ router = APIRouter()
 
 
 @router.get('/me', response_model=schemas.User)
-def update_user_self(
+def get_user_self(
     *,
     current_user: models.User = Depends(deps.get_current_user)
 ):
