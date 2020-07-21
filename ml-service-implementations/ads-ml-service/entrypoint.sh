@@ -22,18 +22,9 @@ if [ ! -f "${MODEL_STORAGE}/key.pem" ] || [ ! -f "${MODEL_STORAGE}/cert.pem" ]; 
 fi
 
 
-
 # Default parameters:
 #   Uvicorn worker class is required by Fastapi
-#   Container schedulers typically expect logs to come out on stdout/stderr, thus gunicorn is configured to do so
-#   Gunicorn needs to store its temporary file in memory (e.g. /dev/shm)
-# Start
 exec gunicorn \
             --worker-class=uvicorn.workers.UvicornWorker \
-            --log-file=- \
-            --worker-tmp-dir=/dev/shm \
             --config=file:gunicorn.init.py \
-            --bind=:8080 \
-            --certfile="${MODEL_STORAGE}/cert.pem" \
-            --keyfile="${MODEL_STORAGE}/key.pem" \
             main:app
