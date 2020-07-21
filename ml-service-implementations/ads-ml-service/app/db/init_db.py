@@ -31,7 +31,7 @@ from ..schemas.binary_ml_model import BinaryMLModelCreate
 from ..schemas.model import ModelCreate
 from ..schemas.model_config import ModelConfigCreate
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 EXAMPLES_ROOT = PROJECT_ROOT.joinpath('examples')
 
 

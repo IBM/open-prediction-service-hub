@@ -21,7 +21,7 @@ before_install:
 
 
 script:
-  - python3 -m pytest -v src/app/tests
+  - python3 -m pytest -v app/tests
 
 
 before_deploy:

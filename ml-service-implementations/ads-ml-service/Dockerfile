@@ -5,18 +5,20 @@ FROM debian:buster-backports
 ARG OPS_HOME="/app"
 
 # ENV variables used by server
-ENV PYTHONPATH="${PYTHONPATH}:${OPS_HOME}/src"
-ENV RETRAIN_MODELS=FALSE
+ENV PYTHONPATH="${OPS_HOME}:${PYTHONPATH}"
 ENV OPS_HOME=${OPS_HOME}
 ENV MODEL_STORAGE=${OPS_HOME}
+ENV RETRAIN_MODELS=FALSE
 ENV ENABLE_SSL=FALSE
 
 
 # Prepare python env
 RUN \
-    echo "Acquire::http::Pipeline-Depth 0; \
+    echo "\
+    Acquire::http::Pipeline-Depth 0; \
     Acquire::http::No-Cache true; \
-    Acquire::BrokenProxy    true;" > /etc/apt/apt.conf.d/99fixbadproxy && \
+    Acquire::BrokenProxy    true; \
+    " > /etc/apt/apt.conf.d/99fixbadproxy && \
     apt-get -qq update && \
     apt-get -qq --assume-yes --fix-missing install python3.7-dev && \
     apt-get -qq --assume-yes --fix-missing install python3-pip && \
@@ -50,7 +52,7 @@ RUN \
 
 USER ops
 EXPOSE 8080
-WORKDIR ${OPS_HOME}/src/app
+WORKDIR ${OPS_HOME}/app
 
 
 ENTRYPOINT ["/entrypoint.sh"]
