@@ -9,18 +9,19 @@ notifications:
 services:
   - docker
 
+env:
+  - MODEL_STORAGE=/tmp
+
 before_install:
   - cd ml-service-implementations/ads-ml-service
-  - pip3 install --quiet --upgrade pip
-  - pip3 install --quiet -r requirements-test.txt
-  - pip3 install --quiet -r requirements-ml.txt
-  - pip3 install --quiet -r requirements.txt
+  - python3 -m pip install --quiet --upgrade pip
+  - python3 -m pip install --quiet -r requirements-test.txt
+  - python3 -m pip install --quiet -r requirements-ml.txt
+  - python3 -m pip install --quiet -r requirements.txt
 
-install:
-  - python3 setup.py install --quiet
 
 script:
-  - python3 -m pytest -v src/tests
+  - python3 -m pytest -v app/tests
 
 
 before_deploy:
