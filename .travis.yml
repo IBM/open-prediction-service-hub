@@ -39,4 +39,6 @@ deploy:
     script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
     on:
       all_branches: true
-      condition: ${TRAVIS_BRANCH} =~ ^develop$
+      condition: env(RELEASE_YEAR) IS present AND \
+                  env(RELEASE_QUARTER) IS present AND \
+                  env(TRAVIS_BRANCH) == concat("release", "/", env(RELEASE_YEAR), env(RELEASE_QUARTER))
