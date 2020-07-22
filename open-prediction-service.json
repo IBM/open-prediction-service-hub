@@ -363,7 +363,7 @@
         }
       }
     },
-    "/train/{model_id}": {
+    "/trainings/{model_id}": {
       "post": {
         "tags": [
           "Train"
@@ -402,7 +402,7 @@
         }
       }
     },
-    "/predict": {
+    "/predictions": {
       "post": {
         "tags": [
           "Runtime"
