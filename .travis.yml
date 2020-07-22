@@ -24,6 +24,14 @@ script:
   - python3 -m pytest -v app/tests
 
 
+stages:
+  - name: deploy
+    if: |
+      env(RELEASE_YEAR) IS present AND \
+      env(RELEASE_QUARTER) IS present AND \
+      env(TRAVIS_BRANCH) == concat("release", "/", env(RELEASE_YEAR), env(RELEASE_QUARTER))
+
+
 before_deploy:
   - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
   # example: demo:20190405-171003-4-master
@@ -37,9 +45,3 @@ deploy:
   - provider: script
     skip_cleanup: true
     script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
-    on:
-      all_branches: true
-      condition: |
-        env(RELEASE_YEAR) IS present AND \
-        env(RELEASE_QUARTER) IS present AND \
-        env(TRAVIS_BRANCH) == concat("release", "/", env(RELEASE_YEAR), env(RELEASE_QUARTER))
