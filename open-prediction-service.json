@@ -7,6 +7,10 @@
   },
   "tags": [
     {
+      "name": "Status",
+      "description": "Endpoints related to the capacities of the server"
+    },
+    {
       "name": "Discovery",
       "description": "Endpoints related to the discovery of machine learning models and deployments"
     },
@@ -27,7 +31,7 @@
     "/capabilities": {
       "get": {
         "tags": [
-          "Discovery"
+          "Status"
         ],
         "summary": "Get Server Capabilities",
         "operationId": "get_capabilities",
@@ -58,7 +62,7 @@
     "/status": {
       "get": {
         "tags": [
-          "Discovery"
+          "Status"
         ],
         "summary": "Get Server Status",
         "description": "Returns a health check on underlying services availability",
@@ -142,6 +146,7 @@
         "tags": [
           "Manage"
         ],
+        "description": "Removes latest model",
         "responses": {
           "200": {
             "description": "Successful Response"
@@ -159,7 +164,39 @@
         }
       }
     },
-    "/models/{model_id}/versions": {
+    "/models/{model_id}": {
+      "delete": {
+        "tags": [
+          "Manage"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{model_id}/endpoints": {
       "get": {
         "tags": [
           "Discovery"
@@ -181,10 +218,137 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelVersion"
+                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
                 }
               }
             }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Manage"
+        ],
+        "summary": "Create Endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "model_id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Required endpoint definition",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Manage"
+        ],
+        "summary": "Delete latest endpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "model_id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/models/{model_id}/endpoints/{endpoint_id}": {
+      "delete": {
+        "tags": [
+          "Manage"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "model_id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "required": true,
+            "name": "endpoint_id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
           },
           "default": {
             "description": "Error",
@@ -220,7 +384,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelVersion"
+                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
                 }
               }
             }
@@ -283,8 +447,9 @@
   },
   "components": {
     "schemas": {
-      "MachineLearningModelVersion": {
-        "title": "Machine Learning Model Version",
+      "MachineLearningModelEndpoint": {
+        "title": "Machine Learning Model Endpoint",
+        "description": "Represents a way to access to the runnable prediction",
         "required": [
           "id",
           "name",
@@ -369,6 +534,9 @@
             "type": "string",
             "format": "date-time",
             "description": "date of the update of the model"
+          },
+          "version": {
+            "type": "string"
           }
         }
       },
