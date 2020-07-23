@@ -90,7 +90,29 @@ Then you will see some thing like
 This part is not designed to offer a fine tuned ops cluster, but
 a minimum example of working ops instance.
 
-#### 2.1 kubernetes
+#### 2.1 OpenShift
+
+Although instances can be created in exactly the same way as using kubectl, 
+the cli tool offered by OpenShift really simplifies the entire workflow.
+
+Create a working instance in 3 lines:
+```shell script
+# 1.1 Create kubernetes namespace for OPS
+oc new-project ads-ml-service
+# 1.2 If namespace already exists
+oc project ads-ml-service
+
+# 2. Create kubernetes service and associated deployment for OPS
+oc new-app \
+  https://github.com/icp4a/automation-decision-services-extensions#master \
+  --name ads-ml-service \
+  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service
+  
+# Expose service to external clients (If ADS client is not in the same cluster)
+oc expose service/ads-ml-service
+```
+
+#### 2.2 kubernetes
 
 Suppose you have a working kubernetes cluster and have configured kubectl
 properly. To verify that, run `kubectl cluster-info`, your nodes should be listed.
@@ -126,30 +148,6 @@ ibm-cloud.kubernetes.io/external-ip: xxx.xxx.xxx.xxx
 ```
 
 ads-ml-service is available at `xxx.xxx.xxx.xxx` on port `30000`.
-
-#### 2.1 OpenShift
-
-Although instances can be created in exactly the same way as using kubectl, 
-the cli tool offered by OpenShift really simplifies the entire workflow.
-
-Create a working instance in 3 lines:
-```shell script
-# 1.1 Create kubernetes namespace for OPS
-oc new-project ads-ml-service
-# 1.2 If namespace already exists
-oc project ads-ml-service
-
-# 2. Create kubernetes service and associated deployment for OPS
-oc new-app \
-  https://github.com/icp4a/automation-decision-services-extensions#master \
-  --name ads-ml-service \
-  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service
-  
-# Expose service to external clients (If ADS client is not in the same cluster)
-oc expose service/ads-ml-service
-```
-
-`{{IMAGE_URL}}` is the same as [kubernetes](#21-kubernetes)
 
 
 # Security configuration
