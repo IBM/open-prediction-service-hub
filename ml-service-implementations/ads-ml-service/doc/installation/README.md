@@ -160,9 +160,9 @@ is the recommended way
 (.e.g [traefik](https://docs.traefik.io/) and [caddy](https://caddyserver.com/)).
 
 Some details:
-*   During initialization defined in `entrypoint.sh`, Default user (can be configured by environment 
-    var `DEFAULT_USER` and `DEFAULT_USER_PWD`) and example models are added. Their default 
-    values are `admin` and `password`. 
+*   During initialization defined in `entrypoint.sh`, default user (can be configured by environment 
+    var `DEFAULT_USER` and `DEFAULT_USER_PWD`) and example models are added. Default values for username and password 
+    are `admin` and `password`. 
 *   JWT HMAC secret key is generated using standard library secrets during server initialization.
 
 ## Configure ops credentials
