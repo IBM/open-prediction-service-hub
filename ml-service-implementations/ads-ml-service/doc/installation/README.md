@@ -154,14 +154,53 @@ ads-ml-service is available at `xxx.xxx.xxx.xxx` on port `30000`.
 
 Authentication and authorization is achieved by using username/password and 
 JWT tokens. Meanwhile, to prevent man-in-the-middle attack,
-[HTTPS](https://en.wikipedia.org/wiki/HTTPS) needs to be configured inside
-or outside of this project.
+[HTTPS](https://en.wikipedia.org/wiki/HTTPS) needs to be configured. 
+[TLS termination proxy](https://en.wikipedia.org/wiki/TLS_termination_proxy) 
+is the recommended way
+(.e.g [traefik](https://docs.traefik.io/) and [caddy](https://caddyserver.com/)).
 
 Some details:
 *   During initialization defined in `entrypoint.sh`, Default user (can be configured by environment 
-    var `DEFAULT_USER` and `DEFAULT_USER_PWD`) and example models are added. 
+    var `DEFAULT_USER` and `DEFAULT_USER_PWD`) and example models are added. Their default 
+    values are `admin` and `password`. 
 *   JWT HMAC secret key is generated using standard library secrets during server initialization.
 
-## 1. Configure HTTPS outside of ads-ml-service
+## Configure ops credentials
 
-[TLS termination proxy](https://en.wikipedia.org/wiki/TLS_termination_proxy) is recommended
+Suppose you want to create a user with name `toto` and password `titi`.
+
+### OpenShift
+
+You can achieve this simply by overriding the service creation command:
+
+```shell script
+oc new-app \
+  https://github.com/icp4a/automation-decision-services-extensions#master \
+  --name ads-ml-service \
+  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service \
+  DEFAULT_USER=toto \
+  DEFAULT_USER_PWD=titi
+```
+
+### Kubernetes
+
+Suppose you want to do the same thing using `kubectl`. First you need to create
+K8S secret object.
+
+```shell script
+kubectl create secret generic ops-user-creds \
+      --from-literal=DEFAULT_USER=toto\
+      --from-literal=DEFAULT_USER_PWD=titi
+```
+
+you will see:
+```
+secret/ops-user-creds created
+```
+
+Finally replace the old deployment file `deployment.yaml` by `deployment_custom_pwd.yaml`:
+```
+kubectl apply -f kubernetes/deployment_custom_pwd.yaml
+```
+
+### 
