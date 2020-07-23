@@ -203,4 +203,15 @@ Finally replace the old deployment file `deployment.yaml` by `deployment_custom_
 kubectl apply -f kubernetes/deployment_custom_pwd.yaml
 ```
 
-### 
+### Local service 
+
+Replace the command by:
+
+```shell script
+docker run --detach --restart=always \
+  --publish 80:8080 \
+  --name open-prediction \
+  -e DEFAULT_USER=toto \
+  -e DEFAULT_USER_PWD=titi \
+  open-prediction:latest
+```
