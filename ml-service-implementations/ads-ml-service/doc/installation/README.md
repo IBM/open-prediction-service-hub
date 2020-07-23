@@ -147,3 +147,20 @@ oc expose service/ads-ml-service
 ```
 
 `{{IMAGE_URL}}` is the same as [kubernetes](#21-kubernetes)
+
+
+# Security configuration
+
+Authentication and authorization is achieved by using username/password and 
+JWT tokens. Meanwhile, to prevent man-in-the-middle attack,
+[HTTPS](https://en.wikipedia.org/wiki/HTTPS) needs to be configured inside
+or outside of this project.
+
+Some details:
+*   During initialization defined in `entrypoint.sh`, Default user (can be configured by environment 
+    var `DEFAULT_USER` and `DEFAULT_USER_PWD`) and example models are added. 
+*   JWT HMAC secret key is generated using standard library secrets during server initialization.
+
+## 1. Configure HTTPS outside of ads-ml-service
+
+[TLS termination proxy](https://en.wikipedia.org/wiki/TLS_termination_proxy) is recommended
