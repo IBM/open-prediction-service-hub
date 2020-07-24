@@ -68,7 +68,7 @@
         "description": "Returns a health check on underlying services availability",
         "operationId": "get_status",
         "responses": {
-          "default": {
+          "200": {
             "description": "Health Check",
             "content": {
               "application/json": {
@@ -171,12 +171,7 @@
         ],
         "parameters": [
           {
-            "in": "path",
-            "name": "model_id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/ModelIDParam"
           }
         ],
         "responses": {
@@ -204,12 +199,7 @@
         "summary": "List Endpoints",
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "model_id",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/ModelIDParam"
           }
         ],
         "responses": {
@@ -218,7 +208,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                  "$ref": "#/components/schemas/MachineLearningModelEndpoints"
                 }
               }
             }
@@ -242,12 +232,7 @@
         "summary": "Create Endpoint",
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "model_id",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/ModelIDParam"
           }
         ],
         "requestBody": {
@@ -291,12 +276,7 @@
         "summary": "Delete latest endpoint",
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "model_id",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/ModelIDParam"
           }
         ],
         "responses": {
@@ -330,20 +310,10 @@
         ],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "model_id",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/ModelIDParam"
           },
           {
-            "in": "path",
-            "required": true,
-            "name": "endpoint_id",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/EnpointIDParam"
           }
         ],
         "responses": {
@@ -370,12 +340,7 @@
         ],
         "parameters": [
           {
-            "in": "path",
-            "required": true,
-            "name": "model_id",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/ModelIDParam"
           }
         ],
         "responses": {
@@ -447,6 +412,13 @@
   },
   "components": {
     "schemas": {
+      "MachineLearningModelEndpoints": {
+        "title": "List of Machine Learning Endpoints",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+        }
+      },
       "MachineLearningModelEndpoint": {
         "title": "Machine Learning Model Endpoint",
         "description": "Represents a way to access to the runnable prediction",
@@ -468,6 +440,21 @@
             "title": "Name",
             "type": "string",
             "description": "Name of Version"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string",
+            "description": "Status of endpoint",
+            "enum": [
+              "out_of_service",
+              "creating",
+              "updating",
+              "under_maintenance",
+              "rolling_back",
+              "in_service",
+              "deleting",
+              "failed"
+            ]
           },
           "model_id": {
             "title": "Name",
@@ -602,8 +589,8 @@
             "type": "string",
             "description": "Status of the service",
             "enum": [
-              "OK",
-              "ERROR"
+              "ok",
+              "error"
             ]
           },
           "error": {
@@ -625,9 +612,9 @@
             "type": "string",
             "description": "Capabilities of the service",
             "enum": [
-              "CONSUME",
-              "MANAGE",
-              "TRAIN"
+              "consume",
+              "manage",
+              "train"
             ]
           }
         }
@@ -681,6 +668,26 @@
           }
         },
         "description": "All information needed for model invocation"
+      }
+    },
+    "parameters": {
+      "ModelIDParam": {
+        "in": "path",
+        "name": "model_id",
+        "description": "ID of model",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "EnpointIDParam": {
+        "in": "path",
+        "required": true,
+        "name": "endpoint_id",
+        "description": "ID of endpoint",
+        "schema": {
+          "type": "string"
+        }
       }
     }
   }
