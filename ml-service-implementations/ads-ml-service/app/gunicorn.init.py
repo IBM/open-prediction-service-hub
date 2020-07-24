@@ -24,7 +24,7 @@ TRUE = ('TRUE', 'True', 'true', '1')
 
 
 use_ssl = True if os.getenv('ENABLE_SSL') in TRUE else False
-storage = os.getenv('MODEL_STORAGE')
+ssl_settings = os.getenv('SSL_SETTINGS')
 
 
 # Gunicorn config variables
@@ -35,5 +35,6 @@ worker_tmp_dir = '/dev/shm'
 log_file = '-'
 ssl_version = 'TLSv1_2'
 bind = ':8080'
-certfile = f'{storage}/cert.pem' if use_ssl else None
-keyfile = f'{storage}/key.pem' if use_ssl else None
+ca_certs = f'{ssl_settings}/ca.crt' if use_ssl else None
+certfile = f'{ssl_settings}/server.crt' if use_ssl else None
+keyfile = f'{ssl_settings}/server.key' if use_ssl else None
