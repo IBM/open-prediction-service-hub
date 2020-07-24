@@ -324,6 +324,20 @@
   },
   "components": {
     "schemas": {
+      "Link": {
+        "type": "object",
+        "description": "linked relationship to a typed resource.",
+        "properties": {
+          "rel": {
+            "type": "string",
+            "description": "type of relationship for this resource."
+          },
+          "href": {
+            "type": "string",
+            "description": "URI of the linked resource."
+          }
+        }
+      },
       "PredictionResponse": {
         "type": "object",
         "additionalProperties": true
@@ -332,7 +346,7 @@
         "title": "List of Machine Learning Endpoints",
         "description": "List of Machine Learning Endpoints",
         "properties": {
-          "endpoints" : {
+          "endpoints": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MachineLearningModelEndpoint"
@@ -347,7 +361,6 @@
           "id",
           "name",
           "status",
-          "model_id",
           "deployed_at"
         ],
         "type": "object",
@@ -377,16 +390,33 @@
               "failed"
             ]
           },
-          "model_id": {
-            "title": "Name",
-            "type": "string",
-            "description": "Id of Model this Version is from"
-          },
           "deployed_at": {
             "type": "string",
             "format": "date-time",
             "description": "date of the Version"
+          },
+          "links": {
+            "description": "optional array of typed linked resources",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
           }
+        },
+        "example": {
+          "id": "8c2af534-cdce-11ea-87d0-0242ac130003",
+          "name": "South America gigafactory",
+          "status": [
+            "in_service"
+          ],
+          "output_schema": null,
+          "deployed_at": "2020-07-24T17:53:47.909Z",
+          "links": [
+            {
+              "rel": "model",
+              "href": "78bcb500-cdce-11ea-87d0-0242ac130003"
+            }
+          ]
         }
       },
       "MachineLearningModels": {
@@ -394,7 +424,7 @@
         "description": "List of Machine Learning Models",
         "type": "object",
         "properties": {
-          "models" : {
+          "models": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MachineLearningModel"
@@ -453,7 +483,44 @@
           "version": {
             "type": "string",
             "description": "version of the model"
+          },
+          "links": {
+            "description": "optional array of typed linked resources",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
           }
+        },
+        "example": {
+          "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
+          "name": "Linear regression #1",
+          "input_schema": [
+            {
+              "name": "feature #1",
+              "order": 1,
+              "type": "integer"
+            },
+            {
+              "name": "feature #2",
+              "order": 2,
+              "type": "double"
+            }
+          ],
+          "output_schema": null,
+          "created_at": "2020-07-24T16:53:47.909Z",
+          "modified_at": "2020-07-24T16:53:47.909Z",
+          "version": "v0",
+          "links": [
+            {
+              "rel": "endpoint",
+              "href": "841ff27c-cdce-11ea-87d0-0242ac130003"
+            },
+            {
+              "rel": "endpoint",
+              "href": "8c2af534-cdce-11ea-87d0-0242ac130003"
+            }
+          ]
         }
       },
       "Feature": {
@@ -535,7 +602,7 @@
       },
       "Capabilities": {
         "title": "Capabilities",
-        "description":"Available capabilities from this service",
+        "description": "Available capabilities from this service",
         "required": [
           "capabilities"
         ],
