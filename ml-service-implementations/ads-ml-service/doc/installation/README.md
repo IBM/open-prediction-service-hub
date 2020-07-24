@@ -215,3 +215,22 @@ docker run --detach --restart=always \
   -e DEFAULT_USER_PWD=titi \
   open-prediction:latest
 ```
+
+## Configure HTTPS
+
+Suppose you have already storied your certificates under `${MASTER_CONFIG_DIR}`
+
+### OpenShift
+
+```shell script
+oc create route edge --service=ads-ml-service \
+    --cert=${MASTER_CONFIG_DIR}/server.crt \
+    --key=${MASTER_CONFIG_DIR}/server.key \
+    --ca-cert=${MASTER_CONFIG_DIR}/ca.crt
+```
+
+### Kubernetes
+
+Ingress controller configuration is platform dependent. Contact your K8S provider.
+
+### Local service
