@@ -19,10 +19,6 @@
       "description": "Endpoints related to the management of machine learning models and deployments"
     },
     {
-      "name": "Train",
-      "description": "Endpoints related to the taining of machine learning models"
-    },
-    {
       "name": "Runtime",
       "description": "Endpoints to run deployed models"
     }
@@ -344,42 +340,6 @@
         }
       }
     },
-    "/trainings/{model_id}": {
-      "post": {
-        "tags": [
-          "Train"
-        ],
-        "summary": "Train a model by ID",
-        "operationId": "train_model_by_id",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/ModelIDParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/predictions": {
       "post": {
         "tags": [
@@ -646,9 +606,9 @@
             "type": "string",
             "description": "Capabilities of the service",
             "enum": [
-              "consume",
+              "discovery",
               "manage",
-              "train"
+              "runtime"
             ]
           }
         }
