@@ -237,5 +237,5 @@ Ingress controller configuration is platform dependent. Contact your K8S provide
 
 It is highly recommended to configure a TLS termination proxy (e.g [traefik](https://docs.traefik.io/))
 to easily and securely manage HTTPS configurations. For testing purposes,
-you can mount a volume containing `server.crt`, `server.crt`, `ca.crt`, point
+you can mount a volume containing `server.key`, `server.crt`, `ca.crt`, point
 `SSL_SETTINGS` to its path and set `ENABLE_SSL=TRUE` to enable HTTPS.
