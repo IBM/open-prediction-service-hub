@@ -222,6 +222,8 @@ Suppose you have already storied your certificates under `${MASTER_CONFIG_DIR}`
 
 ### OpenShift
 
+Replace `oc expose service/ads-ml-service` by:
+
 ```shell script
 oc create route edge --service=ads-ml-service \
     --cert=${MASTER_CONFIG_DIR}/server.crt \
