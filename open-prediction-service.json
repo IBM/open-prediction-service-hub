@@ -138,29 +138,6 @@
             }
           }
         }
-      },
-      "delete": {
-        "tags": [
-          "Manage"
-        ],
-        "summary": "Delete latest Model",
-        "description": "Removes latest model",
-        "operationId": "delete_latest_model",
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "default": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/models/{model_id}": {
@@ -250,40 +227,6 @@
             }
           }
         },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Manage"
-        ],
-        "summary": "Delete latest endpoint",
-        "operationId": "delete_latest_endpoint",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/ModelIDParam"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful Response",
