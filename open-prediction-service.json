@@ -170,16 +170,16 @@
         }
       }
     },
-    "/models/{model_id}/endpoints": {
+    "/endpoints": {
       "get": {
         "tags": [
           "Discovery"
         ],
-        "summary": "List Endpoints of Model",
-        "operationId": "list_endpoints_by_model_id",
+        "summary": "List Endpoints",
+        "operationId": "list_endpoints",
         "parameters": [
           {
-            "$ref": "#/components/parameters/ModelIDParam"
+            "$ref": "#/components/parameters/ModelIDParamQuery"
           }
         ],
         "responses": {
@@ -213,7 +213,7 @@
         "operationId": "create_endpoint",
         "parameters": [
           {
-            "$ref": "#/components/parameters/ModelIDParam"
+            "$ref": "#/components/parameters/ModelIDParamQuery"
           }
         ],
         "requestBody": {
@@ -251,7 +251,7 @@
         }
       }
     },
-    "/models/{model_id}/endpoints/{endpoint_id}": {
+    "/endpoints/{endpoint_id}": {
       "delete": {
         "tags": [
           "Manage"
@@ -259,9 +259,6 @@
         "summary": "Delete endpoint by ID",
         "operationId": "delete_endpoint_by_id",
         "parameters": [
-          {
-            "$ref": "#/components/parameters/ModelIDParam"
-          },
           {
             "$ref": "#/components/parameters/EnpointIDParam"
           }
@@ -613,6 +610,14 @@
         "name": "model_id",
         "description": "ID of model",
         "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ModelIDParamQuery": {
+        "in": "query",
+        "name": "model_id",
+        "description": "ID of model",
         "schema": {
           "type": "string"
         }
