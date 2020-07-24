@@ -34,6 +34,7 @@
           "Status"
         ],
         "summary": "Get Server Capabilities",
+        "description": "Returns the server capabilities",
         "operationId": "get_capabilities",
         "responses": {
           "200": {
@@ -146,7 +147,9 @@
         "tags": [
           "Manage"
         ],
+        "summary": "Delete latest Model",
         "description": "Removes latest model",
+        "operationId": "delete_latest_model",
         "responses": {
           "200": {
             "description": "Successful Response"
@@ -169,6 +172,9 @@
         "tags": [
           "Manage"
         ],
+        "summary": "Delete Model by ID",
+        "description": "Removes a model specified by ID",
+        "operationId": "delete_model_by_model_id",
         "parameters": [
           {
             "$ref": "#/components/parameters/ModelIDParam"
@@ -196,7 +202,8 @@
         "tags": [
           "Discovery"
         ],
-        "summary": "List Endpoints",
+        "summary": "List Endpoints of Model",
+        "operationId": "list_endpoints_by_model_id",
         "parameters": [
           {
             "$ref": "#/components/parameters/ModelIDParam"
@@ -230,6 +237,7 @@
           "Manage"
         ],
         "summary": "Create Endpoint",
+        "operationId": "create_endpoint",
         "parameters": [
           {
             "$ref": "#/components/parameters/ModelIDParam"
@@ -274,6 +282,7 @@
           "Manage"
         ],
         "summary": "Delete latest endpoint",
+        "operationId": "delete_latest_endpoint",
         "parameters": [
           {
             "$ref": "#/components/parameters/ModelIDParam"
@@ -308,6 +317,8 @@
         "tags": [
           "Manage"
         ],
+        "summary": "Delete endpoint by ID",
+        "operationId": "delete_endpoint_by_id",
         "parameters": [
           {
             "$ref": "#/components/parameters/ModelIDParam"
@@ -338,6 +349,8 @@
         "tags": [
           "Train"
         ],
+        "summary": "Train a model by ID",
+        "operationId": "train_model_by_id",
         "parameters": [
           {
             "$ref": "#/components/parameters/ModelIDParam"
@@ -413,7 +426,8 @@
   "components": {
     "schemas": {
       "MachineLearningModelEndpoints": {
-        "title": "List of Machine Learning Endpoints",
+        "title": "Machine Learning Endpoints List",
+        "description": "List of Machine Learning Endpoints",
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/MachineLearningModelEndpoint"
@@ -469,7 +483,8 @@
         }
       },
       "MachineLearningModels": {
-        "title": "List of Machine Learning Models",
+        "title": "Machine Learning Models List",
+        "description": "List of Machine Learning Models",
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/MachineLearningModel"
@@ -477,6 +492,7 @@
       },
       "MachineLearningModel": {
         "title": "Machine Learning Model",
+        "description": "Machine learning model data",
         "required": [
           "id",
           "name",
@@ -523,12 +539,14 @@
             "description": "date of the update of the model"
           },
           "version": {
-            "type": "string"
+            "type": "string",
+            "description": "version of the model"
           }
         }
       },
       "Feature": {
         "title": "Feature",
+        "description": "Feature of a model",
         "required": [
           "name",
           "order",
@@ -555,6 +573,7 @@
       },
       "Error": {
         "type": "object",
+        "description": "Error",
         "properties": {
           "error": {
             "title": "Error Message",
@@ -565,6 +584,7 @@
       },
       "OutputSchema": {
         "title": "OutputSchema",
+        "description": "Model output schema",
         "type": "object",
         "additionalProperties": true,
         "example": {
@@ -579,6 +599,7 @@
       },
       "ServerStatus": {
         "title": "ServerStatus",
+        "description": "Status of the service",
         "required": [
           "status"
         ],
@@ -602,6 +623,7 @@
       },
       "Capabilities": {
         "title": "Capabilities",
+        "description":"Available capabilities from this service",
         "required": [
           "capabilities"
         ],
