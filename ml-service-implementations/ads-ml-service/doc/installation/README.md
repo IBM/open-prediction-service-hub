@@ -157,7 +157,7 @@ JWT tokens. Meanwhile, to prevent man-in-the-middle attack,
 [HTTPS](https://en.wikipedia.org/wiki/HTTPS) needs to be configured. 
 [TLS termination proxy](https://en.wikipedia.org/wiki/TLS_termination_proxy) 
 is the recommended way
-(.e.g [traefik](https://docs.traefik.io/) and [caddy](https://caddyserver.com/)).
+(e.g [traefik](https://docs.traefik.io/) and [caddy](https://caddyserver.com/)).
 
 Some details:
 *   During initialization defined in `entrypoint.sh`, default user (can be configured by environment 
@@ -234,3 +234,8 @@ oc create route edge --service=ads-ml-service \
 Ingress controller configuration is platform dependent. Contact your K8S provider.
 
 ### Local service
+
+It is highly recommended to configure a TLS termination proxy (e.g [traefik](https://docs.traefik.io/))
+to easily and securely manage HTTPS configurations. For testing purposes,
+you can mount a volume containing `server.crt`, `server.crt`, `ca.crt`, point
+`SSL_SETTINGS` to its path and set `ENABLE_SSL=TRUE` to enable HTTPS.
