@@ -151,7 +151,7 @@
         "description": "Removes latest model",
         "operationId": "delete_latest_model",
         "responses": {
-          "200": {
+          "204": {
             "description": "Successful Response"
           },
           "default": {
@@ -181,7 +181,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Successful Response"
           },
           "default": {
@@ -328,7 +328,7 @@
           }
         ],
         "responses": {
-          "200": {
+          "204": {
             "description": "Successful Response"
           },
           "default": {
@@ -403,8 +403,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": true
+                  "$ref": "#/components/schemas/PredictionResponse"
                 }
               }
             }
@@ -425,12 +424,20 @@
   },
   "components": {
     "schemas": {
+      "PredictionResponse": {
+        "type": "object",
+        "additionalProperties": true
+      },
       "MachineLearningModelEndpoints": {
-        "title": "Machine Learning Endpoints List",
+        "title": "List of Machine Learning Endpoints",
         "description": "List of Machine Learning Endpoints",
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+        "properties": {
+          "endpoints" : {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+            }
+          }
         }
       },
       "MachineLearningModelEndpoint": {
@@ -483,11 +490,16 @@
         }
       },
       "MachineLearningModels": {
-        "title": "Machine Learning Models List",
+        "title": "List of Machine Learning Models",
         "description": "List of Machine Learning Models",
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/MachineLearningModel"
+        "type": "object",
+        "properties": {
+          "models" : {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MachineLearningModel"
+            }
+          }
         }
       },
       "MachineLearningModel": {
