@@ -90,7 +90,29 @@ Then you will see some thing like
 This part is not designed to offer a fine tuned ops cluster, but
 a minimum example of working ops instance.
 
-#### 2.1 kubernetes
+#### 2.1 OpenShift
+
+Although instances can be created in exactly the same way as using kubectl, 
+the cli tool offered by OpenShift really simplifies the entire workflow.
+
+Create a working instance in 3 lines:
+```shell script
+# 1.1 Create kubernetes namespace for OPS
+oc new-project ads-ml-service
+# 1.2 If namespace already exists
+oc project ads-ml-service
+
+# 2. Create kubernetes service and associated deployment for OPS
+oc new-app \
+  https://github.com/icp4a/automation-decision-services-extensions#master \
+  --name ads-ml-service \
+  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service
+  
+# Expose service to external clients (If ADS client is not in the same cluster)
+oc expose service/ads-ml-service
+```
+
+#### 2.2 kubernetes
 
 Suppose you have a working kubernetes cluster and have configured kubectl
 properly. To verify that, run `kubectl cluster-info`, your nodes should be listed.
@@ -127,23 +149,95 @@ ibm-cloud.kubernetes.io/external-ip: xxx.xxx.xxx.xxx
 
 ads-ml-service is available at `xxx.xxx.xxx.xxx` on port `30000`.
 
-#### 2.1 OpenShift
 
-Although instances can be created in exactly the same way as using kubectl, 
-the cli tool offered by OpenShift really simplifies the entire workflow.
+# Security configuration
 
-Create a working instance in 3 lines:
+Authentication and authorization is achieved by using username/password and 
+JWT tokens. Meanwhile, to prevent man-in-the-middle attack,
+[HTTPS](https://en.wikipedia.org/wiki/HTTPS) needs to be configured. 
+[TLS termination proxy](https://en.wikipedia.org/wiki/TLS_termination_proxy) 
+is the recommended way
+(e.g [traefik](https://docs.traefik.io/) and [caddy](https://caddyserver.com/)).
+
+Some details:
+*   During initialization defined in `entrypoint.sh`, default user (can be configured by environment 
+    var `DEFAULT_USER` and `DEFAULT_USER_PWD`) and example models are added. Default values for username and password 
+    are `admin` and `password`. 
+*   JWT HMAC secret key is generated using standard library secrets during server initialization.
+
+## Configure ops credentials
+
+Suppose you want to create a user with name `toto` and password `titi`.
+
+### OpenShift
+
+You can achieve this simply by overriding the service creation command:
+
 ```shell script
-# 1.1 Create kubernetes namespace for OPS
-oc new-project ads-ml-service
-# 1.2 If namespace already exists
-oc project ads-ml-service
-
-# 2. Create kubernetes service and associated deployment for OPS
-oc new-app --name ads-ml-service {{IMAGE_URL}}
-
-# Expose service to external clients (If ADS client is not in the same cluster)
-oc expose service/ads-ml-service
+oc new-app \
+  https://github.com/icp4a/automation-decision-services-extensions#master \
+  --name ads-ml-service \
+  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service \
+  DEFAULT_USER=toto \
+  DEFAULT_USER_PWD=titi
 ```
 
-`{{IMAGE_URL}}` is the same as [kubernetes](#21-kubernetes)
+### Kubernetes
+
+Suppose you want to do the same thing using `kubectl`. First you need to create
+K8S secret object.
+
+```shell script
+kubectl create secret generic ops-user-creds \
+      --from-literal=DEFAULT_USER=toto\
+      --from-literal=DEFAULT_USER_PWD=titi
+```
+
+you will see:
+```
+secret/ops-user-creds created
+```
+
+Finally replace the old deployment file `deployment.yaml` by `deployment_custom_pwd.yaml`:
+```
+kubectl apply -f kubernetes/deployment_custom_pwd.yaml
+```
+
+### Local service 
+
+Replace the command by:
+
+```shell script
+docker run --detach --restart=always \
+  --publish 80:8080 \
+  --name open-prediction \
+  -e DEFAULT_USER=toto \
+  -e DEFAULT_USER_PWD=titi \
+  open-prediction:latest
+```
+
+## Configure HTTPS
+
+Suppose you have already storied your certificates under `${MASTER_CONFIG_DIR}`
+
+### OpenShift
+
+Replace `oc expose service/ads-ml-service` by:
+
+```shell script
+oc create route edge --service=ads-ml-service \
+    --cert=${MASTER_CONFIG_DIR}/server.crt \
+    --key=${MASTER_CONFIG_DIR}/server.key \
+    --ca-cert=${MASTER_CONFIG_DIR}/ca.crt
+```
+
+### Kubernetes
+
+Ingress controller configuration is platform dependent. Contact your K8S provider.
+
+### Local service
+
+It is highly recommended to configure a TLS termination proxy (e.g [traefik](https://docs.traefik.io/))
+to easily and securely manage HTTPS configurations. For testing purposes,
+you can mount a volume containing `server.key`, `server.crt`, `ca.crt`, point
+`SSL_SETTINGS` to its path and set `ENABLE_SSL=TRUE` to enable HTTPS.

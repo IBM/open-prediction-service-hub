@@ -9,7 +9,7 @@ set -e
 . "${OPS_HOME}"/prestart.sh
 
 
-if [ ! -f "${MODEL_STORAGE}/key.pem" ] || [ ! -f "${MODEL_STORAGE}/cert.pem" ]; then
+if [ ! -f "${SSL_SETTINGS}/server.key" ] || [ ! -f "${SSL_SETTINGS}/server.crt" ] || [ ! -f "${SSL_SETTINGS}/ca.crt" ]; then
   # default certificate
   echo "[INFO] SSL certificates not found"
   echo "[INFO] Creating default certificates"
@@ -18,7 +18,9 @@ if [ ! -f "${MODEL_STORAGE}/key.pem" ] || [ ! -f "${MODEL_STORAGE}/cert.pem" ]; 
     -nodes \
     -subj '/CN=localhost' \
     -days 365 \
-    -keyout "${MODEL_STORAGE}/key.pem" -out "${MODEL_STORAGE}/cert.pem"
+    -keyout "${SSL_SETTINGS}/server.key" -out "${SSL_SETTINGS}/server.crt"
+  cp "${SSL_SETTINGS}/server.crt" "${SSL_SETTINGS}/ca.crt"
+  echo "[INFO] Created self-signed certificates"
 fi
 
 
