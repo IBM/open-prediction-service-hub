@@ -11,7 +11,7 @@
       "description": "Endpoints related to the capacities of the server"
     },
     {
-      "name": "Discovery",
+      "name": "Discover",
       "description": "Endpoints related to the discovery of machine learning models and deployments"
     },
     {
@@ -81,7 +81,7 @@
     "/models": {
       "get": {
         "tags": [
-          "Discovery"
+          "Discover"
         ],
         "summary": "List Models",
         "description": "Returns the list of ML models.",
@@ -184,7 +184,7 @@
     "/endpoints": {
       "get": {
         "tags": [
-          "Discovery"
+          "Discover"
         ],
         "summary": "List Endpoints",
         "operationId": "list_endpoints",
@@ -711,7 +711,7 @@
             "items":{
               "type": "string",
               "enum": [
-                "discovery",
+                "discover",
                 "manage",
                 "runtime"
               ]
