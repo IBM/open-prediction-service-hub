@@ -830,7 +830,7 @@
         "name": "page_size",
         "description": "number of items to return",
         "schema": {
-          "type": "string"
+          "type": "integer"
         }
       },
       "PageBeforeParam": {
