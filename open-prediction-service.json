@@ -706,13 +706,16 @@
         "properties": {
           "capabilities": {
             "title": "Capabilities",
-            "type": "string",
+            "type": "array",
             "description": "Capabilities of the service",
-            "enum": [
-              "discovery",
-              "manage",
-              "runtime"
-            ]
+            "items":{
+              "type": "string",
+              "enum": [
+                "discovery",
+                "manage",
+                "runtime"
+              ]
+            }
           }
         }
       },
