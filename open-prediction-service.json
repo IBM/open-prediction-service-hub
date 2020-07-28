@@ -760,7 +760,7 @@
         },
         "example": {
           "parameters": [
-           {
+            {
                 "name": "creditScore",
                 "value": "5"
             },
@@ -779,7 +779,8 @@
             {
                 "name": "rate",
                 "value": "3"
-            },
+            }
+          ],
           "target": [
             {
               "rel": "endpoint",
