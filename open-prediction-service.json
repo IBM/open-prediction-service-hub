@@ -736,8 +736,8 @@
         "title": "Prediction Payload",
         "description": "All information needed for model invocation",
         "required": [
-          "endpoint_id",
-          "params"
+          "target",
+          "parameters"
         ],
         "type": "object",
         "properties": {
