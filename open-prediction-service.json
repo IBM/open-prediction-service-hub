@@ -86,6 +86,17 @@
         "summary": "List Models",
         "description": "Returns the list of ML models.",
         "operationId": "list_models",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PageSizeParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageBeforeParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageAfterParam"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -180,6 +191,15 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ModelIDParamQuery"
+          },
+          {
+            "$ref": "#/components/parameters/PageSizeParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageBeforeParam"
+          },
+          {
+            "$ref": "#/components/parameters/PageAfterParam"
           }
         ],
         "responses": {
@@ -340,7 +360,12 @@
       },
       "PredictionResponse": {
         "type": "object",
-        "additionalProperties": true
+        "properties": {
+          "result": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
       },
       "MachineLearningModelEndpoints": {
         "title": "List of Machine Learning Endpoints",
@@ -413,8 +438,12 @@
           "deployed_at": "2020-07-24T17:53:47.909Z",
           "links": [
             {
+              "rel": "self",
+              "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+            },
+            {
               "rel": "model",
-              "href": "78bcb500-cdce-11ea-87d0-0242ac130003"
+              "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
             }
           ]
         }
@@ -429,8 +458,66 @@
             "items": {
               "$ref": "#/components/schemas/MachineLearningModel"
             }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
           }
-        }
+        },
+        "example": [
+          {
+            "models": [
+              {
+                "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
+                "name": "Linear regression #1",
+                "input_schema": [
+                  {
+                    "name": "feature #1",
+                    "order": 1,
+                    "type": "integer"
+                  },
+                  {
+                    "name": "feature #2",
+                    "order": 2,
+                    "type": "double"
+                  }
+                ],
+                "output_schema": null,
+                "created_at": "2020-07-24T16:53:47.909Z",
+                "modified_at": "2020-07-24T16:53:47.909Z",
+                "version": "v0",
+                "links": [
+                  {
+                    "rel": "self",
+                    "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
+                  },
+                  {
+                    "rel": "endpoint",
+                    "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
+                  },
+                  {
+                    "rel": "endpoint",
+                    "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "links": [
+              {
+                "rel": "prev",
+                "href": null
+              },
+              {
+                "rel": "next",
+                "href": "http://open-prediction-service.org/models?page_after=88bcb500-cdce-11ea-87d0-0242ac130003&page_size=2"
+              }
+            ]
+          }
+        ]
       },
       "MachineLearningModel": {
         "title": "Machine Learning Model",
@@ -513,12 +600,16 @@
           "version": "v0",
           "links": [
             {
-              "rel": "endpoint",
-              "href": "841ff27c-cdce-11ea-87d0-0242ac130003"
+              "rel": "self",
+              "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
             },
             {
               "rel": "endpoint",
-              "href": "8c2af534-cdce-11ea-87d0-0242ac130003"
+              "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
+            },
+            {
+              "rel": "endpoint",
+              "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
             }
           ]
         }
@@ -643,24 +734,33 @@
       },
       "Prediction": {
         "title": "Prediction Payload",
+        "description": "All information needed for model invocation",
         "required": [
-          "deployment_id",
+          "endpoint_id",
           "params"
         ],
         "type": "object",
         "properties": {
-          "deployment_id": {
-            "title": "deployment id",
+          "target": {
+            "description": "Add at least a relation to an `endpoint id `to be able to call the correct prediction. Eventually add also a `model id` in case endpoints contains multiple models.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            },
+            "minItems": 1
+          },
+          "endpoint_id": {
+            "title": "endpoint id",
             "type": "string",
-            "description": "id of the deployment to call"
+            "description": "id of the endpoint to call"
           },
           "model_id": {
             "title": "model id",
             "type": "string",
             "description": "optionnal id of the model id corresponding to this deployment (in case deployments have multiple models for example)"
           },
-          "params": {
-            "title": "Params",
+          "parameters": {
+            "title": "Parameters",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Parameter"
@@ -668,7 +768,18 @@
             "description": "Model parameters"
           }
         },
-        "description": "All information needed for model invocation"
+        "example": {
+          "parameters": {
+            "age": 35,
+            "gender": "MALE"
+          },
+          "target": [
+            {
+              "rel": "endpoint",
+              "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+            }
+          ]
+        }
       }
     },
     "parameters": {
@@ -694,6 +805,30 @@
         "required": true,
         "name": "endpoint_id",
         "description": "ID of endpoint",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "PageSizeParam": {
+        "in": "query",
+        "name": "page_size",
+        "description": "number of items to return",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "PageBeforeParam": {
+        "in": "query",
+        "name": "page_before",
+        "description": "return page_size items before reference in page_before",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "PageAfterParam": {
+        "in": "query",
+        "name": "page_after",
+        "description": "return page_size items afrer reference in page_after",
         "schema": {
           "type": "string"
         }
