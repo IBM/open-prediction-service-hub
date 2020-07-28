@@ -360,9 +360,11 @@
       },
       "PredictionResponse": {
         "type": "object",
+        "description": "Response of a prediction",
         "properties": {
           "result": {
             "type": "object",
+            "description": "Result of a prediction",
             "additionalProperties": true
           }
         }
@@ -373,6 +375,7 @@
         "properties": {
           "endpoints": {
             "type": "array",
+            "description": "List of endpoints",
             "items": {
               "$ref": "#/components/schemas/MachineLearningModelEndpoint"
             }
@@ -455,12 +458,14 @@
         "properties": {
           "models": {
             "type": "array",
+            "description": "List of models",
             "items": {
               "$ref": "#/components/schemas/MachineLearningModel"
             }
           },
           "links": {
             "type": "array",
+            "description": "List of links",
             "items": {
               "$ref": "#/components/schemas/Link"
             }
