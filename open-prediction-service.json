@@ -749,16 +749,6 @@
             },
             "minItems": 1
           },
-          "endpoint_id": {
-            "title": "endpoint id",
-            "type": "string",
-            "description": "id of the endpoint to call"
-          },
-          "model_id": {
-            "title": "model id",
-            "type": "string",
-            "description": "optionnal id of the model id corresponding to this deployment (in case deployments have multiple models for example)"
-          },
           "parameters": {
             "title": "Parameters",
             "type": "array",
