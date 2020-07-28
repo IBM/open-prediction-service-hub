@@ -33,6 +33,15 @@ The Open Prediction Service is available as an [Open API v3 specification](open-
 
 All the types manipulated by the different endpoints are described in the *Schemas* section below.
 
+Python tests based on *pytest* are provided to insure integration in Decision Designer or Decision Runtime.
+
+``` bash
+pytest api-tests/ --url <ENPOINT_URL>
+
+# For example:
+pytest api-tests/ --url http://localhost:8080/
+```
+
 ![OpenAPI](doc/ops-OpenApi.jpg)
 
 ### *Admin* section

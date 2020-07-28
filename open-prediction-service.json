@@ -759,10 +759,27 @@
           }
         },
         "example": {
-          "parameters": {
-            "age": 35,
-            "gender": "MALE"
-          },
+          "parameters": [
+           {
+                "name": "creditScore",
+                "value": "5"
+            },
+            {
+                "name": "income",
+                "value": "5"
+            },
+            {
+                "name": "loanAmount",
+                "value": "5"
+            },
+            {
+                "name": "monthDuration",
+                "value": "5"
+            },
+            {
+                "name": "rate",
+                "value": "3"
+            },
           "target": [
             {
               "rel": "endpoint",
