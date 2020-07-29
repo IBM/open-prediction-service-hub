@@ -445,7 +445,7 @@
               "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
             },
             {
-              "rel": "model",
+              "rel": "model_id",
               "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
             }
           ]
@@ -499,11 +499,11 @@
                     "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
                   },
                   {
-                    "rel": "endpoint",
+                    "rel": "endpoint_id",
                     "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
                   },
                   {
-                    "rel": "endpoint",
+                    "rel": "endpoint_id",
                     "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
                   }
                 ]
@@ -609,11 +609,11 @@
               "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
             },
             {
-              "rel": "endpoint",
+              "rel": "endpoint_id",
               "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
             },
             {
-              "rel": "endpoint",
+              "rel": "endpoint_id",
               "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
             }
           ]
@@ -750,7 +750,7 @@
         "type": "object",
         "properties": {
           "target": {
-            "description": "Add at least a relation to an `endpoint id `to be able to call the correct prediction. Eventually add also a `model id` in case endpoints contains multiple models.",
+            "description": "Add at least a relation to an `endpoint_id `to be able to call the correct prediction. Eventually add also a `model_id` in case endpoints contains multiple models.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Link"
@@ -791,7 +791,7 @@
           ],
           "target": [
             {
-              "rel": "endpoint",
+              "rel": "endpoint_id",
               "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
             }
           ]
