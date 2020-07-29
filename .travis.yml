@@ -33,14 +33,16 @@ stages:
   - name: deploy
     if: |
       env(RELEASE_YEAR) IS present AND \
-      env(RELEASE_QUARTER) IS present AND \
-      env(TRAVIS_BRANCH) == concat("release", "/", env(RELEASE_YEAR), env(RELEASE_QUARTER))
-
+      ( env(RELEASE_QUARTER) IS present OR env(DESIGNER_Q) IS present )
 
 # Needed to install IBM cloud cli
 sudo: required
 
 deploy:
   - provider: script
-    skip_cleanup: true
     script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
+    on:
+      all_branches: true
+      condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${RELEASE_QUARTER}"
+#  - provider: script
+#    script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
