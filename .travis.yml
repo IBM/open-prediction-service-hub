@@ -28,13 +28,6 @@ script:
   # Test project inside container
   - docker run --rm -it --entrypoint="python3" ads-ml-service -m pytest /app/app/tests
 
-stages:
-  - test
-  - name: deploy
-    if: |
-      env(RELEASE_YEAR) IS present AND \
-      ( env(RELEASE_QUARTER) IS present OR env(DESIGNER_Q) IS present )
-
 # Needed to install IBM cloud cli
 sudo: required
 
@@ -44,5 +37,8 @@ deploy:
     on:
       all_branches: true
       condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${RELEASE_QUARTER}"
-#  - provider: script
-#    script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
+  - provider: script
+    script: chmod +x kubernetes/* && kubernetes/docker_image_registry.sh
+    on:
+      all_branches: true
+      condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${DESIGNER_COMPATIBLE_REL}"
