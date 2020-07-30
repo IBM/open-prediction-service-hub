@@ -81,7 +81,7 @@
     "/models": {
       "get": {
         "tags": [
-          "Discover"
+          "Discovery"
         ],
         "summary": "List Models",
         "description": "Returns the list of ML models.",
@@ -173,7 +173,7 @@
     "/endpoints": {
       "get": {
         "tags": [
-          "Discover"
+          "Discovery"
         ],
         "summary": "List Endpoints",
         "operationId": "list_endpoints",
@@ -425,7 +425,7 @@
               "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
             },
             {
-              "rel": "model_id",
+              "rel": "model",
               "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
             }
           ]
@@ -479,11 +479,11 @@
                     "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
                   },
                   {
-                    "rel": "endpoint_id",
+                    "rel": "endpoint",
                     "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
                   },
                   {
-                    "rel": "endpoint_id",
+                    "rel": "endpoint",
                     "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
                   }
                 ]
@@ -577,11 +577,11 @@
               "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
             },
             {
-              "rel": "endpoint_id",
+              "rel": "endpoint",
               "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
             },
             {
-              "rel": "endpoint_id",
+              "rel": "endpoint",
               "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
             }
           ]
@@ -724,7 +724,7 @@
         "type": "object",
         "properties": {
           "target": {
-            "description": "Add at least a relation to an `endpoint_id `to be able to call the correct prediction. Eventually add also a `model_id` in case endpoints contains multiple models.",
+            "description": "Add at least a relation to an `endpoint`to be able to call the correct prediction. Eventually add also a `model` in case endpoints contains multiple models.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Link"
@@ -765,7 +765,7 @@
           ],
           "target": [
             {
-              "rel": "endpoint_id",
+              "rel": "endpoint",
               "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
             }
           ]
