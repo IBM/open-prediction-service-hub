@@ -42,4 +42,4 @@ deploy:
     script: chmod +x kubernetes/* && kubernetes/docker_image_registry.sh
     on:
       all_branches: true
-      condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${DESIGNER_COMPATIBLE_REL}"
+      # condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${DESIGNER_COMPATIBLE_REL}"
