@@ -17,9 +17,10 @@ install:
   - python3 -m pip install --quiet -r requirements-ml.txt
   - python3 -m pip install --quiet -r requirements.txt
   - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M')
+  - export FULL_TAG=${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}
   - docker build -t ads-ml-service:latest -f Dockerfile .
   # example tag: demo:20200729-1530-20-release-2020Q2
-  - docker tag ads-ml-service:latest ads-ml-service:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}
+  - docker tag ads-ml-service:latest ads-ml-service:${FULL_TAG}
 
 # Launch Testes
 script:
