@@ -86,17 +86,6 @@
         "summary": "List Models",
         "description": "Returns the list of ML models.",
         "operationId": "list_models",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/PageSizeParam"
-          },
-          {
-            "$ref": "#/components/parameters/PageBeforeParam"
-          },
-          {
-            "$ref": "#/components/parameters/PageAfterParam"
-          }
-        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -191,15 +180,6 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/ModelIDParamQuery"
-          },
-          {
-            "$ref": "#/components/parameters/PageSizeParam"
-          },
-          {
-            "$ref": "#/components/parameters/PageBeforeParam"
-          },
-          {
-            "$ref": "#/components/parameters/PageAfterParam"
           }
         ],
         "responses": {
@@ -509,18 +489,6 @@
                 ]
               }
             ]
-          },
-          {
-            "links": [
-              {
-                "rel": "prev",
-                "href": null
-              },
-              {
-                "rel": "next",
-                "href": "http://open-prediction-service.org/models?page_after=88bcb500-cdce-11ea-87d0-0242ac130003&page_size=2"
-              }
-            ]
           }
         ]
       },
@@ -706,18 +674,24 @@
         "properties": {
           "capabilities": {
             "title": "Capabilities",
-            "type": "array",
             "description": "Capabilities of the service",
-            "items":{
-              "type": "string",
-              "enum": [
-                "discover",
-                "manage",
-                "runtime"
-              ]
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Capability"
             }
           }
         }
+      },
+      "Capability": {
+        "title": "Capability",
+        "description": "capability of a service",
+        "type": "string",
+        "enum": [
+          "status",
+          "discover",
+          "manage",
+          "runtime"
+        ]
       },
       "Parameter": {
         "title": "Parameter",
@@ -769,24 +743,24 @@
         "example": {
           "parameters": [
             {
-                "name": "creditScore",
-                "value": "5"
+              "name": "creditScore",
+              "value": "5"
             },
             {
-                "name": "income",
-                "value": "5"
+              "name": "income",
+              "value": "5"
             },
             {
-                "name": "loanAmount",
-                "value": "5"
+              "name": "loanAmount",
+              "value": "5"
             },
             {
-                "name": "monthDuration",
-                "value": "5"
+              "name": "monthDuration",
+              "value": "5"
             },
             {
-                "name": "rate",
-                "value": "3"
+              "name": "rate",
+              "value": "3"
             }
           ],
           "target": [
@@ -821,30 +795,6 @@
         "required": true,
         "name": "endpoint_id",
         "description": "ID of endpoint",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "PageSizeParam": {
-        "in": "query",
-        "name": "page_size",
-        "description": "number of items to return",
-        "schema": {
-          "type": "integer"
-        }
-      },
-      "PageBeforeParam": {
-        "in": "query",
-        "name": "page_before",
-        "description": "return page_size items before reference in page_before",
-        "schema": {
-          "type": "string"
-        }
-      },
-      "PageAfterParam": {
-        "in": "query",
-        "name": "page_after",
-        "description": "return page_size items afrer reference in page_after",
         "schema": {
           "type": "string"
         }
