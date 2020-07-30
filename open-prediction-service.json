@@ -7,19 +7,19 @@
   },
   "tags": [
     {
-      "name": "Status",
+      "name": "status",
       "description": "Endpoints related to the capacities of the server"
     },
     {
-      "name": "Discover",
+      "name": "discover",
       "description": "Endpoints related to the discovery of machine learning models and deployments"
     },
     {
-      "name": "Manage",
+      "name": "manage",
       "description": "Endpoints related to the management of machine learning models and deployments"
     },
     {
-      "name": "Runtime",
+      "name": "runtime",
       "description": "Endpoints to run deployed models"
     }
   ],
@@ -27,7 +27,7 @@
     "/capabilities": {
       "get": {
         "tags": [
-          "Status"
+          "status"
         ],
         "summary": "Get Server Capabilities",
         "description": "Returns the server capabilities",
@@ -59,7 +59,7 @@
     "/status": {
       "get": {
         "tags": [
-          "Status"
+          "status"
         ],
         "summary": "Get Server Status",
         "description": "Returns a health check on underlying services availability",
@@ -81,7 +81,7 @@
     "/models": {
       "get": {
         "tags": [
-          "Discovery"
+          "discover"
         ],
         "summary": "List Models",
         "description": "Returns the list of ML models.",
@@ -111,7 +111,7 @@
       },
       "post": {
         "tags": [
-          "Manage"
+          "manage"
         ],
         "summary": "Add a trained Model",
         "description": "Adds a trained mode in the form of a trained model file",
@@ -143,7 +143,7 @@
     "/models/{model_id}": {
       "delete": {
         "tags": [
-          "Manage"
+          "manage"
         ],
         "summary": "Delete Model by ID",
         "description": "Removes a model specified by ID",
@@ -173,7 +173,7 @@
     "/endpoints": {
       "get": {
         "tags": [
-          "Discovery"
+          "discover"
         ],
         "summary": "List Endpoints",
         "operationId": "list_endpoints",
@@ -207,7 +207,7 @@
       },
       "post": {
         "tags": [
-          "Manage"
+          "manage"
         ],
         "summary": "Create Endpoint",
         "operationId": "create_endpoint",
@@ -254,7 +254,7 @@
     "/endpoints/{endpoint_id}": {
       "delete": {
         "tags": [
-          "Manage"
+          "manage"
         ],
         "summary": "Delete endpoint by ID",
         "operationId": "delete_endpoint_by_id",
@@ -283,7 +283,7 @@
     "/predictions": {
       "post": {
         "tags": [
-          "Runtime"
+          "runtime"
         ],
         "summary": "Call Prediction of specified deployment",
         "operationId": "prediction",
