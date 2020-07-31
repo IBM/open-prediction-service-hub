@@ -31,22 +31,22 @@ ibm_container_registry_login() {
 
 tag_image() {
   echo -e "${YELLOW}[INFO] Tagging image${NC}"
-  docker tag open-prediction:"${IMAGE_TAG}" us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}"
-  docker tag open-prediction:latest us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest
+  docker tag ads-ml-service:"${IMAGE_TAG}" us.icr.io/"${CR_NAMESPACE}"/ads-ml-service:"${IMAGE_TAG}"
+  docker tag ads-ml-service:latest us.icr.io/"${CR_NAMESPACE}"/ads-ml-service:latest
 }
 
 push_image() {
   echo -e "${YELLOW}[INFO] Pushing image${NC}"
-  docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}"
-  docker push us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest
+  docker push us.icr.io/"${CR_NAMESPACE}"/ads-ml-service:"${IMAGE_TAG}"
+  docker push us.icr.io/"${CR_NAMESPACE}"/ads-ml-service:latest
 }
 
 ibm_cloud_specific(){
   # Free version of register have limited size
-  ibmcloud cr image-rm us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest || echo -e "Not need to remove image"
+  ibmcloud cr image-rm us.icr.io/"${CR_NAMESPACE}"/ads-ml-service:latest || echo -e "Not need to remove image"
   ibmcloud cr build \
-    -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:"${IMAGE_TAG}" \
-    -t us.icr.io/"${CR_NAMESPACE}"/open-prediction:latest \
+    -t us.icr.io/"${CR_NAMESPACE}"/ads-ml-service:"${IMAGE_TAG}" \
+    -t us.icr.io/"${CR_NAMESPACE}"/ads-ml-service:latest \
     -f Dockerfile .
 }
 
