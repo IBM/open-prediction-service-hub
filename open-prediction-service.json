@@ -19,7 +19,7 @@
       "description": "Endpoints related to the management of machine learning models and deployments"
     },
     {
-      "name": "runtime",
+      "name": "run",
       "description": "Endpoints to run deployed models"
     }
   ],
@@ -283,7 +283,7 @@
     "/predictions": {
       "post": {
         "tags": [
-          "runtime"
+          "run"
         ],
         "summary": "Call Prediction of specified deployment",
         "operationId": "prediction",
@@ -690,7 +690,7 @@
           "status",
           "discover",
           "manage",
-          "runtime"
+          "run"
         ]
       },
       "Parameter": {
