@@ -56,21 +56,21 @@
         }
       }
     },
-    "/status": {
+    "/info": {
       "get": {
         "tags": [
           "status"
         ],
-        "summary": "Get Server Status",
-        "description": "Returns a health check on underlying services availability",
-        "operationId": "get_status",
+        "summary": "Get Server Information and Status",
+        "description": "Returns a health check of underlying service and additional information",
+        "operationId": "get_info",
         "responses": {
           "200": {
             "description": "Health Check",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServerStatus"
+                  "$ref": "#/components/schemas/ServerInfo"
                 }
               }
             }
@@ -640,14 +640,26 @@
           }
         }
       },
-      "ServerStatus": {
-        "title": "ServerStatus",
-        "description": "Status of the service",
+      "ServerInfo": {
+        "title": "ServerInfo",
+        "description": "Information of the service",
         "required": [
-          "status"
+          "status",
+          "info"
         ],
         "type": "object",
         "properties": {
+          "info": {
+            "title": "Information",
+            "type": "object",
+            "description": "Information of the service",
+            "additionalProperties": true,
+            "example": {
+              "description": "Sample service for scikit-learn",
+              "version": "1.0.0",
+              "owner": "admin"
+            }
+          },
           "status": {
             "title": "Status",
             "type": "string",
