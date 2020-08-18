@@ -7,8 +7,8 @@
   },
   "tags": [
     {
-      "name": "status",
-      "description": "Endpoints related to the capacities of the server"
+      "name": "info",
+      "description": "Endpoints related to the capabilities of the server"
     },
     {
       "name": "discover",
@@ -27,7 +27,7 @@
     "/capabilities": {
       "get": {
         "tags": [
-          "status"
+          "info"
         ],
         "summary": "Get Server Capabilities",
         "description": "Returns the server capabilities",
@@ -59,7 +59,7 @@
     "/info": {
       "get": {
         "tags": [
-          "status"
+          "info"
         ],
         "summary": "Get Server Information and Status",
         "description": "Returns a health check of underlying service and additional information",
@@ -699,7 +699,7 @@
         "description": "capability of a service",
         "type": "string",
         "enum": [
-          "status",
+          "info",
           "discover",
           "manage",
           "run"
