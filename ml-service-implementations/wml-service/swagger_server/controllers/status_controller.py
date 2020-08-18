@@ -14,7 +14,7 @@
 # limitations under the License.IBM Confidential
 #
 
-import sys, os
+import sys
 
 import requests
 from swagger_server.util import get_wml_api_date_version, get_wml_credentials
