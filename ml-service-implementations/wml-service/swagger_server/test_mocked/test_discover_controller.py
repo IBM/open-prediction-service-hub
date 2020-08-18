@@ -16,14 +16,7 @@ from swagger_server.models.machine_learning_model_endpoints import MachineLearni
 from swagger_server.models.machine_learning_models import MachineLearningModels  # noqa: E501
 from swagger_server.test import BaseTestCase
 
-mocked_credentials = {
-    "WML_TOKEN": "token",
-    "WML_INSTANCE_ID": "instance_id",
-    "WML_URL": "url"
-}
-def mock_wml_env():
-    return mock.patch.dict(os.environ, mocked_credentials)
-
+from swagger_server.test_mocked.util import mock_wml_env, MOCKED_CREDENTIALS
 
 class TestDiscoverController(BaseTestCase, unittest.TestCase):
     """DiscoverController integration test stubs"""
@@ -54,7 +47,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                                 "text": ""
                             },
                             "online_url": {
-                                "url": mocked_credentials["WML_URL"] + "/v4/deployments/55c93e6f-82ac-4d51-a052-4d2249aabe7a/predictions"
+                                "url": MOCKED_CREDENTIALS["WML_URL"] + "/v4/deployments/55c93e6f-82ac-4d51-a052-4d2249aabe7a/predictions"
                             },
                             "state": "ready"
                         }
@@ -88,7 +81,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, MachineLearningModelEndpoints)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
 
     @mock_wml_env()
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -116,7 +109,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                                 "text": ""
                             },
                             "online_url": {
-                                "url": mocked_credentials["WML_URL"] + "/v4/deployments/55c93e6f-82ac-4d51-a052-4d2249aabe7a/predictions"
+                                "url": MOCKED_CREDENTIALS["WML_URL"] + "/v4/deployments/55c93e6f-82ac-4d51-a052-4d2249aabe7a/predictions"
                             },
                             "state": "ready"
                         }
@@ -149,7 +142,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, MachineLearningModelEndpoints)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
 
     @mock_wml_env()
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -177,7 +170,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                                 "text": ""
                             },
                             "online_url": {
-                                "url": mocked_credentials["WML_URL"] + "/v4/deployments/55c93e6f-82ac-4d51-a052-4d2249aabe7a/predictions"
+                                "url": MOCKED_CREDENTIALS["WML_URL"] + "/v4/deployments/55c93e6f-82ac-4d51-a052-4d2249aabe7a/predictions"
                             },
                             "state": "ready"
                         }
@@ -204,7 +197,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, MachineLearningModelEndpoints)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
 
     @mock_wml_env()
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -222,7 +215,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
 
     @mock_wml_env()
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -240,7 +233,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
 
     @mock_wml_env()
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -259,7 +252,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments?version=2020-08-07', data={}, headers=ANY)
 
     # LIST MODELS
     @mock_wml_env()
@@ -433,7 +426,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, MachineLearningModels)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/models?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/models?version=2020-08-07', data={}, headers=ANY)
 
     @mock_wml_env()
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -451,7 +444,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/models?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/models?version=2020-08-07', data={}, headers=ANY)
 
     @mock_wml_env()
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -469,7 +462,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/models?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/models?version=2020-08-07', data={}, headers=ANY)
 
     @mock_wml_env()
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -489,7 +482,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_request.assert_called_once_with("GET", mocked_credentials["WML_URL"] + '/v4/models?version=2020-08-07', data={}, headers=ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["WML_URL"] + '/v4/models?version=2020-08-07', data={}, headers=ANY)
 
 
 if __name__ == '__main__':

@@ -17,19 +17,11 @@
 import sys, os
 
 import requests
+from swagger_server.util import get_wml_api_date_version, get_wml_credentials
 from swagger_server.models.capabilities import Capabilities  # noqa: E501
 from swagger_server.models.capability import Capability  # noqa: E501
 from swagger_server.models.server_status import ServerStatus  # noqa: E501
 
-WML_URL = os.getenv('WML_URL')
-WML_INSTANCE_ID = os.getenv('WML_INSTANCE_ID')
-WML_TOKEN = os.getenv('WML_TOKEN')
-
-WML_CREDENTIALS = {
-    "token": WML_TOKEN,
-    "instance_id": WML_INSTANCE_ID,
-    "url": WML_URL
-}
 
 def get_capabilities():  # noqa: E501
     """Get Server Capabilities
@@ -52,12 +44,14 @@ def get_status():  # noqa: E501
     :rtype: ServerStatus
     """
     try:
-        url = WML_CREDENTIALS['url'] + "/v4/deployments" + "?version=" + api_version_date
+        wml_credentials = get_wml_credentials()
+        api_version_date = get_wml_api_date_version()
+        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date
 
         payload = {}
         headers = {
-            'ML-Instance-ID': WML_CREDENTIALS['instance_id'],
-            'Authorization': 'Bearer ' + WML_CREDENTIALS['token']
+            'ML-Instance-ID': wml_credentials['instance_id'],
+            'Authorization': 'Bearer ' + wml_credentials['token']
         }
 
         response = requests.request("GET", url, headers=headers, data=payload)
