@@ -114,8 +114,18 @@
           "manage"
         ],
         "summary": "Add a trained Model",
-        "description": "Adds a trained mode in the form of a trained model file",
+        "description": "Add a trained model to the service",
         "operationId": "add_model",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelFile"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -210,6 +220,7 @@
           "manage"
         ],
         "summary": "Create Endpoint",
+        "description": "Create a model endpoint",
         "operationId": "create_endpoint",
         "parameters": [
           {
@@ -514,6 +525,7 @@
             "description": "Name of model"
           },
           "input_schema": {
+            "$ref": "#/components/schemas/InputSchema",
             "title": "Input Schema",
             "type": "array",
             "items": {
@@ -587,6 +599,80 @@
           ]
         }
       },
+      "ModelFile": {
+        "title": "Model File",
+        "description": "Supported file from which a machine learning model can be loaded from",
+        "allOf": [
+          {
+            "type": "object",
+            "required": [
+              "file"
+            ],
+            "properties": {
+              "file": {
+                "title": "File",
+                "description": "File",
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/MachineLearningModel"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "metadata": {
+                "type": "object",
+                "description": "additional metadata",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "author": {
+                    "type": "string"
+                  },
+                  "method_name": {
+                    "type": "string"
+                  },
+                  "class_names": {
+                    "type": "object",
+                    "example": {
+                      "output_value": {
+                        "example": "label1"
+                      },
+                      "output_value_2": {
+                        "example": "label2"
+                      }
+                    }
+                  },
+                  "metrics": {
+                    "type": "array",
+                    "description": "Model Input Schema",
+                    "items": {
+                      "required": [
+                        "name",
+                        "type"
+                      ],
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        ]
+      },
       "Feature": {
         "title": "Feature",
         "description": "Feature of a model",
@@ -624,6 +710,14 @@
             "description": "Error message"
           }
         }
+      },
+      "InputSchema": {
+        "title": "Input Schema",
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Feature"
+        },
+        "description": "Input schema of ml model"
       },
       "OutputSchema": {
         "title": "OutputSchema",
