@@ -3,11 +3,9 @@
 from __future__ import absolute_import
 
 import unittest
-from datetime import datetime
 from unittest import mock
 
 from unittest.mock import ANY
-import os
 import requests
 
 from swagger_server.controllers.discover_controller import list_endpoints, list_models
