@@ -29,7 +29,6 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
 
         List Endpoints
         """
-        assert os.getenv("WML_TOKEN") == "token"
         mock_request.return_value.json.return_value = {
             "resources": [
                 {
