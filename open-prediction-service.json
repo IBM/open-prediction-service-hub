@@ -151,6 +151,191 @@
       }
     },
     "/models/{model_id}": {
+      "patch": {
+        "tags": [
+          "manage"
+        ],
+        "summary": "Update a model",
+        "description": "update an existing model in the service",
+        "operationId": "update_model_by_model_id",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ModelIDParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "allOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "title": "File",
+                        "description": "File",
+                        "type": "string",
+                        "format": "binary"
+                      }
+                    }
+                  },
+                  {
+                    "title": "Machine Learning Model",
+                    "description": "Machine learning model data",
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Name",
+                        "type": "string",
+                        "description": "Name of model"
+                      },
+                      "input_schema": {
+                        "title": "Input Schema",
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/InputSchema"
+                          }
+                        ],
+                        "description": "Input schema of native ml model"
+                      },
+                      "output_schema": {
+                        "title": "Output Schema",
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/OutputSchema"
+                          }
+                        ],
+                        "description": "Output schema of native ml model"
+                      },
+                      "version": {
+                        "type": "string",
+                        "description": "version of the model"
+                      },
+                      "links": {
+                        "description": "optional array of typed linked resources",
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/Link"
+                        }
+                      }
+                    },
+                    "example": {
+                      "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
+                      "name": "Linear regression #1",
+                      "input_schema": [
+                        {
+                          "name": "feature #1",
+                          "order": 1,
+                          "type": "integer"
+                        },
+                        {
+                          "name": "feature #2",
+                          "order": 2,
+                          "type": "double"
+                        }
+                      ],
+                      "output_schema": {
+                        "type": "array",
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "version": "v0",
+                      "links": [
+                        {
+                          "rel": "self",
+                          "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
+                        },
+                        {
+                          "rel": "endpoint",
+                          "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
+                        },
+                        {
+                          "rel": "endpoint",
+                          "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "metadata": {
+                        "type": "object",
+                        "description": "additional metadata",
+                        "properties": {
+                          "description": {
+                            "type": "string"
+                          },
+                          "author": {
+                            "type": "string"
+                          },
+                          "method_name": {
+                            "type": "string"
+                          },
+                          "class_names": {
+                            "type": "object",
+                            "example": {
+                              "output_value": "label",
+                              "output_value_2": "label2"
+                            }
+                          },
+                          "metrics": {
+                            "type": "array",
+                            "description": "Model Input Schema",
+                            "items": {
+                              "required": [
+                                "name",
+                                "type"
+                              ],
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningModel"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "manage"
@@ -525,12 +710,12 @@
             "description": "Name of model"
           },
           "input_schema": {
-            "$ref": "#/components/schemas/InputSchema",
             "title": "Input Schema",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Feature"
-            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InputSchema"
+              }
+            ],
             "description": "Input schema of ml model"
           },
           "output_schema": {
@@ -618,7 +803,100 @@
             }
           },
           {
-            "$ref": "#/components/schemas/MachineLearningModel"
+            "title": "Machine Learning Model",
+            "description": "Machine learning model data",
+            "required": [
+              "name",
+              "created_at"
+            ],
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string",
+                "description": "Name of model"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "date of the creation of the model"
+              },
+              "id": {
+                "title": "ID",
+                "type": "string",
+                "description": "ID of model"
+              },
+              "input_schema": {
+                "title": "Input Schema",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/InputSchema"
+                  }
+                ],
+                "description": "Input schema of native ml model"
+              },
+              "output_schema": {
+                "title": "Output Schema",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OutputSchema"
+                  }
+                ],
+                "description": "Output schema of native ml model"
+              },
+              "version": {
+                "type": "string",
+                "description": "version of the model"
+              },
+              "links": {
+                "description": "optional array of typed linked resources",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Link"
+                }
+              }
+            },
+            "example": {
+              "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
+              "name": "Linear regression #1",
+              "input_schema": [
+                {
+                  "name": "feature #1",
+                  "order": 1,
+                  "type": "integer"
+                },
+                {
+                  "name": "feature #2",
+                  "order": 2,
+                  "type": "double"
+                }
+              ],
+              "output_schema": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "created_at": "2020-07-24T16:53:47.909Z",
+              "version": "v0",
+              "links": [
+                {
+                  "rel": "self",
+                  "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
+                },
+                {
+                  "rel": "endpoint",
+                  "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
+                },
+                {
+                  "rel": "endpoint",
+                  "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+                }
+              ]
+            }
           },
           {
             "type": "object",
@@ -639,12 +917,8 @@
                   "class_names": {
                     "type": "object",
                     "example": {
-                      "output_value": {
-                        "example": "label1"
-                      },
-                      "output_value_2": {
-                        "example": "label2"
-                      }
+                      "output_value": "label",
+                      "output_value_2": "label2"
                     }
                   },
                   "metrics": {
@@ -723,16 +997,7 @@
         "title": "OutputSchema",
         "description": "Model output schema",
         "type": "object",
-        "additionalProperties": true,
-        "example": {
-          "prediction": {
-            "type": "string"
-          },
-          "probability": {
-            "type": "array",
-            "items": "double"
-          }
-        }
+        "additionalProperties": true
       },
       "ServerInfo": {
         "title": "ServerInfo",
