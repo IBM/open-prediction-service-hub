@@ -14,13 +14,17 @@
 # limitations under the License.IBM Confidential
 #
 
-import connexion
-import six
-
+import sys
+from swagger_server.util import \
+    get_wml_credentials  # , \
+#   get_wml_api_date_version
+# NOT USED because predictions endpoint not working with specified api version
 from swagger_server.models.error import Error  # noqa: E501
-from swagger_server.models.prediction import Prediction  # noqa: E501
 from swagger_server.models.prediction_response import PredictionResponse  # noqa: E501
-from swagger_server import util
+
+import requests
+import json
+
 
 def prediction(body):  # noqa: E501
     """Call Prediction of specified deployment
@@ -32,48 +36,64 @@ def prediction(body):  # noqa: E501
 
     :rtype: PredictionResponse
     """
-    # # Retrieve parameters
-    # req_data = []
-    # for param in body['parameters']:
-    #     # Comment: we dont have access to the model schemas ==> we do not know input data types
-    #     # Using input as it comes
-    #     req_data.append(param['value'])
-    # data = np.array([req_data])
-    #
-    # # Retrieve target
-    # endpoint = None
-    # for target in body['target']:
-    #     if 'rel' in target and target['rel'] == 'endpoint':
-    #         endpoint = target['href']
-    #
-    # if not endpoint:
-    #     return Error(error='endpoint should be provided in target array')
-    #
-    # # client.invoke_endpoint works with bytes buffers
-    # # serialize     input
-    # # deserialize   output
-    # # content type  The MIME type of the input data in the request body.
-    # [serializer, deserializer, contentType] = [npy_serializer, numpy_deserializer, 'application/x-npy']
-    #
-    # body = serializer(data)
-    #
-    # try:
-    #     client = boto3.client('sagemaker-runtime')
-    #     # Invoke endpoint with numpy content type
-    #     response = client.invoke_endpoint(
-    #         EndpointName=endpoint,
-    #         Body=body,
-    #         ContentType=contentType
-    #     )
-    #     response_body = response["Body"]
-    #     result = deserializer(response_body, response["ContentType"])
-    #     predictions = result[0]
-    #     return PredictionResponse(result=dict(predictions=predictions))
-    # except botocore.exceptions.ClientError as error:
-    #     return Error(error=str(error))
-    # except botocore.exceptions.ParamValidationError as error:
-    #     return Error(error=str(error))
-    # except:
-    #     print("Unexpected error:", sys.exc_info()[0])
-    #     return Error(error=str(sys.exc_info()[0]))
-    return 'todo'
+    # Retrieve parameters
+    req_data = []
+    fields_data = []
+    for param in body['parameters']:
+        # Comment: we dont have access to the model schemas ==> we do not know input data types
+        # Using input as it comes
+        # TODO TMP: parsing as int
+        req_data.append(int(param['value']))
+        fields_data.append(param['name'])
+    data = [req_data]
+
+    # Retrieve target
+    endpoint = None
+    for target in body['target']:
+        if 'rel' in target and target['rel'] == 'endpoint':
+            endpoint = target['href']
+
+    if not endpoint:
+        return Error(error='endpoint should be provided in target array')
+
+    try:
+        wml_credentials = get_wml_credentials()
+        # api_version_date = get_wml_api_date_version()
+        # 19/08/2020 Endpoint is not working when version is specified
+        # however according to https://watson-ml-v4-api.mybluemix.net/wml-restapi-cpd.html#/
+        # api version will be mandatory in the next release
+        url = wml_credentials[
+                  'url'] + "/v4/deployments/" + endpoint + "/predictions"  # + "?version=" + api_version_date
+
+        payload = {
+            "input_data": [
+                {
+                    "fields": fields_data,
+                    "values": data
+                }
+            ]
+        }
+        payload = json.dumps(payload)
+
+        headers = {
+            'Content-Type': 'application/json',
+            'ML-Instance-ID': wml_credentials['instance_id'],
+            'Authorization': 'Bearer ' + wml_credentials['token']
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload)
+        response.raise_for_status()
+
+        result = response.json()["predictions"]
+        result = result[0]
+        predictions = {}
+        for index, field in enumerate(result["fields"]):
+            predictions[field] = result["values"][0][index]
+        return PredictionResponse(result=dict(predictions=predictions))
+    except requests.exceptions.HTTPError as error:
+        return Error(error=str(error))
+    except requests.exceptions.RequestException as error:
+        return Error(error=str(error))
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        return Error(error=str(sys.exc_info()[0]))
