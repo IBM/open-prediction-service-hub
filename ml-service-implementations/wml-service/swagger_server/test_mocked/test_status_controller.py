@@ -13,6 +13,7 @@ from swagger_server.controllers.status_controller import get_capabilities, get_s
 
 from swagger_server.test_mocked.util import mock_wml_env, MOCKED_CREDENTIALS
 
+
 class TestStatusController(BaseTestCase):
     """StatusController integration test stubs"""
 
