@@ -7,11 +7,11 @@ from six import BytesIO
 
 from unittest import mock
 
-import botocore
-from botocore.response import StreamingBody
-
-import numpy as np
-
+# import botocore
+# from botocore.response import StreamingBody
+#
+# import numpy as np
+import requests
 
 from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.parameter import Parameter  # noqa: E501
@@ -21,52 +21,60 @@ from swagger_server.models.prediction_response import PredictionResponse  # noqa
 from swagger_server.test import BaseTestCase
 
 from swagger_server.controllers.runtime_controller import prediction
+from swagger_server.test_mocked.util import mock_wml_env, MOCKED_CREDENTIALS
 
 
 class TestRuntimeController(BaseTestCase):
     """RuntimeController integration test stubs"""
 
-    @mock.patch("swagger_server.controllers.runtime_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.runtime_controller.boto3.client")
-    def test_prediction(self, mock_boto_client, mock_invoke_endpoint):
+    @mock_wml_env()
+    @mock.patch("swagger_server.controllers.runtime_controller.requests.request")
+    def test_prediction(self, mock_request):
         """Test case for prediction
 
         Call Prediction of specified deployment
         """
-        mock_boto_client.return_value = botocore.client.BaseClient()
-        buffer = BytesIO()
-        x = np.array(['this on returned', 2, 3])
-        np.save(buffer, x)
-        body = StreamingBody(BytesIO(buffer.getvalue()), len(buffer.getvalue()))
 
-        mock_invoke_endpoint.return_value.invoke_endpoint.return_value = {
-            'Body': body,
-            'ContentType': 'application/x-npy',
-            'InvokedProductionVariant': 'string',
-            'CustomAttributes': 'string'
+        mock_request.return_value.json.return_value = {
+            "predictions": [
+                {
+                    "fields": [
+                        "prediction",
+                        "probability"
+                    ],
+                    "values": [
+                        [
+                            1,
+                            [
+                                0.0,
+                                1.0
+                            ]
+                        ]
+                    ]
+                }
+            ]
         }
 
-        body = Prediction(parameters=[Parameter(name='name', value='toto')], target=[Link(rel='endpoint', href='toto')])
+        body = Prediction(parameters=[Parameter(name='name', value='5')], target=[Link(rel='endpoint', href='toto')])
 
-        expected = "{'result': {'predictions': 'this on returned'}}"
+        expected = "{'result': {'predictions': {'prediction': 1, 'probability': [0.0, 1.0]}}}"
 
         response = prediction(json.loads(json.dumps(body)))
 
         assert isinstance(response, PredictionResponse)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_boto_client.assert_called_once_with('sagemaker-runtime')
-        mock_invoke_endpoint.assert_called_once()
+        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments/toto/predictions', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
 
-    @mock.patch("swagger_server.controllers.runtime_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.runtime_controller.boto3.client")
-    def test_prediction_no_endpoint_in_target(self, mock_boto_client, mock_invoke_endpoint):
+    @mock_wml_env()
+    @mock.patch("swagger_server.controllers.runtime_controller.requests.request")
+    def test_prediction_no_endpoint_in_target(self, mock_request):
         """Test case for prediction
 
         Call Prediction of specified deployment
         """
 
-        body = Prediction(parameters=[Parameter(name='name', value='toto')], target=[Link(rel='noEndpoint', href='toto')])
+        body = Prediction(parameters=[Parameter(name='name', value='5')], target=[Link(rel='noEndpoint', href='toto')])
 
         expected = "{'error': 'endpoint should be provided in target array'}"
 
@@ -75,85 +83,69 @@ class TestRuntimeController(BaseTestCase):
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_boto_client.assert_not_called()
-        mock_invoke_endpoint.assert_not_called()
+        mock_request.assert_not_called()
 
-    @mock.patch("swagger_server.controllers.runtime_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.runtime_controller.boto3.client")
-    def test_prediction_client_error(self, mock_boto_client, mock_invoke_endpoint):
+    @mock_wml_env()
+    @mock.patch("swagger_server.controllers.runtime_controller.requests.request")
+    def test_prediction_http_error(self, mock_request):
         """Test case for prediction
 
         Call Prediction of specified deployment
         """
-        mock_boto_client.return_value = botocore.client.BaseClient()
+        mock_request.return_value.json.side_effect = requests.exceptions.HTTPError("401 Client Error: Unauthorized")
 
-        mock_invoke_endpoint.return_value.invoke_endpoint.side_effect = botocore.exceptions.ClientError(
-            error_response={'Error': {'Code': 'ErrorCode'}},
-            operation_name='invoke_endpoint'
-        )
+        expected = ("{'error': '401 Client Error: Unauthorized'}")
 
-        body = Prediction(parameters=[Parameter(name='name', value='toto')], target=[Link(rel='endpoint', href='toto')])
-
-        expected = "{'error': 'An error occurred (ErrorCode) when calling the invoke_endpoint '\n" + \
-                   "          'operation: Unknown'}"
+        body = Prediction(parameters=[Parameter(name='name', value='5')], target=[Link(rel='endpoint', href='toto')])
 
         response = prediction(json.loads(json.dumps(body)))
 
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_boto_client.assert_called_once_with('sagemaker-runtime')
-        mock_invoke_endpoint.assert_called_once()
+        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments/toto/predictions', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
 
-    @mock.patch("swagger_server.controllers.runtime_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.runtime_controller.boto3.client")
-    def test_prediction_param_validation_error(self, mock_boto_client, mock_invoke_endpoint):
+    @mock_wml_env()
+    @mock.patch("swagger_server.controllers.runtime_controller.requests.request")
+    def test_prediction_request_error(self, mock_request):
         """Test case for prediction
 
         Call Prediction of specified deployment
         """
-        mock_boto_client.return_value = botocore.client.BaseClient()
+        mock_request.return_value.json.side_effect = requests.exceptions.RequestException("401 Client Error: Unauthorized")
 
-        mock_invoke_endpoint.return_value.invoke_endpoint.side_effect = botocore.exceptions.ParamValidationError(
-            report='param error'
-        )
+        expected = ("{'error': '401 Client Error: Unauthorized'}")
 
-        body = Prediction(parameters=[Parameter(name='name', value='toto')], target=[Link(rel='endpoint', href='toto')])
-
-        expected = "{'error': 'Parameter validation failed:\\nparam error'}"
+        body = Prediction(parameters=[Parameter(name='name', value='5')], target=[Link(rel='endpoint', href='toto')])
 
         response = prediction(json.loads(json.dumps(body)))
 
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_boto_client.assert_called_once_with('sagemaker-runtime')
-        mock_invoke_endpoint.assert_called_once()
+        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments/toto/predictions', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
 
-    @mock.patch("swagger_server.controllers.runtime_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.runtime_controller.boto3.client")
-    def test_prediction_unknown_error(self, mock_boto_client, mock_invoke_endpoint):
+    @mock_wml_env()
+    @mock.patch("swagger_server.controllers.runtime_controller.requests.request")
+    def test_prediction_unknown_error(self, mock_request):
         """Test case for prediction
 
         Call Prediction of specified deployment
         """
-        mock_boto_client.return_value = botocore.client.BaseClient()
-
-        mock_invoke_endpoint.return_value.invoke_endpoint.side_effect = {
+        mock_request.return_value.json.side_effect = {
             'error': 'error message'
         }
 
-        body = Prediction(parameters=[Parameter(name='name', value='toto')], target=[Link(rel='endpoint', href='toto')])
+        expected = '{\'error\': "<class \'TypeError\'>"}'
 
-        expected = "{'error': \"<class 'TypeError'>\"}"
+        body = Prediction(parameters=[Parameter(name='name', value='5')], target=[Link(rel='endpoint', href='toto')])
 
         response = prediction(json.loads(json.dumps(body)))
 
         assert isinstance(response, Error)
         assert str(response) == expected, 'response is not matching expected response'
 
-        mock_boto_client.assert_called_once_with('sagemaker-runtime')
-        mock_invoke_endpoint.assert_called_once()
+        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["WML_URL"] + '/v4/deployments/toto/predictions', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
 
 
 if __name__ == '__main__':
