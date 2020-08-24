@@ -113,14 +113,115 @@
         "tags": [
           "manage"
         ],
-        "summary": "Add a trained Model",
-        "description": "Add a trained model to the service",
+        "summary": "Add a Model",
+        "description": "Add a model to the service",
         "operationId": "add_model",
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ModelFile"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Name",
+                    "type": "string",
+                    "description": "Name of model"
+                  },
+                  "id": {
+                    "title": "ID",
+                    "type": "string",
+                    "description": "ID of model"
+                  },
+                  "input_schema": {
+                    "title": "Input Schema",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/InputSchema"
+                      }
+                    ],
+                    "description": "Input schema of native ml model"
+                  },
+                  "output_schema": {
+                    "title": "Output Schema",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/OutputSchema"
+                      }
+                    ],
+                    "description": "Output schema of native ml model"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "version of the model"
+                  },
+                  "links": {
+                    "description": "optional array of typed linked resources",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "additional metadata",
+                    "properties": {
+                      "description": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": true
+                  }
+                },
+                "example": {
+                  "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
+                  "name": "Linear regression #1",
+                  "input_schema": [
+                    {
+                      "name": "feature #1",
+                      "order": 1,
+                      "type": "integer"
+                    },
+                    {
+                      "name": "feature #2",
+                      "order": 2,
+                      "type": "double"
+                    }
+                  ],
+                  "output_schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "version": "v0",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
+                    },
+                    {
+                      "rel": "endpoint",
+                      "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
+                    },
+                    {
+                      "rel": "endpoint",
+                      "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+                    }
+                  ],
+                  "metadata": {
+                    "description": "model description",
+                    "author": "admin",
+                    "metrics": [
+                      {
+                        "name": "accuracy",
+                        "value": "0.97"
+                      }
+                    ]
+                  }
+                }
               }
             }
           },
@@ -165,23 +266,10 @@
         ],
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
                 "allOf": [
                   {
-                    "type": "object",
-                    "properties": {
-                      "file": {
-                        "title": "File",
-                        "description": "File",
-                        "type": "string",
-                        "format": "binary"
-                      }
-                    }
-                  },
-                  {
-                    "title": "Machine Learning Model",
-                    "description": "Machine learning model data",
                     "type": "object",
                     "properties": {
                       "name": {
@@ -217,6 +305,16 @@
                         "items": {
                           "$ref": "#/components/schemas/Link"
                         }
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "description": "additional metadata",
+                        "properties": {
+                          "description": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
                       }
                     },
                     "example": {
@@ -243,6 +341,7 @@
                           }
                         }
                       },
+                      "created_at": "2020-07-24T16:53:47.909Z",
                       "version": "v0",
                       "links": [
                         {
@@ -257,53 +356,16 @@
                           "rel": "endpoint",
                           "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
                         }
-                      ]
-                    }
-                  },
-                  {
-                    "type": "object",
-                    "properties": {
+                      ],
                       "metadata": {
-                        "type": "object",
-                        "description": "additional metadata",
-                        "properties": {
-                          "description": {
-                            "type": "string"
-                          },
-                          "author": {
-                            "type": "string"
-                          },
-                          "method_name": {
-                            "type": "string"
-                          },
-                          "class_names": {
-                            "type": "object",
-                            "example": {
-                              "output_value": "label",
-                              "output_value_2": "label2"
-                            }
-                          },
-                          "metrics": {
-                            "type": "array",
-                            "description": "Model Input Schema",
-                            "items": {
-                              "required": [
-                                "name",
-                                "type"
-                              ],
-                              "type": "object",
-                              "properties": {
-                                "name": {
-                                  "type": "string"
-                                },
-                                "value": {
-                                  "type": "string"
-                                }
-                              }
-                            }
+                        "description": "model description",
+                        "author": "admin",
+                        "metrics": [
+                          {
+                            "name": "accuracy",
+                            "value": "0.97"
                           }
-                        },
-                        "additionalProperties": true
+                        ]
                       }
                     }
                   }
@@ -416,9 +478,64 @@
           "description": "Required endpoint definition",
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "title": "ID",
+                    "type": "string",
+                    "description": "ID of Version"
+                  },
+                  "name": {
+                    "title": "Name",
+                    "type": "string",
+                    "description": "Name of Version"
+                  },
+                  "status": {
+                    "title": "Status",
+                    "type": "string",
+                    "description": "Status of endpoint",
+                    "enum": [
+                      "out_of_service",
+                      "creating",
+                      "updating",
+                      "under_maintenance",
+                      "rolling_back",
+                      "in_service",
+                      "deleting",
+                      "failed"
+                    ]
+                  },
+                  "links": {
+                    "description": "optional array of typed linked resources",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                },
+                "additionalProperties": true,
+                "example": {
+                  "id": "8c2af534-cdce-11ea-87d0-0242ac130003",
+                  "url": "http://my-model.zip",
+                  "name": "South America gigafactory",
+                  "status": [
+                    "in_service"
+                  ],
+                  "output_schema": null,
+                  "deployed_at": "2020-07-24T17:53:47.909Z",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+                    },
+                    {
+                      "rel": "model",
+                      "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
+                    }
+                  ]
+                }
               }
             }
           }
@@ -448,6 +565,97 @@
       }
     },
     "/endpoints/{endpoint_id}": {
+      "patch": {
+        "tags": [
+          "manage"
+        ],
+        "summary": "Update an endpoint",
+        "description": "update an existing model in the service",
+        "operationId": "update_endpoint_by_endpoint_id",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EnpointIDParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Name",
+                    "type": "string",
+                    "description": "Name of Version"
+                  },
+                  "status": {
+                    "title": "Status",
+                    "type": "string",
+                    "description": "Status of endpoint",
+                    "enum": [
+                      "out_of_service",
+                      "creating",
+                      "updating",
+                      "under_maintenance",
+                      "rolling_back",
+                      "in_service",
+                      "deleting",
+                      "failed"
+                    ]
+                  },
+                  "links": {
+                    "description": "optional array of typed linked resources",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  }
+                },
+                "additionalProperties": true,
+                "example": {
+                  "url": "http://my-model-2.zip",
+                  "name": "South America gigafactory",
+                  "status": [
+                    "in_service"
+                  ],
+                  "links": [
+                    {
+                      "rel": "self",
+                      "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+                    },
+                    {
+                      "rel": "model",
+                      "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": [
           "manage"
@@ -541,7 +749,17 @@
           "result": {
             "type": "object",
             "description": "Result of a prediction",
-            "additionalProperties": true
+            "additionalProperties": true,
+            "example": {
+              "prediction": "label 1",
+              "probability": [
+                0.2,
+                0.4,
+                0.2
+              ],
+              "timeElapsed": "2020-07-24T16:53:47.909Z",
+              "inError": false
+            }
           }
         }
       },
@@ -638,55 +856,8 @@
             "items": {
               "$ref": "#/components/schemas/MachineLearningModel"
             }
-          },
-          "links": {
-            "type": "array",
-            "description": "List of links",
-            "items": {
-              "$ref": "#/components/schemas/Link"
-            }
           }
-        },
-        "example": [
-          {
-            "models": [
-              {
-                "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
-                "name": "Linear regression #1",
-                "input_schema": [
-                  {
-                    "name": "feature #1",
-                    "order": 1,
-                    "type": "integer"
-                  },
-                  {
-                    "name": "feature #2",
-                    "order": 2,
-                    "type": "double"
-                  }
-                ],
-                "output_schema": null,
-                "created_at": "2020-07-24T16:53:47.909Z",
-                "modified_at": "2020-07-24T16:53:47.909Z",
-                "version": "v0",
-                "links": [
-                  {
-                    "rel": "self",
-                    "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
-                  },
-                  {
-                    "rel": "endpoint",
-                    "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
-                  },
-                  {
-                    "rel": "endpoint",
-                    "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        }
       },
       "MachineLearningModel": {
         "title": "Machine Learning Model",
@@ -747,6 +918,16 @@
             "items": {
               "$ref": "#/components/schemas/Link"
             }
+          },
+          "metadata": {
+            "type": "object",
+            "description": "additional metadata",
+            "properties": {
+              "description": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
           }
         },
         "example": {
@@ -764,7 +945,22 @@
               "type": "double"
             }
           ],
-          "output_schema": null,
+          "output_schema": {
+            "prediction": {
+              "type": "string"
+            },
+            "probability": {
+              "type": "array",
+              "items": "double"
+            },
+            "timeElapsed": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "inError": {
+              "type": "boolean"
+            }
+          },
           "created_at": "2020-07-24T16:53:47.909Z",
           "modified_at": "2020-07-24T16:53:47.909Z",
           "version": "v0",
@@ -781,171 +977,18 @@
               "rel": "endpoint",
               "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
             }
-          ]
-        }
-      },
-      "ModelFile": {
-        "title": "Model File",
-        "description": "Supported file from which a machine learning model can be loaded from",
-        "allOf": [
-          {
-            "type": "object",
-            "required": [
-              "file"
-            ],
-            "properties": {
-              "file": {
-                "title": "File",
-                "description": "File",
-                "type": "string",
-                "format": "binary"
+          ],
+          "metadata": {
+            "description": "model description",
+            "author": "admin",
+            "metrics": [
+              {
+                "name": "accuracy",
+                "value": "0.97"
               }
-            }
-          },
-          {
-            "title": "Machine Learning Model",
-            "description": "Machine learning model data",
-            "required": [
-              "name",
-              "created_at"
-            ],
-            "type": "object",
-            "properties": {
-              "name": {
-                "title": "Name",
-                "type": "string",
-                "description": "Name of model"
-              },
-              "created_at": {
-                "type": "string",
-                "format": "date-time",
-                "description": "date of the creation of the model"
-              },
-              "id": {
-                "title": "ID",
-                "type": "string",
-                "description": "ID of model"
-              },
-              "input_schema": {
-                "title": "Input Schema",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/InputSchema"
-                  }
-                ],
-                "description": "Input schema of native ml model"
-              },
-              "output_schema": {
-                "title": "Output Schema",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/OutputSchema"
-                  }
-                ],
-                "description": "Output schema of native ml model"
-              },
-              "version": {
-                "type": "string",
-                "description": "version of the model"
-              },
-              "links": {
-                "description": "optional array of typed linked resources",
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Link"
-                }
-              }
-            },
-            "example": {
-              "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
-              "name": "Linear regression #1",
-              "input_schema": [
-                {
-                  "name": "feature #1",
-                  "order": 1,
-                  "type": "integer"
-                },
-                {
-                  "name": "feature #2",
-                  "order": 2,
-                  "type": "double"
-                }
-              ],
-              "output_schema": {
-                "type": "array",
-                "items": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                }
-              },
-              "created_at": "2020-07-24T16:53:47.909Z",
-              "version": "v0",
-              "links": [
-                {
-                  "rel": "self",
-                  "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
-                },
-                {
-                  "rel": "endpoint",
-                  "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
-                },
-                {
-                  "rel": "endpoint",
-                  "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
-                }
-              ]
-            }
-          },
-          {
-            "type": "object",
-            "properties": {
-              "metadata": {
-                "type": "object",
-                "description": "additional metadata",
-                "properties": {
-                  "description": {
-                    "type": "string"
-                  },
-                  "author": {
-                    "type": "string"
-                  },
-                  "method_name": {
-                    "type": "string"
-                  },
-                  "class_names": {
-                    "type": "object",
-                    "example": {
-                      "output_value": "label",
-                      "output_value_2": "label2"
-                    }
-                  },
-                  "metrics": {
-                    "type": "array",
-                    "description": "Model Input Schema",
-                    "items": {
-                      "required": [
-                        "name",
-                        "type"
-                      ],
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string"
-                        },
-                        "value": {
-                          "type": "string"
-                        }
-                      }
-                    }
-                  }
-                },
-                "additionalProperties": true
-              }
-            }
+            ]
           }
-        ]
+        }
       },
       "Feature": {
         "title": "Feature",
@@ -1079,7 +1122,20 @@
           },
           "value": {
             "title": "Value",
-            "type": "string",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ],
             "description": "Value of the feature"
           }
         },
@@ -1114,24 +1170,16 @@
         "example": {
           "parameters": [
             {
-              "name": "creditScore",
-              "value": "5"
+              "name": "name",
+              "value": "John Doe"
             },
             {
-              "name": "income",
-              "value": "5"
+              "name": "age",
+              "value": 17
             },
             {
-              "name": "loanAmount",
-              "value": "5"
-            },
-            {
-              "name": "monthDuration",
-              "value": "5"
-            },
-            {
-              "name": "rate",
-              "value": "3"
+              "name": "ofAge",
+              "value": false
             }
           ],
           "target": [
