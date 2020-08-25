@@ -252,6 +252,41 @@
       }
     },
     "/models/{model_id}": {
+      "get": {
+        "tags": [
+          "discover"
+        ],
+        "summary": "Get a Model",
+        "description": "Returns a ML model.",
+        "operationId": "get_model_by_id",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ModelIDParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningModel"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "tags": [
           "manage"
@@ -565,6 +600,41 @@
       }
     },
     "/endpoints/{endpoint_id}": {
+      "get": {
+        "tags": [
+          "discover"
+        ],
+        "summary": "Get an Endpoint",
+        "description": "Returns an ML endpoint.",
+        "operationId": "get_endpoint_by_id",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/EnpointIDParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "tags": [
           "manage"
