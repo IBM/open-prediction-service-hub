@@ -270,7 +270,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModel"
+                  "$ref": "#/components/schemas/Model"
                 }
               }
             }
@@ -618,7 +618,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                  "$ref": "#/components/schemas/Endpoint"
                 }
               }
             }
