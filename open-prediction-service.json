@@ -1109,6 +1109,7 @@
       },
       "NominalParameter": {
         "title": "NominalParameter",
+        "description": "Nominal parameter for ml model invocation",
         "required": [
           "realtype",
           "name",
@@ -1131,8 +1132,9 @@
           }
         }
       },
-      "DisceteParameter": {
-        "title": "DisceteParameter",
+      "DiscreteParameter": {
+        "title": "DiscreteParameter",
+        "description": "Discrete (64bit integer) parameter for ml model invocation",
         "required": [
           "realtype",
           "name",
@@ -1158,6 +1160,7 @@
       },
       "ContinuousParameter": {
         "title": "ContinuousParameter",
+        "description": "Continuous (64bit float) parameter for ml model invocation",
         "required": [
           "realtype",
           "name",
@@ -1183,6 +1186,7 @@
       },
       "BooleanParameter": {
         "title": "BooleanParameter",
+        "description": "Boolean parameter for ml model invocation",
         "required": [
           "realtype",
           "name",
@@ -1213,7 +1217,7 @@
             "$ref": "#/components/schemas/NominalParameter"
           },
           {
-            "$ref": "#/components/schemas/DisceteParameter"
+            "$ref": "#/components/schemas/DiscreteParameter"
           },
           {
             "$ref": "#/components/schemas/ContinuousParameter"
