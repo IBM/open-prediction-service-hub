@@ -15,6 +15,7 @@ uvicorn
 gunicorn
 expiringdict
 sqlalchemy
+datamodel-code-generator~=0.5.28
 
 
 # Load pre-trained model
