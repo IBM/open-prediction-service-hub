@@ -1107,9 +1107,10 @@
           "run"
         ]
       },
-      "Parameter": {
-        "title": "Parameter",
+      "NominalParameter": {
+        "title": "NominalParameter",
         "required": [
+          "realtype",
           "name",
           "value"
         ],
@@ -1122,24 +1123,108 @@
           },
           "value": {
             "title": "Value",
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "integer"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "boolean"
-              }
-            ],
-            "description": "Value of the feature"
+            "type": "string",
+            "description": "Name of the nominal feature"
+          },
+          "realtype": {
+            "type": "string"
           }
-        },
-        "description": "Parameter for ml model invocation"
+        }
+      },
+      "DisceteParameter": {
+        "title": "DisceteParameter",
+        "required": [
+          "realtype",
+          "name",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of the feature"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer",
+            "format": "int64",
+            "description": "Name of the numerical feature"
+          },
+          "realtype": {
+            "type": "string"
+          }
+        }
+      },
+      "ContinuousParameter": {
+        "title": "ContinuousParameter",
+        "required": [
+          "realtype",
+          "name",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of the feature"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number",
+            "format": "double",
+            "description": "Name of the numerical feature"
+          },
+          "realtype": {
+            "type": "string"
+          }
+        }
+      },
+      "BooleanParameter": {
+        "title": "BooleanParameter",
+        "required": [
+          "realtype",
+          "name",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "description": "Name of the feature"
+          },
+          "value": {
+            "title": "Value",
+            "type": "boolean",
+            "description": "Name of the boolean feature"
+          },
+          "realtype": {
+            "type": "string"
+          }
+        }
+      },
+      "Parameter": {
+        "title": "Parameter",
+        "description": "Parameter for ml model invocation",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/NominalParameter"
+          },
+          {
+            "$ref": "#/components/schemas/DisceteParameter"
+          },
+          {
+            "$ref": "#/components/schemas/ContinuousParameter"
+          },
+          {
+            "$ref": "#/components/schemas/BooleanParameter"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "realtype"
+        }
       },
       "Prediction": {
         "title": "Prediction Payload",
