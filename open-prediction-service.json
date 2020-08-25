@@ -92,7 +92,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModels"
+                  "$ref": "#/components/schemas/Models"
                 }
               }
             }
@@ -233,7 +233,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModel"
+                  "$ref": "#/components/schemas/Model"
                 }
               }
             }
@@ -416,7 +416,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModel"
+                  "$ref": "#/components/schemas/Model"
                 }
               }
             }
@@ -480,7 +480,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelEndpoints"
+                  "$ref": "#/components/schemas/Endpoints"
                 }
               }
             }
@@ -581,7 +581,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                  "$ref": "#/components/schemas/Endpoint"
                 }
               }
             }
@@ -709,7 +709,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+                  "$ref": "#/components/schemas/Endpoint"
                 }
               }
             }
@@ -833,7 +833,7 @@
           }
         }
       },
-      "MachineLearningModelEndpoints": {
+      "Endpoints": {
         "title": "List of Machine Learning Endpoints",
         "description": "List of Machine Learning Endpoints",
         "properties": {
@@ -841,12 +841,12 @@
             "type": "array",
             "description": "List of endpoints",
             "items": {
-              "$ref": "#/components/schemas/MachineLearningModelEndpoint"
+              "$ref": "#/components/schemas/Endpoint"
             }
           }
         }
       },
-      "MachineLearningModelEndpoint": {
+      "Endpoint": {
         "title": "Machine Learning Model Endpoint",
         "description": "Represents a way to access to the runnable prediction",
         "required": [
@@ -915,7 +915,7 @@
           ]
         }
       },
-      "MachineLearningModels": {
+      "Models": {
         "title": "List of Machine Learning Models",
         "description": "List of Machine Learning Models",
         "type": "object",
@@ -924,12 +924,12 @@
             "type": "array",
             "description": "List of models",
             "items": {
-              "$ref": "#/components/schemas/MachineLearningModel"
+              "$ref": "#/components/schemas/Model"
             }
           }
         }
       },
-      "MachineLearningModel": {
+      "Model": {
         "title": "Machine Learning Model",
         "description": "Machine learning model data",
         "required": [
