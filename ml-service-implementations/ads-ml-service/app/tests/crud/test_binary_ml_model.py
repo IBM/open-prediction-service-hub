@@ -20,8 +20,8 @@ from typing import NoReturn
 
 from sqlalchemy.orm import Session
 
-from ... import crud
-from ...schemas.binary_ml_model import BinaryMLModelCreate
+from app import crud
+from app.schemas.binary_ml_model import BinaryMLModelCreate
 
 
 def test_create_binary_ml_model(db: Session, classification_predictor, classification_config) -> NoReturn:
