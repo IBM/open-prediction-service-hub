@@ -16,8 +16,8 @@
 
 
 from fastapi.testclient import TestClient
+
 from app.core.configuration import get_config
-from app.version import __version__
 
 
 def test_get_server_capabilities(
