@@ -117,8 +117,12 @@ def test_delete_model(db: Session, classification_predictor, classification_conf
     model = crud.crud_model.model.create(db, obj_in=model_in)
 
     model_1 = crud.crud_model.model.delete(db, id=model.id)
+    model_config_1 = model_1.config
+
     model_2 = crud.crud_model.model.get(db, id=model_1.id)
+    model_config_2 = crud.crud_model_config.model_config.get(db, id=model_config_1.id)
 
     assert model_2 is None
+    assert model_config_2 is None
     assert model_1.id == model.id
     assert jsonable_encoder(model_1.config.configuration) == jsonable_encoder(model.config.configuration)

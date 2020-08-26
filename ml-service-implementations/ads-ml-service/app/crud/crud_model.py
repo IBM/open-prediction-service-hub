@@ -19,7 +19,7 @@ from typing import Text
 
 from sqlalchemy.orm import Session
 
-from .base import CRUDBase, IdType
+from .base import CRUDBase
 from .crud_binary_ml_model import binary_ml_model
 from .crud_model_config import model_config
 from ..models import Model
@@ -44,15 +44,6 @@ class CRUDModel(CRUDBase[Model, ModelCreate, ModelUpdate]):
     def get_by_name_and_ver(self, db: Session, *, name: Text, version: Text):
         return db.query(Model) \
             .filter(Model.name == name, Model.version == version).first()
-
-    def delete(self, db: Session, *, id: IdType) -> Model:
-        model = self.get(db, id=id)
-        binary = binary_ml_model.delete(db, id=model.binary.id)
-        config = model_config.delete(db, id=model.config.id)
-        model_1 = super().delete(db, id=id)
-        model_1.binary = binary
-        model_1.config = config
-        return model_1
 
 
 model = CRUDModel(Model)
