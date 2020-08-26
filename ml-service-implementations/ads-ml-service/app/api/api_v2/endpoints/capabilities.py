@@ -17,13 +17,16 @@
 
 from fastapi import APIRouter
 
-from .endpoints import login
-from .endpoints import users
-from .endpoints import info
-from .endpoints import capabilities
+import app.gen.model.ops_model as ops_model
 
-api_router: APIRouter = APIRouter()
-api_router.include_router(login.router, tags=['Login'])
-api_router.include_router(users.router, prefix='/users', tags=['Users'])
-api_router.include_router(info.router)
-api_router.include_router(capabilities.router)
+router = APIRouter()
+
+
+@router.get(
+    path='/capabilities',
+    response_model=ops_model.Capabilities
+)
+def server_capabilities():
+    return {
+        'capabilities': ['info', 'discover', 'manage', 'run']
+    }
