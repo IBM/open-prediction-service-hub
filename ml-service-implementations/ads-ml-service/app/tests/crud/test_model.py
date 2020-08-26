@@ -20,10 +20,10 @@ import pickle
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from ... import crud
-from ...schemas.binary_ml_model import BinaryMLModelCreate
-from ...schemas.model import ModelCreate
-from ...schemas.model_config import ModelConfigCreate
+from app import crud
+from app.schemas.binary_ml_model import BinaryMLModelCreate
+from app.schemas.model import ModelCreate
+from app.schemas.model_config import ModelConfigCreate
 
 
 def test_create_model(db: Session, classification_predictor, classification_config):
