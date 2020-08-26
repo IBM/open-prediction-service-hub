@@ -15,13 +15,17 @@
 #
 
 
-from fastapi import APIRouter
+from fastapi.testclient import TestClient
+from app.core.configuration import get_config
+from app.version import __version__
 
-from .endpoints import login
-from .endpoints import users
-from .endpoints import info
 
-api_router: APIRouter = APIRouter()
-api_router.include_router(login.router, tags=['Login'])
-api_router.include_router(users.router, prefix='/users', tags=['Users'])
-api_router.include_router(info.router)
+def test_get_server_info(
+    client: TestClient
+) -> None:
+    response = client.get(f'{get_config().API_V2_STR}/info')
+    content = response.json()
+
+    assert response.status_code == 200
+    assert content['status'] == 'ok'
+    assert content['info']['server-version'] == __version__
