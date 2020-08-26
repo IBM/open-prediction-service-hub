@@ -22,14 +22,14 @@ from pathlib import Path
 
 from sqlalchemy.orm import Session
 
-from .base import Base
-from .session import engine
-from .. import crud
-from .. import schemas
-from ..core.configuration import get_config
-from ..schemas.binary_ml_model import BinaryMLModelCreate
-from ..schemas.model import ModelCreate
-from ..schemas.model_config import ModelConfigCreate
+from app import crud
+from app import schemas
+from app.core.configuration import get_config
+from app.db.base_class import Base
+from app.db.session import engine
+from app.schemas.binary_ml_model import BinaryMLModelCreate
+from app.schemas.model import ModelCreate
+from app.schemas.model_config import ModelConfigCreate
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 EXAMPLES_ROOT = PROJECT_ROOT.joinpath('examples')

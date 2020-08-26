@@ -18,24 +18,22 @@
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
-from ... import crud
-from ...schemas.model_config import ModelConfigCreate
+from app import crud
+from app.schemas.model_config import ModelConfigCreate
 
 
 def test_create_model_config(db: Session, classification_config):
     config_in = ModelConfigCreate(**classification_config)
     config = crud.model_config.create(db, obj_in=config_in)
 
-    assert config.name == config_in.name
-    assert config.version == config_in.version
     assert jsonable_encoder(config.configuration) == jsonable_encoder(config_in)
 
 
 def test_get_schemas(db: Session, classification_config):
     config_in = ModelConfigCreate(**classification_config)
     config = crud.model_config.create(db, obj_in=config_in)
-
     schemas = crud.model_config.get_all(db)
+
     assert len(schemas) == 1
     assert schemas[0].id == config.id
     assert jsonable_encoder(schemas[0].configuration) == jsonable_encoder(config_in)
@@ -44,8 +42,8 @@ def test_get_schemas(db: Session, classification_config):
 def test_get_model_config(db: Session, classification_config):
     config_in = ModelConfigCreate(**classification_config)
     config = crud.model_config.create(db, obj_in=config_in)
-
     m_2 = crud.model_config.get(db, id=config.id)
+
     assert m_2 is not None
     assert jsonable_encoder(m_2.configuration) == jsonable_encoder(config_in)
 
@@ -53,7 +51,6 @@ def test_get_model_config(db: Session, classification_config):
 def test_delete_model_config(db: Session, classification_config):
     config_in = ModelConfigCreate(**classification_config)
     config = crud.model_config.create(db, obj_in=config_in)
-
     config_2 = crud.model_config.delete(db, id=config.id)
 
     assert config_2.id == config.id

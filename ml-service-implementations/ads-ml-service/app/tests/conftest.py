@@ -17,23 +17,23 @@
 
 import os
 import random
+from datetime import datetime
 from typing import NoReturn, Dict, Generator, Text
 
 import numpy as np
 import pytest
-
 from fastapi.testclient import TestClient
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from .utils.utils import random_string
-from .utils.user import auth_token_from_username
-from ..core.configuration import get_config
-from .. import crud
-from ..db.base import Base
-from ..schemas import UserCreate
+from app import crud
+from app.core.configuration import get_config
+from app.db.base import Base
+from app.schemas import UserCreate
+from app.tests.utils.user import auth_token_from_username
+from app.tests.utils.utils import random_string
 
 
 class DummyRegressor(BaseEstimator, RegressorMixin):
@@ -137,7 +137,7 @@ def base_config() -> Dict:
         'metadata': {
             'description': random_string(),
             'author': random_string(),
-            'trained_at': random_string(),
+            'trained_at': datetime.strptime('1/1/2008 1:30 PM', '%m/%d/%Y %I:%M %p').__str__(),
             'metrics': [
                 {
                     'name': random_string(),

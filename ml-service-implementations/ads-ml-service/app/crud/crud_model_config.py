@@ -27,8 +27,6 @@ class CRUDModelConfig(CRUDBase[ModelConfig, ModelConfigCreate, ModelConfigUpdate
 
     def create(self, db: Session, *, obj_in: ModelConfigCreate) -> ModelConfig:
         db_obj = ModelConfig(
-            name=obj_in.name,
-            version=obj_in.version,
             configuration=obj_in.dict()
         )
         db.add(db_obj)
@@ -39,8 +37,6 @@ class CRUDModelConfig(CRUDBase[ModelConfig, ModelConfigCreate, ModelConfigUpdate
     def create_with_model(self, db: Session, *, obj_in: ModelConfigCreate, model_id: IdType) -> ModelConfig:
         db_obj = ModelConfig(
             model_id=model_id,
-            name=obj_in.name,
-            version=obj_in.version,
             configuration=jsonable_encoder(obj_in)
         )
         db.add(db_obj)
