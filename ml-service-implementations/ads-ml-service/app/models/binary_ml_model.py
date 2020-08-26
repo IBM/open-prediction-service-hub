@@ -18,13 +18,10 @@
 from sqlalchemy import Column, LargeBinary, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from ..db.base_class import Base
+from app.db.base_class import Base
 
 
 class BinaryMLModel(Base):
-    __tablename__ = "binary_ml_model"
-
-    id = Column(Integer, nullable=False, primary_key=True, index=True)
     model_b64 = Column(LargeBinary, nullable=False)
 
     model_id = Column(Integer, ForeignKey('model.id'))
