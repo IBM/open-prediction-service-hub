@@ -27,8 +27,8 @@ class Model(Base):
     name = Column(String, nullable=False)
     version = Column(String, nullable=False)
 
-    binary = relationship('BinaryMLModel', back_populates='model', uselist=False)
-    config = relationship('ModelConfig', back_populates='model', uselist=False)
+    binary = relationship('BinaryMLModel', back_populates='model', uselist=False, cascade='all, delete')
+    config = relationship('ModelConfig', back_populates='model', uselist=False, cascade='all, delete')
 
     __table_args__ = (
         UniqueConstraint('name', 'version', name='_unique_name_ver_combination'),
