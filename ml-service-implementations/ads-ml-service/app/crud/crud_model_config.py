@@ -27,7 +27,7 @@ class CRUDModelConfig(CRUDBase[ModelConfig, ModelConfigCreate, ModelConfigUpdate
 
     def create(self, db: Session, *, obj_in: ModelConfigCreate) -> ModelConfig:
         db_obj = ModelConfig(
-            configuration=obj_in.dict()
+            **obj_in.dict()
         )
         db.add(db_obj)
         db.commit()

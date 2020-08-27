@@ -31,8 +31,8 @@ class CRUDModel(CRUDBase[Model, ModelCreate, ModelUpdate]):
         db_binary = binary_ml_model.create(db, obj_in=obj_in.binary)
         db_config = model_config.create(db, obj_in=obj_in.config)
         db_obj = Model(
-            name=obj_in.config.name,
-            version=obj_in.config.version,
+            name=obj_in.name,
+            version=obj_in.version,
             binary=db_binary,
             config=db_config
         )
