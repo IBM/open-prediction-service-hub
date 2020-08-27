@@ -133,22 +133,10 @@
                     "description": "ID of model"
                   },
                   "input_schema": {
-                    "title": "Input Schema",
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/InputSchema"
-                      }
-                    ],
-                    "description": "Input schema of native ml model"
+                    "$ref": "#/components/schemas/InputSchema"
                   },
                   "output_schema": {
-                    "title": "Output Schema",
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/OutputSchema"
-                      }
-                    ],
-                    "description": "Output schema of native ml model"
+                    "$ref": "#/components/schemas/OutputSchema"
                   },
                   "version": {
                     "type": "string",
@@ -303,108 +291,92 @@
           "content": {
             "application/json": {
               "schema": {
-                "allOf": [
-                  {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Name",
+                    "type": "string",
+                    "description": "Name of model"
+                  },
+                  "input_schema": {
+                    "$ref": "#/components/schemas/InputSchema"
+                  },
+                  "output_schema": {
+                    "$ref": "#/components/schemas/OutputSchema"
+                  },
+                  "version": {
+                    "type": "string",
+                    "description": "version of the model"
+                  },
+                  "links": {
+                    "description": "optional array of typed linked resources",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Link"
+                    }
+                  },
+                  "metadata": {
                     "type": "object",
+                    "description": "additional metadata",
                     "properties": {
-                      "name": {
-                        "title": "Name",
-                        "type": "string",
-                        "description": "Name of model"
-                      },
-                      "input_schema": {
-                        "title": "Input Schema",
-                        "allOf": [
-                          {
-                            "$ref": "#/components/schemas/InputSchema"
-                          }
-                        ],
-                        "description": "Input schema of native ml model"
-                      },
-                      "output_schema": {
-                        "title": "Output Schema",
-                        "allOf": [
-                          {
-                            "$ref": "#/components/schemas/OutputSchema"
-                          }
-                        ],
-                        "description": "Output schema of native ml model"
-                      },
-                      "version": {
-                        "type": "string",
-                        "description": "version of the model"
-                      },
-                      "links": {
-                        "description": "optional array of typed linked resources",
-                        "type": "array",
-                        "items": {
-                          "$ref": "#/components/schemas/Link"
-                        }
-                      },
-                      "metadata": {
-                        "type": "object",
-                        "description": "additional metadata",
-                        "properties": {
-                          "description": {
-                            "type": "string"
-                          }
-                        },
-                        "additionalProperties": true
+                      "description": {
+                        "type": "string"
                       }
                     },
-                    "example": {
-                      "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
-                      "name": "Linear regression #1",
-                      "input_schema": [
-                        {
-                          "name": "feature #1",
-                          "order": 1,
-                          "type": "integer"
-                        },
-                        {
-                          "name": "feature #2",
-                          "order": 2,
-                          "type": "double"
-                        }
-                      ],
-                      "output_schema": {
-                        "type": "array",
-                        "items": {
-                          "type": "array",
-                          "items": {
-                            "type": "number"
-                          }
-                        }
-                      },
-                      "created_at": "2020-07-24T16:53:47.909Z",
-                      "version": "v0",
-                      "links": [
-                        {
-                          "rel": "self",
-                          "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
-                        },
-                        {
-                          "rel": "endpoint",
-                          "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
-                        },
-                        {
-                          "rel": "endpoint",
-                          "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
-                        }
-                      ],
-                      "metadata": {
-                        "description": "model description",
-                        "author": "admin",
-                        "metrics": [
-                          {
-                            "name": "accuracy",
-                            "value": "0.97"
-                          }
-                        ]
+                    "additionalProperties": true
+                  }
+                },
+                "example": {
+                  "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
+                  "name": "Linear regression #1",
+                  "input_schema": [
+                    {
+                      "name": "feature #1",
+                      "order": 1,
+                      "type": "integer"
+                    },
+                    {
+                      "name": "feature #2",
+                      "order": 2,
+                      "type": "double"
+                    }
+                  ],
+                  "output_schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
                       }
                     }
+                  },
+                  "created_at": "2020-07-24T16:53:47.909Z",
+                  "version": "v0",
+                  "links": [
+                    {
+                      "rel": "self",
+                      "href": "http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003"
+                    },
+                    {
+                      "rel": "endpoint",
+                      "href": "http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003"
+                    },
+                    {
+                      "rel": "endpoint",
+                      "href": "http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003"
+                    }
+                  ],
+                  "metadata": {
+                    "description": "model description",
+                    "author": "admin",
+                    "metrics": [
+                      {
+                        "name": "accuracy",
+                        "value": "0.97"
+                      }
+                    ]
                   }
-                ]
+                }
               }
             }
           },
@@ -951,22 +923,10 @@
             "description": "Name of model"
           },
           "input_schema": {
-            "title": "Input Schema",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/InputSchema"
-              }
-            ],
-            "description": "Input schema of ml model"
+            "$ref": "#/components/schemas/InputSchema"
           },
           "output_schema": {
-            "title": "Output Schema",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/OutputSchema"
-              }
-            ],
-            "description": "Output schema of ml model"
+            "$ref": "#/components/schemas/OutputSchema"
           },
           "created_at": {
             "type": "string",
