@@ -28,7 +28,7 @@ from app.schemas.model_config import ModelConfigCreate
 
 def test_create_model(db: Session, classification_predictor, classification_config):
     binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+    config_in = ModelConfigCreate(configuration=classification_config)
 
     model_in = ModelCreate(
         name=classification_config['name'],
@@ -40,14 +40,14 @@ def test_create_model(db: Session, classification_predictor, classification_conf
     model = crud.crud_model.model.create(db, obj_in=model_in)
 
     assert model is not None
-    assert model.name == config_in.name
-    assert model.version == config_in.version
-    assert jsonable_encoder(model.config.configuration) == jsonable_encoder(config_in)
+    assert model.name == config_in.configuration['name']
+    assert model.version == config_in.configuration['version']
+    assert jsonable_encoder(model.config.configuration) == jsonable_encoder(config_in.configuration)
 
 
 def test_count_models(db: Session, classification_predictor, classification_config):
     binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+    config_in = ModelConfigCreate(configuration=classification_config)
 
     model_in = ModelCreate(
         name=classification_config['name'],
@@ -64,7 +64,7 @@ def test_count_models(db: Session, classification_predictor, classification_conf
 
 def test_get_model(db: Session, classification_predictor, classification_config):
     binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+    config_in = ModelConfigCreate(configuration=classification_config)
 
     model_in = ModelCreate(
         name=classification_config['name'],
@@ -84,7 +84,7 @@ def test_get_model(db: Session, classification_predictor, classification_config)
 
 def test_get_model_by_name_and_version(db: Session, classification_predictor, classification_config):
     binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+    config_in = ModelConfigCreate(configuration=classification_config)
 
     model_in = ModelCreate(
         name=classification_config['name'],
@@ -105,7 +105,7 @@ def test_get_model_by_name_and_version(db: Session, classification_predictor, cl
 
 def test_delete_model(db: Session, classification_predictor, classification_config):
     binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+    config_in = ModelConfigCreate(configuration=classification_config)
 
     model_in = ModelCreate(
         name=classification_config['name'],

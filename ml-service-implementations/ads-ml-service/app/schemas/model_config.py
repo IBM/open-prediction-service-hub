@@ -15,32 +15,19 @@
 #
 
 
-from typing import Text, Optional, List, Dict
+from typing import Text, Optional, Dict, Any
 
 from pydantic import BaseModel
-
-from .feature import Feature
-from .metadata import Metadata
-from .output_schema import OutputSchema
 
 
 # Shared properties
 class ModelConfigBase(BaseModel):
-    name: Optional[Text]
-    version: Optional[Text]
-    method_name: Optional[Text]
-    input_schema: Optional[List[Feature]]
-    output_schema: Optional[OutputSchema]
-    metadata: Optional[Metadata]
+    configuration: Optional[Dict[Text, Any]]
 
 
 # Properties to receive via API on creation
 class ModelConfigCreate(ModelConfigBase):
-    name: Text
-    version: Text
-    method_name: Text
-    input_schema: List[Feature]
-    metadata: Metadata
+    configuration: Dict[Text, Any]
 
 
 # Properties to receive via API on update
@@ -49,8 +36,8 @@ class ModelConfigUpdate(ModelConfigBase):
 
 
 class ModelConfigInDBBase(ModelConfigBase):
-    id: Optional[int]
-    configuration: Dict
+    id: int
+    configuration: Dict[Text, Any]
 
     class Config:
         orm_mode = True

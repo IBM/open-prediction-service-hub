@@ -28,6 +28,7 @@ from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+import app.core.uri as uri
 from app import crud
 from app.core.configuration import get_config
 from app.db.base import Base
@@ -127,6 +128,51 @@ def classification_with_prob_predictor():
 
 @pytest.fixture
 def base_config() -> Dict:
+    config_v2 = {
+        'name': random_string(),
+        'version': '0.0.1',
+        'input_schema': [
+            {
+                'name': 'x',
+                'order': 0,
+                'type': 'double'
+            },
+            {
+                'name': 'y',
+                'order': 1,
+                'type': 'double'
+            }
+        ],
+        'output_schema': {
+            'prediction': {
+                'type': 'string'
+            },
+            'probability': {
+                'type': 'array',
+                'items': 'double'
+            },
+            'timeElapsed': {
+                'type': 'string',
+                'format': 'date-time'
+            },
+            'inError': {
+                'type': 'boolean'
+            }
+        },
+        'created_at': datetime.strptime('1/1/2008 1:30 PM', '%m/%d/%Y %I:%M %p').__str__(),
+        'modified_at': datetime.strptime('1/1/2008 1:30 PM', '%m/%d/%Y %I:%M %p').__str__(),
+        'metadata': {
+            'description': random_string(),
+            'author': random_string(),
+            'metrics': [
+                {
+                    'name': random_string(),
+                    'value': 0.97
+                }
+            ]
+        }
+
+    }
     config = {
         'name': random_string(),
         'version': random_string(),
@@ -146,16 +192,16 @@ def base_config() -> Dict:
             ]
         }
     }
-    return config
+    return config_v2
 
 
 @pytest.fixture
 def classification_config(base_config: Dict) -> Dict:
     base_config['method_name'] = 'predict'
     base_config['output_schema'] = {
-            'attributes': [
-                {'name': 'prediction', 'type': 'string'}
-            ]
+        'attributes': [
+            {'name': 'prediction', 'type': 'string'}
+        ]
     }
     return base_config
 
@@ -164,9 +210,9 @@ def classification_config(base_config: Dict) -> Dict:
 def regression_config(base_config: Dict) -> Dict:
     base_config['method_name'] = 'predict'
     base_config['output_schema'] = {
-            'attributes': [
-                {'name': 'prediction', 'type': 'float'}
-            ]
+        'attributes': [
+            {'name': 'prediction', 'type': 'float'}
+        ]
     }
     return base_config
 
@@ -175,10 +221,10 @@ def regression_config(base_config: Dict) -> Dict:
 def classification_prob_config(base_config: Dict) -> Dict:
     base_config['method_name'] = 'predict_proba'
     base_config['output_schema'] = {
-            'attributes': [
-                {'name': 'prediction', 'type': 'float'},
-                {'name': 'probabilities', 'type': '[Probability]'}
-            ]
+        'attributes': [
+            {'name': 'prediction', 'type': 'float'},
+            {'name': 'probabilities', 'type': '[Probability]'}
+        ]
     }
     return base_config
 
@@ -213,8 +259,8 @@ def client(db, tmp_path) -> Generator[TestClient, None, None]:
     def _db_override():
         return db
 
-    from ..main import app
-    from ..api.deps import get_db
+    from app.main import app
+    from app.api.deps import get_db
 
     app.dependency_overrides[get_db] = _db_override
 
