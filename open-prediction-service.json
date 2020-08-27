@@ -696,7 +696,6 @@
           }
         },
         "example": {
-          "id": "8bcb500-cdce-11ea-87d0-0242ac130003",
           "name": "Linear regression #1",
           "input_schema": [
             {
