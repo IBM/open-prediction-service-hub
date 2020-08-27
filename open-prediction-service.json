@@ -352,7 +352,7 @@
         "operationId": "get_endpoint_by_id",
         "parameters": [
           {
-            "$ref": "#/components/parameters/EnpointIDParam"
+            "$ref": "#/components/parameters/EndpointIDParam"
           }
         ],
         "responses": {
@@ -387,7 +387,7 @@
         "operationId": "update_endpoint_by_endpoint_id",
         "parameters": [
           {
-            "$ref": "#/components/parameters/EnpointIDParam"
+            "$ref": "#/components/parameters/EndpointIDParam"
           }
         ],
         "requestBody": {
@@ -430,7 +430,7 @@
         "operationId": "delete_endpoint_by_id",
         "parameters": [
           {
-            "$ref": "#/components/parameters/EnpointIDParam"
+            "$ref": "#/components/parameters/EndpointIDParam"
           }
         ],
         "responses": {
@@ -1083,7 +1083,7 @@
           "type": "string"
         }
       },
-      "EnpointIDParam": {
+      "EndpointIDParam": {
         "in": "path",
         "required": true,
         "name": "endpoint_id",
