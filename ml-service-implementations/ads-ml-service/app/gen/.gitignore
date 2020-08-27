@@ -1,2 +1,2 @@
-/model/**
-!/model/__init__.py
+/schemas/**
+!/schemas/__init__.py
