@@ -120,7 +120,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BaseModel"
+                "$ref": "#/components/schemas/ModelCreation"
               }
             }
           },
@@ -202,7 +202,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BaseModel"
+                "$ref": "#/components/schemas/ModelUpdate"
               }
             }
           },
@@ -313,7 +313,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BaseEndpoint"
+                "$ref": "#/components/schemas/EndpointCreation"
               }
             }
           }
@@ -394,7 +394,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BaseEndpoint"
+                "$ref": "#/components/schemas/EndpointUpdate"
               }
             }
           }
@@ -542,13 +542,9 @@
           }
         }
       },
-      "BaseEndpoint": {
-        "title": "Machine Learning Model Update/Create Endpoint",
+      "EndpointUpdate": {
+        "title": "Machine Learning Model Endpoint Update",
         "description": "Represents a way to access to the runnable prediction",
-        "required": [
-          "name",
-          "status"
-        ],
         "type": "object",
         "properties": {
           "name": {
@@ -593,6 +589,19 @@
           ]
         }
       },
+      "EndpointCreation": {
+        "title": "Machine Learning Model Endpoint Creation",
+        "description": "Represents a way to access to the runnable prediction",
+        "required": [
+          "name",
+          "status"
+        ],
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EndpointUpdate"
+          }
+        ]
+      },
       "Endpoint": {
         "title": "Machine Learning Model Endpoint",
         "description": "Represents a way to access to the runnable prediction",
@@ -604,7 +613,7 @@
         ],
         "allOf": [
           {
-            "$ref": "#/components/schemas/BaseEndpoint"
+            "$ref": "#/components/schemas/EndpointUpdate"
           }
         ],
         "type": "object",
@@ -654,12 +663,9 @@
           }
         }
       },
-      "BaseModel": {
-        "title": "Machine Learning Model",
+      "ModelUpdate": {
+        "title": "Machine Learning Model Update",
         "description": "Machine learning model data",
-        "required": [
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
@@ -748,6 +754,18 @@
           }
         }
       },
+      "ModelCreation": {
+        "title": "Machine Learning Model Creation",
+        "description": "Machine learning model data",
+        "required": [
+          "name"
+        ],
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ModelUpdate"
+          }
+        ]
+      },
       "Model": {
         "title": "Machine Learning Model",
         "description": "Machine learning model data",
@@ -759,7 +777,7 @@
         ],
         "allOf": [
           {
-            "$ref": "#/components/schemas/BaseModel"
+            "$ref": "#/components/schemas/ModelUpdate"
           },
           {
             "type": "object",
