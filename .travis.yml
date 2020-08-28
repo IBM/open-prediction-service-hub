@@ -15,19 +15,25 @@ before_install:
   - pip3 install --quiet -r requirements-test.txt
   - pip3 install --quiet -r requirements-ml.txt
   - pip3 install --quiet -r requirements.txt
+  - cd ../sagemaker-service
+  - pip3 install --quiet tox
 
 install:
+  - cd ../ads-ml-service
   - python3 setup.py install --quiet
 
 script:
   - python3 -m pytest -v src/tests
-
+  - cd ../sagemaker-service
+  - tox
 
 before_deploy:
   - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
   # example: demo:20190405-171003-4-master
   # '/' is replaces by -
-  - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f Dockerfile .
+  - docker build -t sagemaker-service:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t sagemaker-service:latest -f Dockerfile .
+  - cd ../ads-ml-service
+  - docker build -t ads-ml-service:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t ads-ml-service:latest -f Dockerfile .
 
 # Needed to install IBM cloud cli
 sudo: required
@@ -38,4 +44,4 @@ deploy:
     script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
     on:
       all_branches: true
-      condition: ${TRAVIS_BRANCH} =~ ^develop$
+      condition: ${TRAVIS_BRANCH} =~ ^(develop|release/2020Q3|release/2020Q2)$
