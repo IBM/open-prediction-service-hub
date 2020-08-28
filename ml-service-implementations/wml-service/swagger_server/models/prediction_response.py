@@ -44,7 +44,7 @@ class PredictionResponse(Model):
     def result(self) -> Dict:
         """Gets the result of this PredictionResponse.
 
-        Result of a prediction  # noqa: E501
+        Result of a Prediction  # noqa: E501
 
         :return: The result of this PredictionResponse.
         :rtype: Dict
@@ -55,7 +55,7 @@ class PredictionResponse(Model):
     def result(self, result: Dict):
         """Sets the result of this PredictionResponse.
 
-        Result of a prediction  # noqa: E501
+        Result of a Prediction  # noqa: E501
 
         :param result: The result of this PredictionResponse.
         :type result: Dict

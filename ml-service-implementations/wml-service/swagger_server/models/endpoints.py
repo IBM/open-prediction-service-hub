@@ -45,7 +45,7 @@ class Endpoints(Model):
     def endpoints(self) -> List[Endpoint]:
         """Gets the endpoints of this Endpoints.
 
-        List of endpoints  # noqa: E501
+        List of Endpoints  # noqa: E501
 
         :return: The endpoints of this Endpoints.
         :rtype: List[Endpoint]
@@ -56,7 +56,7 @@ class Endpoints(Model):
     def endpoints(self, endpoints: List[Endpoint]):
         """Sets the endpoints of this Endpoints.
 
-        List of endpoints  # noqa: E501
+        List of Endpoints  # noqa: E501
 
         :param endpoints: The endpoints of this Endpoints.
         :type endpoints: List[Endpoint]

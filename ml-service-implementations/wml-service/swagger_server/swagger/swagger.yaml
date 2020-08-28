@@ -56,7 +56,7 @@ paths:
       tags:
         - discover
       summary: List Models
-      description: Returns the list of ML models.
+      description: Returns the list of ML Models.
       operationId: list_models
       responses:
         "200":
@@ -136,7 +136,7 @@ paths:
       tags:
         - discover
       summary: Get an Endpoint
-      description: Returns an ML endpoint.
+      description: Returns an ML Endpoint.
       operationId: get_endpoint_by_id
       parameters:
         - name: endpoint_id
@@ -165,7 +165,7 @@ paths:
     post:
       tags:
         - run
-      summary: Call Prediction of specified deployment
+      summary: Call Prediction of specified Endpoint
       operationId: prediction
       requestBody:
         content:
@@ -205,7 +205,7 @@ components:
         result:
           type: object
           additionalProperties: true
-          description: Result of a prediction
+          description: Result of a Prediction
           example:
             prediction: label 1
             probability:
@@ -214,7 +214,7 @@ components:
               - 0.2
             timeElapsed: 2020-07-24T16:53:47.909Z
             inError: false
-      description: Response of a prediction
+      description: Response of a Prediction
       example:
         result:
           prediction: label 1
@@ -229,7 +229,7 @@ components:
       properties:
         endpoints:
           type: array
-          description: List of endpoints
+          description: List of Endpoints
           items:
             $ref: '#/components/schemas/Endpoint'
       description: List of Machine Learning Endpoints
@@ -237,8 +237,7 @@ components:
         endpoints:
           - id: 8c2af534-cdce-11ea-87d0-0242ac130003
             name: South America gigafactory
-            status:
-              - in_service
+            status: in_service
             deployed_at: 2020-07-24T17:53:47.909Z
             links:
               - rel: self
@@ -247,27 +246,17 @@ components:
                 href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
           - id: 8c2af534-cdce-11ea-87d0-0242ac130003
             name: South America gigafactory
-            status:
-              - in_service
+            status: in_service
             deployed_at: 2020-07-24T17:53:47.909Z
             links:
               - rel: self
                 href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
               - rel: model
                 href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
-    Endpoint:
-      title: Machine Learning Model Endpoint
-      required:
-        - deployed_at
-        - id
-        - name
-        - status
+    EndpointUpdate:
+      title: Machine Learning Model Endpoint Update
       type: object
       properties:
-        id:
-          title: ID
-          type: string
-          description: ID of Version
         name:
           title: Name
           type: string
@@ -275,7 +264,7 @@ components:
         status:
           title: Status
           type: string
-          description: Status of endpoint
+          description: Status of the Endpoint
           enum:
             - out_of_service
             - creating
@@ -285,27 +274,82 @@ components:
             - in_service
             - deleting
             - failed
-        deployed_at:
-          type: string
-          description: date of the Version
-          format: date-time
         links:
           type: array
-          description: optional array of typed linked resources
+          description: Optional array of typed linked resources
           items:
             $ref: '#/components/schemas/Link'
-      description: Represents a way to access to the runnable prediction
+      description: Represents a way to access to the runnable Prediction
+      example:
+        name: South America gigafactory
+        status: in_service
+        links:
+          - rel: model
+            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
+    EndpointCreation:
+      title: Machine Learning Model Endpoint Creation
+      required:
+        - name
+        - status
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Name of Version
+        status:
+          title: Status
+          type: string
+          description: Status of the Endpoint
+          enum:
+            - out_of_service
+            - creating
+            - updating
+            - under_maintenance
+            - rolling_back
+            - in_service
+            - deleting
+            - failed
+        links:
+          type: array
+          description: Optional array of typed linked resources
+          items:
+            $ref: '#/components/schemas/Link'
+      description: Represents a way to access to the runnable Prediction
+      example:
+        name: South America gigafactory
+        status: in_service
+        links:
+          - rel: model
+            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
+    Endpoint:
+      title: Machine Learning Model Endpoint
+      description: Represents a way to access to the runnable Prediction
       example:
         id: 8c2af534-cdce-11ea-87d0-0242ac130003
         name: South America gigafactory
-        status:
-          - in_service
+        status: in_service
         deployed_at: 2020-07-24T17:53:47.909Z
         links:
           - rel: self
             href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
           - rel: model
             href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
+      allOf:
+        - $ref: '#/components/schemas/EndpointCreation'
+        - required:
+            - deployed_at
+            - id
+          type: object
+          properties:
+            id:
+              title: Id
+              type: string
+              description: Id of Version
+            deployed_at:
+              type: string
+              description: date of the Version
+              format: date-time
     Models:
       title: List of Machine Learning Models
       type: object
@@ -390,41 +434,18 @@ components:
               metrics:
                 - name: accuracy
                   value: "0.97"
-    Model:
-      title: Machine Learning Model
-      required:
-        - created_at
-        - id
-        - modified_at
-        - name
+    ModelUpdate:
+      title: Machine Learning Model Update
       type: object
       properties:
-        id:
-          title: ID
-          type: string
-          description: ID of model
         name:
           title: Name
           type: string
           description: Name of model
         input_schema:
-          title: Input Schema
-          description: Input schema of ml model
-          allOf:
-            - $ref: '#/components/schemas/InputSchema'
+          $ref: '#/components/schemas/InputSchema'
         output_schema:
-          title: Output Schema
-          description: Output schema of ml model
-          allOf:
-            - $ref: '#/components/schemas/OutputSchema'
-        created_at:
-          type: string
-          description: date of the creation of the model
-          format: date-time
-        modified_at:
-          type: string
-          description: date of the update of the model
-          format: date-time
+          $ref: '#/components/schemas/OutputSchema'
         version:
           type: string
           description: version of the model
@@ -434,7 +455,99 @@ components:
           items:
             $ref: '#/components/schemas/Link'
         metadata:
-          $ref: '#/components/schemas/models_metadata'
+          $ref: '#/components/schemas/ModelUpdate_metadata'
+      description: Machine learning model data
+      example:
+        name: 'Linear regression #1'
+        input_schema:
+          - name: 'feature #1'
+            order: 1
+            type: integer
+          - name: 'feature #2'
+            order: 2
+            type: double
+        output_schema:
+          prediction:
+            type: string
+          probability:
+            type: array
+            items: double
+          timeElapsed:
+            type: string
+            format: date-time
+          inError:
+            type: boolean
+        version: v0
+        links:
+          - rel: endpoint
+            href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
+          - rel: endpoint
+            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
+        metadata:
+          description: model description
+          author: admin
+          metrics:
+            - name: accuracy
+              value: "0.97"
+    ModelCreation:
+      title: Machine Learning Model Creation
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Name of model
+        input_schema:
+          $ref: '#/components/schemas/InputSchema'
+        output_schema:
+          $ref: '#/components/schemas/OutputSchema'
+        version:
+          type: string
+          description: version of the model
+        links:
+          type: array
+          description: optional array of typed linked resources
+          items:
+            $ref: '#/components/schemas/Link'
+        metadata:
+          $ref: '#/components/schemas/ModelUpdate_metadata'
+      description: Machine learning model data
+      example:
+        name: 'Linear regression #1'
+        input_schema:
+          - name: 'feature #1'
+            order: 1
+            type: integer
+          - name: 'feature #2'
+            order: 2
+            type: double
+        output_schema:
+          prediction:
+            type: string
+          probability:
+            type: array
+            items: double
+          timeElapsed:
+            type: string
+            format: date-time
+          inError:
+            type: boolean
+        version: v0
+        links:
+          - rel: endpoint
+            href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
+          - rel: endpoint
+            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
+        metadata:
+          description: model description
+          author: admin
+          metrics:
+            - name: accuracy
+              value: "0.97"
+    Model:
+      title: Machine Learning Model
       description: Machine learning model data
       example:
         id: 8bcb500-cdce-11ea-87d0-0242ac130003
@@ -473,6 +586,26 @@ components:
           metrics:
             - name: accuracy
               value: "0.97"
+      allOf:
+        - $ref: '#/components/schemas/ModelUpdate'
+        - required:
+            - created_at
+            - id
+            - modified_at
+          type: object
+          properties:
+            id:
+              title: ID
+              type: string
+              description: ID of model
+            created_at:
+              type: string
+              description: date of the creation of the model
+              format: date-time
+            modified_at:
+              type: string
+              description: date of the update of the model
+              format: date-time
     Feature:
       title: Feature
       required:
@@ -574,94 +707,26 @@ components:
         - discover
         - manage
         - run
-    NominalParameter:
-      title: NominalParameter
-      required:
-        - name
-        - realtype
-        - value
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-          description: Name of the feature
-        value:
-          title: Value
-          type: string
-          description: Name of the nominal feature
-        realtype:
-          type: string
-      description: Nominal parameter for ml model invocation
-    DiscreteParameter:
-      title: DiscreteParameter
-      required:
-        - name
-        - realtype
-        - value
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-          description: Name of the feature
-        value:
-          title: Value
-          type: integer
-          description: Name of the numerical feature
-          format: int64
-        realtype:
-          type: string
-      description: Discrete (64bit integer) parameter for ml model invocation
-    ContinuousParameter:
-      title: ContinuousParameter
-      required:
-        - name
-        - realtype
-        - value
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-          description: Name of the feature
-        value:
-          title: Value
-          type: number
-          description: Name of the numerical feature
-          format: double
-        realtype:
-          type: string
-      description: Continuous (64bit float) parameter for ml model invocation
-    BooleanParameter:
-      title: BooleanParameter
-      required:
-        - name
-        - realtype
-        - value
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-          description: Name of the feature
-        value:
-          title: Value
-          type: boolean
-          description: Name of the boolean feature
-        realtype:
-          type: string
-      description: Boolean parameter for ml model invocation
     Parameter:
       title: Parameter
+      required:
+        - name
+        - value
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Name of the feature
+        value:
+          title: Value
+          description: Value of the feature
+          anyOf:
+            - type: integer
+            - type: number
+            - type: string
+            - type: boolean
       description: Parameter for ml model invocation
-      discriminator:
-        propertyName: realtype
-      oneOf:
-        - $ref: '#/components/schemas/NominalParameter'
-        - $ref: '#/components/schemas/DiscreteParameter'
-        - $ref: '#/components/schemas/ContinuousParameter'
-        - $ref: '#/components/schemas/BooleanParameter'
     Prediction:
       title: Prediction Payload
       required:
@@ -692,213 +757,17 @@ components:
             value: 17
           - name: ofAge
             value: false
+          - name: score
+            value: 0.42
         target:
           - rel: endpoint
             href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
-    models_metadata:
+    ModelUpdate_metadata:
       type: object
       properties:
         description:
           type: string
       description: additional metadata
-    body:
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-          description: Name of model
-        id:
-          title: ID
-          type: string
-          description: ID of model
-        input_schema:
-          title: Input Schema
-          description: Input schema of native ml model
-          allOf:
-            - $ref: '#/components/schemas/InputSchema'
-        output_schema:
-          title: Output Schema
-          description: Output schema of native ml model
-          allOf:
-            - $ref: '#/components/schemas/OutputSchema'
-        version:
-          type: string
-          description: version of the model
-        links:
-          type: array
-          description: optional array of typed linked resources
-          items:
-            $ref: '#/components/schemas/Link'
-        metadata:
-          $ref: '#/components/schemas/models_metadata'
-      example:
-        id: 8bcb500-cdce-11ea-87d0-0242ac130003
-        name: 'Linear regression #1'
-        input_schema:
-          - name: 'feature #1'
-            order: 1
-            type: integer
-          - name: 'feature #2'
-            order: 2
-            type: double
-        output_schema:
-          type: array
-          items:
-            type: array
-            items:
-              type: number
-        version: v0
-        links:
-          - rel: self
-            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
-          - rel: endpoint
-            href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
-          - rel: endpoint
-            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
-        metadata:
-          description: model description
-          author: admin
-          metrics:
-            - name: accuracy
-              value: "0.97"
-    body_1:
-      allOf:
-        - type: object
-          properties:
-            name:
-              title: Name
-              type: string
-              description: Name of model
-            input_schema:
-              title: Input Schema
-              description: Input schema of native ml model
-              allOf:
-                - $ref: '#/components/schemas/InputSchema'
-            output_schema:
-              title: Output Schema
-              description: Output schema of native ml model
-              allOf:
-                - $ref: '#/components/schemas/OutputSchema'
-            version:
-              type: string
-              description: version of the model
-            links:
-              type: array
-              description: optional array of typed linked resources
-              items:
-                $ref: '#/components/schemas/Link'
-            metadata:
-              $ref: '#/components/schemas/models_metadata'
-          example:
-            id: 8bcb500-cdce-11ea-87d0-0242ac130003
-            name: 'Linear regression #1'
-            input_schema:
-              - name: 'feature #1'
-                order: 1
-                type: integer
-              - name: 'feature #2'
-                order: 2
-                type: double
-            output_schema:
-              type: array
-              items:
-                type: array
-                items:
-                  type: number
-            created_at: 2020-07-24T16:53:47.909Z
-            version: v0
-            links:
-              - rel: self
-                href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
-              - rel: endpoint
-                href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
-              - rel: endpoint
-                href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
-            metadata:
-              description: model description
-              author: admin
-              metrics:
-                - name: accuracy
-                  value: "0.97"
-    body_2:
-      type: object
-      properties:
-        id:
-          title: ID
-          type: string
-          description: ID of Version
-        name:
-          title: Name
-          type: string
-          description: Name of Version
-        status:
-          title: Status
-          type: string
-          description: Status of endpoint
-          enum:
-            - out_of_service
-            - creating
-            - updating
-            - under_maintenance
-            - rolling_back
-            - in_service
-            - deleting
-            - failed
-        links:
-          type: array
-          description: optional array of typed linked resources
-          items:
-            $ref: '#/components/schemas/Link'
-      additionalProperties: true
-      example:
-        id: 8c2af534-cdce-11ea-87d0-0242ac130003
-        url: http://my-model.zip
-        name: South America gigafactory
-        status:
-          - in_service
-        deployed_at: 2020-07-24T17:53:47.909Z
-        links:
-          - rel: self
-            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
-          - rel: model
-            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
-    body_3:
-      type: object
-      properties:
-        name:
-          title: Name
-          type: string
-          description: Name of Version
-        status:
-          title: Status
-          type: string
-          description: Status of endpoint
-          enum:
-            - out_of_service
-            - creating
-            - updating
-            - under_maintenance
-            - rolling_back
-            - in_service
-            - deleting
-            - failed
-        links:
-          type: array
-          description: optional array of typed linked resources
-          items:
-            $ref: '#/components/schemas/Link'
-      additionalProperties: true
-      example:
-        url: http://my-model-2.zip
-        name: South America gigafactory
-        status:
-          - in_service
-        links:
-          - rel: self
-            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
-          - rel: model
-            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
   parameters:
     ModelIDParam:
       name: model_id
@@ -918,7 +787,7 @@ components:
       explode: true
       schema:
         type: string
-    EnpointIDParam:
+    EndpointIDParam:
       name: endpoint_id
       in: path
       description: ID of endpoint

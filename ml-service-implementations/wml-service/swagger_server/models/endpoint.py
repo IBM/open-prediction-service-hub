@@ -6,6 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.endpoint_creation import EndpointCreation  # noqa: F401,E501
 from swagger_server.models.link import Link  # noqa: F401,E501
 from swagger_server import util
 
@@ -15,40 +16,40 @@ class Endpoint(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: str=None, name: str=None, status: str=None, deployed_at: datetime=None, links: List[Link]=None):  # noqa: E501
+    def __init__(self, name: str=None, status: str=None, links: List[Link]=None, id: str=None, deployed_at: datetime=None):  # noqa: E501
         """Endpoint - a model defined in Swagger
 
-        :param id: The id of this Endpoint.  # noqa: E501
-        :type id: str
         :param name: The name of this Endpoint.  # noqa: E501
         :type name: str
         :param status: The status of this Endpoint.  # noqa: E501
         :type status: str
-        :param deployed_at: The deployed_at of this Endpoint.  # noqa: E501
-        :type deployed_at: datetime
         :param links: The links of this Endpoint.  # noqa: E501
         :type links: List[Link]
+        :param id: The id of this Endpoint.  # noqa: E501
+        :type id: str
+        :param deployed_at: The deployed_at of this Endpoint.  # noqa: E501
+        :type deployed_at: datetime
         """
         self.swagger_types = {
-            'id': str,
             'name': str,
             'status': str,
-            'deployed_at': datetime,
-            'links': List[Link]
+            'links': List[Link],
+            'id': str,
+            'deployed_at': datetime
         }
 
         self.attribute_map = {
-            'id': 'id',
             'name': 'name',
             'status': 'status',
-            'deployed_at': 'deployed_at',
-            'links': 'links'
+            'links': 'links',
+            'id': 'id',
+            'deployed_at': 'deployed_at'
         }
-        self._id = id
         self._name = name
         self._status = status
-        self._deployed_at = deployed_at
         self._links = links
+        self._id = id
+        self._deployed_at = deployed_at
 
     @classmethod
     def from_dict(cls, dikt) -> 'Endpoint':
@@ -60,31 +61,6 @@ class Endpoint(Model):
         :rtype: Endpoint
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def id(self) -> str:
-        """Gets the id of this Endpoint.
-
-        ID of Version  # noqa: E501
-
-        :return: The id of this Endpoint.
-        :rtype: str
-        """
-        return self._id
-
-    @id.setter
-    def id(self, id: str):
-        """Sets the id of this Endpoint.
-
-        ID of Version  # noqa: E501
-
-        :param id: The id of this Endpoint.
-        :type id: str
-        """
-        if id is None:
-            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
-
-        self._id = id
 
     @property
     def name(self) -> str:
@@ -115,7 +91,7 @@ class Endpoint(Model):
     def status(self) -> str:
         """Gets the status of this Endpoint.
 
-        Status of endpoint  # noqa: E501
+        Status of the Endpoint  # noqa: E501
 
         :return: The status of this Endpoint.
         :rtype: str
@@ -126,7 +102,7 @@ class Endpoint(Model):
     def status(self, status: str):
         """Sets the status of this Endpoint.
 
-        Status of endpoint  # noqa: E501
+        Status of the Endpoint  # noqa: E501
 
         :param status: The status of this Endpoint.
         :type status: str
@@ -139,6 +115,54 @@ class Endpoint(Model):
             )
 
         self._status = status
+
+    @property
+    def links(self) -> List[Link]:
+        """Gets the links of this Endpoint.
+
+        Optional array of typed linked resources  # noqa: E501
+
+        :return: The links of this Endpoint.
+        :rtype: List[Link]
+        """
+        return self._links
+
+    @links.setter
+    def links(self, links: List[Link]):
+        """Sets the links of this Endpoint.
+
+        Optional array of typed linked resources  # noqa: E501
+
+        :param links: The links of this Endpoint.
+        :type links: List[Link]
+        """
+
+        self._links = links
+
+    @property
+    def id(self) -> str:
+        """Gets the id of this Endpoint.
+
+        Id of Version  # noqa: E501
+
+        :return: The id of this Endpoint.
+        :rtype: str
+        """
+        return self._id
+
+    @id.setter
+    def id(self, id: str):
+        """Sets the id of this Endpoint.
+
+        Id of Version  # noqa: E501
+
+        :param id: The id of this Endpoint.
+        :type id: str
+        """
+        if id is None:
+            raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
+
+        self._id = id
 
     @property
     def deployed_at(self) -> datetime:
@@ -164,26 +188,3 @@ class Endpoint(Model):
             raise ValueError("Invalid value for `deployed_at`, must not be `None`")  # noqa: E501
 
         self._deployed_at = deployed_at
-
-    @property
-    def links(self) -> List[Link]:
-        """Gets the links of this Endpoint.
-
-        optional array of typed linked resources  # noqa: E501
-
-        :return: The links of this Endpoint.
-        :rtype: List[Link]
-        """
-        return self._links
-
-    @links.setter
-    def links(self, links: List[Link]):
-        """Sets the links of this Endpoint.
-
-        optional array of typed linked resources  # noqa: E501
-
-        :param links: The links of this Endpoint.
-        :type links: List[Link]
-        """
-
-        self._links = links
