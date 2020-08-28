@@ -362,8 +362,7 @@ components:
             $ref: '#/components/schemas/Link'
       example:
         name: South America gigafactory
-        status:
-          - in_service
+        status: in_service
         links:
           - rel: model
             href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
@@ -399,8 +398,7 @@ components:
             $ref: '#/components/schemas/Link'
       example:
         name: South America gigafactory
-        status:
-          - in_service
+        status: in_service
         links:
           - rel: model
             href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
@@ -425,8 +423,7 @@ components:
       example:
         id: 8c2af534-cdce-11ea-87d0-0242ac130003
         name: South America gigafactory
-        status:
-          - in_service
+        status: in_service
         deployed_at: '2020-07-24T17:53:47.909Z'
         links:
           - rel: self
