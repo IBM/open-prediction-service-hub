@@ -21,7 +21,7 @@ from flask import json
 from six import BytesIO
 
 from swagger_server.models.error import Error  # noqa: E501
-from swagger_server.models.discrete_parameter import DiscreteParameter # noqa: E501
+from swagger_server.models.parameter import Parameter # noqa: E501
 from swagger_server.models.link import Link  # noqa: E501
 from swagger_server.models.prediction import Prediction  # noqa: E501
 from swagger_server.models.prediction_response import PredictionResponse  # noqa: E501
@@ -36,7 +36,7 @@ class TestRunController(BaseTestCase):
 
         Call Prediction of specified deployment
         """
-        body = Prediction(parameters=[DiscreteParameter(name='name', value='toto', realtype='DiscreteParameter')], target=[Link(rel='endpoint', href='toto')])
+        body = Prediction(parameters=[Parameter(name='name', value='toto')], target=[Link(rel='endpoint', href='toto')])
         response = self.client.open(
             '/predictions',
             method='POST',

@@ -15,7 +15,6 @@ import requests
 
 from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.parameter import Parameter  # noqa: E501
-from swagger_server.models.nominal_parameter import NominalParameter  # noqa: E501
 from swagger_server.models.link import Link  # noqa: E501
 from swagger_server.models.prediction import Prediction  # noqa: E501
 from swagger_server.models.prediction_response import PredictionResponse  # noqa: E501
@@ -56,7 +55,7 @@ class TestRunController(BaseTestCase):
             ]
         }
 
-        body = Prediction(parameters=[NominalParameter(name='name', value='5')], target=[Link(rel='endpoint', href='toto')])
+        body = Prediction(parameters=[Parameter(name='name', value=5)], target=[Link(rel='endpoint', href='toto')])
 
         expected = "{'result': {'predictions': {'prediction': 1, 'probability': [0.0, 1.0]}}}"
 
@@ -76,7 +75,7 @@ class TestRunController(BaseTestCase):
         Call Prediction of specified deployment
         """
 
-        body = Prediction(parameters=[NominalParameter(name='name', value='5')], target=[Link(rel='noEndpoint', href='toto')])
+        body = Prediction(parameters=[Parameter(name='name', value=5)], target=[Link(rel='noEndpoint', href='toto')])
 
         expected = "{'error': 'endpoint should be provided in target array'}"
 
@@ -99,7 +98,7 @@ class TestRunController(BaseTestCase):
 
         expected = ("{'error': '401 Client Error: Unauthorized'}")
 
-        body = Prediction(parameters=[NominalParameter(name='name', value='5')], target=[Link(rel='endpoint', href='toto')])
+        body = Prediction(parameters=[Parameter(name='name', value=5)], target=[Link(rel='endpoint', href='toto')])
 
         response = prediction(json.loads(json.dumps(body)))
 
@@ -120,7 +119,7 @@ class TestRunController(BaseTestCase):
 
         expected = ("{'error': '401 Client Error: Unauthorized'}")
 
-        body = Prediction(parameters=[NominalParameter(name='name', value='5')], target=[Link(rel='endpoint', href='toto')])
+        body = Prediction(parameters=[Parameter(name='name', value=5)], target=[Link(rel='endpoint', href='toto')])
 
         response = prediction(json.loads(json.dumps(body)))
 
@@ -143,7 +142,7 @@ class TestRunController(BaseTestCase):
 
         expected = '{\'error\': "<class \'TypeError\'>"}'
 
-        body = Prediction(parameters=[NominalParameter(name='name', value='5')], target=[Link(rel='endpoint', href='toto')])
+        body = Prediction(parameters=[Parameter(name='name', value=5)], target=[Link(rel='endpoint', href='toto')])
 
         response = prediction(json.loads(json.dumps(body)))
 

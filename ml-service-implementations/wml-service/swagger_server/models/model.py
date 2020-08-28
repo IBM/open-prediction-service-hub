@@ -6,10 +6,11 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
+from swagger_server.models.input_schema import InputSchema  # noqa: F401,E501
 from swagger_server.models.link import Link  # noqa: F401,E501
-from swagger_server.models.models_metadata import ModelsMetadata  # noqa: F401,E501
-from swagger_server.models.all_of_model_input_schema import AllOfModelInputSchema  # noqa: F401,E501
-from swagger_server.models.all_of_model_output_schema import AllOfModelOutputSchema  # noqa: F401,E501
+from swagger_server.models.model_update import ModelUpdate  # noqa: F401,E501
+from swagger_server.models.model_update_metadata import ModelUpdateMetadata  # noqa: F401,E501
+from swagger_server.models.output_schema import OutputSchema  # noqa: F401,E501
 from swagger_server import util
 
 
@@ -18,60 +19,60 @@ class Model(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: str=None, name: str=None, input_schema: AllOfModelInputSchema=None, output_schema: AllOfModelOutputSchema=None, created_at: datetime=None, modified_at: datetime=None, version: str=None, links: List[Link]=None, metadata: ModelsMetadata=None):  # noqa: E501
+    def __init__(self, name: str=None, input_schema: InputSchema=None, output_schema: OutputSchema=None, version: str=None, links: List[Link]=None, metadata: ModelUpdateMetadata=None, id: str=None, created_at: datetime=None, modified_at: datetime=None):  # noqa: E501
         """Model - a model defined in Swagger
 
-        :param id: The id of this Model.  # noqa: E501
-        :type id: str
         :param name: The name of this Model.  # noqa: E501
         :type name: str
         :param input_schema: The input_schema of this Model.  # noqa: E501
-        :type input_schema: AllOfModelInputSchema
+        :type input_schema: InputSchema
         :param output_schema: The output_schema of this Model.  # noqa: E501
-        :type output_schema: AllOfModelOutputSchema
-        :param created_at: The created_at of this Model.  # noqa: E501
-        :type created_at: datetime
-        :param modified_at: The modified_at of this Model.  # noqa: E501
-        :type modified_at: datetime
+        :type output_schema: OutputSchema
         :param version: The version of this Model.  # noqa: E501
         :type version: str
         :param links: The links of this Model.  # noqa: E501
         :type links: List[Link]
         :param metadata: The metadata of this Model.  # noqa: E501
-        :type metadata: ModelsMetadata
+        :type metadata: ModelUpdateMetadata
+        :param id: The id of this Model.  # noqa: E501
+        :type id: str
+        :param created_at: The created_at of this Model.  # noqa: E501
+        :type created_at: datetime
+        :param modified_at: The modified_at of this Model.  # noqa: E501
+        :type modified_at: datetime
         """
         self.swagger_types = {
-            'id': str,
             'name': str,
-            'input_schema': AllOfModelInputSchema,
-            'output_schema': AllOfModelOutputSchema,
-            'created_at': datetime,
-            'modified_at': datetime,
+            'input_schema': InputSchema,
+            'output_schema': OutputSchema,
             'version': str,
             'links': List[Link],
-            'metadata': ModelsMetadata
+            'metadata': ModelUpdateMetadata,
+            'id': str,
+            'created_at': datetime,
+            'modified_at': datetime
         }
 
         self.attribute_map = {
-            'id': 'id',
             'name': 'name',
             'input_schema': 'input_schema',
             'output_schema': 'output_schema',
-            'created_at': 'created_at',
-            'modified_at': 'modified_at',
             'version': 'version',
             'links': 'links',
-            'metadata': 'metadata'
+            'metadata': 'metadata',
+            'id': 'id',
+            'created_at': 'created_at',
+            'modified_at': 'modified_at'
         }
-        self._id = id
         self._name = name
         self._input_schema = input_schema
         self._output_schema = output_schema
-        self._created_at = created_at
-        self._modified_at = modified_at
         self._version = version
         self._links = links
         self._metadata = metadata
+        self._id = id
+        self._created_at = created_at
+        self._modified_at = modified_at
 
     @classmethod
     def from_dict(cls, dikt) -> 'Model':
@@ -83,6 +84,138 @@ class Model(Model):
         :rtype: Model
         """
         return util.deserialize_model(dikt, cls)
+
+    @property
+    def name(self) -> str:
+        """Gets the name of this Model.
+
+        Name of model  # noqa: E501
+
+        :return: The name of this Model.
+        :rtype: str
+        """
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        """Sets the name of this Model.
+
+        Name of model  # noqa: E501
+
+        :param name: The name of this Model.
+        :type name: str
+        """
+
+        self._name = name
+
+    @property
+    def input_schema(self) -> InputSchema:
+        """Gets the input_schema of this Model.
+
+
+        :return: The input_schema of this Model.
+        :rtype: InputSchema
+        """
+        return self._input_schema
+
+    @input_schema.setter
+    def input_schema(self, input_schema: InputSchema):
+        """Sets the input_schema of this Model.
+
+
+        :param input_schema: The input_schema of this Model.
+        :type input_schema: InputSchema
+        """
+
+        self._input_schema = input_schema
+
+    @property
+    def output_schema(self) -> OutputSchema:
+        """Gets the output_schema of this Model.
+
+
+        :return: The output_schema of this Model.
+        :rtype: OutputSchema
+        """
+        return self._output_schema
+
+    @output_schema.setter
+    def output_schema(self, output_schema: OutputSchema):
+        """Sets the output_schema of this Model.
+
+
+        :param output_schema: The output_schema of this Model.
+        :type output_schema: OutputSchema
+        """
+
+        self._output_schema = output_schema
+
+    @property
+    def version(self) -> str:
+        """Gets the version of this Model.
+
+        version of the model  # noqa: E501
+
+        :return: The version of this Model.
+        :rtype: str
+        """
+        return self._version
+
+    @version.setter
+    def version(self, version: str):
+        """Sets the version of this Model.
+
+        version of the model  # noqa: E501
+
+        :param version: The version of this Model.
+        :type version: str
+        """
+
+        self._version = version
+
+    @property
+    def links(self) -> List[Link]:
+        """Gets the links of this Model.
+
+        optional array of typed linked resources  # noqa: E501
+
+        :return: The links of this Model.
+        :rtype: List[Link]
+        """
+        return self._links
+
+    @links.setter
+    def links(self, links: List[Link]):
+        """Sets the links of this Model.
+
+        optional array of typed linked resources  # noqa: E501
+
+        :param links: The links of this Model.
+        :type links: List[Link]
+        """
+
+        self._links = links
+
+    @property
+    def metadata(self) -> ModelUpdateMetadata:
+        """Gets the metadata of this Model.
+
+
+        :return: The metadata of this Model.
+        :rtype: ModelUpdateMetadata
+        """
+        return self._metadata
+
+    @metadata.setter
+    def metadata(self, metadata: ModelUpdateMetadata):
+        """Sets the metadata of this Model.
+
+
+        :param metadata: The metadata of this Model.
+        :type metadata: ModelUpdateMetadata
+        """
+
+        self._metadata = metadata
 
     @property
     def id(self) -> str:
@@ -108,77 +241,6 @@ class Model(Model):
             raise ValueError("Invalid value for `id`, must not be `None`")  # noqa: E501
 
         self._id = id
-
-    @property
-    def name(self) -> str:
-        """Gets the name of this Model.
-
-        Name of model  # noqa: E501
-
-        :return: The name of this Model.
-        :rtype: str
-        """
-        return self._name
-
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this Model.
-
-        Name of model  # noqa: E501
-
-        :param name: The name of this Model.
-        :type name: str
-        """
-        if name is None:
-            raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
-
-        self._name = name
-
-    @property
-    def input_schema(self) -> AllOfModelInputSchema:
-        """Gets the input_schema of this Model.
-
-        Input schema of ml model  # noqa: E501
-
-        :return: The input_schema of this Model.
-        :rtype: AllOfModelInputSchema
-        """
-        return self._input_schema
-
-    @input_schema.setter
-    def input_schema(self, input_schema: AllOfModelInputSchema):
-        """Sets the input_schema of this Model.
-
-        Input schema of ml model  # noqa: E501
-
-        :param input_schema: The input_schema of this Model.
-        :type input_schema: AllOfModelInputSchema
-        """
-
-        self._input_schema = input_schema
-
-    @property
-    def output_schema(self) -> AllOfModelOutputSchema:
-        """Gets the output_schema of this Model.
-
-        Output schema of ml model  # noqa: E501
-
-        :return: The output_schema of this Model.
-        :rtype: AllOfModelOutputSchema
-        """
-        return self._output_schema
-
-    @output_schema.setter
-    def output_schema(self, output_schema: AllOfModelOutputSchema):
-        """Sets the output_schema of this Model.
-
-        Output schema of ml model  # noqa: E501
-
-        :param output_schema: The output_schema of this Model.
-        :type output_schema: AllOfModelOutputSchema
-        """
-
-        self._output_schema = output_schema
 
     @property
     def created_at(self) -> datetime:
@@ -229,70 +291,3 @@ class Model(Model):
             raise ValueError("Invalid value for `modified_at`, must not be `None`")  # noqa: E501
 
         self._modified_at = modified_at
-
-    @property
-    def version(self) -> str:
-        """Gets the version of this Model.
-
-        version of the model  # noqa: E501
-
-        :return: The version of this Model.
-        :rtype: str
-        """
-        return self._version
-
-    @version.setter
-    def version(self, version: str):
-        """Sets the version of this Model.
-
-        version of the model  # noqa: E501
-
-        :param version: The version of this Model.
-        :type version: str
-        """
-
-        self._version = version
-
-    @property
-    def links(self) -> List[Link]:
-        """Gets the links of this Model.
-
-        optional array of typed linked resources  # noqa: E501
-
-        :return: The links of this Model.
-        :rtype: List[Link]
-        """
-        return self._links
-
-    @links.setter
-    def links(self, links: List[Link]):
-        """Sets the links of this Model.
-
-        optional array of typed linked resources  # noqa: E501
-
-        :param links: The links of this Model.
-        :type links: List[Link]
-        """
-
-        self._links = links
-
-    @property
-    def metadata(self) -> ModelsMetadata:
-        """Gets the metadata of this Model.
-
-
-        :return: The metadata of this Model.
-        :rtype: ModelsMetadata
-        """
-        return self._metadata
-
-    @metadata.setter
-    def metadata(self, metadata: ModelsMetadata):
-        """Sets the metadata of this Model.
-
-
-        :param metadata: The metadata of this Model.
-        :type metadata: ModelsMetadata
-        """
-
-        self._metadata = metadata
