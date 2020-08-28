@@ -242,7 +242,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EndpointUpdate'
-             
       responses:
         '200':
           description: Successful Response
@@ -334,7 +333,6 @@ components:
           description: List of Endpoints
           items:
             $ref: '#/components/schemas/Endpoint'
-            
     EndpointUpdate:
       title: Machine Learning Model Endpoint Update
       description: Represents a way to access to the runnable Prediction
@@ -369,36 +367,61 @@ components:
         links:
           - rel: model
             href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
-  
     EndpointCreation:
       title: Machine Learning Model Endpoint Creation
       description: Represents a way to access to the runnable Prediction
       required:
         - name
         - status
-      allOf:
-        - $ref: '#/components/schemas/EndpointUpdate'
-        
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Name of Version
+        status:
+          title: Status
+          type: string
+          description: Status of the Endpoint
+          enum:
+            - out_of_service
+            - creating
+            - updating
+            - under_maintenance
+            - rolling_back
+            - in_service
+            - deleting
+            - failed
+        links:
+          description: Optional array of typed linked resources
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+      example:
+        name: South America gigafactory
+        status:
+          - in_service
+        links:
+          - rel: model
+            href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
     Endpoint:
       title: Machine Learning Model Endpoint
       description: Represents a way to access to the runnable Prediction
-      required:
-        - id
-        - name
-        - status
-        - deployed_at
       allOf:
-        - $ref: '#/components/schemas/EndpointUpdate'
-      type: object
-      properties:
-        id:
-          title: Id
-          type: string
-          description: Id of Version
-        deployed_at:
-          type: string
-          format: date-time
-          description: date of the Version
+        - type: object
+          required:
+            - id
+            - deployed_at
+          properties:
+            id:
+              title: Id
+              type: string
+              description: Id of Version
+            deployed_at:
+              type: string
+              format: date-time
+              description: date of the Version
+        - $ref: '#/components/schemas/EndpointCreation'
       example:
         id: 8c2af534-cdce-11ea-87d0-0242ac130003
         name: South America gigafactory
@@ -420,7 +443,6 @@ components:
           description: List of models
           items:
             $ref: '#/components/schemas/Model'
-            
     ModelUpdate:
       title: Machine Learning Model Update
       description: Machine learning model data
@@ -481,26 +503,77 @@ components:
           metrics:
             - name: accuracy
               value: '0.97'
-    
     ModelCreation:
       title: Machine Learning Model Creation
       description: Machine learning model data
       required:
         - name
-      allOf:
-      - $ref: '#/components/schemas/ModelUpdate'
-    
+      type: object
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Name of model
+        input_schema:
+          $ref: '#/components/schemas/InputSchema'
+        output_schema:
+          $ref: '#/components/schemas/OutputSchema'
+        version:
+          type: string
+          description: version of the model
+        links:
+          description: optional array of typed linked resources
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+        metadata:
+          type: object
+          description: additional metadata
+          properties:
+            description:
+              type: string
+          additionalProperties: true
+      example:
+        name: 'Linear regression #1'
+        input_schema:
+          - name: 'feature #1'
+            order: 1
+            type: integer
+          - name: 'feature #2'
+            order: 2
+            type: double
+        output_schema:
+          prediction:
+            type: string
+          probability:
+            type: array
+            items: double
+          timeElapsed:
+            type: string
+            format: date-time
+          inError:
+            type: boolean
+        version: v0
+        links:
+          - rel: endpoint
+            href: 'http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003'
+          - rel: endpoint
+            href: 'http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003'
+        metadata:
+          description: model description
+          author: admin
+          metrics:
+            - name: accuracy
+              value: '0.97'
     Model:
       title: Machine Learning Model
       description: Machine learning model data
-      required:
-        - id
-        - name
-        - created_at
-        - modified_at
       allOf:
-      - $ref: '#/components/schemas/ModelUpdate'
       - type: object
+        required:
+          - id
+          - created_at
+          - modified_at
         properties:
           id:
             title: ID
@@ -514,6 +587,7 @@ components:
             type: string
             format: date-time
             description: date of the update of the model
+      - $ref: '#/components/schemas/ModelUpdate'
       example:
         id: 8bcb500-cdce-11ea-87d0-0242ac130003
         name: 'Linear regression #1'
@@ -641,7 +715,6 @@ components:
         - discover
         - manage
         - run
-        
     Parameter:
       title: Parameter
       description: Parameter for ml model invocation
@@ -662,7 +735,6 @@ components:
             - type: string
             - type: boolean
           description: Value of the feature
-
     Prediction:
       title: Prediction Payload
       description: All information needed for model invocation
