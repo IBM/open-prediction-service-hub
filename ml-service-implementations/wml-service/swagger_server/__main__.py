@@ -17,15 +17,24 @@
 import connexion
 
 from swagger_server import encoder
-
+import argparse
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-p',
+        '--port',
+        action='store',
+        dest='port',
+        help='port of your choice to run the app',
+        default=8080,
+        metavar=8080
+    )
+    args = parser.parse_args()
     app = connexion.App(__name__, specification_dir='./swagger/')
-    app.debug = True
     app.app.json_encoder = encoder.JSONEncoder
     app.add_api('swagger.yaml', arguments={'title': 'Open Prediction Service'}, pythonic_params=True)
-    app.run(port=8080)
-
+    app.run(port=args.port)
 
 if __name__ == '__main__':
     main()
