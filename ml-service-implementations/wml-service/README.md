@@ -25,23 +25,42 @@ To build the microservice image
 docker build -t wml-service .
 ```
 
-To run the microservice
+To run the microservice, you will need to provide the following parameters:
+- WML_API_KEY : your Watson Machine Learning service apikey
+- WML_URL : your Watson Machine Learning service url
+- WML_INSTANCE_ID : your Watson Machine Learning service instance id
+
 
 ```sh
 docker run \
     -p 8080:8080 \
+    -e WML_API_KEY=<WML_API_KEY> \
+    -e WML_URL=<WML_URL> \
+    -e WML_INSTANCE_ID=<WML_INSTANCE_ID> \
+    --name wml-service \
+    wml-service
+```
+If you want to run the microservice on another port
+```sh
+docker run \
+    -p <PORT>:8080 \
+    -e WML_API_KEY=<WML_API_KEY> \
+    -e WML_URL=<WML_URL> \
+    -e WML_INSTANCE_ID=<WML_INSTANCE_ID> \
     --name wml-service \
     wml-service
 ```
 
 To check that you have a running container
 ```sh
-docker ps wml-service
+docker ps -f name=wml-service
 ```
 
 > Your predictive service is available at [http://localhost:8080/](http://localhost:8080/).
 
 > Swagger UI documentation is available at [http://localhost:8080/ui](http://localhost:8080/ui)
+
+Or on the port of choice respectively at `http://localhost:<PORT>/` and `http://localhost:<PORT>/ui`
 
 ### Stop the microservice
 To stop the container
@@ -65,7 +84,11 @@ tox
 
 __To launch tests on your WML instance:__
 
-First, make sure you have a working and configured environment to use AWS SDK (Option 3, 4 or 5 as described in [AWS SDK documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html#configuring-credentials))
+First, make sure you have a working and configured environment with the following global variables:
+- WML_API_KEY : your Watson Machine Learning service apikey
+- WML_URL : your Watson Machine Learning service url
+- WML_INSTANCE_ID : your Watson Machine Learning service instance id
+
 
 Then, run tests using tox:
 ```
