@@ -15,12 +15,16 @@ before_install:
   - pip3 install --quiet -r requirements-test.txt
   - pip3 install --quiet -r requirements-ml.txt
   - pip3 install --quiet -r requirements.txt
+  - cd ../wml-service
+  - pip3 install --quiet tox
 
 install:
   - python3 setup.py install --quiet
 
 script:
   - python3 -m pytest -v src/tests
+  - cd ../wml-service
+  - tox
 
 
 before_deploy:
@@ -28,6 +32,9 @@ before_deploy:
   # example: demo:20190405-171003-4-master
   # '/' is replaces by -
   - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f Dockerfile .
+  - cd ../wml-service
+  - docker build -t wml-service:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t wml-service:latest -f Dockerfile .
+
 
 # Needed to install IBM cloud cli
 sudo: required
