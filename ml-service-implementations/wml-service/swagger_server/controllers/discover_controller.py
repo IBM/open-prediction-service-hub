@@ -15,13 +15,15 @@
 #
 
 import sys
-from swagger_server.util import get_wml_api_date_version, get_wml_credentials
+from swagger_server.wml_util import get_wml_api_date_version, get_wml_credentials
 from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.link import Link  # noqa: E501
-from swagger_server.models.machine_learning_model import MachineLearningModel  # noqa: E501
-from swagger_server.models.machine_learning_model_endpoint import MachineLearningModelEndpoint  # noqa: E501
-from swagger_server.models.machine_learning_model_endpoints import MachineLearningModelEndpoints  # noqa: E501
-from swagger_server.models.machine_learning_models import MachineLearningModels  # noqa: E501
+from swagger_server.models.model import Model  # noqa: E501
+from swagger_server.models.endpoint import Endpoint  # noqa: E501
+from swagger_server.models.endpoints import Endpoints  # noqa: E501
+from swagger_server.models.models import Models  # noqa: E501
+
+from flask import request
 
 import requests
 
@@ -33,6 +35,137 @@ STATUS_MAPPER = {
 }
 
 
+def get_endpoint_by_id(endpoint_id):  # noqa: E501
+    """Get an Endpoint
+
+    Returns an ML endpoint. # noqa: E501
+
+    :param endpoint_id: ID of endpoint
+    :type endpoint_id: str
+
+    :rtype: Endpoint
+    """
+    root_url = request.url_root
+    try:
+        wml_credentials = get_wml_credentials()
+        api_version_date = get_wml_api_date_version()
+        url = wml_credentials['url'] + "/v4/deployments/" + endpoint_id + "?version=" + api_version_date
+
+        payload = {}
+        headers = {
+            'ML-Instance-ID': wml_credentials['instance_id'],
+            'Authorization': 'Bearer ' + wml_credentials['token']
+        }
+
+        response = requests.request("GET", url, headers=headers, data=payload)
+        response.raise_for_status()
+
+        endpoint = response.json()
+
+        return Endpoint(
+            id=endpoint_id,
+            name=endpoint['metadata']['name'],
+            status=STATUS_MAPPER[endpoint['entity']['status']['state']],
+            deployed_at=endpoint['metadata']['created_at'],
+            links=[
+                Link(
+                    rel='self',
+                    href=root_url + 'endpoints/' + endpoint_id
+                ),
+                Link(
+                    rel='model',
+                    href=root_url + 'models/' + endpoint['entity']['asset']['href'].split('models/')[1].split('/')[0]
+                )
+            ]
+        )
+    except requests.exceptions.HTTPError as error:
+        return Error(error=str(error))
+    except requests.exceptions.RequestException as error:
+        return Error(error=str(error))
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        return Error(error=str(sys.exc_info()[0]))
+
+
+def get_model_by_id(model_id):  # noqa: E501
+    """Get a Model
+
+    Returns a ML model. # noqa: E501
+
+    :param model_id: ID of model
+    :type model_id: str
+
+    :rtype: Model
+    """
+    root_url = request.url_root
+    try:
+        wml_credentials = get_wml_credentials()
+        api_version_date = get_wml_api_date_version()
+
+        url = wml_credentials['url'] + "/v4/models/" + model_id + "?version=" + api_version_date
+
+        payload = {}
+        headers = {
+            'ML-Instance-ID': wml_credentials['instance_id'],
+            'Authorization': 'Bearer ' + wml_credentials['token']
+        }
+        # get all models
+        response = requests.request("GET", url, headers=headers, data=payload)
+        response.raise_for_status()
+        model = response.json()
+
+        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date + "&asset_id=" + model_id
+
+        # get all endpoints for this model asset
+        response = requests.request("GET", url, headers=headers, data=payload)
+        response.raise_for_status()
+        endpoints = response.json()["resources"]
+
+        # Inserting model link
+        links = [
+            Link(
+                rel='model',
+                href=root_url + 'models/' + model_id
+            )
+        ]
+
+        for endpoint in endpoints:
+            links.append(
+                Link(
+                    rel='endpoint',
+                    href=root_url + 'endpoints/' + endpoint['metadata']['id']
+                )
+            )
+
+        return Model(
+            id=model_id,
+            name=model['metadata']['name'],
+            input_schema= (
+                model['entity']['schemas']['input'][0]['fields']
+                if len(model['entity']['schemas']['input']) > 0
+                   and 'fields' in model['entity']['schemas']['input'][0]
+                else {}
+            ),
+            output_schema= (
+                model['entity']['schemas']['output'][0]['fields']
+                if len(model['entity']['schemas']['output']) > 0
+                   and 'fields' in model['entity']['schemas']['output'][0]
+                else {}
+            ),
+            created_at=model['metadata']['created_at'],
+            modified_at=model['metadata']['modified_at'],
+            version=model['metadata']['rev'],
+            links=links
+        )
+    except requests.exceptions.HTTPError as error:
+        return Error(error=str(error))
+    except requests.exceptions.RequestException as error:
+        return Error(error=str(error))
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        return Error(error=str(sys.exc_info()[0]))
+
+
 def list_endpoints(model_id=None):  # noqa: E501
     """List Endpoints
 
@@ -41,12 +174,15 @@ def list_endpoints(model_id=None):  # noqa: E501
     :param model_id: ID of model
     :type model_id: str
 
-    :rtype: MachineLearningModelEndpoints
+    :rtype: Endpoints
     """
+    root_url = request.url_root
     try:
         wml_credentials = get_wml_credentials()
         api_version_date = get_wml_api_date_version()
         url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date
+        if model_id is not None:
+            url += "&asset_id=" + model_id
 
         payload = {}
         headers = {
@@ -60,34 +196,27 @@ def list_endpoints(model_id=None):  # noqa: E501
         endpoints = response.json()["resources"]
         endpoints_list = []
 
-        def append_endpoint(endpoint_el):
+        for endpoint in endpoints:
             endpoints_list.append(
-                MachineLearningModelEndpoint(
-                    id=endpoint_el['metadata']['id'],
-                    name=endpoint_el['metadata']['name'],
-                    status=STATUS_MAPPER[endpoint_el['entity']['status']['state']],
-                    deployed_at=endpoint_el['metadata']['created_at'],
+                Endpoint(
+                    id=endpoint['metadata']['id'],
+                    name=endpoint['metadata']['name'],
+                    status=STATUS_MAPPER[endpoint['entity']['status']['state']],
+                    deployed_at=endpoint['metadata']['created_at'],
                     links=[
                         Link(
                             rel='self',
-                            href=endpoint_el['metadata']['id']
+                            href=root_url + 'endpoints/' + endpoint['metadata']['id']
                         ),
                         Link(
                             rel='model',
-                            href=endpoint_el['entity']['asset']['id']
+                            href=root_url + 'models/' + endpoint['entity']['asset']['href'].split('models/')[1].split('/')[0]
                         )
                     ]
                 )
             )
 
-        for endpoint in endpoints:
-            if model_id == None:
-                append_endpoint(endpoint)
-            else:
-                if endpoint['entity']['asset']['id'] == model_id:
-                    append_endpoint(endpoint)
-
-        return MachineLearningModelEndpoints(endpoints=endpoints_list)
+        return Endpoints(endpoints=endpoints_list)
     except requests.exceptions.HTTPError as error:
         return Error(error=str(error))
     except requests.exceptions.RequestException as error:
@@ -103,8 +232,9 @@ def list_models():  # noqa: E501
     Returns the list of ML models. # noqa: E501
 
 
-    :rtype: MachineLearningModels
+    :rtype: Models
     """
+    root_url = request.url_root
     try:
         wml_credentials = get_wml_credentials()
         api_version_date = get_wml_api_date_version()
@@ -116,15 +246,48 @@ def list_models():  # noqa: E501
             'ML-Instance-ID': wml_credentials['instance_id'],
             'Authorization': 'Bearer ' + wml_credentials['token']
         }
-
+        # get all models
         response = requests.request("GET", url, headers=headers, data=payload)
         models = response.json()["resources"]
 
+        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date
+
+        # get all endpoints
+        response = requests.request("GET", url, headers=headers, data=payload)
+        response.raise_for_status()
+
+        endpoints = response.json()["resources"]
+
+        # create dict mapping model name to endpoint links
+        link_by_model = {}
+
+        for endpoint in endpoints:
+            endpoint_model_id = endpoint['entity']['asset']['href'].split('models/')[1].split('/')[0]
+            link = Link(
+                rel='endpoint',
+                href=root_url + 'endpoints/' + endpoint['metadata']['id']
+            )
+            if endpoint_model_id in link_by_model:
+                link_by_model[endpoint_model_id].append(link)
+            else:
+                link_by_model[endpoint_model_id] = [link]
+
         model_list = []
         for model in models:
+            model_id = model['metadata']['id']
+            # Inserting model link
+            link = Link(
+                rel='model',
+                href=root_url + 'models/' + model_id
+            )
+            if model_id in link_by_model:
+                link_by_model[model_id].insert(0, link)
+            else:
+                link_by_model[model_id] = [link]
+
             model_list.append(
-                MachineLearningModel(
-                    id=model['metadata']['id'],
+                Model(
+                    id=model_id,
                     name=model['metadata']['name'],
                     input_schema= (
                         model['entity']['schemas']['input'][0]['fields']
@@ -141,15 +304,10 @@ def list_models():  # noqa: E501
                     created_at=model['metadata']['created_at'],
                     modified_at=model['metadata']['modified_at'],
                     version=model['metadata']['rev'],
-                    links=[
-                        Link(
-                            rel='self',
-                            href=model['metadata']['id']
-                        )
-                    ]
+                    links=link_by_model[model_id]
                 )
             )
-        return MachineLearningModels(models=model_list)
+        return Models(models=model_list)
     except requests.exceptions.HTTPError as error:
         return Error(error=str(error))
     except requests.exceptions.RequestException as error:

@@ -1,18 +1,3 @@
-#!/usr/bin/env python3
-#
-# Copyright 2020 IBM
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.IBM Confidential
-#
 # coding: utf-8
 
 from __future__ import absolute_import
@@ -66,7 +51,7 @@ class Prediction(Model):
     def target(self) -> List[Link]:
         """Gets the target of this Prediction.
 
-        Add at least a relation to an `endpoint` to be able to call the correct prediction. Eventually add also a `model` in case endpoints contains multiple models.  # noqa: E501
+        Add at least a relation to an `endpoint`to be able to call the correct prediction. Eventually add also a `model` in case endpoints contains multiple models.  # noqa: E501
 
         :return: The target of this Prediction.
         :rtype: List[Link]
@@ -77,7 +62,7 @@ class Prediction(Model):
     def target(self, target: List[Link]):
         """Sets the target of this Prediction.
 
-        Add at least a relation to an `endpoint` to be able to call the correct prediction. Eventually add also a `model` in case endpoints contains multiple models.  # noqa: E501
+        Add at least a relation to an `endpoint`to be able to call the correct prediction. Eventually add also a `model` in case endpoints contains multiple models.  # noqa: E501
 
         :param target: The target of this Prediction.
         :type target: List[Link]

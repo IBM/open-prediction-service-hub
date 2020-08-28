@@ -19,12 +19,24 @@ from unittest import mock
 import os
 
 
-MOCKED_CREDENTIALS = {
-    "WML_TOKEN": "token",
+MOCKED_CREDENTIALS_VARS = {
+    "WML_API_KEY": "apikey",
     "WML_INSTANCE_ID": "instance_id",
     "WML_URL": "url"
 }
 
+MOCKED_CREDENTIALS = {
+    "token": "token",
+    "instance_id": MOCKED_CREDENTIALS_VARS["WML_INSTANCE_ID"],
+    "url": MOCKED_CREDENTIALS_VARS["WML_URL"]
+}
+
 
 def mock_wml_env():
-    return mock.patch.dict(os.environ, MOCKED_CREDENTIALS)
+    return mock.patch.dict(os.environ, MOCKED_CREDENTIALS_VARS)
+
+
+def mock_wml_credentials(controller):
+    return mock.patch("swagger_server.controllers." + controller + ".get_wml_credentials",
+                      return_value=MOCKED_CREDENTIALS)
+

@@ -15,7 +15,7 @@
 #
 
 import sys
-from swagger_server.util import \
+from swagger_server.wml_util import \
     get_wml_credentials  # , \
 #   get_wml_api_date_version
 # NOT USED because predictions endpoint not working with specified api version
@@ -40,10 +40,7 @@ def prediction(body):  # noqa: E501
     req_data = []
     fields_data = []
     for param in body['parameters']:
-        # Comment: we dont have access to the model schemas ==> we do not know input data types
-        # Using input as it comes
-        # TODO TMP: parsing as int
-        req_data.append(int(param['value']))
+        req_data.append(param['value'])
         fields_data.append(param['name'])
     data = [req_data]
 
@@ -62,8 +59,7 @@ def prediction(body):  # noqa: E501
         # 19/08/2020 Endpoint is not working when version is specified
         # however according to https://watson-ml-v4-api.mybluemix.net/wml-restapi-cpd.html#/
         # api version will be mandatory in the next release
-        url = wml_credentials[
-                  'url'] + "/v4/deployments/" + endpoint + "/predictions"  # + "?version=" + api_version_date
+        url = wml_credentials['url'] + "/v4/deployments/" + endpoint + "/predictions"  # + "?version=" + api_version_date
 
         payload = {
             "input_data": [
