@@ -362,8 +362,7 @@ components:
             $ref: '#/components/schemas/Link'
       example:
         name: South America gigafactory
-        status:
-          - in_service
+        status: in_service
         links:
           - rel: model
             href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
@@ -399,8 +398,7 @@ components:
             $ref: '#/components/schemas/Link'
       example:
         name: South America gigafactory
-        status:
-          - in_service
+        status: in_service
         links:
           - rel: model
             href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
@@ -408,6 +406,7 @@ components:
       title: Machine Learning Model Endpoint
       description: Represents a way to access to the runnable Prediction
       allOf:
+        - $ref: '#/components/schemas/EndpointCreation'
         - type: object
           required:
             - id
@@ -421,12 +420,10 @@ components:
               type: string
               format: date-time
               description: date of the Version
-        - $ref: '#/components/schemas/EndpointCreation'
       example:
         id: 8c2af534-cdce-11ea-87d0-0242ac130003
         name: South America gigafactory
-        status:
-          - in_service
+        status: in_service
         deployed_at: '2020-07-24T17:53:47.909Z'
         links:
           - rel: self
@@ -569,25 +566,25 @@ components:
       title: Machine Learning Model
       description: Machine learning model data
       allOf:
-      - type: object
-        required:
-          - id
-          - created_at
-          - modified_at
-        properties:
-          id:
-            title: ID
-            type: string
-            description: ID of model
-          created_at:
-            type: string
-            format: date-time
-            description: date of the creation of the model
-          modified_at:
-            type: string
-            format: date-time
-            description: date of the update of the model
-      - $ref: '#/components/schemas/ModelUpdate'
+        - $ref: '#/components/schemas/ModelUpdate'
+        - type: object
+          required:
+            - id
+            - created_at
+            - modified_at
+          properties:
+            id:
+              title: ID
+              type: string
+              description: ID of model
+            created_at:
+              type: string
+              format: date-time
+              description: date of the creation of the model
+            modified_at:
+              type: string
+              format: date-time
+              description: date of the update of the model
       example:
         id: 8bcb500-cdce-11ea-87d0-0242ac130003
         name: 'Linear regression #1'
