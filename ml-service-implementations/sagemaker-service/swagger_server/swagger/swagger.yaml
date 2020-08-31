@@ -1,15 +1,17 @@
 openapi: 3.0.3
 info:
   title: Open Prediction Service
+  description: The Open Prediction Service API is an effort to provide an Open API
+    that enables unsupported native ML Providers in Decision Designer or Decision
+    Runtime.
   version: 2.0.0
-  description: The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
+servers:
+  - url: /
 tags:
   - name: info
     description: Endpoints related to the capabilities of the server
   - name: discover
     description: Endpoints related to the discovery of machine learning models and deployments
-  - name: manage
-    description: Endpoints related to the management of machine learning models and deployments
   - name: run
     description: Endpoints to run deployed models
 paths:
@@ -21,7 +23,7 @@ paths:
       description: Returns the server capabilities
       operationId: get_capabilities
       responses:
-        '200':
+        "200":
           description: Successful Response
           content:
             application/json:
@@ -33,6 +35,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.info_controller
   /info:
     get:
       tags:
@@ -41,12 +44,13 @@ paths:
       description: Returns a health check of underlying service and additional information
       operationId: get_info
       responses:
-        '200':
+        "200":
           description: Health Check
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServerInfo'
+      x-openapi-router-controller: swagger_server.controllers.info_controller
   /models:
     get:
       tags:
@@ -55,7 +59,7 @@ paths:
       description: Returns the list of ML Models.
       operationId: list_models
       responses:
-        '200':
+        "200":
           description: Successful Response
           content:
             application/json:
@@ -67,32 +71,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    post:
-      tags:
-        - manage
-      summary: Add a Model
-      description: Add a Model to the service
-      operationId: add_model
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ModelCreation'
-        required: true
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Model'
-        default:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  '/models/{model_id}':
+      x-openapi-router-controller: swagger_server.controllers.discover_controller
+  /models/{model_id}:
     get:
       tags:
         - discover
@@ -100,9 +80,16 @@ paths:
       description: Returns a ML model.
       operationId: get_model_by_id
       parameters:
-        - $ref: '#/components/parameters/ModelIDParam'
+        - name: model_id
+          in: path
+          description: ID of model
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: Successful Response
           content:
             application/json:
@@ -114,50 +101,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    patch:
-      tags:
-        - manage
-      summary: Update a Model
-      description: update an existing Model in the service
-      operationId: update_model_by_model_id
-      parameters:
-        - $ref: '#/components/parameters/ModelIDParam'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ModelUpdate'
-        required: true
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Model'
-        default:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      tags:
-        - manage
-      summary: Delete Model by Id
-      description: Removes a model specified by Id
-      operationId: delete_model_by_model_id
-      parameters:
-        - $ref: '#/components/parameters/ModelIDParam'
-      responses:
-        '204':
-          description: Successful Response
-        default:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.discover_controller
   /endpoints:
     get:
       tags:
@@ -165,9 +109,16 @@ paths:
       summary: List Endpoints
       operationId: list_endpoints
       parameters:
-        - $ref: '#/components/parameters/ModelIDParamQuery'
+        - name: model_id
+          in: query
+          description: ID of model
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: Successful Response
           content:
             application/json:
@@ -179,35 +130,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    post:
-      tags:
-        - manage
-      summary: Create Endpoint
-      description: Create a Model Endpoint
-      operationId: create_endpoint
-      parameters:
-        - $ref: '#/components/parameters/ModelIDParamQuery'
-      requestBody:
-        description: Required Endpoint definition
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EndpointCreation'
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Endpoint'
-        default:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  '/endpoints/{endpoint_id}':
+      x-openapi-router-controller: swagger_server.controllers.discover_controller
+  /endpoints/{endpoint_id}:
     get:
       tags:
         - discover
@@ -215,9 +139,16 @@ paths:
       description: Returns an ML Endpoint.
       operationId: get_endpoint_by_id
       parameters:
-        - $ref: '#/components/parameters/EndpointIDParam'
+        - name: endpoint_id
+          in: path
+          description: ID of endpoint
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
       responses:
-        '200':
+        "200":
           description: Successful Response
           content:
             application/json:
@@ -229,48 +160,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    patch:
-      tags:
-        - manage
-      summary: Update an Endpoint
-      description: update an existing Endpoint in the service
-      operationId: update_endpoint_by_endpoint_id
-      parameters:
-        - $ref: '#/components/parameters/EndpointIDParam'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EndpointUpdate'
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Endpoint'
-        default:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    delete:
-      tags:
-        - manage
-      summary: Delete Endpoint by Id
-      operationId: delete_endpoint_by_id
-      parameters:
-        - $ref: '#/components/parameters/EndpointIDParam'
-      responses:
-        '204':
-          description: Successful Response
-        default:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.discover_controller
   /predictions:
     post:
       tags:
@@ -284,7 +174,7 @@ paths:
               $ref: '#/components/schemas/Prediction'
         required: true
       responses:
-        '200':
+        "200":
           description: Successful Response
           content:
             application/json:
@@ -296,11 +186,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.run_controller
 components:
   schemas:
     Link:
       type: object
-      description: linked relationship to a typed resource.
       properties:
         rel:
           type: string
@@ -308,34 +198,63 @@ components:
         href:
           type: string
           description: URI of the linked resource.
+      description: linked relationship to a typed resource.
     PredictionResponse:
       type: object
-      description: Response of a Prediction
       properties:
         result:
           type: object
-          description: Result of a Prediction
           additionalProperties: true
+          description: Result of a Prediction
           example:
             prediction: label 1
             probability:
               - 0.2
               - 0.4
               - 0.2
-            timeElapsed: '2020-07-24T16:53:47.909Z'
+            timeElapsed: 2020-07-24T16:53:47.909Z
             inError: false
+      description: Response of a Prediction
+      example:
+        result:
+          prediction: label 1
+          probability:
+            - 0.2
+            - 0.4
+            - 0.2
+          timeElapsed: 2020-07-24T16:53:47.909Z
+          inError: false
     Endpoints:
       title: List of Machine Learning Endpoints
-      description: List of Machine Learning Endpoints
       properties:
         endpoints:
           type: array
           description: List of Endpoints
           items:
             $ref: '#/components/schemas/Endpoint'
+      description: List of Machine Learning Endpoints
+      example:
+        endpoints:
+          - id: 8c2af534-cdce-11ea-87d0-0242ac130003
+            name: South America gigafactory
+            status: in_service
+            deployed_at: 2020-07-24T17:53:47.909Z
+            links:
+              - rel: self
+                href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
+              - rel: model
+                href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
+          - id: 8c2af534-cdce-11ea-87d0-0242ac130003
+            name: South America gigafactory
+            status: in_service
+            deployed_at: 2020-07-24T17:53:47.909Z
+            links:
+              - rel: self
+                href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
+              - rel: model
+                href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
     EndpointUpdate:
       title: Machine Learning Model Endpoint Update
-      description: Represents a way to access to the runnable Prediction
       type: object
       properties:
         name:
@@ -356,19 +275,19 @@ components:
             - deleting
             - failed
         links:
-          description: Optional array of typed linked resources
           type: array
+          description: Optional array of typed linked resources
           items:
             $ref: '#/components/schemas/Link'
+      description: Represents a way to access to the runnable Prediction
       example:
         name: South America gigafactory
         status: in_service
         links:
           - rel: model
-            href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
     EndpointCreation:
       title: Machine Learning Model Endpoint Creation
-      description: Represents a way to access to the runnable Prediction
       required:
         - name
         - status
@@ -392,25 +311,36 @@ components:
             - deleting
             - failed
         links:
-          description: Optional array of typed linked resources
           type: array
+          description: Optional array of typed linked resources
           items:
             $ref: '#/components/schemas/Link'
+      description: Represents a way to access to the runnable Prediction
       example:
         name: South America gigafactory
         status: in_service
         links:
           - rel: model
-            href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
     Endpoint:
       title: Machine Learning Model Endpoint
       description: Represents a way to access to the runnable Prediction
+      example:
+        id: 8c2af534-cdce-11ea-87d0-0242ac130003
+        name: South America gigafactory
+        status: in_service
+        deployed_at: 2020-07-24T17:53:47.909Z
+        links:
+          - rel: self
+            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
+          - rel: model
+            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
       allOf:
         - $ref: '#/components/schemas/EndpointCreation'
-        - type: object
-          required:
-            - id
+        - required:
             - deployed_at
+            - id
+          type: object
           properties:
             id:
               title: Id
@@ -418,21 +348,10 @@ components:
               description: Id of Version
             deployed_at:
               type: string
-              format: date-time
               description: date of the Version
-      example:
-        id: 8c2af534-cdce-11ea-87d0-0242ac130003
-        name: South America gigafactory
-        status: in_service
-        deployed_at: '2020-07-24T17:53:47.909Z'
-        links:
-          - rel: self
-            href: 'http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003'
-          - rel: model
-            href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
+              format: date-time
     Models:
       title: List of Machine Learning Models
-      description: List of Machine Learning Models
       type: object
       properties:
         models:
@@ -440,9 +359,83 @@ components:
           description: List of models
           items:
             $ref: '#/components/schemas/Model'
+      description: List of Machine Learning Models
+      example:
+        models:
+          - id: 8bcb500-cdce-11ea-87d0-0242ac130003
+            name: 'Linear regression #1'
+            input_schema:
+              - name: 'feature #1'
+                order: 1
+                type: integer
+              - name: 'feature #2'
+                order: 2
+                type: double
+            output_schema:
+              prediction:
+                type: string
+              probability:
+                type: array
+                items: double
+              timeElapsed:
+                type: string
+                format: date-time
+              inError:
+                type: boolean
+            created_at: 2020-07-24T16:53:47.909Z
+            modified_at: 2020-07-24T16:53:47.909Z
+            version: v0
+            links:
+              - rel: self
+                href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
+              - rel: endpoint
+                href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
+              - rel: endpoint
+                href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
+            metadata:
+              description: model description
+              author: admin
+              metrics:
+                - name: accuracy
+                  value: "0.97"
+          - id: 8bcb500-cdce-11ea-87d0-0242ac130003
+            name: 'Linear regression #1'
+            input_schema:
+              - name: 'feature #1'
+                order: 1
+                type: integer
+              - name: 'feature #2'
+                order: 2
+                type: double
+            output_schema:
+              prediction:
+                type: string
+              probability:
+                type: array
+                items: double
+              timeElapsed:
+                type: string
+                format: date-time
+              inError:
+                type: boolean
+            created_at: 2020-07-24T16:53:47.909Z
+            modified_at: 2020-07-24T16:53:47.909Z
+            version: v0
+            links:
+              - rel: self
+                href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
+              - rel: endpoint
+                href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
+              - rel: endpoint
+                href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
+            metadata:
+              description: model description
+              author: admin
+              metrics:
+                - name: accuracy
+                  value: "0.97"
     ModelUpdate:
       title: Machine Learning Model Update
-      description: Machine learning model data
       type: object
       properties:
         name:
@@ -457,17 +450,13 @@ components:
           type: string
           description: version of the model
         links:
-          description: optional array of typed linked resources
           type: array
+          description: optional array of typed linked resources
           items:
             $ref: '#/components/schemas/Link'
         metadata:
-          type: object
-          description: additional metadata
-          properties:
-            description:
-              type: string
-          additionalProperties: true
+          $ref: '#/components/schemas/ModelUpdate_metadata'
+      description: Machine learning model data
       example:
         name: 'Linear regression #1'
         input_schema:
@@ -491,18 +480,17 @@ components:
         version: v0
         links:
           - rel: endpoint
-            href: 'http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
           - rel: endpoint
-            href: 'http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
         metadata:
           description: model description
           author: admin
           metrics:
             - name: accuracy
-              value: '0.97'
+              value: "0.97"
     ModelCreation:
       title: Machine Learning Model Creation
-      description: Machine learning model data
       required:
         - name
       type: object
@@ -519,17 +507,13 @@ components:
           type: string
           description: version of the model
         links:
-          description: optional array of typed linked resources
           type: array
+          description: optional array of typed linked resources
           items:
             $ref: '#/components/schemas/Link'
         metadata:
-          type: object
-          description: additional metadata
-          properties:
-            description:
-              type: string
-          additionalProperties: true
+          $ref: '#/components/schemas/ModelUpdate_metadata'
+      description: Machine learning model data
       example:
         name: 'Linear regression #1'
         input_schema:
@@ -553,38 +537,18 @@ components:
         version: v0
         links:
           - rel: endpoint
-            href: 'http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
           - rel: endpoint
-            href: 'http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
         metadata:
           description: model description
           author: admin
           metrics:
             - name: accuracy
-              value: '0.97'
+              value: "0.97"
     Model:
       title: Machine Learning Model
       description: Machine learning model data
-      allOf:
-        - $ref: '#/components/schemas/ModelUpdate'
-        - type: object
-          required:
-            - id
-            - created_at
-            - modified_at
-          properties:
-            id:
-              title: ID
-              type: string
-              description: ID of model
-            created_at:
-              type: string
-              format: date-time
-              description: date of the creation of the model
-            modified_at:
-              type: string
-              format: date-time
-              description: date of the update of the model
       example:
         id: 8bcb500-cdce-11ea-87d0-0242ac130003
         name: 'Linear regression #1'
@@ -606,25 +570,44 @@ components:
             format: date-time
           inError:
             type: boolean
-        created_at: '2020-07-24T16:53:47.909Z'
-        modified_at: '2020-07-24T16:53:47.909Z'
+        created_at: 2020-07-24T16:53:47.909Z
+        modified_at: 2020-07-24T16:53:47.909Z
         version: v0
         links:
           - rel: self
-            href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003
           - rel: endpoint
-            href: 'http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/endpoints/841ff27c-cdce-11ea-87d0-0242ac130003
           - rel: endpoint
-            href: 'http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
         metadata:
           description: model description
           author: admin
           metrics:
             - name: accuracy
-              value: '0.97'
+              value: "0.97"
+      allOf:
+        - $ref: '#/components/schemas/ModelUpdate'
+        - required:
+            - created_at
+            - id
+            - modified_at
+          type: object
+          properties:
+            id:
+              title: ID
+              type: string
+              description: ID of model
+            created_at:
+              type: string
+              description: date of the creation of the model
+              format: date-time
+            modified_at:
+              type: string
+              description: date of the update of the model
+              format: date-time
     Feature:
       title: Feature
-      description: Feature of a model
       required:
         - name
         - order
@@ -643,38 +626,38 @@ components:
           title: Type
           type: string
           description: type of feature. Can be python type or numpy type
+      description: Feature of a model
     Error:
       type: object
-      description: Error
       properties:
         error:
           title: Error Message
           type: string
           description: Error message
+      description: Error
     InputSchema:
       title: Input Schema
       type: array
+      description: Input schema of ml model
       items:
         $ref: '#/components/schemas/Feature'
-      description: Input schema of ml model
     OutputSchema:
       title: OutputSchema
-      description: Model output schema
       type: object
       additionalProperties: true
+      description: Model output schema
     ServerInfo:
       title: ServerInfo
-      description: Information of the service
       required:
-        - status
         - info
+        - status
       type: object
       properties:
         info:
           title: Information
           type: object
-          description: Information of the service
           additionalProperties: true
+          description: Information of the service
           example:
             description: Sample service for scikit-learn
             version: 1.0.0
@@ -690,23 +673,35 @@ components:
           title: Error Message
           type: string
           description: Error if status in error
+      description: Information of the service
+      example:
+        error: error
+        info:
+          description: Sample service for scikit-learn
+          version: 1.0.0
+          owner: admin
+        status: ok
     Capabilities:
       title: Capabilities
-      description: Available capabilities from this service
       required:
         - capabilities
       type: object
       properties:
         capabilities:
           title: Capabilities
-          description: Capabilities of the service
           type: array
+          description: Capabilities of the service
           items:
             $ref: '#/components/schemas/Capability'
+      description: Available capabilities from this service
+      example:
+        capabilities:
+          - info
+          - info
     Capability:
       title: Capability
-      description: capability of a service
       type: string
+      description: capability of a service
       enum:
         - info
         - discover
@@ -714,7 +709,6 @@ components:
         - run
     Parameter:
       title: Parameter
-      description: Parameter for ml model invocation
       required:
         - name
         - value
@@ -726,32 +720,35 @@ components:
           description: Name of the feature
         value:
           title: Value
+          description: Value of the feature
           anyOf:
             - type: integer
             - type: number
             - type: string
             - type: boolean
-          description: Value of the feature
+      description: Parameter for ml model invocation
     Prediction:
       title: Prediction Payload
-      description: All information needed for model invocation
       required:
-        - target
         - parameters
+        - target
       type: object
       properties:
         target:
-          description: Add at least a relation to an `endpoint`to be able to call the correct prediction. Eventually add also a `model` in case endpoints contains multiple models.
+          minItems: 1
           type: array
+          description: Add at least a relation to an `endpoint`to be able to call
+            the correct prediction. Eventually add also a `model` in case endpoints
+            contains multiple models.
           items:
             $ref: '#/components/schemas/Link'
-          minItems: 1
         parameters:
           title: Parameters
           type: array
+          description: Model parameters
           items:
             $ref: '#/components/schemas/Parameter'
-          description: Model parameters
+      description: All information needed for model invocation
       example:
         parameters:
           - name: name
@@ -764,25 +761,38 @@ components:
             value: 0.42
         target:
           - rel: endpoint
-            href: 'http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003'
+            href: http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003
+    ModelUpdate_metadata:
+      type: object
+      properties:
+        description:
+          type: string
+      description: additional metadata
   parameters:
     ModelIDParam:
-      in: path
       name: model_id
+      in: path
       description: ID of model
       required: true
+      style: simple
+      explode: false
       schema:
         type: string
     ModelIDParamQuery:
-      in: query
       name: model_id
+      in: query
       description: ID of model
+      required: false
+      style: form
+      explode: true
       schema:
         type: string
     EndpointIDParam:
-      in: path
-      required: true
       name: endpoint_id
+      in: path
       description: ID of endpoint
+      required: true
+      style: simple
+      explode: false
       schema:
         type: string
