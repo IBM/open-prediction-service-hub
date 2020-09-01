@@ -124,7 +124,7 @@ def get_model_by_id(model_id):  # noqa: E501
         # Inserting model link
         links = [
             Link(
-                rel='model',
+                rel='self',
                 href=root_url + 'models/' + model_id
             )
         ]
@@ -277,7 +277,7 @@ def list_models():  # noqa: E501
             model_id = model['metadata']['id']
             # Inserting model link
             link = Link(
-                rel='model',
+                rel='self',
                 href=root_url + 'models/' + model_id
             )
             if model_id in link_by_model:
