@@ -27,7 +27,7 @@ def get_wml_api_date_version():
 def get_wml_credentials():
     wml_api_key = os.getenv('WML_API_KEY') or ''
 
-    url = "https://iam.cloud.ibm.com/identity/token"
+    url = os.getenv('WML_AUTH_URL') or "https://iam.cloud.ibm.com/identity/token"
 
     payload = 'grant_type=urn%3Aibm%3Aparams%3Aoauth%3Agrant-type%3Aapikey&apikey=' + wml_api_key
     headers = {
