@@ -87,7 +87,7 @@ def prediction(body):  # noqa: E501
         predictions = {}
         for index, field in enumerate(result["fields"]):
             predictions[field] = result["values"][0][index]
-        return PredictionResponse(result=dict(predictions=predictions))
+        return PredictionResponse(result=dict(predictions))
     except requests.exceptions.HTTPError as error:
         return Error(error=str(error))
     except requests.exceptions.RequestException as error:
