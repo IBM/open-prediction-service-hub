@@ -371,7 +371,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "                  {'name': 'pdays', 'type': 'int64'},\n" +
                     "                  {'name': 'previous', 'type': 'int64'},\n" +
                     "                  {'name': 'poutcome', 'type': 'object'}],\n" +
-                    " 'links': [{'href': 'http://localhost/models/FakeModelId', 'rel': 'model'},\n" +
+                    " 'links': [{'href': 'http://localhost/models/FakeModelId', 'rel': 'self'},\n" +
                     "           {'href': 'http://localhost/endpoints/55c93e6f-82ac-4d51-a052-4d2249aabe7a',\n" +
                     "            'rel': 'endpoint'},\n" +
                     "           {'href': 'http://localhost/endpoints/56c93e6f-82ac-4d51-a052-4d2249aabe7a',\n" +
@@ -989,7 +989,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "                              {'name': 'previous', 'type': 'int64'},\n" +
                     "                              {'name': 'poutcome', 'type': 'object'}],\n" +
                     "             'links': [{'href': 'http://localhost/models/FakeModelId',\n" +
-                    "                        'rel': 'model'},\n" +
+                    "                        'rel': 'self'},\n" +
                     "                       {'href': 'http://localhost/endpoints/55c93e6f-82ac-4d51-a052-4d2249aabe7a',\n" +
                     "                        'rel': 'endpoint'}],\n" +
                     "             'metadata': None,\n" +
@@ -1206,7 +1206,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "                              {'name': 'previous', 'type': 'int64'},\n" +
                     "                              {'name': 'poutcome', 'type': 'object'}],\n" +
                     "             'links': [{'href': 'http://localhost/models/FakeModelId',\n" +
-                    "                        'rel': 'model'}],\n" +
+                    "                        'rel': 'self'}],\n" +
                     "             'metadata': None,\n" +
                     "             'modified_at': '2020-06-05T07:20:15.802Z',\n" +
                     "             'name': 'Bank marketing (sample) test - P8 '\n" +
@@ -1454,7 +1454,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "                              {'name': 'previous', 'type': 'int64'},\n" +
                     "                              {'name': 'poutcome', 'type': 'object'}],\n" +
                     "             'links': [{'href': 'http://localhost/models/FakeModelId',\n" +
-                    "                        'rel': 'model'},\n" +
+                    "                        'rel': 'self'},\n" +
                     "                       {'href': 'http://localhost/endpoints/FakeEndpointId',\n" +
                     "                        'rel': 'endpoint'},\n" +
                     "                       {'href': 'http://localhost/endpoints/FakeEndpointId2',\n" +

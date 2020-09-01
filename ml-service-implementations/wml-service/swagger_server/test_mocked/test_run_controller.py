@@ -57,7 +57,7 @@ class TestRunController(BaseTestCase):
 
         body = Prediction(parameters=[Parameter(name='name', value=5)], target=[Link(rel='endpoint', href='toto')])
 
-        expected = "{'result': {'predictions': {'prediction': 1, 'probability': [0.0, 1.0]}}}"
+        expected = "{'result': {'prediction': 1, 'probability': [0.0, 1.0]}}"
 
         response = prediction(json.loads(json.dumps(body)))
 
