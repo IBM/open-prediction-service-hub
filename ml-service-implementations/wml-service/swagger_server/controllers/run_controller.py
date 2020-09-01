@@ -49,6 +49,8 @@ def prediction(body):  # noqa: E501
     for target in body['target']:
         if 'rel' in target and target['rel'] == 'endpoint':
             endpoint = target['href']
+            if endpoint.startswith('http'):
+                endpoint = endpoint[endpoint.rfind('/')+1:]
 
     if not endpoint:
         return Error(error='endpoint should be provided in target array')
