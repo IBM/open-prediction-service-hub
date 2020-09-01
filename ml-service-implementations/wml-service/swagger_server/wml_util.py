@@ -39,6 +39,9 @@ def get_wml_credentials():
 
     wml_token = response.json()['access_token']
     wml_url = os.getenv('WML_URL') or ''
+    if wml_url.endswith('/v4'):
+        wml_url = wml_url[:-3]
+        
     wml_instance_id = os.getenv('WML_INSTANCE_ID') or ''
 
     wml_credentials = {
