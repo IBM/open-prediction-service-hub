@@ -281,3 +281,4 @@ buildNumber.properties
 # ------- This project ----------------
 .idea
 *.iml
+.vscode
