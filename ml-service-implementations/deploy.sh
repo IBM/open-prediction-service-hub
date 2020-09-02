@@ -5,6 +5,9 @@ DIR="$( dirname "$SOURCE" )"
 DEPLOY_SERVICE=$1
 
 DEPLOY_LATEST_TAG=latest
+DEPLOY_TAG=$(date +'%Y%m%d-%H%M%S')-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}
+
+echo "DEPLOY_TAG=${DEPLOY_TAG}"
 
 if [ "$TRAVIS_BRANCH" == "master" ]; then
     DEPLOY_LATEST_TAG=stable
