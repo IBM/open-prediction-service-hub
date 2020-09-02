@@ -10,4 +10,4 @@ test:
 	python3 -m pytest --cov=src src/tests
 
 locust:
-	python3 -m locust -f src/tests/stress_test/locustfile.py
+	python3 -m locust -f scripts/locustfile.py
