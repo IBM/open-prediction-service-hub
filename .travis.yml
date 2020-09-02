@@ -15,6 +15,8 @@ before_install:
   - pip3 install --quiet -r requirements-test.txt
   - pip3 install --quiet -r requirements-ml.txt
   - pip3 install --quiet -r requirements.txt
+  - cd ../wml-service
+  - pip3 install --quiet tox
   - cd ../sagemaker-service
   - pip3 install --quiet tox
 
@@ -24,6 +26,8 @@ install:
 
 script:
   - python3 -m pytest -v src/tests
+  - cd ../wml-service
+  - tox
   - cd ../sagemaker-service
   - tox
 
@@ -31,9 +35,12 @@ before_deploy:
   - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
   # example: demo:20190405-171003-4-master
   # '/' is replaces by -
-  - docker build -t sagemaker-service:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t sagemaker-service:latest -f Dockerfile .
   - cd ../ads-ml-service
   - docker build -t ads-ml-service:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t ads-ml-service:latest -f Dockerfile .
+  - cd ../wml-service
+  - docker build -t wml-service:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t wml-service:latest -f Dockerfile .
+  - cd ../sagemaker-service
+  - docker build -t sagemaker-service:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t sagemaker-service:latest -f Dockerfile .
 
 # Needed to install IBM cloud cli
 sudo: required
