@@ -9,7 +9,7 @@ services:
 stages:
   - name: testing
   - name: deploy
-    if: branch IN (master develop)
+    if: branch IN (master develop release/2020Q3)
 
 jobs:
   include:
@@ -30,13 +30,8 @@ jobs:
       - pip3 install --quiet tox
       - tox
     - stage: deploy
-      script: skip
       env: 
         - DEPLOY_TAG=$(date +'%Y%m%d-%H%M%S')-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}
-      deploy: 
-        - provider: script
-          script: ml-service-implementations/deploy.sh ads-ml-service
-        - provider: script
-          script: ml-service-implementations/deploy.sh wml-service
-        - provider: script
-          script: ml-service-implementations/deploy.sh sagemaker-service
+      script: ml-service-implementations/deploy.sh ads-ml-service
+    -  script: ml-service-implementations/deploy.sh wml-service
+    -  script: ml-service-implementations/deploy.sh sagemaker-service
