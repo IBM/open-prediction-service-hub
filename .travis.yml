@@ -6,57 +6,40 @@ python:
 services:
   - docker
 
-# Prepare pip for dependency installation
-before_install:
-  - cd ml-service-implementations/ads-ml-service
-  - pip3 install --quiet --upgrade pip
-  - pip3 install --quiet -r requirements-test.txt
-  - pip3 install --quiet -r requirements-ml.txt
-  - pip3 install --quiet -r requirements.txt
-  - cd ../wml-service
-  - pip3 install --quiet tox
-  - cd ../sagemaker-service
-  - pip3 install --quiet tox
+stages:
+  - name: testing
+  - name: deploy
+    if: branch IN (master develop)
 
-# Install dependencies
-install:
-  - cd ../ads-ml-service
-  - python3 setup.py install --quiet
-
-# Launch Tests
-script:
-  # Test project locally
-  - python3 -m pytest -v app/tests
-  # Test project inside container
-  - docker run --rm -it --entrypoint="python3" ads-ml-service -m pytest /app/app/tests
-  - cd ../wml-service
-  - tox
-  - cd ../sagemaker-service
-  - tox
-
-before_deploy:
-  - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
-  - export DEPLOY_TAG=${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}
-  # example: demo:20190405-171003-4-master
-  # '/' is replaces by -
-  - cd ../ads-ml-service
-  - docker build -t ads-ml-service:${DEPLOY_TAG} -t ads-ml-service:latest -f Dockerfile .
-  - cd ../wml-service
-  - docker build -t wml-service:${DEPLOY_TAG} -t wml-service:latest -f Dockerfile .
-  - cd ../sagemaker-service
-  - docker build -t sagemaker-service:${DEPLOY_TAG} -t sagemaker-service:latest -f Dockerfile .
-
-# Needed to install IBM cloud cli
-sudo: required
-
-deploy:
-  - provider: script
-    script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
-    on:
-      all_branches: true
-      condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${RELEASE_QUARTER}"
-  - provider: script
-    script: chmod +x kubernetes/* && kubernetes/docker_image_registry.sh
-    on:
-      all_branches: true
-      condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${INTEGRATION_COMPATIBLE_REL}"
+jobs:
+  include:
+    - stage: testing
+      script: 
+        - cd ml-service-implementations/ads-ml-service
+        - pip3 install --quiet --upgrade pip
+        - pip3 install --quiet -r requirements-test.txt
+        - pip3 install --quiet -r requirements-ml.txt
+        - pip3 install --quiet -r requirements.txt
+        # Test project locally
+        - python3 -m pytest -v app/tests
+        # Test project inside container
+        - docker run --rm -it --entrypoint="python3" ads-ml-service -m pytest /app/app/tests
+    - script:
+      - cd ml-service-implementations/wml-service
+      - pip3 install --quiet tox
+      - tox
+    - script:
+      - cd ml-service-implementations/sagemaker-service
+      - pip3 install --quiet tox
+      - tox
+    - stage: deploy
+      script: skip
+      env: 
+        - DEPLOY_TAG=$(date +'%Y%m%d-%H%M%S')-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}
+      deploy: 
+        - provider: script
+          script: ml-service-implementations/deploy.sh ads-ml-service
+        - provider: script
+          script: ml-service-implementations/deploy.sh wml-service
+        - provider: script
+          script: ml-service-implementations/deploy.sh sagemaker-service
