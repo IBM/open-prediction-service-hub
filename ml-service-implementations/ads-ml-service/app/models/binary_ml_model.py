@@ -15,14 +15,23 @@
 #
 
 
-from sqlalchemy import Column, LargeBinary, Integer, ForeignKey
+import enum
+import typing
+
+from sqlalchemy import Column, LargeBinary, Integer, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 
 
-class BinaryMLModel(Base):
-    model_b64 = Column(LargeBinary, nullable=False)
+class MlLib(typing.Text, enum.Enum):
+    SKLearn = 'skl'
+    XGBoost = 'xgb'
 
-    model_id = Column(Integer, ForeignKey('model.id'))
+
+class BinaryMLModel(Base):
+    model_b64 = Column('model_b64', LargeBinary, nullable=False)
+    library = Column('library', Enum(MlLib), nullable=False)
+
+    model_id = Column('model_id', Integer, ForeignKey('model.id'))
     model = relationship('Model', back_populates='binary', uselist=False)
