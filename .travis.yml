@@ -30,8 +30,6 @@ jobs:
       - pip3 install --quiet tox
       - tox
     - stage: deploy
-      env: 
-        - DEPLOY_TAG=$(date +'%Y%m%d-%H%M%S')-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}
       script: ml-service-implementations/deploy.sh ads-ml-service
     -  script: ml-service-implementations/deploy.sh wml-service
     -  script: ml-service-implementations/deploy.sh sagemaker-service
