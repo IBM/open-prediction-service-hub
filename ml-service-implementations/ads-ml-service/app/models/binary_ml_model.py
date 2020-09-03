@@ -26,5 +26,5 @@ class BinaryMlModel(base_class.Base):
     model_b64 = sa.Column('model_b64', sa.LargeBinary, nullable=False)
     library = sa.Column('library', sa.Enum(supported_lib.MlLib), nullable=False)
 
-    endpoint_id = sa.Column('endpoint_id', sa.Integer, sa.ForeignKey('endpoint.id'))
+    endpoint_id = sa.Column('endpoint_id', sa.Integer, sa.ForeignKey('endpoint.id'), nullable=False)
     endpoint = orm.relationship('Endpoint', back_populates='binary', uselist=False)
