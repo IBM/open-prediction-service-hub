@@ -15,14 +15,14 @@
 #
 
 
-from sqlalchemy import Column, JSON, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 
-from app.db.base_class import Base
+import app.db.base_class as base_class
 
 
-class ModelConfig(Base):
-    model_id = Column(Integer, ForeignKey('model.id'))
-    model = relationship('Model', back_populates='config', uselist=False)
+class ModelConfig(base_class.Base):
+    configuration = sa.Column('configuration', sa.JSON, nullable=False)
 
-    configuration = Column(JSON, nullable=False)
+    model_id = sa.Column('model_id', sa.Integer, sa.ForeignKey('model.id'))
+    model = orm.relationship('Model', back_populates='config', uselist=False)
