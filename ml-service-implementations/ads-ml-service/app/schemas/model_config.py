@@ -15,39 +15,35 @@
 #
 
 
-from typing import Text, Optional, Dict, Any
+import typing
 
-from pydantic import BaseModel
-
-
-# Shared properties
-class ModelConfigBase(BaseModel):
-    configuration: Optional[Dict[Text, Any]]
+import pydantic
 
 
-# Properties to receive via API on creation
+class ModelConfigBase(pydantic.BaseModel):
+    configuration: typing.Optional[typing.Dict[typing.Text, typing.Any]]
+
+
 class ModelConfigCreate(ModelConfigBase):
-    configuration: Dict[Text, Any]
+    configuration: typing.Dict[typing.Text, typing.Any]
 
 
-# Properties to receive via API on update
 class ModelConfigUpdate(ModelConfigBase):
     pass
 
 
 class ModelConfigInDBBase(ModelConfigBase):
     id: int
-    configuration: Dict[Text, Any]
+    configuration: typing.Dict[typing.Text, typing.Any]
+    model_id: int
 
     class Config:
         orm_mode = True
 
 
-# Additional properties to return via API
 class ModelConfig(ModelConfigInDBBase):
     pass
 
 
-# Additional properties to be storied in DB
 class ModelConfigInDB(ModelConfigInDBBase):
     pass
