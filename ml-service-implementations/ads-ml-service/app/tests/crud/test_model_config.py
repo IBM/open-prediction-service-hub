@@ -15,43 +15,74 @@
 #
 
 
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
+import typing
 
-from app import crud
-from app.schemas.model_config import ModelConfigCreate
+import fastapi.encoders as encoders
+import sqlalchemy.orm as orm
 
-
-def test_create_model_config(db: Session, classification_config):
-    config_in = ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create(db, obj_in=config_in)
-
-    assert jsonable_encoder(config.configuration) == jsonable_encoder(config_in.configuration)
+import app.crud as crud
+import app.schemas as schemas
 
 
-def test_get_schemas(db: Session, classification_config):
-    config_in = ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create(db, obj_in=config_in)
-    schemas = crud.model_config.get_all(db)
+def test_create_model_config(
+        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
+    config_in = schemas.ModelConfigCreate(configuration=classification_config)
+    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model.id)
 
-    assert len(schemas) == 1
-    assert schemas[0].id == config.id
-    assert jsonable_encoder(schemas[0].configuration) == jsonable_encoder(config_in.configuration)
-
-
-def test_get_model_config(db: Session, classification_config):
-    config_in = ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create(db, obj_in=config_in)
-    m_2 = crud.model_config.get(db, id=config.id)
-
-    assert m_2 is not None
-    assert jsonable_encoder(m_2.configuration) == jsonable_encoder(config_in.configuration)
+    assert encoders.jsonable_encoder(config.configuration) == encoders.jsonable_encoder(config_in.configuration)
 
 
-def test_delete_model_config(db: Session, classification_config):
-    config_in = ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create(db, obj_in=config_in)
+def test_get_model_config(
+        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
+    config_in = schemas.ModelConfigCreate(configuration=classification_config)
+    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model.id)
+    config_1 = crud.model_config.get(db, id=config.id)
+
+    assert model.id == config.model_id
+    assert config_1 is not None
+    assert encoders.jsonable_encoder(config_1.configuration) == encoders.jsonable_encoder(config_in.configuration)
+
+
+def test_get_model_config_by_model(
+        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
+    config_in = schemas.ModelConfigCreate(configuration=classification_config)
+    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model.id)
+    config_1 = crud.model_config.get_by_model(db, id=model.id)
+
+    assert config_1 is not None
+    assert config_1.id == config.id
+    assert config_1.model_id == model.id
+    assert encoders.jsonable_encoder(config_1.configuration) == encoders.jsonable_encoder(config_in.configuration)
+
+
+def test_get_all_model_configs(
+        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
+    config_in = schemas.ModelConfigCreate(configuration=classification_config)
+    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model.id)
+    s = crud.model_config.get_all(db)
+
+    assert model.id == config.model_id
+    assert len(s) == 1
+    assert s[0].id == config.id
+    assert encoders.jsonable_encoder(s[0].configuration) == encoders.jsonable_encoder(config_in.configuration)
+
+
+def test_delete_model_config(
+        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
+    config_in = schemas.ModelConfigCreate(configuration=classification_config)
+    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model.id)
     config_2 = crud.model_config.delete(db, id=config.id)
 
+    assert model.id == config.model_id
     assert config_2.id == config.id
     assert crud.model_config.get(db, id=config.id) is None

@@ -24,5 +24,5 @@ import app.db.base_class as base_class
 class ModelConfig(base_class.Base):
     configuration = sa.Column('configuration', sa.JSON, nullable=False)
 
-    model_id = sa.Column('model_id', sa.Integer, sa.ForeignKey('model.id'))
+    model_id = sa.Column('model_id', sa.Integer, sa.ForeignKey('model.id'), nullable=False)
     model = orm.relationship('Model', back_populates='config', uselist=False)
