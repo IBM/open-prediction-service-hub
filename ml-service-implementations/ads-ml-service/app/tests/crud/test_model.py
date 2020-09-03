@@ -24,7 +24,7 @@ import app.crud as crud
 import app.schemas as schemas
 
 
-def test_create_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+def test_create_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
     model_in = schemas.ModelCreate(name=classification_config['name'])
     model = crud.model.create(db, obj_in=model_in)
 
@@ -32,7 +32,7 @@ def test_create_model(db: orm.Session, classification_config: typing.Dict[typing
     assert model.name == classification_config['name']
 
 
-def test_count_models(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+def test_count_models(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
     model_in = schemas.ModelCreate(name=classification_config['name'])
     model = crud.model.create(db, obj_in=model_in)
 
@@ -40,7 +40,7 @@ def test_count_models(db: orm.Session, classification_config: typing.Dict[typing
     assert crud.model.count(db) == 1
 
 
-def test_get_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+def test_get_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
     model_in = schemas.ModelCreate(name=classification_config['name'])
     model = crud.model.create(db, obj_in=model_in)
     model_1 = crud.model.get(db, id=model.id)
@@ -50,7 +50,9 @@ def test_get_model(db: orm.Session, classification_config: typing.Dict[typing.Te
     assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)
 
 
-def test_get_model_by_name(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+def test_get_model_by_name(
+        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+) -> typing.NoReturn:
     model_in = schemas.ModelCreate(name=classification_config['name'])
     model = crud.model.create(db, obj_in=model_in)
     model_1 = crud.model.get_by_name(db, name=classification_config['name'])
@@ -60,7 +62,7 @@ def test_get_model_by_name(db: orm.Session, classification_config: typing.Dict[t
     assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)
 
 
-def test_delete_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+def test_delete_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
     model_in = schemas.ModelCreate(name=classification_config['name'])
     model = crud.model.create(db, obj_in=model_in)
     model_1 = crud.model.delete(db, id=model.id)
