@@ -6,40 +6,30 @@ python:
 services:
   - docker
 
-# Prepare pip for dependency installation
-before_install:
-  - python3 -m pip install --quiet --upgrade pip
+stages:
+  - name: testing
+  - name: deploy
+    if: branch IN (master develop release/2020Q3)
 
-# Install dependencies
-install:
-  - cd ml-service-implementations/ads-ml-service
-  - python3 -m pip install --quiet -r requirements-test.txt
-  - python3 -m pip install --quiet -r requirements-ml.txt
-  - python3 -m pip install --quiet -r requirements.txt
-  - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M')
-  - export FULL_TAG=${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-}
-  - docker build -t ads-ml-service:latest -f Dockerfile .
-  # example tag: demo:20200729-1530-20-release-2020Q2
-  - docker tag ads-ml-service:latest ads-ml-service:${FULL_TAG}
-
-# Launch Testes
-script:
-  # Test project locally
-  - python3 -m pytest -v app/tests
-  # Test project inside container
-  - docker run --rm -it --entrypoint="python3" ads-ml-service -m pytest /app/app/tests
-
-# Needed to install IBM cloud cli
-sudo: required
-
-deploy:
-  - provider: script
-    script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
-    on:
-      all_branches: true
-      condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${RELEASE_QUARTER}"
-  - provider: script
-    script: chmod +x kubernetes/* && kubernetes/docker_image_registry.sh
-    on:
-      all_branches: true
-      condition: ${TRAVIS_BRANCH} == "release/${RELEASE_YEAR}${INTEGRATION_COMPATIBLE_REL}"
+jobs:
+  include:
+    - stage: testing
+      script: 
+        - cd ml-service-implementations/ads-ml-service
+        - pip3 install --quiet --upgrade pip
+        - pip3 install --quiet -r requirements-test.txt
+        - pip3 install --quiet -r requirements-ml.txt
+        - pip3 install --quiet -r requirements.txt
+        - python3 -m pytest -v app/tests
+    - script:
+      - cd ml-service-implementations/wml-service
+      - pip3 install --quiet tox
+      - tox
+    - script:
+      - cd ml-service-implementations/sagemaker-service
+      - pip3 install --quiet tox
+      - tox
+    - stage: deploy
+      script: ml-service-implementations/deploy.sh ads-ml-service
+    -  script: ml-service-implementations/deploy.sh wml-service
+    -  script: ml-service-implementations/deploy.sh sagemaker-service
