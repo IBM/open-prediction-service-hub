@@ -15,16 +15,10 @@
 #
 
 
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
-
-import app.db.base_class as base_class
-import app.core.supported_lib as supported_lib
+import enum
+import typing
 
 
-class BinaryMlModel(base_class.Base):
-    model_b64 = sa.Column('model_b64', sa.LargeBinary, nullable=False)
-    library = sa.Column('library', sa.Enum(supported_lib.MlLib), nullable=False)
-
-    endpoint_id = sa.Column('endpoint_id', sa.Integer, sa.ForeignKey('endpoint.id'))
-    endpoint = orm.relationship('Endpoint', back_populates='binary', uselist=False)
+class MlLib(typing.Text, enum.Enum):
+    SKLearn = 'skl'
+    XGBoost = 'xgb'
