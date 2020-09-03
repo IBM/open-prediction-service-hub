@@ -12,6 +12,10 @@ ENV RETRAIN_MODELS=FALSE
 ENV SSL_SETTINGS=${OPS_HOME}
 ENV ENABLE_SSL=FALSE
 
+RUN \
+    echo "Acquire::http::Pipeline-Depth 0; \
+Acquire::http::No-Cache true; \
+Acquire::BrokenProxy    true;" > /etc/apt/apt.conf.d/99fixbadproxy
 
 # Prepare python env
 RUN \
