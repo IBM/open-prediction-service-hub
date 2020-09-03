@@ -18,14 +18,14 @@
 import pickle
 
 import pytest
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+import sqlalchemy.exc as exc
+import sqlalchemy.orm as orm
 
 import app.models as models
 
 
-def test_working_config(db: Session, classification_predictor):
-    binary_model = models.BinaryMLModel(model_b64=pickle.dumps(classification_predictor), library=models.MlLib.SKLearn)
+def test_add_binary_with_lib(db: orm.Session, classification_predictor):
+    binary_model = models.BinaryMlModel(model_b64=pickle.dumps(classification_predictor), library=models.MlLib.SKLearn)
     db.add(binary_model)
     db.commit()
     db.refresh(binary_model)
@@ -34,10 +34,29 @@ def test_working_config(db: Session, classification_predictor):
     assert binary_model.library == models.MlLib.SKLearn
 
 
-def test_add_binary_without_lib(db: Session, classification_predictor):
-    binary_model = models.BinaryMLModel(model_b64=pickle.dumps(classification_predictor))
+def test_add_binary_with_lib_str(db: orm.Session, classification_predictor):
+    binary_model = models.BinaryMlModel(model_b64=pickle.dumps(classification_predictor), library='skl')
+    db.add(binary_model)
+    db.commit()
+    db.refresh(binary_model)
+
+    assert binary_model.model_b64
+    assert binary_model.library == models.MlLib.SKLearn
+
+
+def test_add_binary_without_lib(db: orm.Session, classification_predictor):
+    binary_model = models.BinaryMlModel(model_b64=pickle.dumps(classification_predictor))
     db.add(binary_model)
 
-    with pytest.raises(IntegrityError):
+    with pytest.raises(exc.IntegrityError):
+        db.commit()
+        db.refresh(binary_model)
+
+
+def test_add_binary_with_non_existing_lib(db: orm.Session, classification_predictor):
+    binary_model = models.BinaryMlModel(model_b64=pickle.dumps(classification_predictor), library='not-existing')
+    db.add(binary_model)
+
+    with pytest.raises(exc.IntegrityError):
         db.commit()
         db.refresh(binary_model)
