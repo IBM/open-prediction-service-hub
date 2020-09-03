@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-#
-# Copyright 2020 IBM
-# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -16,10 +12,15 @@
 
 
 import sqlalchemy as sa
+import sqlalchemy.orm as orm
 
 import app.db.base_class as base_class
 
 
-class User(base_class.Base):
-    username = sa.Column(sa.NCHAR(32), nullable=False, index=True, unique=True)
-    hashed_password = sa.Column(sa.BINARY(64), nullable=False)
+class Endpoint(base_class.Base):
+    name = sa.Column('name', sa.NCHAR(length=128), nullable=False)
+
+    model_id = sa.Column('model_id', sa.Integer, sa.ForeignKey('model.id'))
+    model = orm.relationship('Model', back_populates='endpoint', uselist=False)
+
+    binary = orm.relationship('BinaryMlModel', back_populates='endpoint', cascade='all, delete', uselist=False)

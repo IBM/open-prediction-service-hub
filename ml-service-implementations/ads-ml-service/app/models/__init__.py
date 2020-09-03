@@ -15,7 +15,9 @@
 #
 
 
-from .user import User
-from .binary_ml_model import BinaryMLModel
-from .model_config import ModelConfig
+from .binary_ml_model import BinaryMlModel
+from .binary_ml_model import MlLib
+from .endpoint import Endpoint
 from .model import Model
+from .model_config import ModelConfig
+from .user import User

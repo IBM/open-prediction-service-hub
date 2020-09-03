@@ -18,10 +18,10 @@
 import enum
 import typing
 
-from sqlalchemy import Column, LargeBinary, Integer, ForeignKey, Enum
-from sqlalchemy.orm import relationship
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 
-from app.db.base_class import Base
+import app.db.base_class as base_class
 
 
 class MlLib(typing.Text, enum.Enum):
@@ -29,9 +29,9 @@ class MlLib(typing.Text, enum.Enum):
     XGBoost = 'xgb'
 
 
-class BinaryMLModel(Base):
-    model_b64 = Column('model_b64', LargeBinary, nullable=False)
-    library = Column('library', Enum(MlLib), nullable=False)
+class BinaryMlModel(base_class.Base):
+    model_b64 = sa.Column('model_b64', sa.LargeBinary, nullable=False)
+    library = sa.Column('library', sa.Enum(MlLib), nullable=False)
 
-    model_id = Column('model_id', Integer, ForeignKey('model.id'))
-    model = relationship('Model', back_populates='binary', uselist=False)
+    endpoint_id = sa.Column('endpoint_id', sa.Integer, sa.ForeignKey('endpoint.id'))
+    endpoint = orm.relationship('Endpoint', back_populates='binary', uselist=False)

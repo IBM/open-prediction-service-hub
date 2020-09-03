@@ -15,22 +15,14 @@
 #
 
 
-from sqlalchemy import Column, String
-from sqlalchemy import UniqueConstraint, Index
-from sqlalchemy.orm import relationship
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 
-from app.db.base_class import Base
+import app.db.base_class as base_class
 
 
-class Model(Base):
+class Model(base_class.Base):
+    name = sa.Column('name', sa.NCHAR(length=128), nullable=False, index=True)
 
-    name = Column(String, nullable=False)
-    version = Column(String, nullable=False)
-
-    binary = relationship('BinaryMLModel', back_populates='model', uselist=False, cascade='all, delete')
-    config = relationship('ModelConfig', back_populates='model', uselist=False, cascade='all, delete')
-
-    __table_args__ = (
-        UniqueConstraint('name', 'version', name='_unique_name_ver_combination'),
-        Index('_name_ver_composite_index', 'name', 'version'),
-    )
+    config = orm.relationship('ModelConfig', back_populates='model', cascade='all, delete', uselist=False)
+    endpoint = orm.relationship('Endpoint', back_populates='model', cascade='all, delete')
