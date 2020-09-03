@@ -15,8 +15,9 @@
 #
 
 
+from .binary_ml_model import BinaryMlModelUpdate, BinaryMlModelCreate, BinaryMlModelInDB, BinaryMlModel
+from .model import ModelCreate, ModelUpdate, ModelInDB, Model
+from .model_config import ModelConfigCreate, ModelConfigUpdate, ModelConfigInDB, ModelConfig
 from .token import Token, TokenData
-from .user import User, UserCreate, UserInDB, UserUpdate
-from .binary_ml_model import BinaryMLModel, BinaryMLModelCreate, BinaryMLModelInDB, BinaryMLModelUpdate
-from .model_config import ModelConfig, ModelConfigCreate, ModelConfigInDB, ModelConfigUpdate
-from .model import Model, ModelCreate, ModelInDB, ModelUpdate
+from .user import UserCreate, UserUpdate, UserInDB, User
+from .endpoint import EndpointCreate, EndpointUpdate, EndpointInDB, Endpoint
