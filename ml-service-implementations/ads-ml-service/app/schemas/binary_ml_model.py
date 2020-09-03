@@ -15,38 +15,40 @@
 #
 
 
-from typing import Text, Optional
+import typing
 
-from pydantic import BaseModel
+import pydantic as pyd
 
-
-# Shared properties
-class BinaryMLModelBase(BaseModel):
-    model_b64: Optional[bytes] = None
+import app.core.supported_lib as supported_lib
 
 
-# Properties to receive via API on creation
-class BinaryMLModelCreate(BinaryMLModelBase):
+class BinaryMlModelBase(pyd.BaseModel):
+    model_b64: typing.Optional[bytes] = None
+    library: typing.Optional[supported_lib.MlLib] = None
+
+
+class BinaryMlModelCreate(BinaryMlModelBase):
     model_b64: bytes
+    library: supported_lib.MlLib
 
 
-# Properties to receive via API on update
-class BinaryMLModelUpdate(BinaryMLModelBase):
+class BinaryMlModelUpdate(BinaryMlModelBase):
     pass
 
 
-class BinaryMLModelInDBBase(BinaryMLModelBase):
+class BinaryMlModelInDBBase(BinaryMlModelBase):
     id: int
+    model_b64: bytes
+    library: supported_lib.MlLib
+    endpoint_id: int
 
     class Config:
         orm_mode = True
 
 
-# Additional properties to return via API
-class BinaryMLModel(BinaryMLModelInDBBase):
+class BinaryMlModel(BinaryMlModelInDBBase):
     pass
 
 
-# Additional properties to be storied in DB
-class BinaryMLModelInDB(BinaryMLModelInDBBase):
+class BinaryMlModelInDB(BinaryMlModelInDBBase):
     pass
