@@ -17,6 +17,7 @@
 
 from app.db.base_class import Base
 from app.models.model_config import ModelConfig
-from app.models.binary_ml_model import BinaryMLModel
+from app.models.binary_ml_model import BinaryMlModel
 from app.models.user import User
 from app.models.model import Model
+from app.models.endpoint import Endpoint
