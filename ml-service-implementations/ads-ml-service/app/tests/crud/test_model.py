@@ -15,114 +15,57 @@
 #
 
 
-import pickle
+import typing
 
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
+import fastapi.encoders as encoders
+import sqlalchemy.orm as orm
 
-from app import crud
-from app.schemas.binary_ml_model import BinaryMLModelCreate
-from app.schemas.model import ModelCreate
-from app.schemas.model_config import ModelConfigCreate
+import app.crud as crud
+import app.schemas as schemas
 
 
-def test_create_model(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(configuration=classification_config)
-
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
+def test_create_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+    model_in = schemas.ModelCreate(name=classification_config['name'])
+    model = crud.model.create(db, obj_in=model_in)
 
     assert model is not None
-    assert model.name == config_in.configuration['name']
-    assert model.version == config_in.configuration['version']
-    assert jsonable_encoder(model.config.configuration) == jsonable_encoder(config_in.configuration)
+    assert model.name == classification_config['name']
 
 
-def test_count_models(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(configuration=classification_config)
-
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
+def test_count_models(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+    model_in = schemas.ModelCreate(name=classification_config['name'])
+    model = crud.model.create(db, obj_in=model_in)
 
     assert model is not None
-    assert crud.model_config.count(db) == 1
+    assert crud.model.count(db) == 1
 
 
-def test_get_model(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(configuration=classification_config)
-
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
-
-    model_1 = crud.crud_model.model.get(db, id=model.id)
+def test_get_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+    model_in = schemas.ModelCreate(name=classification_config['name'])
+    model = crud.model.create(db, obj_in=model_in)
+    model_1 = crud.model.get(db, id=model.id)
 
     assert model_1 is not None
     assert model_1.id == model.id
-    assert jsonable_encoder(model_1.config.configuration) == jsonable_encoder(model.config.configuration)
+    assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)
 
 
-def test_get_model_by_name_and_version(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(configuration=classification_config)
-
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
-
-    model_1 = crud.crud_model.model.get_by_name_and_ver(db, name=classification_config['name'],
-                                                        version=classification_config['version'])
+def test_get_model_by_name(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+    model_in = schemas.ModelCreate(name=classification_config['name'])
+    model = crud.model.create(db, obj_in=model_in)
+    model_1 = crud.model.get_by_name(db, name=classification_config['name'])
 
     assert model_1 is not None
     assert model_1.id == model.id
-    assert jsonable_encoder(model_1.config.configuration) == jsonable_encoder(model.config.configuration)
+    assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)
 
 
-def test_delete_model(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(configuration=classification_config)
-
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
-
-    model_1 = crud.crud_model.model.delete(db, id=model.id)
-    model_config_1 = model_1.config
-
-    model_2 = crud.crud_model.model.get(db, id=model_1.id)
-    model_config_2 = crud.crud_model_config.model_config.get(db, id=model_config_1.id)
+def test_delete_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]):
+    model_in = schemas.ModelCreate(name=classification_config['name'])
+    model = crud.model.create(db, obj_in=model_in)
+    model_1 = crud.model.delete(db, id=model.id)
+    model_2 = crud.model.get(db, id=model_1.id)
 
     assert model_2 is None
-    assert model_config_2 is None
     assert model_1.id == model.id
-    assert jsonable_encoder(model_1.config.configuration) == jsonable_encoder(model.config.configuration)
+    assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)

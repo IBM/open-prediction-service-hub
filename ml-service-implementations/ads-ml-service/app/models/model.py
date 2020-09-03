@@ -22,7 +22,7 @@ import app.db.base_class as base_class
 
 
 class Model(base_class.Base):
-    name = sa.Column('name', sa.NCHAR(length=128), nullable=False, index=True)
+    name = sa.Column('name', sa.NCHAR(length=128), nullable=False, index=True, unique=True)
 
     config = orm.relationship('ModelConfig', back_populates='model', cascade='all, delete', uselist=False)
     endpoint = orm.relationship('Endpoint', back_populates='model', cascade='all, delete')

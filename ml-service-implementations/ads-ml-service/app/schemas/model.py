@@ -15,62 +15,34 @@
 #
 
 
-from __future__ import annotations
+import typing
 
-from typing import Text, Optional, Sequence, Dict
-
-from pydantic import BaseModel, Field
-
-from .feature import Feature
-from .metadata import Metadata
-from .output_schema import OutputSchema
-from ..schemas.binary_ml_model import BinaryMLModelBase, BinaryMLModelCreate
-from ..schemas.model_config import ModelConfigBase, ModelConfigCreate
+import pydantic as pyd
 
 
-class MLSchema(BaseModel):
-    """Model independent information"""
-    name: Text = Field(..., description='Name of model')
-    version: Text = Field(..., description='Version of model')
-    method_name: Text = Field(..., description='Name of method. (e.g predict, predict_proba)')
-    input_schema: Sequence[Feature] = Field(..., description='Input schema of ml model')
-    output_schema: Optional[OutputSchema] = Field(..., description='Output schema of ml model')
-    metadata: Metadata = Field(..., description='Additional information for ml model')
+class ModelBase(pyd.BaseModel):
+    name: typing.Optional[typing.Text] = None
 
 
-# Shared properties
-class ModelBase(BaseModel):
-    name: Optional[Text] = None
-    version: Optional[Text] = None
-    binary: Optional[BinaryMLModelBase] = None
-    config: Optional[ModelConfigBase] = None
-
-
-# Properties to receive via API on creation
 class ModelCreate(ModelBase):
-    name: Text
-    version: Text
-    binary: Optional[BinaryMLModelCreate] = None
-    config: Optional[ModelConfigCreate] = None
+    name: typing.Text
 
 
-# Properties to receive via API on update
 class ModelUpdate(ModelBase):
     pass
 
 
 class ModelInDBBase(ModelBase):
-    id: Optional[int]
+    id: int
+    name: typing.Text
 
     class Config:
         orm_mode = True
 
 
-# Additional properties to return via API
 class Model(ModelInDBBase):
     pass
 
 
-# Additional properties to be storied in DB
 class ModelInDB(ModelInDBBase):
     pass

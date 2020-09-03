@@ -15,35 +15,18 @@
 #
 
 
-from typing import Text
+import typing
 
-from sqlalchemy.orm import Session
+import sqlalchemy.orm as orm
 
+import app.models as models
+import app.schemas as schemas
 from .base import CRUDBase
-from .crud_binary_ml_model import binary_ml_model
-from .crud_model_config import model_config
-from ..models import Model
-from ..schemas import ModelCreate, ModelUpdate
 
 
-class CRUDModel(CRUDBase[Model, ModelCreate, ModelUpdate]):
-    def create(self, db: Session, *, obj_in: ModelCreate) -> Model:
-        db_binary = binary_ml_model.create(db, obj_in=obj_in.binary)
-        db_config = model_config.create(db, obj_in=obj_in.config)
-        db_obj = Model(
-            name=obj_in.name,
-            version=obj_in.version,
-            binary=db_binary,
-            config=db_config
-        )
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
-
-    def get_by_name_and_ver(self, db: Session, *, name: Text, version: Text):
-        return db.query(Model) \
-            .filter(Model.name == name, Model.version == version).first()
+class CRUDModel(CRUDBase[models.Model, schemas.ModelCreate, schemas.ModelUpdate]):
+    def get_by_name(self, db: orm.Session, *, name: typing.Text) -> typing.Optional[models.Model]:
+        return db.query(self.model).filter(self.model.name == name).first()
 
 
-model = CRUDModel(Model)
+model = CRUDModel(models.Model)
