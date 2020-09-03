@@ -20,17 +20,17 @@ import typing
 import sqlalchemy.orm as orm
 
 import app.crud as crud
+import app.models as models
 import app.schemas as schemas
 import app.tests.utils.utils as utils
 
 
 def test_create_endpoint(
-        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+        db: orm.Session, model_in_db: models.Model
 ) -> typing.NoReturn:
     endpoint_name = utils.random_string()
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
     endpoint_in = schemas.EndpointCreate(name=endpoint_name)
-    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model.id)
+    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
 
     assert endpoint.name == endpoint_name
-    assert endpoint.model_id == model.id
+    assert endpoint.model_id == model_in_db.id
