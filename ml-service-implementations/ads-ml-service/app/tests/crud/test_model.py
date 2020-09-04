@@ -22,6 +22,8 @@ import sqlalchemy.orm as orm
 
 import app.crud as crud
 import app.schemas as schemas
+import app.models as models
+import app.tests.utils.utils as utils
 
 
 def test_create_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
@@ -71,3 +73,24 @@ def test_delete_model(db: orm.Session, classification_config: typing.Dict[typing
     assert model_2 is None
     assert model_1.id == model.id
     assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)
+
+
+def test_cascade_delete_with_config(
+        db: orm.Session, model_in_db: models.Endpoint, classification_config: typing.Dict[typing.Text, typing.Any]
+) -> typing.NoReturn:
+    config_in = schemas.ModelConfigCreate(configuration=classification_config)
+    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model_in_db.id)
+    crud.model.delete(db, id=model_in_db.id)
+    config_1 = crud.model_config.get(db, id=config.id)
+
+    assert config_1 is None
+
+
+def test_cascade_delete_with_endpoint(db: orm.Session, model_in_db: models.Endpoint):
+    endpoint_name = utils.random_string()
+    endpoint_in = schemas.EndpointCreate(name=endpoint_name)
+    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
+    crud.model.delete(db, id=model_in_db.id)
+    endpoint_1 = crud.endpoint.get(db, id=endpoint.id)
+
+    assert endpoint_1 is None
