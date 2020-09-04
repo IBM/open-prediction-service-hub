@@ -26,59 +26,60 @@ import app.schemas as schemas
 
 
 def test_create_model_config(
-    db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any], model_in_db: models.Model
+        db: orm.Session, model_config_create: schemas.ModelConfigCreate, model_in_db: models.Model
 ) -> typing.NoReturn:
-    config_in = schemas.ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model_in_db.id)
+    config = crud.model_config.create_with_model(db, obj_in=model_config_create, model_id=model_in_db.id)
 
-    assert encoders.jsonable_encoder(config.configuration) == encoders.jsonable_encoder(config_in.configuration)
+    assert config.model_id == model_in_db.id
+    assert encoders.jsonable_encoder(config.configuration) == \
+           encoders.jsonable_encoder(model_config_create.configuration)
 
 
 def test_get_model_config(
-    db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any], model_in_db: models.Model
+        db: orm.Session, model_config_create: schemas.ModelConfigCreate, model_in_db: models.Model
 ) -> typing.NoReturn:
-    config_in = schemas.ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model_in_db.id)
+    config = crud.model_config.create_with_model(db, obj_in=model_config_create, model_id=model_in_db.id)
     config_1 = crud.model_config.get(db, id=config.id)
 
-    assert model_in_db.id == config.model_id
-    assert config_1 is not None
-    assert encoders.jsonable_encoder(config_1.configuration) == encoders.jsonable_encoder(config_in.configuration)
+    assert config_1.id == config.id
+    assert config_1.model_id == model_in_db.id
+    assert encoders.jsonable_encoder(config_1.configuration) == \
+           encoders.jsonable_encoder(model_config_create.configuration)
 
 
 def test_get_model_config_by_model(
-    db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any], model_in_db: models.Model
+        db: orm.Session, model_config_create: schemas.ModelConfigCreate, model_in_db: models.Model
 ) -> typing.NoReturn:
-    config_in = schemas.ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model_in_db.id)
+    config = crud.model_config.create_with_model(db, obj_in=model_config_create, model_id=model_in_db.id)
     config_1 = crud.model_config.get_by_model(db, model_id=model_in_db.id)
 
-    assert config_1 is not None
     assert config_1.id == config.id
     assert config_1.model_id == model_in_db.id
-    assert encoders.jsonable_encoder(config_1.configuration) == encoders.jsonable_encoder(config_in.configuration)
+    assert encoders.jsonable_encoder(config_1.configuration) == \
+           encoders.jsonable_encoder(model_config_create.configuration)
 
 
 def test_get_all_model_configs(
-    db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any], model_in_db: models.Model
+        db: orm.Session, model_config_create: schemas.ModelConfigCreate, model_in_db: models.Model
 ) -> typing.NoReturn:
-    config_in = schemas.ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model_in_db.id)
-    s = crud.model_config.get_all(db)
+    config = crud.model_config.create_with_model(db, obj_in=model_config_create, model_id=model_in_db.id)
+    configs = crud.model_config.get_all(db)
 
-    assert model_in_db.id == config.model_id
-    assert len(s) == 1
-    assert s[0].id == config.id
-    assert encoders.jsonable_encoder(s[0].configuration) == encoders.jsonable_encoder(config_in.configuration)
+    assert configs[0].id == config.id
+    assert configs[0].model_id == model_in_db.id
+    assert encoders.jsonable_encoder(configs[0].configuration) == \
+           encoders.jsonable_encoder(model_config_create.configuration)
 
 
 def test_delete_model_config(
-    db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any], model_in_db: models.Model
+        db: orm.Session, model_config_create: schemas.ModelConfigCreate, model_in_db: models.Model
 ) -> typing.NoReturn:
-    config_in = schemas.ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model_in_db.id)
-    config_2 = crud.model_config.delete(db, id=config.id)
+    config = crud.model_config.create_with_model(db, obj_in=model_config_create, model_id=model_in_db.id)
+    config_1 = crud.model_config.delete(db, id=config.id)
+    config_2 = crud.model_config.get(db, id=config.id)
 
-    assert model_in_db.id == config.model_id
-    assert config_2.id == config.id
-    assert crud.model_config.get(db, id=config.id) is None
+    assert config_2 is None
+    assert config_1.id == config.id
+    assert config_1.model_id == model_in_db.id
+    assert encoders.jsonable_encoder(config_1.configuration) == \
+           encoders.jsonable_encoder(model_config_create.configuration)
