@@ -41,6 +41,11 @@ def model_create(classification_config: typing.Dict[typing.Text, typing.Any]) ->
     return schemas.ModelCreate(name=classification_config['name'])
 
 
+@pytest.fixture()
+def model_config_create(classification_config: typing.Dict[typing.Text, typing.Any]) -> schemas.ModelConfigCreate:
+    return schemas.ModelConfigCreate(configuration=classification_config)
+
+
 @pytest.fixture
 def random_user() -> schemas.UserCreate:
     username = utils.random_string()

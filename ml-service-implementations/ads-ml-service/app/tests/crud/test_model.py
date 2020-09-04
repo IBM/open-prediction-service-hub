@@ -58,20 +58,19 @@ def test_delete_model(db: orm.Session, model_create: schemas.ModelCreate) -> typ
 
 
 def test_cascade_delete_with_config(
-        db: orm.Session, model_in_db: models.Endpoint, classification_config: typing.Dict[typing.Text, typing.Any]
+        db: orm.Session, model_in_db: models.Endpoint, model_config_create: schemas.ModelConfigCreate
 ) -> typing.NoReturn:
-    config_in = schemas.ModelConfigCreate(configuration=classification_config)
-    config = crud.model_config.create_with_model(db, obj_in=config_in, model_id=model_in_db.id)
+    config = crud.model_config.create_with_model(db, obj_in=model_config_create, model_id=model_in_db.id)
     crud.model.delete(db, id=model_in_db.id)
     config_1 = crud.model_config.get(db, id=config.id)
 
     assert config_1 is None
 
 
-def test_cascade_delete_with_endpoint(db: orm.Session, model_in_db: models.Endpoint):
-    endpoint_name = utils.random_string()
-    endpoint_in = schemas.EndpointCreate(name=endpoint_name)
-    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
+def test_cascade_delete_with_endpoint(db: orm.Session, model_in_db: models.Endpoint) -> typing.NoReturn:
+    endpoint = crud.endpoint.create_with_model(
+        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_in_db.id
+    )
     crud.model.delete(db, id=model_in_db.id)
     endpoint_1 = crud.endpoint.get(db, id=endpoint.id)
 
