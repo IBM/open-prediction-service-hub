@@ -36,6 +36,11 @@ def binary_create(classification_predictor: object) -> schemas.BinaryMlModelCrea
     )
 
 
+@pytest.fixture()
+def model_create(classification_config: typing.Dict[typing.Text, typing.Any]) -> schemas.ModelCreate:
+    return schemas.ModelCreate(name=classification_config['name'])
+
+
 @pytest.fixture
 def random_user() -> schemas.UserCreate:
     username = utils.random_string()
