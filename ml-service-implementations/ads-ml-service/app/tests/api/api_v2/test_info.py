@@ -15,17 +15,18 @@
 #
 
 
-from fastapi.testclient import TestClient
-from app.core.configuration import get_config
-from app.version import __version__
+import typing
+
+import fastapi.testclient as tstc
+
+import app.core.configuration as conf
+import app.version
 
 
-def test_get_server_info(
-    client: TestClient
-) -> None:
-    response = client.get(f'{get_config().API_V2_STR}/info')
+def test_get_server_info(client: tstc.TestClient) -> typing.NoReturn:
+    response = client.get(f'{conf.get_config().API_V2_STR}/info')
     content = response.json()
 
     assert response.status_code == 200
     assert content['status'] == 'ok'
-    assert content['info']['server-version'] == __version__
+    assert content['info']['server-version'] == app.version.__version__
