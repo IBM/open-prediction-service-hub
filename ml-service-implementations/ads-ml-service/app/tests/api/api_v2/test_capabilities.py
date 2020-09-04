@@ -15,15 +15,17 @@
 #
 
 
-from fastapi.testclient import TestClient
+import typing
 
-from app.core.configuration import get_config
+import fastapi.testclient as tstc
+
+import app.core.configuration as conf
 
 
 def test_get_server_capabilities(
-    client: TestClient
-) -> None:
-    response = client.get(f'{get_config().API_V2_STR}/capabilities')
+        client: tstc.TestClient
+) -> typing.NoReturn:
+    response = client.get(f'{conf.get_config().API_V2_STR}/capabilities')
     content = response.json()
 
     assert response.status_code == 200
