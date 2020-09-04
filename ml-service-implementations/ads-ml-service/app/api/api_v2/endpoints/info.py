@@ -15,23 +15,24 @@
 #
 
 
-from fastapi import APIRouter
+import typing
 
-import app.gen.model.ops_model as ops_model
+import fastapi
+
+import app.gen.schemas.ops_schemas as ops_schemas
 import app.version as version
 
-
-router = APIRouter()
+router = fastapi.APIRouter()
 
 
 @router.get(
     path='/info',
-    response_model=ops_model.ServerInfo
+    response_model=ops_schemas.ServerInfo
 )
-def server_info():
+def server_info() -> typing.Dict[typing.Text, typing.Any]:
     return {
         'info': {
             'server-version': version.__version__
         },
-        'status': 'ok'
+        'status': ops_schemas.Status2.ok
     }
