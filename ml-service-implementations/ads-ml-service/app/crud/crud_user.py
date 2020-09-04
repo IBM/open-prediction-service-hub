@@ -15,24 +15,25 @@
 #
 
 
-from typing import Text, Optional, Union, Dict, Any
+import typing
 
-from sqlalchemy.orm import Session
+import sqlalchemy.orm as orm
 
+import app.core.security as security
+import app.models as models
+import app.schemas as schemas
 from .base import CRUDBase
-from ..core.security import get_pwd_hash, verify_pwd
-from ..models import User
-from ..schemas import UserCreate, UserUpdate
 
 
-class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
-    def get_by_username(self, db: Session, *, username: Text) -> Optional[User]:
-        return db.query(User).filter(User.username == username).first()
+class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
+    def get_by_username(self, db: orm.Session, *, username: typing.Text) -> typing.Optional[models.User]:
+        return db.query(self.model).filter(self.model.username == username).first()
 
-    def create(self, db: Session, *, obj_in: UserCreate) -> User:
-        db_obj = User(
+    def create(self, db: orm.Session, *, obj_in: schemas.UserCreate) -> models.User:
+        # noinspection PyArgumentList
+        db_obj = self.model(
             username=obj_in.username,
-            hashed_password=get_pwd_hash(obj_in.password)
+            hashed_password=security.get_pwd_hash(obj_in.password).encode()
         )
         db.add(db_obj)
         db.commit()
@@ -40,24 +41,23 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return db_obj
 
     def update(
-            self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[Text, Any]]
-    ) -> User:
-        update_data = obj_in if isinstance(obj_in, Dict) else obj_in.dict(exclude_unset=True)
-        if update_data['password'] is not None:
-            hashed_password = get_pwd_hash(update_data['password'])
+            self, db: orm.Session, *, db_obj: models.User,
+            obj_in: typing.Union[schemas.UserUpdate, typing.Dict[typing.Text, typing.Any]]
+    ) -> models.User:
+        update_data = obj_in if isinstance(obj_in, typing.Dict) else obj_in.dict(exclude_unset=True)
+        if update_data.get('password'):
+            hashed_password = security.get_pwd_hash(update_data['password'])
             del update_data['password']
-            update_data['hashed_password'] = hashed_password
+            update_data['hashed_password'] = hashed_password.encode()
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
     def authenticate(
-            self, db: Session, *, username: Text, password: Text
-    ) -> Optional[User]:
-        user = self.get_by_username(db, username=username)
-        if not user:
-            return None
-        if not verify_pwd(password, user.hashed_password):
-            return None
-        return user
+            self, db: orm.Session, *, username: typing.Text, password: typing.Text
+    ) -> typing.Optional[models.User]:
+        user_ = self.get_by_username(db, username=username)
+        return user_ \
+            if user_ is not None and security.verify_pwd(password, user_.hashed_password) \
+            else None  # User not exist / passwd error
 
 
-user = CRUDUser(User)
+user = CRUDUser(models.User)

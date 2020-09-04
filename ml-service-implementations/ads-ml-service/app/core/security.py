@@ -15,35 +15,31 @@
 #
 
 
-from datetime import datetime, timedelta
-from typing import Union, Text, Any
+import datetime as dt
+import typing as tp
 
 import jwt
-from passlib.context import CryptContext
+import passlib.context as pw_context
 
-from ..core.configuration import get_config
+import app.core.configuration as conf
 
-
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-
+pwd_context = pw_context.CryptContext(schemes=['bcrypt'], deprecated='auto')
 ALGORITHM = 'HS256'
 
 
-def create_access_token(
-    subject: Union[Text, Any], expires_delta: timedelta = None
-) -> Text:
+def create_access_token(subject: tp.Union[tp.Text, tp.Any], expires_delta: dt.timedelta = None) -> tp.Text:
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = dt.datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=get_config().ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = dt.datetime.utcnow() + dt.timedelta(minutes=conf.get_config().ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {'sub': str(subject), 'exp': expire}
-    encoded_jwt = jwt.encode(to_encode, get_config().SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, conf.get_config().SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def verify_pwd(plain_password: Text, hashed_password: Text) -> bool:
+def verify_pwd(plain_password: tp.Text, hashed_password: tp.Union[bytes, tp.Text]) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_pwd_hash(password: Text) -> Text:
+def get_pwd_hash(password: tp.Text) -> tp.Text:
     return pwd_context.hash(password)
