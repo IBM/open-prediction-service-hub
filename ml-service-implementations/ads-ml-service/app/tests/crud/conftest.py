@@ -15,18 +15,27 @@
 #
 
 
+import pickle
 import typing
 
 import pytest
 import sqlalchemy.orm as orm
 
+import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 import app.schemas as schemas
 import app.tests.utils.utils as utils
 
 
-# Data for user create
+@pytest.fixture()
+def binary_create(classification_predictor: object) -> schemas.BinaryMlModelCreate:
+    return schemas.BinaryMlModelCreate(
+        model_b64=pickle.dumps(classification_predictor),
+        library=supported_lib.MlLib.SKLearn
+    )
+
+
 @pytest.fixture
 def random_user() -> schemas.UserCreate:
     username = utils.random_string()
@@ -36,14 +45,14 @@ def random_user() -> schemas.UserCreate:
 
 @pytest.fixture
 def model_in_db(
-    db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
 ) -> models.Model:
     return crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
 
 
 @pytest.fixture
 def endpoint_in_db(
-    db: orm.Session, model_in_db
+        db: orm.Session, model_in_db: models.Model
 ) -> models.Endpoint:
     return crud.endpoint.create_with_model(
         db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_in_db.id
