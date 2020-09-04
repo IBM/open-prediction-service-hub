@@ -40,7 +40,7 @@ def test_cascade_delete_with_binary(
         db: orm.Session,
         endpoint_in_db: models.Model,
         classification_predictor: object
-):
+) -> typing.NoReturn:
     binary_in = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(classification_predictor),
         library=supported_lib.MlLib.SKLearn
