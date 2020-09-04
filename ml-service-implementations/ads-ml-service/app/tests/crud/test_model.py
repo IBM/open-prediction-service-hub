@@ -17,62 +17,44 @@
 
 import typing
 
-import fastapi.encoders as encoders
 import sqlalchemy.orm as orm
 
 import app.crud as crud
-import app.schemas as schemas
 import app.models as models
+import app.schemas as schemas
 import app.tests.utils.utils as utils
 
 
-def test_create_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
-    model_in = schemas.ModelCreate(name=classification_config['name'])
-    model = crud.model.create(db, obj_in=model_in)
+def test_create_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
 
-    assert model is not None
-    assert model.name == classification_config['name']
+    assert model.name == model_create.name
 
 
-def test_count_models(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
-    model_in = schemas.ModelCreate(name=classification_config['name'])
-    model = crud.model.create(db, obj_in=model_in)
-
-    assert model is not None
-    assert crud.model.count(db) == 1
-
-
-def test_get_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
-    model_in = schemas.ModelCreate(name=classification_config['name'])
-    model = crud.model.create(db, obj_in=model_in)
+def test_get_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
     model_1 = crud.model.get(db, id=model.id)
 
-    assert model_1 is not None
     assert model_1.id == model.id
-    assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)
+    assert model_1.name == model_create.name
 
 
-def test_get_model_by_name(
-        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
-) -> typing.NoReturn:
-    model_in = schemas.ModelCreate(name=classification_config['name'])
-    model = crud.model.create(db, obj_in=model_in)
-    model_1 = crud.model.get_by_name(db, name=classification_config['name'])
+def test_get_model_by_name(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
+    model_1 = crud.model.get_by_name(db, model_create.name)
 
-    assert model_1 is not None
     assert model_1.id == model.id
-    assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)
+    assert model_1.name == model_create.name
 
 
-def test_delete_model(db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]) -> typing.NoReturn:
-    model_in = schemas.ModelCreate(name=classification_config['name'])
-    model = crud.model.create(db, obj_in=model_in)
+def test_delete_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
     model_1 = crud.model.delete(db, id=model.id)
     model_2 = crud.model.get(db, id=model_1.id)
 
     assert model_2 is None
     assert model_1.id == model.id
-    assert encoders.jsonable_encoder(model_1) == encoders.jsonable_encoder(model)
+    assert model_1.name == model_create.name
 
 
 def test_cascade_delete_with_config(
