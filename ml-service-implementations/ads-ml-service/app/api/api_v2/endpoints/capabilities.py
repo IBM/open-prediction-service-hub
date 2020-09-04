@@ -15,18 +15,25 @@
 #
 
 
-from fastapi import APIRouter
+import typing
 
-import app.gen.model.ops_model as ops_model
+import fastapi
 
-router = APIRouter()
+import app.gen.schemas.ops_schemas as ops_model
+
+router = fastapi.APIRouter()
 
 
 @router.get(
     path='/capabilities',
     response_model=ops_model.Capabilities
 )
-def server_capabilities():
+def server_capabilities() -> typing.Dict[typing.Text, typing.Any]:
     return {
-        'capabilities': ['info', 'discover', 'manage', 'run']
+        'capabilities': [
+            ops_model.Capability.info,
+            ops_model.Capability.discover,
+            ops_model.Capability.manage,
+            ops_model.Capability.run
+        ]
     }
