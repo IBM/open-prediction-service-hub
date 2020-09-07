@@ -15,6 +15,7 @@
 #
 
 
+import datetime as dt
 import typing
 
 import pydantic as pyd
@@ -35,6 +36,8 @@ class ModelUpdate(ModelBase):
 class ModelInDBBase(ModelBase):
     id: int
     name: typing.Text
+    created_at: dt.datetime
+    modified_at: dt.datetime
 
     class Config:
         orm_mode = True

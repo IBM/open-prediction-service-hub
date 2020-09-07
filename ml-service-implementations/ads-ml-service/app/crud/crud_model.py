@@ -15,8 +15,10 @@
 #
 
 
-import typing
+import datetime
+import typing as typ
 
+import fastapi.encoders as encoders
 import sqlalchemy.orm as orm
 
 import app.models as models
@@ -25,7 +27,31 @@ from .base import CRUDBase
 
 
 class CRUDModel(CRUDBase[models.Model, schemas.ModelCreate, schemas.ModelUpdate]):
-    def get_by_name(self, db: orm.Session, *, name: typing.Text) -> typing.Optional[models.Model]:
+    def create(self, db: orm.Session, *, obj_in: schemas.ModelConfigCreate) -> models.Model:
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        # noinspection PyArgumentList
+        db_obj = self.model(
+            **encoders.jsonable_encoder(obj_in),
+            created_at=now,
+            modified_at=now
+        )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def update(
+            self,
+            db: orm.Session,
+            *,
+            db_obj: models.Model,
+            obj_in: typ.Union[schemas.ModelUpdate, typ.Dict[typ.Text, typ.Any]]
+    ) -> models.Model:
+        update_data = obj_in if isinstance(obj_in, typ.Dict) else obj_in.dict(exclude_unset=True)
+        update_data['modified_at'] = datetime.datetime.now(tz=datetime.timezone.utc)
+        return super().update(db, db_obj=db_obj, obj_in=update_data)
+
+    def get_by_name(self, db: orm.Session, *, name: typ.Text) -> typ.Optional[models.Model]:
         return db.query(self.model).filter(self.model.name == name).first()
 
 
