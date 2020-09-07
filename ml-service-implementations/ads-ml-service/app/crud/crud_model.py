@@ -27,7 +27,7 @@ from .base import CRUDBase
 
 
 class CRUDModel(CRUDBase[models.Model, schemas.ModelCreate, schemas.ModelUpdate]):
-    def create(self, db: orm.Session, *, obj_in: schemas.ModelConfigCreate) -> models.Model:
+    def create(self, db: orm.Session, *, obj_in: schemas.ModelCreate) -> models.Model:
         now = datetime.datetime.now(tz=datetime.timezone.utc)
         # noinspection PyArgumentList
         db_obj = self.model(
