@@ -15,6 +15,7 @@
 #
 
 
+import datetime as dt
 import typing
 
 import pydantic as pyd
@@ -35,6 +36,7 @@ class EndpointUpdate(EndpointBase):
 class EndpointInDBBase(EndpointBase):
     id: int
     name: typing.Text
+    deployed_at: dt.datetime
     model_id: int
 
     class Config:
