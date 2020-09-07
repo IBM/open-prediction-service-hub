@@ -19,6 +19,7 @@ import app.db.base_class as base_class
 
 class Endpoint(base_class.Base):
     name = sa.Column('name', sa.NCHAR(length=128), nullable=False)
+    deployed_at = sa.Column('deployed_at', sa.DateTime(timezone=False), nullable=False)
 
     model_id = sa.Column('model_id', sa.Integer, sa.ForeignKey('model.id'))
     model = orm.relationship('Model', back_populates='endpoint', uselist=False)

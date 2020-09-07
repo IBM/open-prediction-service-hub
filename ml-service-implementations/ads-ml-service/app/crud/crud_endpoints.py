@@ -15,6 +15,8 @@
 #
 
 
+import datetime as dt
+
 import fastapi.encoders as encoders
 import sqlalchemy.orm as orm
 
@@ -31,6 +33,7 @@ class CRUDModel(CRUDBase[models.Endpoint, schemas.EndpointCreate, schemas.Endpoi
         # noinspection PyArgumentList
         db_obj = self.model(
             **encoders.jsonable_encoder(obj_in),
+            deployed_at=dt.datetime.now(tz=dt.timezone.utc),
             model_id=model_id
         )
         db.add(db_obj)
