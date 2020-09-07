@@ -41,7 +41,7 @@ def test_get_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing
 
 def test_get_model_by_name(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
     model = crud.model.create(db, obj_in=model_create)
-    model_1 = crud.model.get_by_name(db, model_create.name)
+    model_1 = crud.model.get_by_name(db, name=model_create.name)
 
     assert model_1.id == model.id
     assert model_1.name == model_create.name
