@@ -15,9 +15,9 @@
 #
 
 
+import datetime as dt
 import pickle
 import typing
-import datetime as dt
 
 import sqlalchemy.orm as orm
 
@@ -35,9 +35,7 @@ def test_create_endpoint(db: orm.Session, model_in_db: models.Model) -> typing.N
 
     assert endpoint.name == endpoint_name
     assert endpoint.model_id == model_in_db.id
-    assert endpoint.deployed_at.date() == dt.datetime.now(tz=dt.timezone.utc).date()
-    assert endpoint.deployed_at.hour == dt.datetime.now(tz=dt.timezone.utc).hour
-    assert endpoint.deployed_at.minute == dt.datetime.now(tz=dt.timezone.utc).minute
+    assert (dt.datetime.now(tz=dt.timezone.utc) - endpoint.deployed_at.replace(tzinfo=dt.timezone.utc)).seconds < 1
 
 
 def test_cascade_delete_with_binary(
