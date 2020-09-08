@@ -18,5 +18,5 @@
 import re
 
 TEMPLATE = 'ops://{resource_type}/{resource_id}'
-RE_TEMPLATE = r'^(?P<scheme>[a-zA-Z0-9+.-]+)://(?P<resource_path>.*)/(?P<resource_id>.*)$'
+RE_TEMPLATE = r'^(?P<scheme>[a-zA-Z0-9+.-]+)://[^/]*(?P<resource_path>.*)/(?P<resource_id>.*)$'
 ADS_ML_SERVICE_RE = re.compile(RE_TEMPLATE)
