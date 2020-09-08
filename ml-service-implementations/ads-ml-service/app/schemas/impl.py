@@ -108,27 +108,6 @@ class ModelsImpl(ops_schemas.Models):
 class EndpointImpl(ops_schemas.Endpoint):
     @staticmethod
     def from_database(e: models.Endpoint) -> typing.Dict[typing.Text, typing.Any]:
-        tmp = {
-            'id': e.id,
-            'name': e.name,
-            'deployed_at': e.deployed_at,
-            'status': ops_schemas.Status.in_service.__str__() if e.binary else ops_schemas.Status.creating.__str__(),
-            'links': [
-                *[
-                    {
-                        'rel': 'self',
-                        'href': app_uri.TEMPLATE.format(resource_type='endpoint', resource_id=e.id)
-                    }
-                ],
-                *[
-                    {
-                        'rel': 'model',
-                        'href': app_uri.TEMPLATE.format(resource_type='model', resource_id=e.model_id)
-                    }
-                ]
-            ]
-        }
-        print(tmp)
         return {
             'id': e.id,
             'name': e.name,

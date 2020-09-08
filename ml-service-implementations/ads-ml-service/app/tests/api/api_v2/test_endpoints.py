@@ -16,6 +16,7 @@
 
 
 import datetime as dt
+import pickle
 import time
 import typing as typ
 
@@ -26,6 +27,7 @@ import app.core.configuration as conf
 import app.models as models
 import app.tests.utils.utils as utils
 import app.crud as crud
+import app.core.supported_lib as supported_lib
 
 
 def test_get_endpoint(
@@ -115,3 +117,21 @@ def test_delete_endpoint(
 
     assert response.status_code == 204
     assert endpoint is None
+
+
+def test_add_binary(
+        db: saorm.Session,
+        client: tstc.TestClient,
+        endpoint_with_model,
+        classification_predictor: object
+) -> typ.NoReturn:
+    response = client.post(
+        url=conf.get_config().API_V2_STR + '/endpoints' + f'/{endpoint_with_model.id}',
+        files={'file': pickle.dumps(classification_predictor)},
+        data={'lib': supported_lib.MlLib.SKLearn.value.encode()}
+    )
+    response_1 = client.get(
+        url=conf.get_config().API_V2_STR + '/endpoints' + f'/{endpoint_with_model.id}')
+
+    assert response.status_code == 204
+    assert response_1.json()['status'] == 'in_service'
