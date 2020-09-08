@@ -16,19 +16,24 @@
 
 
 import os
+import pickle
 import random
-from datetime import datetime
+import typing
 from typing import NoReturn, Dict, Generator, Text
 
 import numpy as np
 import pytest
+import sqlalchemy.orm as orm
 from fastapi.testclient import TestClient
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-import app.core.uri as uri
+import app.core.supported_lib as supported_lib
+import app.models as models
+import app.schemas as schemas
+import app.tests.utils.utils as utils
 from app import crud
 from app.core.configuration import get_config
 from app.db.base import Base
@@ -159,8 +164,6 @@ def base_config() -> Dict:
                 'type': 'boolean'
             }
         },
-        'created_at': datetime.strptime('1/1/2008 1:30 PM', '%m/%d/%Y %I:%M %p').__str__(),
-        'modified_at': datetime.strptime('1/1/2008 1:30 PM', '%m/%d/%Y %I:%M %p').__str__(),
         'metadata': {
             'description': random_string(),
             'author': random_string(),
@@ -173,31 +176,11 @@ def base_config() -> Dict:
         }
 
     }
-    config = {
-        'name': random_string(),
-        'version': random_string(),
-        'input_schema': [
-            {'name': 'x', 'order': 0, 'type': 'float'},
-            {'name': 'y', 'order': 1, 'type': 'float'}
-        ],
-        'metadata': {
-            'description': random_string(),
-            'author': random_string(),
-            'trained_at': datetime.strptime('1/1/2008 1:30 PM', '%m/%d/%Y %I:%M %p').__str__(),
-            'metrics': [
-                {
-                    'name': random_string(),
-                    'value': random.random()
-                }
-            ]
-        }
-    }
     return config_v2
 
 
 @pytest.fixture
 def classification_config(base_config: Dict) -> Dict:
-    base_config['method_name'] = 'predict'
     base_config['output_schema'] = {
         'attributes': [
             {'name': 'prediction', 'type': 'string'}
@@ -271,3 +254,31 @@ def client(db, tmp_path) -> Generator[TestClient, None, None]:
 @pytest.fixture
 def user_token_header(client, db) -> Dict[Text, Text]:
     return auth_token_from_username(client=client, db=db, username=get_config().USERNAME_TEST_USER)
+
+
+@pytest.fixture
+def endpoint_with_model(
+        db: orm.Session,
+        classification_config: typing.Dict[typing.Text, typing.Any],
+) -> models.Endpoint:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=classification_config), model_id=model.id
+    )
+    endpoint = crud.endpoint.create_with_model(
+        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model.id
+    )
+    return endpoint
+
+
+@pytest.fixture
+def endpoint_with_model_and_binary(
+        db: orm.Session,
+        endpoint_with_model: models.Endpoint,
+        classification_predictor: object,
+) -> models.Endpoint:
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=pickle.dumps(obj=classification_predictor),
+        library=supported_lib.MlLib.SKLearn
+    ), endpoint_id=endpoint_with_model.id)
+    return endpoint_with_model
