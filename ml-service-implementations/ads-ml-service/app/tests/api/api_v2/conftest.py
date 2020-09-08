@@ -39,31 +39,3 @@ def model_with_config_and_endpoint(
     )
     crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model.id)
     return model
-
-
-@pytest.fixture()
-def endpoint_with_model(
-        db: orm.Session,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-) -> models.Endpoint:
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
-    crud.model_config.create_with_model(
-        db, obj_in=schemas.ModelConfigCreate(configuration=classification_config), model_id=model.id
-    )
-    endpoint = crud.endpoint.create_with_model(
-        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model.id
-    )
-    return endpoint
-
-
-@pytest.fixture()
-def endpoint_with_model_and_binary(
-        db: orm.Session,
-        endpoint_with_model: models.Endpoint,
-        classification_predictor: object,
-) -> models.Endpoint:
-    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
-        model_b64=pickle.dumps(obj=classification_predictor),
-        library=supported_lib.MlLib.SKLearn
-    ), endpoint_id=endpoint_with_model.id)
-    return endpoint_with_model
