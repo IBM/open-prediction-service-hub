@@ -114,7 +114,7 @@ def patch_model(
 def get_ml_models_configs(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
-) -> typing.NoReturn:
+) -> responses.Response:
     model = crud.model.get(db, id=model_id)
     if not model:
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)

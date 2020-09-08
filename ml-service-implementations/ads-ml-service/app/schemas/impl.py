@@ -16,6 +16,7 @@
 
 
 import typing
+import enum
 
 import numpy
 import pydantic as pydt
@@ -107,11 +108,32 @@ class ModelsImpl(ops_schemas.Models):
 class EndpointImpl(ops_schemas.Endpoint):
     @staticmethod
     def from_database(e: models.Endpoint) -> typing.Dict[typing.Text, typing.Any]:
+        tmp = {
+            'id': e.id,
+            'name': e.name,
+            'deployed_at': e.deployed_at,
+            'status': ops_schemas.Status.in_service.__str__() if e.binary else ops_schemas.Status.creating.__str__(),
+            'links': [
+                *[
+                    {
+                        'rel': 'self',
+                        'href': app_uri.TEMPLATE.format(resource_type='endpoint', resource_id=e.id)
+                    }
+                ],
+                *[
+                    {
+                        'rel': 'model',
+                        'href': app_uri.TEMPLATE.format(resource_type='model', resource_id=e.model_id)
+                    }
+                ]
+            ]
+        }
+        print(tmp)
         return {
             'id': e.id,
             'name': e.name,
             'deployed_at': e.deployed_at,
-            'status': ops_schemas.Status.in_service if e.binary else ops_schemas.Status.creating,
+            'status': StatusImpl.in_service if e.binary else StatusImpl.creating,
             'links': [
                 *[
                     {
@@ -131,3 +153,14 @@ class EndpointImpl(ops_schemas.Endpoint):
 
 class EndpointsImpl(ops_schemas.Endpoints):
     pass
+
+
+class StatusImpl(typing.Text, enum.Enum):
+    out_of_service = 'out_of_service'
+    creating = 'creating'
+    updating = 'updating'
+    under_maintenance = 'under_maintenance'
+    rolling_back = 'rolling_back'
+    in_service = 'in_service'
+    deleting = 'deleting'
+    failed = 'failed'
