@@ -17,13 +17,19 @@
 
 from fastapi import APIRouter
 
-from .endpoints import login
-from .endpoints import users
-from .endpoints import info
 from .endpoints import capabilities
+from .endpoints import endpoints
+from .endpoints import info
+from .endpoints import login
+from .endpoints import models
+from .endpoints import predictions
+from .endpoints import users
 
 api_router: APIRouter = APIRouter()
 api_router.include_router(login.router, tags=['Login'])
 api_router.include_router(users.router, prefix='/users', tags=['Users'])
 api_router.include_router(info.router)
 api_router.include_router(capabilities.router)
+api_router.include_router(models.router)
+api_router.include_router(endpoints.router)
+api_router.include_router(predictions.router)
