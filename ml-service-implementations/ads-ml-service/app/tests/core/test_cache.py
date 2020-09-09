@@ -15,11 +15,13 @@
 #
 
 
+import typing
 import fastapi.testclient as tstc
 import sqlalchemy.orm as saorm
 
 import app.core.cache as ops_cache
 import app.models as models
+import app.core.kfserving_impl as kfserving_impl
 
 
 def test_cache(
@@ -28,10 +30,11 @@ def test_cache(
         endpoint_with_model_and_binary: models.Endpoint,
         classification_predictor: object
 ):
-    binary_cache = ops_cache.BinaryCache()
-    obj = binary_cache.get_deserialized_model(db, endpoint_with_model_and_binary.id)
+    binary_cache = ops_cache.ModelCache(max_len=64, max_age_seconds=60)
+    obj: typing.Optional[kfserving_impl.SKLearnModelImpl] = \
+        binary_cache.get_deserialized_model(db, endpoint_with_model_and_binary.id)
 
-    assert isinstance(obj, type(classification_predictor))
+    assert isinstance(obj.binary, type(classification_predictor))
 
 
 def test_cache_binary_not_exist(
@@ -40,7 +43,7 @@ def test_cache_binary_not_exist(
         endpoint_with_model_and_binary: models.Endpoint,
         classification_predictor: object
 ):
-    binary_cache = ops_cache.BinaryCache()
+    binary_cache = ops_cache.ModelCache(max_len=64, max_age_seconds=60)
     obj = binary_cache.get_deserialized_model(db, endpoint_with_model_and_binary.id + 1)
 
     assert obj is None
