@@ -13,10 +13,6 @@ passlib[bcrypt]           # Password hash
 fastapi
 uvicorn
 gunicorn
-expiringdict
+cachetools
 sqlalchemy
 datamodel-code-generator~=0.5.28
-
-
-# Load pre-trained model
-requests~=2.23.0

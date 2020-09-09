@@ -23,6 +23,7 @@ import sqlalchemy.orm as saorm
 
 import app.core.configuration as conf
 import app.models as models
+import app.core.cache as ops_cache
 
 
 @pytest.mark.parametrize(
@@ -80,6 +81,7 @@ def test_prediction(
         client: tstc.TestClient,
         endpoint_with_model_and_binary: models.Endpoint
 ) -> typ.NoReturn:
+    ops_cache.cache.clear()
     response = client.post(
         url=conf.get_config().API_V2_STR + '/predictions',
         json={
