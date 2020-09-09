@@ -15,10 +15,10 @@
 #
 
 
-import pytest
 import typing as typ
 
 import fastapi.testclient as tstc
+import pytest
 import sqlalchemy.orm as saorm
 
 import app.core.configuration as conf
@@ -30,10 +30,8 @@ import app.models as models
     [
         ([{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 10}], [0.5, 10]),
         ([{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': True}], [0.5, True]),
-        ([{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 'good'}], [0.5, 'good']),
         ([{'name': 'x', 'value': 10}, {'name': 'y', 'value': True}], [10, True]),
-        ([{'name': 'x', 'value': 10}, {'name': 'y', 'value': 'good'}], [10, 'good']),
-        ([{'name': 'x', 'value': True}, {'name': 'y', 'value': 'good'}], [True, 'good']),
+        ([{'name': 'x', 'value': 'bad'}, {'name': 'y', 'value': 'good'}], ['bad', 'good']),
     ]
 )
 def test_value_casting(
@@ -52,9 +50,29 @@ def test_value_casting(
             ]
         }
     )
-    prediction = response.json()['result']['prediction']
+    prediction = response.json()['result']['predict']
 
     assert prediction == output
+
+
+def test_xgb_prediction(
+        db: saorm.Session,
+        client: tstc.TestClient,
+        endpoint_with_xgb_predictor: models.Endpoint
+) -> typ.NoReturn:
+    response = client.post(
+        url=conf.get_config().API_V2_STR + '/predictions',
+        json={
+            'parameters': [{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 0.5}],
+            'target': [
+                {'rel': 'endpoint', 'href': f'ops:///endpoints/{endpoint_with_xgb_predictor.id}'}
+            ]
+        }
+    )
+    prediction = response.json()['result']['predict']
+
+    assert response.status_code == 200
+    assert isinstance(prediction, list)
 
 
 def test_prediction(
@@ -71,6 +89,7 @@ def test_prediction(
             ]
         }
     )
+    prediction = response.json()['result']['predict']
 
-    prediction = response.json()
     assert response.status_code == 200
+    assert isinstance(prediction, typ.Text)
