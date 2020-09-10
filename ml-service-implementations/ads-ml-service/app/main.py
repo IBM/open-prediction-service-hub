@@ -18,7 +18,7 @@
 import fastapi
 import fastapi.responses as responses
 
-import app.api.api_v2 as api_v2
+import app.api.api_v2.api as api_v2
 import app.version as ads_ml_service_version
 
 app = fastapi.FastAPI(
@@ -28,7 +28,7 @@ app = fastapi.FastAPI(
     openapi_url="/open-prediction-service.json"
 )
 
-app.include_router(api_v2.api.api_router)
+app.include_router(api_v2.api_router)
 
 
 @app.get(path='/', include_in_schema=False)
