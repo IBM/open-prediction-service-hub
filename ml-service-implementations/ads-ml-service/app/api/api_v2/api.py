@@ -15,21 +15,22 @@
 #
 
 
-from fastapi import APIRouter
+import fastapi
 
-from .endpoints import capabilities
-from .endpoints import endpoints
-from .endpoints import info
-from .endpoints import login
-from .endpoints import models
-from .endpoints import predictions
-from .endpoints import users
+import app.api.api_v2.endpoints.capabilities as capabilities
+import app.api.api_v2.endpoints.endpoints as endpoints
+import app.api.api_v2.endpoints.info as info
+import app.api.api_v2.endpoints.login as login
+import app.api.api_v2.endpoints.models as models
+import app.api.api_v2.endpoints.predictions as predictions
+import app.api.api_v2.endpoints.users as users
 
-api_router: APIRouter = APIRouter()
-api_router.include_router(login.router, tags=['Login'])
-api_router.include_router(users.router, prefix='/users', tags=['Users'])
-api_router.include_router(info.router)
-api_router.include_router(capabilities.router)
+api_router = fastapi.APIRouter()
+
+api_router.include_router(users.router, prefix='/users', tags=['account'])
+api_router.include_router(login.router, tags=['login'])
+api_router.include_router(info.router, tags=['info'])
+api_router.include_router(capabilities.router, tags=['info'])
 api_router.include_router(models.router)
 api_router.include_router(endpoints.router)
-api_router.include_router(predictions.router)
+api_router.include_router(predictions.router, tags=['run'])

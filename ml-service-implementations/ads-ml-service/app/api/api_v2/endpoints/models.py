@@ -32,21 +32,9 @@ router = fastapi.APIRouter()
 
 
 @router.get(
-    path='/models/{model_id}',
-    response_model=impl.ModelImpl
-)
-def get_ml_models_configs(
-        model_id: int,
-        db: saorm.Session = fastapi.Depends(deps.get_db)
-) -> typing.Dict[typing.Text, typing.Any]:
-    return impl.ModelImpl.from_database(
-        db_obj=crud.model.get(db, id=model_id)
-    )
-
-
-@router.get(
     path='/models',
-    response_model=impl.ModelsImpl
+    response_model=impl.ModelsImpl,
+    tags=['discover']
 )
 def get_ml_models_configs(
         db: saorm.Session = fastapi.Depends(deps.get_db)
@@ -59,9 +47,24 @@ def get_ml_models_configs(
     }
 
 
+@router.get(
+    path='/models/{model_id}',
+    response_model=impl.ModelImpl,
+    tags=['discover']
+)
+def get_ml_models_configs(
+        model_id: int,
+        db: saorm.Session = fastapi.Depends(deps.get_db)
+) -> typing.Dict[typing.Text, typing.Any]:
+    return impl.ModelImpl.from_database(
+        db_obj=crud.model.get(db, id=model_id)
+    )
+
+
 @router.post(
     path='/models',
-    response_model=impl.ModelImpl
+    response_model=impl.ModelImpl,
+    tags=['manage']
 )
 def add_model(
         m_in: impl.ModelCreateImpl,
@@ -82,7 +85,8 @@ def add_model(
 
 @router.patch(
     path='/models/{model_id}',
-    response_model=impl.ModelImpl
+    response_model=impl.ModelImpl,
+    tags=['manage']
 )
 def patch_model(
         model_id: int,
@@ -109,7 +113,8 @@ def patch_model(
 
 @router.delete(
     path='/models/{model_id}',
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=['manage']
 )
 def get_ml_models_configs(
         model_id: int,
