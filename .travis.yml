@@ -16,14 +16,11 @@ jobs:
     - stage: testing
       script:
         - cd ml-service-implementations/ads-ml-service
-        -> datamodel-codegen
-          --input ../../open-prediction-service.yaml --input-file-type openapi
-          --target-python-version 3.7
-          --output app/gen/schemas/ops_schemas.py
         - pip3 install --quiet --upgrade pip
         - pip3 install --quiet -r requirements-test.txt
         - pip3 install --quiet -r requirements-ml.txt
         - pip3 install --quiet -r requirements.txt
+        - datamodel-codegen --input ../../open-prediction-service.yaml --input-file-type openapi --target-python-version 3.7 --output app/gen/schemas/ops_schemas.py
         - python3 -m pytest -v app/tests
       name: "ads-ml-service-test"
     - script:
