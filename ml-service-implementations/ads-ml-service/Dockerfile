@@ -49,7 +49,12 @@ RUN \
 COPY . ${OPS_HOME}
 COPY entrypoint.sh /entrypoint.sh
 RUN \
-    chown ops:root /entrypoint.sh&& \
+    datamodel-codegen \
+		--input app/gen/tmp.schemas.ops.yaml \
+		--input-file-type openapi \
+		--target-python-version 3.7 \
+		--output app/gen/schemas/ops_schemas.py && \
+    chown ops:root /entrypoint.sh && \
     chmod +x /entrypoint.sh && \
     chmod g=u /entrypoint.sh && \
     chown --recursive ops:root ${OPS_HOME} && \
