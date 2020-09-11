@@ -15,8 +15,8 @@
 #
 
 
-import typing
 import enum
+import typing
 
 import numpy
 import pydantic as pydt
@@ -41,7 +41,7 @@ class FeatureImpl(ops_schemas.Feature):
         """Feature is immutable inside model"""
         allow_mutation: bool = False
 
-    @pydt.validator('type', always=True)
+    @pydt.validator('type')
     def type_check(cls, t) -> typing.Type:
         if t in ('int', 'float', 'bool', 'str'):  # Python type
             return t
@@ -143,3 +143,28 @@ class StatusImpl(typing.Text, enum.Enum):
     in_service = 'in_service'
     deleting = 'deleting'
     failed = 'failed'
+
+
+class ParameterImpl(pydt.BaseModel):
+    name: str = pydt.Field(..., description='Name of the feature', title='Name')
+    value: typing.Any = pydt.Field(
+        ..., description='Value of the feature', title='Value'
+    )
+
+    @pydt.validator('value')
+    def value_check(cls, v) -> typing.Any:
+        if isinstance(v, (int, float, bool, str)):  # Python type
+            return v
+        else:
+            raise ValueError(f'Value not supported: {v}')
+
+
+class PredictionImpl(pydt.BaseModel):
+    target: typing.List[ops_schemas.Link] = pydt.Field(
+        ...,
+        description='Add at least a relation to an `endpoint`to be able to call the correct prediction. Eventually add '
+                    'also a `model` in case endpoints contains multiple models.',
+    )
+    parameters: typing.List[ParameterImpl] = pydt.Field(
+        ..., description='Model parameters', title='Parameters'
+    )

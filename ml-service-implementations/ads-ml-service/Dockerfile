@@ -25,7 +25,7 @@ RUN \
     Acquire::BrokenProxy    true; \
     " > /etc/apt/apt.conf.d/99fixbadproxy && \
     apt-get -qq update && \
-    apt-get -qq --assume-yes --fix-missing install python3.7-dev && \
+    apt-get -qq --assume-yes --fix-missing install python3.7-dev git && \
     apt-get -qq --assume-yes --fix-missing install python3-pip && \
     rm -rf /var/lib/apt/lists/*
 

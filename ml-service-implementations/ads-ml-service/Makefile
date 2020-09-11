@@ -13,9 +13,9 @@ locust:
 	python3 -m locust -f scripts/locustfile.py
 
 # generate models
-model-gen:
+schemas-gen:
 	datamodel-codegen \
-		--input ../../open-prediction-service.json \
+		--input ../../open-prediction-service.yaml \
 		--input-file-type openapi \
 		--target-python-version 3.7 \
-		--output app/gen/model/ops_model.py
+		--output app/gen/schemas/ops_schemas.py

@@ -51,7 +51,7 @@ def test_value_casting(
             ]
         }
     )
-    prediction = response.json()['result']['predict']
+    prediction = response.json()['result']['predictions']
 
     assert prediction == output
 
@@ -70,7 +70,7 @@ def test_xgb_prediction(
             ]
         }
     )
-    prediction = response.json()['result']['predict']
+    prediction = response.json()['result']['predictions']
 
     assert response.status_code == 200
     assert isinstance(prediction, list)
@@ -91,7 +91,8 @@ def test_prediction(
             ]
         }
     )
-    prediction = response.json()['result']['predict']
+    content = response.json()
+    prediction = content['result']['predictions']
 
     assert response.status_code == 200
     assert isinstance(prediction, typ.Text)

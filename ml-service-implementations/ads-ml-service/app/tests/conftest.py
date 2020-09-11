@@ -24,6 +24,7 @@ from typing import NoReturn, Dict, Generator, Text
 import numpy as np
 import pytest
 import sqlalchemy.orm as orm
+import xgboost as xgb
 from fastapi.testclient import TestClient
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
@@ -54,7 +55,7 @@ class DummyRegressor(BaseEstimator, RegressorMixin):
         """
         x is an array-like object
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=['range_'])
         check_array(x)
         r = getattr(self, 'range_')
         return np.array([random.uniform(a=r[0], b=r[1]) for _ in range(len(x))])
@@ -80,15 +81,24 @@ class DummyClassifier(BaseEstimator, ClassifierMixin):
         """
         x is an array-like object
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=['unique_'])
         check_array(x)
         u = getattr(self, 'unique_')
         return np.array([random.choice(u) for _ in range(len(x))])
 
 
 @pytest.fixture
-def classification_predictor():
+def classification_predictor() -> object:
     classifier = DummyClassifier()
+    x_random = np.random.rand(10, 2)
+    y_random = np.array([random_string() for _ in range(10)])
+    classifier.fit(x_random, y_random)
+    return classifier
+
+
+@pytest.fixture
+def xgb_classification_predictor() -> xgb.XGBClassifier:
+    classifier = xgb.XGBClassifier(random_state=42)
     x_random = np.random.rand(10, 2)
     y_random = np.array([random_string() for _ in range(10)])
     classifier.fit(x_random, y_random)
@@ -107,7 +117,7 @@ class DummyClassifierProb(BaseEstimator, ClassifierMixin):
         """
         x is an array-like object
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=['unique_'])
         check_array(x)
         u = getattr(self, 'unique_')
         return np.array([random.choice(u) for _ in range(len(x))])
@@ -116,7 +126,7 @@ class DummyClassifierProb(BaseEstimator, ClassifierMixin):
         """
         x is an array-like object
         """
-        check_is_fitted(self)
+        check_is_fitted(self, attributes=['unique_'])
         check_array(x)
         u = getattr(self, 'unique_')
         return np.array([np.random.dirichlet(np.ones(len(u)), size=1)[0] for _ in range(len(x))])
@@ -214,6 +224,7 @@ def classification_prob_config(base_config: Dict) -> Dict:
 
 @pytest.fixture
 def db(tmp_path) -> Generator[Session, None, None]:
+    os.environ['MODEL_STORAGE'] = str(tmp_path.resolve())
     engine = create_engine(
         f'sqlite:///{tmp_path.resolve().joinpath("test.db")}', connect_args={"check_same_thread": False})
     Base.metadata.create_all(bind=engine)
@@ -231,7 +242,6 @@ def db(tmp_path) -> Generator[Session, None, None]:
 
 @pytest.fixture
 def client(db, tmp_path) -> Generator[TestClient, None, None]:
-    os.environ['MODEL_STORAGE'] = str(tmp_path.resolve())
     os.environ['DEFAULT_USER'] = get_config().DEFAULT_USER
     os.environ['DEFAULT_USER_PWD'] = get_config().DEFAULT_USER
 
@@ -280,5 +290,45 @@ def endpoint_with_model_and_binary(
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(obj=classification_predictor),
         library=supported_lib.MlLib.SKLearn
+    ), endpoint_id=endpoint_with_model.id)
+    return endpoint_with_model
+
+
+class IdentityPredictor(BaseEstimator):
+    def __init__(self):
+        pass
+
+    def fit(self, x, y) -> NoReturn:
+        pass
+
+    def predict(self, x) -> typing.Any:
+        return x
+
+
+@pytest.fixture
+def endpoint_with_identity_predictor(
+        db: orm.Session,
+        endpoint_with_model: models.Endpoint,
+        classification_predictor: object,
+) -> models.Endpoint:
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=pickle.dumps(obj=IdentityPredictor()),
+        library=supported_lib.MlLib.SKLearn
+    ), endpoint_id=endpoint_with_model.id)
+    return endpoint_with_model
+
+
+@pytest.fixture
+def endpoint_with_xgb_predictor(
+        tmpdir,
+        db: orm.Session,
+        endpoint_with_model: models.Endpoint,
+        xgb_classification_predictor: xgb.XGBClassifier,
+) -> models.Endpoint:
+    model_path = tmpdir.join('model.bst')
+    xgb_classification_predictor.save_model(fname=model_path.__str__())
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=model_path.read_binary(),
+        library=supported_lib.MlLib.XGBoost
     ), endpoint_id=endpoint_with_model.id)
     return endpoint_with_model
