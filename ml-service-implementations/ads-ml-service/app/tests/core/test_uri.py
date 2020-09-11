@@ -25,7 +25,7 @@ import app.core.uri as ops_uri
 @pytest.mark.parametrize(
     'uri, expected',
     [
-        ('ops:///endpoints/1', ('/endpoints', 1)),  # native python int
+        ('ops:///endpoints/1', ('/endpoints', 1)),
         ('ops:///models/25', ('/models', 25))
     ]
 )

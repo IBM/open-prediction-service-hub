@@ -21,7 +21,7 @@ import numpy as np
 import pytest
 from app.schemas.prediction import Prediction, Probability
 
-from ...schemas.feature import Feature
+from app.schemas.impl import FeatureImpl
 
 
 @pytest.mark.parametrize(
@@ -49,7 +49,7 @@ from ...schemas.feature import Feature
     ]
 )
 def test_integer_mapping(type_str: Text, real_type: Type):
-    f = Feature(name='', order=0, type=type_str)
+    f = FeatureImpl(name='', order=0, type=type_str)
     assert f.get_type() == real_type
     assert np.issubdtype(f.get_type(), np.integer)
 
@@ -69,7 +69,7 @@ def test_integer_mapping(type_str: Text, real_type: Type):
     ]
 )
 def test_floating_point_mapping(type_str: Text, real_type: Type):
-    f = Feature(name='', order=0, type=type_str)
+    f = FeatureImpl(name='', order=0, type=type_str)
     assert f.get_type() == real_type
     assert np.issubdtype(f.get_type(), np.floating)
 
@@ -82,7 +82,7 @@ def test_floating_point_mapping(type_str: Text, real_type: Type):
     ]
 )
 def test_boolean_mapping(type_str: Text, real_type: Type):
-    f = Feature(name='', order=0, type=type_str)
+    f = FeatureImpl(name='', order=0, type=type_str)
     assert f.get_type() == real_type
     assert np.issubdtype(f.get_type(), np.bool_)
 
@@ -96,14 +96,14 @@ def test_boolean_mapping(type_str: Text, real_type: Type):
     ]
 )
 def test_string_mapping(type_str: Text, real_type: Type):
-    f = Feature(name='', order=0, type=type_str)
+    f = FeatureImpl(name='', order=0, type=type_str)
     assert f.get_type() == real_type
     assert np.issubdtype(f.get_type(), np.character)
 
 
 def test_not_existing_type():
     with pytest.raises(ValueError):
-        Feature(name='', order=0, type='unknown')
+        FeatureImpl(name='', order=0, type='unknown')
 
 
 def test_not_valid_predict_proba():

@@ -21,6 +21,7 @@ import typing as typ
 import sklearnserver
 import xgbserver
 import xgboost
+import numpy
 
 
 class InMemoryKFModel(object):
@@ -36,6 +37,22 @@ class SKLearnModelImpl(InMemoryKFModel, sklearnserver.SKLearnModel):
     def load(self):
         setattr(self, '_model', self.binary)
         self.ready = True
+
+    def predict(self, request: typ.Dict):
+        if not hasattr(self._model, 'predict_proba'):
+            return super().predict(request=request)
+        else:
+            instances = request['instances']
+            try:
+                inputs = numpy.array(request['instances'])
+            except Exception as e:
+                raise Exception(
+                    f'Failed to initialize NumPy array from inputs: {e}, {instances}')
+            try:
+                scores = self._model.predict_proba(inputs).tolist()
+            except Exception as e:
+                raise Exception(f'Failed to predict {e}')
+            return {**super().predict(request=request), 'scores': scores}
 
 
 class XGBoostModelImpl(InMemoryKFModel, xgbserver.XGBoostModel):

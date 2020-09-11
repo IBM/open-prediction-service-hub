@@ -66,10 +66,13 @@ def predict(
         raise fastapi.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Model file not found')
 
+    ml_output = deserialized.predict(
+        {'instances': [[pair.value for pair in pre_in.parameters]]}
+    )
+
+    # return flatmap
     return {
         'result': {
-            'predict': deserialized.predict(
-                {'instances': [[pair.value for pair in pre_in.parameters]]}
-            )['predictions'][0]
+            **{k: v[0] for k, v in ml_output.items()}
         }
     }
