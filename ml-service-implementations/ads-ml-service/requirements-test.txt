@@ -1,5 +1,7 @@
 # Test dependencies
-pytest-cov
-coverage
+
+# Test launcher
+pytest
+
+## Stress test
 locust
-scikit-learn~=0.22.0

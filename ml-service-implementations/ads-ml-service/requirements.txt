@@ -1,18 +1,22 @@
 #  Dependences for web service
 
-## Data structure
-numpy
-pandas
-pydantic
-
 ## Web interface
-pyjwt
-tenacity
-python-multipart          # File service
-passlib[bcrypt]           # Password hash
 fastapi
+sqlalchemy
 uvicorn
 gunicorn
+pyjwt
+datamodel-code-generator~=0.5.30
+
+# Cache
 cachetools
-sqlalchemy
-datamodel-code-generator~=0.5.28
+readerwriterlock
+
+# Service initialization
+tenacity
+
+## File upload
+python-multipart
+
+## Password hash
+passlib[bcrypt]
