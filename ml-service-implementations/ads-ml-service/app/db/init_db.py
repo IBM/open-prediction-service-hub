@@ -15,121 +15,117 @@
 #
 
 
+import json
 import logging
-import pickle
+import pathlib
 import subprocess
-from pathlib import Path
+import typing as typ
 
-from sqlalchemy.orm import Session
+import fastapi.encoders as encoders
+import sqlalchemy.orm as saorm
 
-from app import crud
-from app import schemas
-from app.core.configuration import get_config
-from app.db.base_class import Base
-from app.db.session import engine
-from app.schemas.binary_ml_model import BinaryMLModelCreate
-from app.schemas.model import ModelCreate
-from app.schemas.model_config import ModelConfigCreate
+import app.core.configuration as conf
+import app.core.supported_lib as supported_lib
+import app.crud as crud
+import app.db.base as db_base
+import app.db.session as db_session
+import app.gen.schemas.ops_schemas as ops_schemas
+import app.schemas as schemas
+import app.schemas.impl as impl
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-EXAMPLES_ROOT = PROJECT_ROOT.joinpath('examples')
+PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2].resolve()
+EXAMPLES_ROOT = PROJECT_ROOT.joinpath('examples', 'model_training_and_deployment')
+MODEL_BASENAME = 'model'
+MODEL_EXTENSIONS = ['.joblib', '.pkl', '.pickle' '.bst']
+
+logger = logging.getLogger(__name__)
 
 
-def __prepare_archive(directory: Path, archive: Path) -> Path:
-    logger = logging.getLogger(__name__)
-
-    if archive.exists():
-        if not get_config().RETRAIN_MODELS:
-            logger.info(f'model {archive} exists. set RETRAIN_MODELS to re-train.')
-            return archive
+def train_example_model(project_dir: pathlib.Path) -> pathlib.Path:
+    paths = [project_dir.joinpath(MODEL_BASENAME + model_extension) for model_extension in MODEL_EXTENSIONS]
+    try:
+        model_file = next(path for path in paths if path.exists())
+        if not conf.get_config().RETRAIN_MODELS:
+            logger.info(f'model {model_file} exists. set RETRAIN_MODELS to re-train.')
+            return model_file
         else:
-            logger.info(f'model {archive} exists, re-training it.')
-    else:
-        logger.info(f'model {archive} doesn\'t exists, training it.')
+            logger.info(f'model {model_file} exists, re-training it.')
+    except StopIteration:
+        logger.info(f'model for {project_dir} doesn\'t exists, training.')
 
     # input/output is accepted as str instead of bytes
     subprocess.run(
-        ['python3', str(directory.joinpath('training.py'))], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        ['python3', str(project_dir.joinpath('training.py'))],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
     )
-    subprocess.run(
-        ['python3', str(directory.joinpath('deployment.py'))], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-    )
-
-    return archive
+    return next(path for path in paths if path.exists())
 
 
-def __miniloan_linear_svc_pickle() -> Path:
-    directory = EXAMPLES_ROOT.joinpath(
-        'model_training_and_deployment', 'classification', 'miniloan_linear_svc')
-    archive = directory.joinpath('miniloan-linear-svc-archive.pkl')
-
-    return __prepare_archive(directory, archive)
-
-
-def __miniloan_xgb_pickle() -> Path:
-    directory = EXAMPLES_ROOT.joinpath(
-        'model_training_and_deployment', 'classification', 'miniloan_xgb')
-    archive = directory.joinpath('miniloan-xgb-archive.pkl')
-
-    return __prepare_archive(directory, archive)
+def find_config_file(project_dir: pathlib.Path) -> pathlib.Path:
+    model_config = project_dir.joinpath('deployment_conf.json')
+    if model_config.exists():
+        return model_config
+    else:
+        raise ValueError(f'Configuration file not found in: {project_dir}')
 
 
-def __miniloan_rfc_pickle() -> Path:
-    directory = EXAMPLES_ROOT.joinpath(
-        'model_training_and_deployment', 'classification_with_probabilities', 'miniloan_rfc')
-    archive = directory.joinpath('miniloan-rfc-archive.pkl')
+def load_models(
+        db: saorm.Session, project_dirs: typ.List[pathlib.Path]
+) -> typ.List[typ.Tuple[pathlib.Path, pathlib.Path, pathlib.Path]]:
+    projects = list(
+        map(lambda project: (project, train_example_model(project), find_config_file(project)), project_dirs))
 
-    return __prepare_archive(directory, archive)
+    for p in projects:
+        binary: bytes
+        config: typ.Dict[typ.Text, typ.Any]
+        with p[1].open(mode='rb') as fd:
+            binary = fd.read()
+        with p[2].open(mode='r') as fd:
+            config = json.load(fd)
 
-
-def __miniloan_rfr_pickle() -> Path:
-    directory = EXAMPLES_ROOT.joinpath('model_training_and_deployment', 'regression', 'miniloan_rfr')
-    archive = directory.joinpath('miniloan-rfr-archive.pkl')
-
-    return __prepare_archive(directory, archive)
-
-
-def __load_models(db: Session):
-    __miniloan_linear_svc_pickle()
-    __miniloan_xgb_pickle()
-    __miniloan_rfc_pickle()
-    __miniloan_rfr_pickle()
-
-    models = PROJECT_ROOT.joinpath('examples').rglob('miniloan-*-archive.pkl')
-    results = []
-    for p in models:
-        with p.open(mode='rb') as fd:
-            content = fd.read()
-            p = pickle.loads(content)
-        predictor = p['model']
-        config = p['model_config']
-
-        binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(predictor))
-        config_in = ModelConfigCreate(**config)
-
-        model_in = ModelCreate(
-            name=config['name'],
-            version=config['version'],
-            binary=binary_in,
-            config=config_in
+        model_config = impl.ModelCreateImpl(**config['model'])
+        endpoint_config = ops_schemas.EndpointCreation(
+            **config['endpoint']
         )
+        model = crud.model.create(db, obj_in=schemas.ModelCreate(name=model_config.name))
+        model_config = crud.model_config.create_with_model(
+            db,
+            obj_in=schemas.ModelConfigCreate(configuration=encoders.jsonable_encoder(obj=model_config)),
+            model_id=model.id
+        )
+        endpoint = crud.endpoint.create_with_model(
+            db,
+            obj_in=schemas.EndpointCreate(name=endpoint_config.name),
+            model_id=model.id
+        )
+        bin_db = crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+            model_b64=binary,
+            library=supported_lib.MlLib.SKLearn
+        ), endpoint_id=endpoint.id)
 
-        model = crud.crud_model.model.create(db, obj_in=model_in)
-        results.append(model)
-
-    assert (all(results))
+        assert all(obj for obj in (model, model_config, endpoint, bin_db))
+    return projects
 
 
-def init_db(db: Session):
-    Base.metadata.create_all(bind=engine)
+def init_db(db: saorm.Session):
+    db_base.Base.metadata.create_all(bind=db_session.engine)
 
     # load example ml model
-    __load_models(db)
+    load_models(
+        db, [
+            EXAMPLES_ROOT.joinpath('classification', 'miniloan_linear_svc'),
+            EXAMPLES_ROOT.joinpath('classification', 'miniloan_xgb'),
+            EXAMPLES_ROOT.joinpath('regression', 'miniloan_rfr'),
+            EXAMPLES_ROOT.joinpath('classification_with_probabilities', 'miniloan_rfc')
+        ]
+    )
 
-    user = crud.user.get_by_username(db, username=get_config().DEFAULT_USER)
+    user = crud.user.get_by_username(db, username=conf.get_config().DEFAULT_USER)
     if user is None:
         user_in = schemas.user.UserCreate(
-            username=get_config().DEFAULT_USER,
-            password=get_config().DEFAULT_USER_PWD
+            username=conf.get_config().DEFAULT_USER,
+            password=conf.get_config().DEFAULT_USER_PWD
         )
-        user = crud.user.create(db, obj_in=user_in)
+        crud.user.create(db, obj_in=user_in)
