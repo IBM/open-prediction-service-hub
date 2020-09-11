@@ -14,7 +14,7 @@ stages:
 jobs:
   include:
     - stage: testing
-      script: 
+      script:
         - cd ml-service-implementations/ads-ml-service
         - pip3 install --quiet --upgrade pip
         - pip3 install --quiet -r requirements-test.txt
