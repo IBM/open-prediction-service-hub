@@ -16,13 +16,13 @@
 
 
 import io
-import threading
 import typing
 
 import cachetools
 import joblib
 import kfserving
 import sqlalchemy.orm as saorm
+import readerwriterlock.rwlock as rwlock
 
 import app.core.kfserving_impl as kfserving_impl
 import app.core.supported_lib as supported_lib
@@ -48,16 +48,19 @@ def _deserialize(db_obj: models.BinaryMlModel) -> kfserving.KFModel:
 
 class ModelCache(object):
     def __init__(self, max_len: int, max_age_seconds: int):
-        self.__cache_lock__ = threading.Lock()
+        self.__cache_lock__ = rwlock.RWLockFair()
         self.__cache__: cachetools.TTLCache[int, kfserving.KFModel] = \
             cachetools.TTLCache(maxsize=max_len, ttl=max_age_seconds)
 
     def get_deserialized_model(self, db: saorm.Session, endpoint_id: int) -> typing.Optional[kfserving.KFModel]:
-        with self.__cache_lock__:
-            try:
-                m = self.__cache__[endpoint_id]
-                return m
-            except KeyError:
+        try:
+            with self.__cache_lock__.gen_rlock():
+                return self.__cache__[endpoint_id]
+        except KeyError:
+            with self.__cache_lock__.gen_wlock():
+                # already added by other thread
+                if endpoint_id in self.__cache__:
+                    return self.__cache__[endpoint_id]
                 archive = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
                 if not archive:
                     return None
@@ -66,7 +69,7 @@ class ModelCache(object):
                 return deserialized
 
     def clear(self):
-        with self.__cache_lock__:
+        with self.__cache_lock__.gen_wlock():
             self.__cache__.clear()
 
 
