@@ -33,7 +33,9 @@ EXAMPLES_ROOT = PROJECT_ROOT.joinpath('examples', 'model_training_and_deployment
     [
         EXAMPLES_ROOT.joinpath('classification', 'iris_svc'),
         EXAMPLES_ROOT.joinpath('classification', 'miniloan_linear_svc'),
-        EXAMPLES_ROOT.joinpath('classification', 'miniloan_xgb')
+        EXAMPLES_ROOT.joinpath('classification', 'miniloan_xgb'),
+        EXAMPLES_ROOT.joinpath('regression', 'miniloan_rfr'),
+        EXAMPLES_ROOT.joinpath('classification_with_probabilities', 'miniloan_rfc')
     ]
 )
 def test_load_models(

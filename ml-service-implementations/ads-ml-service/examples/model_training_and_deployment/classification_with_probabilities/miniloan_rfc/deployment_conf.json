@@ -1,59 +1,57 @@
 {
-  "name": "miniloan-rfc",
-  "version": "v0",
-  "method_name": "predict_proba",
-  "input_schema": [
-    {
-      "name": "creditScore",
-      "order": 0,
-      "type": "int64"
-    },
-    {
-      "name": "income",
-      "order": 1,
-      "type": "float64"
-    },
-    {
-      "name": "loanAmount",
-      "order": 2,
-      "type": "float64"
-    },
-    {
-      "name": "monthDuration",
-      "order": 3,
-      "type": "float64"
-    },
-    {
-      "name": "rate",
-      "order": 4,
-      "type": "float64"
-    }
-  ],
-  "output_schema": {
-    "attributes": [
+  "model": {
+    "name": "[sample][miniloan-dataset][RandomForestClassifier] loan approval example",
+    "version": "v1",
+    "input_schema": [
       {
-        "name": "prediction",
-        "type": "string"
+        "name": "creditScore",
+        "order": 0,
+        "type": "float"
       },
       {
-        "name": "probabilities",
-        "type": "[Probability]"
-      }
-    ]
-  },
-  "metadata": {
-    "author": "ke",
-    "class_names": {
-      "0": "false",
-      "1": "true"
-    },
-    "description": "Loan approval",
-    "metrics": [
+        "name": "income",
+        "order": 1,
+        "type": "float"
+      },
       {
-        "name": "accuracy",
-        "value": 0.9759807846277022
+        "name": "loanAmount",
+        "order": 2,
+        "type": "float"
+      },
+      {
+        "name": "monthDuration",
+        "order": 3,
+        "type": "float"
+      },
+      {
+        "name": "rate",
+        "order": 4,
+        "type": "float"
       }
     ],
-    "trained_at": "2020-05-04T07:49:18.338633"
+    "output_schema": {
+      "result": {
+        "prediction": {
+          "type": "string"
+        },
+        "scores": {
+          "type": "array",
+          "items": "float"
+        }
+      }
+    },
+    "metadata": {
+      "description": "Loan approval example",
+      "metrics": [
+        {
+          "name": "accuracy",
+          "value": 0.9759807846277022
+        }
+      ]
+    }
+  },
+  "endpoint": {
+    "name": "[sample][miniloan-dataset][RandomForestClassifier] example endpoint for loan approval",
+    "status": "creating"
   }
 }
