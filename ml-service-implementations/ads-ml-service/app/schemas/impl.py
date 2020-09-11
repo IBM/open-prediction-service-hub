@@ -88,13 +88,13 @@ class ModelImpl(ops_schemas.Model):
                 *[
                     {
                         'rel': 'self',
-                        'href': app_uri.TEMPLATE.format(resource_type='model', resource_id=db_obj.id)
+                        'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=db_obj.id)
                     }
                 ],
                 *[
                     {
                         'rel': 'endpoint',
-                        'href': app_uri.TEMPLATE.format(resource_type='endpoint', resource_id=endpoint.id)
+                        'href': app_uri.TEMPLATE.format(resource_type='endpoints', resource_id=endpoint.id)
                     } for endpoint in db_obj.endpoint
                 ]
             ]
@@ -117,13 +117,13 @@ class EndpointImpl(ops_schemas.Endpoint):
                 *[
                     {
                         'rel': 'self',
-                        'href': app_uri.TEMPLATE.format(resource_type='endpoint', resource_id=e.id)
+                        'href': app_uri.TEMPLATE.format(resource_type='endpoints', resource_id=e.id)
                     }
                 ],
                 *[
                     {
                         'rel': 'model',
-                        'href': app_uri.TEMPLATE.format(resource_type='model', resource_id=e.model_id)
+                        'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=e.model_id)
                     }
                 ]
             ]
