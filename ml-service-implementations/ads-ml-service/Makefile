@@ -1,18 +1,16 @@
-# generate models
-schemas-gen:
-	datamodel-codegen \
-		--input ../../open-prediction-service.yaml \
-		--input-file-type openapi \
-		--target-python-version 3.7 \
-		--output app/gen/schemas/ops_schemas.py
+default: build
 
-# Example service
-build: schemas-gen
-	docker build -t ads-ml-service .
+# Prepare interface schema generation
+prepare-schemas-gen:
+	cp ../../open-prediction-service.yaml app/gen/tmp.schemas.ops.yaml
+
+# Build docker container
+build: prepare-schemas-gen
+	docker build -t ads-ml-service:latest .
 
 # Launch a testing server
 launch: build
-	docker run --rm -it -p 8080:8080 --name ads-ml-service ads-ml-service
+	docker run --rm -it -p 8080:8080 --name ads-ml-service ads-ml-service:latest
 
 # Test
 test: build
