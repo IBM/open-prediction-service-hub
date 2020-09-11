@@ -58,7 +58,7 @@ def test_get_model_by_name(db: orm.Session, model_create: schemas.ModelCreate) -
 def test_update_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
     model = crud.model.create(db, obj_in=model_create)
     new_model_name = utils.random_string()
-    time.sleep(2)
+    time.sleep(3)
     model_1 = crud.model.update(db, db_obj=model, obj_in=schemas.ModelUpdate(name=new_model_name))
 
     assert model_1.id == model.id
