@@ -18,7 +18,6 @@
 
 
 import logging
-import pickle
 import sys
 from pathlib import Path
 
@@ -95,11 +94,7 @@ def main():
                                test.loc[:, used_names[-1]])
     logger.debug(f'accuracy: {acc}')
 
-    with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
-        pickle.dump(
-            obj=best_estimator,
-            file=fd
-        )
+    best_estimator.save_model(fname=Path(__file__).resolve().parent.joinpath('model.bst').__str__())
 
 
 if __name__ == '__main__':
