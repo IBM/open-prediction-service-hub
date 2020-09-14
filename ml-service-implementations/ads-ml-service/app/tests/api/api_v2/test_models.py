@@ -104,7 +104,7 @@ def test_update_model_conf(
         classification_config: typing.Dict[typing.Text, typing.Any],
         model_with_config_and_endpoint: models.Model
 ) -> typing.NoReturn:
-    time.sleep(2)
+    time.sleep(3)
     response = client.patch(
         url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config_and_endpoint.id}',
         json={
