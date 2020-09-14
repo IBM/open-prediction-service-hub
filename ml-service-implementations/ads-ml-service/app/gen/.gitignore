@@ -1,3 +1,2 @@
 /schemas/**
 !/schemas/__init__.py
-tmp.schemas.ops.yaml
