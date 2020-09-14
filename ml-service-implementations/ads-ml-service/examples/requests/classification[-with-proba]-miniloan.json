@@ -20,7 +20,7 @@
   "target": [
     {
       "rel": "endpoint",
-      "href": "ops:///endpoints/4"
+      "href": "/endpoints/{miniloan_endpoint_id}"
     }
   ]
 }
