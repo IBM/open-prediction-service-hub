@@ -35,7 +35,9 @@ jobs:
       - tox
       name: "sagemaker-proxy-test"
     - stage: deploy
-      script: ml-service-implementations/deploy.sh ads-ml-service
+      script:
+        - cp open-prediction-service.yaml ml-service-implementations/ads-ml-service/app/gen/tmp.schemas.ops.yaml
+        - ml-service-implementations/deploy.sh ads-ml-service
       name: "ads-ml-service-deploy"
     -  script: ml-service-implementations/deploy.sh wml-service
        name: "wml-proxy-deploy"
