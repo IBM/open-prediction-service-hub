@@ -8,7 +8,7 @@ gunicorn
 pyjwt
 datamodel-code-generator~=0.5.30
 
-# Cache
+## Cache
 cachetools
 readerwriterlock
 
@@ -20,3 +20,10 @@ python-multipart
 
 ## Password hash
 passlib[bcrypt]
+
+## Testes
+pytest
+
+# Raw interface for model serving
+--editable git+https://github.com/kubeflow/kfserving@master#egg=sklearnserver&subdirectory=python/sklearnserver
+--editable git+https://github.com/kubeflow/kfserving@master#egg=xgbserver&subdirectory=python/xgbserver
