@@ -18,23 +18,24 @@
 
 
 import logging
+import pathlib
 import sys
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import sklearn.model_selection as model_selection
 import xgboost
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+
+logger = logging.getLogger(__name__)
+FILE_PATH = pathlib.Path(__file__).resolve()
 
 
 def main():
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    logger = logging.getLogger(__name__)
-
     names = ['name', 'creditScore', 'income', 'loanAmount', 'monthDuration', 'approval', 'rate', 'yearlyReimbursement']
     used_names = ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'approval']
 
-    miniloan_file = Path(__file__).resolve().parents[3].joinpath('data').joinpath('miniloan-decisions-ls-10K.csv')
+    miniloan_file = FILE_PATH.parents[3].joinpath('data').joinpath(
+        'miniloan-decisions-ls-10K.csv')
 
     data = pd.read_csv(
         miniloan_file,
@@ -56,10 +57,12 @@ def main():
         [np.inf, -np.inf], np.nan
     ).dropna().loc[:, used_names]
 
-    train, test = train_test_split(data, random_state=7)
+    x = data.loc[:, used_names[:-1]].to_numpy()
+    y = data.loc[:, used_names[-1]].to_numpy()
+    x_train, x_test, y_train, y_test = model_selection.train_test_split(x, y, random_state=7)
 
-    logger.debug(f'training size: {len(train)}')
-    logger.debug(f'validation size: {len(test)}')
+    logger.info(f'training size: {len(x_test)}')
+    logger.info(f'validation size: {len(y_test)}')
 
     params = {
         'estimator': xgboost.XGBClassifier(random_state=42),
@@ -77,10 +80,7 @@ def main():
         },
     }
 
-    parameter_estimator = RandomizedSearchCV(**params)
-
-    x_train = train.loc[:, used_names[:-1]]
-    y_train = train.loc[:, used_names[-1]]
+    parameter_estimator = model_selection.RandomizedSearchCV(**params)
 
     parameter_estimator.fit(x_train, y_train)
     best_estimator = xgboost.XGBClassifier(
@@ -90,12 +90,11 @@ def main():
 
     best_estimator.fit(x_train, y_train)
 
-    acc = best_estimator.score(test.loc[:, used_names[:-1]],
-                               test.loc[:, used_names[-1]])
-    logger.debug(f'accuracy: {acc}')
+    logger.info(f'accuracy: {best_estimator.score(x_test, y_test)}')
 
-    best_estimator.save_model(fname=Path(__file__).resolve().parent.joinpath('model.bst').__str__())
+    best_estimator.save_model(fname=FILE_PATH.parent.joinpath('model.bst').__str__())
 
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     main()
