@@ -47,7 +47,7 @@
     }
   },
   "endpoint": {
-    "name": "[sample][miniloan-dataset][linear-svc] example endpoint for loan approval",
+    "name": "[sample][miniloan-dataset][XGBClassifier] example endpoint for loan approval",
     "status": "creating"
   }
 }
