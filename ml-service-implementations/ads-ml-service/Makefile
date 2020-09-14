@@ -14,7 +14,7 @@ launch: build
 
 # Test
 test: build
-	docker run --rm -it --entrypoint="python3" ads-ml-service -m pytest -v /app/app/tests
+	docker run --rm -it --entrypoint="python3"  -e RETRAIN_MODELS=1 ads-ml-service -m pytest -v /app/app/tests
 
 # Launch stress test server
 locust:
