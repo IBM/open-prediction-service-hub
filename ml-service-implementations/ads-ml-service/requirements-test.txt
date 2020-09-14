@@ -1,7 +1,0 @@
-# Test dependencies
-
-# Test launcher
-pytest
-
-## Stress test
-locust
