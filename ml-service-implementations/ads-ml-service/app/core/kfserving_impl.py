@@ -38,7 +38,7 @@ class SKLearnModelImpl(InMemoryKFModel, sklearnserver.SKLearnModel):
         setattr(self, '_model', self.binary)
         self.ready = True
 
-    def predict(self, request: typ.Dict):
+    def predict(self, request: typ.Dict) -> typ.Dict:
         if not hasattr(self._model, 'predict_proba'):
             return super().predict(request=request)
         else:
@@ -63,3 +63,12 @@ class XGBoostModelImpl(InMemoryKFModel, xgbserver.XGBoostModel):
     def load(self):
         setattr(self, '_booster', xgboost.Booster(params={"nthread": self.nthread}, model_file=self.binary))
         self.ready = True
+
+    def predict(self, request: typ.Dict) -> typ.Dict:
+        instances = request['instances']
+        try:
+            inputs = numpy.array(request['instances'])
+        except Exception as e:
+            raise Exception(
+                f'Failed to initialize NumPy array from inputs: {e}, {instances}')
+        return super().predict({'instances': inputs})
