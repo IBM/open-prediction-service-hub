@@ -24,6 +24,7 @@ import sqlalchemy.orm as saorm
 import app.core.configuration as conf
 import app.models as models
 import app.core.cache as ops_cache
+import app.core.uri as ops_uri
 
 
 @pytest.mark.parametrize(
@@ -47,7 +48,8 @@ def test_value_casting(
         json={
             'parameters': model_input,
             'target': [
-                {'rel': 'endpoint', 'href': f'ops:///endpoints/{endpoint_with_identity_predictor.id}'}
+                {'rel': 'endpoint', 'href': ops_uri.TEMPLATE.format(
+                    resource_type='endpoints', resource_id=endpoint_with_identity_predictor.id)}
             ]
         }
     )
@@ -66,7 +68,8 @@ def test_xgb_prediction(
         json={
             'parameters': [{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 0.5}],
             'target': [
-                {'rel': 'endpoint', 'href': f'ops:///endpoints/{endpoint_with_xgb_predictor.id}'}
+                {'rel': 'endpoint', 'href': ops_uri.TEMPLATE.format(
+                    resource_type='endpoints', resource_id=endpoint_with_xgb_predictor.id)}
             ]
         }
     )
@@ -87,7 +90,8 @@ def test_prediction(
         json={
             'parameters': [{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 0.5}],
             'target': [
-                {'rel': 'endpoint', 'href': f'ops:///endpoints/{endpoint_with_model_and_binary.id}'}
+                {'rel': 'endpoint', 'href': ops_uri.TEMPLATE.format(
+                    resource_type='endpoints', resource_id=endpoint_with_model_and_binary.id)}
             ]
         }
     )
