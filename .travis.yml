@@ -18,7 +18,7 @@ jobs:
         - cd ml-service-implementations/ads-ml-service
         - pip3 install --quiet --upgrade pip
         - pip3 install --quiet -r requirements-ml.txt
-        - pip3 install --quiet -r requirements.txt
+        - pip3 install --quiet -r requirements.txt --ignore-installed
         - cp ../../open-prediction-service.yaml app/gen/tmp.schemas.ops.yaml
         - datamodel-codegen --input app/gen/tmp.schemas.ops.yaml --input-file-type openapi --target-python-version 3.7 --output app/gen/schemas/ops_schemas.py
         - python3 -m pytest -v app/tests

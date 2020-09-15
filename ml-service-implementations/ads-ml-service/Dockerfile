@@ -40,8 +40,8 @@ COPY requirements.txt requirements-ml.txt ${OPS_HOME}/
 WORKDIR ${OPS_HOME}
 RUN \
     python3 -m pip install --no-cache-dir --quiet --upgrade pip && \
-    python3 -m pip install --no-cache-dir --quiet --requirement requirements-ml.txt --ignore-installed && \
-    python3 -m pip install --no-cache-dir --quiet --requirement requirements.txt
+    python3 -m pip install --no-cache-dir --quiet --requirement requirements-ml.txt && \
+    python3 -m pip install --no-cache-dir --quiet --requirement requirements.txt  --ignore-installed
 
 
 # Install this project
