@@ -9,7 +9,7 @@ services:
 stages:
   - name: testing
   - name: deploy
-    if: branch IN (master develop release/2020Q3)
+    if: branch IN (master, develop, release/2020Q3)
 
 jobs:
   include:
@@ -21,15 +21,21 @@ jobs:
         - pip3 install --quiet -r requirements-ml.txt
         - pip3 install --quiet -r requirements.txt
         - python3 -m pytest -v app/tests
+      name: "ads-ml-service-test"
     - script:
       - cd ml-service-implementations/wml-service
       - pip3 install --quiet tox
       - tox
+      name: "wml-proxy-test"
     - script:
       - cd ml-service-implementations/sagemaker-service
       - pip3 install --quiet tox
       - tox
+      name: "sagemaker-proxy-test"
     - stage: deploy
       script: ml-service-implementations/deploy.sh ads-ml-service
+      name: "ads-ml-service-deploy"
     -  script: ml-service-implementations/deploy.sh wml-service
+       name: "wml-proxy-deploy"
     -  script: ml-service-implementations/deploy.sh sagemaker-service
+       name: "sagemaker-proxy-deploy"
