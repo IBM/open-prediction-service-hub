@@ -15,23 +15,31 @@
 #
 
 
-from sqlalchemy.orm import Session
+import typing
 
-from .base import CRUDBase
-from ..models import BinaryMLModel
-from ..schemas import BinaryMLModelCreate, BinaryMLModelUpdate
+import sqlalchemy.orm as orm
+
+import app.models as models
+import app.schemas as schemas
+from .base import CRUDBase, IdType
 
 
-class CRUDBinaryMLModel(CRUDBase[BinaryMLModel, BinaryMLModelCreate, BinaryMLModelUpdate]):
-
-    def create(self, db: Session, *, obj_in: BinaryMLModelCreate) -> BinaryMLModel:
-        db_obj = BinaryMLModel(
-            model_b64=obj_in.model_b64
+class CRUDBinaryMLModel(CRUDBase[models.BinaryMlModel, schemas.BinaryMlModelCreate, schemas.BinaryMlModelUpdate]):
+    def create_with_endpoint(
+            self, db: orm.Session, *, obj_in: schemas.BinaryMlModelCreate, endpoint_id: IdType
+    ) -> models.BinaryMlModel:
+        # noinspection PyArgumentList
+        db_obj = self.model(
+            **obj_in.dict(),
+            endpoint_id=endpoint_id
         )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
+    def get_by_endpoint(self, db: orm.Session, *, endpoint_id: IdType) -> typing.Optional[models.Endpoint]:
+        return db.query(self.model).filter(self.model.endpoint_id == endpoint_id).first()
 
-binary_ml_model = CRUDBinaryMLModel(BinaryMLModel)
+
+binary_ml_model = CRUDBinaryMLModel(models.BinaryMlModel)

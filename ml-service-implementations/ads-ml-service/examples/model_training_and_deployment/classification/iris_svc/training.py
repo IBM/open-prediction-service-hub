@@ -85,7 +85,7 @@ def main():
                                test.loc[:, col_names[-1]])
     logger.debug(f'accuracy: {acc}')
 
-    with Path(__file__).resolve().parent.joinpath('iris-svc-model.pkl').open(mode='wb') as fd:
+    with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
             obj=best_estimator,
             file=fd

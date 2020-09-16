@@ -15,110 +15,86 @@
 #
 
 
-import pickle
+import datetime as dt
+import time
+import typing
 
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
+import sqlalchemy.orm as orm
 
-from ... import crud
-from ...schemas.binary_ml_model import BinaryMLModelCreate
-from ...schemas.model import ModelCreate
-from ...schemas.model_config import ModelConfigCreate
-
-
-def test_create_model(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
-
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
-
-    assert model is not None
-    assert model.name == config_in.name
-    assert model.version == config_in.version
-    assert jsonable_encoder(model.config.configuration) == jsonable_encoder(config_in)
+import app.crud as crud
+import app.models as models
+import app.schemas as schemas
+import app.tests.utils.utils as utils
 
 
-def test_count_models(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+def test_create_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
 
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
-
-    assert model is not None
-    assert crud.model_config.count(db) == 1
+    assert model.name == model_create.name
+    assert (dt.datetime.now(tz=dt.timezone.utc) - model.created_at.replace(tzinfo=dt.timezone.utc)).seconds < 1
+    assert (dt.datetime.now(tz=dt.timezone.utc) - model.modified_at.replace(tzinfo=dt.timezone.utc)).seconds < 1
 
 
-def test_get_model(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+def test_get_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
+    model_1 = crud.model.get(db, id=model.id)
 
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
-
-    model_1 = crud.crud_model.model.get(db, id=model.id)
-
-    assert model_1 is not None
     assert model_1.id == model.id
-    assert jsonable_encoder(model_1.config.configuration) == jsonable_encoder(model.config.configuration)
+    assert model_1.name == model_create.name
+    assert model_1.created_at == model.created_at
+    assert model_1.modified_at == model.modified_at
 
 
-def test_get_model_by_name_and_version(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+def test_get_model_by_name(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
+    model_1 = crud.model.get_by_name(db, name=model_create.name)
 
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
-
-    model = crud.crud_model.model.create(db, obj_in=model_in)
-
-    model_1 = crud.crud_model.model.get_by_name_and_ver(db, name=classification_config['name'],
-                                                        version=classification_config['version'])
-
-    assert model_1 is not None
     assert model_1.id == model.id
-    assert jsonable_encoder(model_1.config.configuration) == jsonable_encoder(model.config.configuration)
+    assert model_1.name == model_create.name
+    assert model_1.created_at == model.created_at
+    assert model_1.modified_at == model.modified_at
 
 
-def test_delete_model(db: Session, classification_predictor, classification_config):
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    config_in = ModelConfigCreate(**classification_config)
+def test_update_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
+    new_model_name = utils.random_string()
+    time.sleep(3)
+    model_1 = crud.model.update(db, db_obj=model, obj_in=schemas.ModelUpdate(name=new_model_name))
 
-    model_in = ModelCreate(
-        name=classification_config['name'],
-        version=classification_config['version'],
-        binary=binary_in,
-        config=config_in
-    )
+    assert model_1.id == model.id
+    assert model_1.name == new_model_name
+    assert model_1.created_at == model.created_at
+    assert (dt.datetime.now(tz=dt.timezone.utc) - model.created_at.replace(tzinfo=dt.timezone.utc)).seconds > 1
+    assert (dt.datetime.now(tz=dt.timezone.utc) - model.modified_at.replace(tzinfo=dt.timezone.utc)).seconds < 1
 
-    model = crud.crud_model.model.create(db, obj_in=model_in)
 
-    model_1 = crud.crud_model.model.delete(db, id=model.id)
-    model_2 = crud.crud_model.model.get(db, id=model_1.id)
+def test_delete_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
+    model = crud.model.create(db, obj_in=model_create)
+    model_1 = crud.model.delete(db, id=model.id)
+    model_2 = crud.model.get(db, id=model_1.id)
 
     assert model_2 is None
     assert model_1.id == model.id
-    assert jsonable_encoder(model_1.config.configuration) == jsonable_encoder(model.config.configuration)
+    assert model_1.name == model_create.name
+    assert model_1.created_at == model.created_at
+    assert model_1.modified_at == model.modified_at
+
+
+def test_cascade_delete_with_config(
+        db: orm.Session, model_in_db: models.Endpoint, model_config_create: schemas.ModelConfigCreate
+) -> typing.NoReturn:
+    config = crud.model_config.create_with_model(db, obj_in=model_config_create, model_id=model_in_db.id)
+    crud.model.delete(db, id=model_in_db.id)
+    config_1 = crud.model_config.get(db, id=config.id)
+
+    assert config_1 is None
+
+
+def test_cascade_delete_with_endpoint(db: orm.Session, model_in_db: models.Endpoint) -> typing.NoReturn:
+    endpoint = crud.endpoint.create_with_model(
+        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_in_db.id
+    )
+    crud.model.delete(db, id=model_in_db.id)
+    endpoint_1 = crud.endpoint.get(db, id=endpoint.id)
+
+    assert endpoint_1 is None

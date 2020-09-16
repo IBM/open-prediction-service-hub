@@ -15,56 +15,50 @@
 #
 
 
-from typing import Generator, Text
+import typing
 
+import fastapi
+import fastapi.security as fsec
 import jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from jwt import PyJWTError
-from app.core import security
-from pydantic import ValidationError
-from sqlalchemy.orm import Session
+import pydantic as pyd
+import sqlalchemy.orm as saorm
+import starlette.status as status
 
-from ..core.configuration import get_config
-from ..core.open_prediction_service import OpenPredictionService
-from ..db.session import SessionLocal
-from .. import schemas
-from .. import crud
-from .. import models
+import app.core.configuration as conf
+import app.core.security as security
+import app.crud as crud
+import app.db.session as session
+import app.models as models
+import app.schemas as schemas
 
-reusable_oauth2: OAuth2PasswordBearer = OAuth2PasswordBearer(
-    tokenUrl=f'{get_config().API_V2_STR}/login/access-token'
+reusable_oauth2 = fsec.OAuth2PasswordBearer(
+    tokenUrl=f'/login/access-token'
 )
 
 
-def get_db() -> Generator[Session, None, None]:
+def get_db() -> typing.Iterable[saorm.Session]:
     db = None
     try:
-        db = SessionLocal()
+        db = session.SessionLocal()
         yield db
     finally:
         db.close()
 
 
-# Dependency
-def get_ml_service(db: Session = Depends(get_db)) -> Generator[OpenPredictionService, None, None]:
-    yield OpenPredictionService(db=db)
-
-
 def get_current_user(
-    db: Session = Depends(get_db), token: Text = Depends(reusable_oauth2)
+        db: saorm.Session = fastapi.Depends(get_db), token: typing.Text = fastapi.Depends(reusable_oauth2)
 ) -> models.User:
     try:
         payload = jwt.decode(
-            token, get_config().SECRET_KEY, algorithms=[security.ALGORITHM]
+            token, conf.get_config().SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = schemas.token.TokenData(**payload)
-    except (PyJWTError, ValidationError):
-        raise HTTPException(
+    except (jwt.PyJWTError, pyd.ValidationError):
+        raise fastapi.HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='Not valid credentials'
         )
     user = crud.user.get(db, id=token_data.sub)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
+        raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
     return user

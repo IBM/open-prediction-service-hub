@@ -94,7 +94,7 @@ def main():
                                test.loc[:, used_names[-1]])
     logger.debug(f'accuracy: {acc}')
 
-    with Path(__file__).resolve().parent.joinpath('miniloan-rfc-model.pkl').open(mode='wb') as fd:
+    with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
             obj=best_estimator,
             file=fd

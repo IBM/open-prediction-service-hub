@@ -15,14 +15,11 @@
 #
 
 
-from sqlalchemy import Column, String, Integer
+import sqlalchemy as sa
 
-from ..db.base_class import Base
+import app.db.base_class as base_class
 
 
-class User(Base):
-    __tablename__ = "user"
-
-    id = Column(Integer, nullable=False, index=True, primary_key=True)
-    username = Column(String, nullable=False, index=True, unique=True)
-    hashed_password = Column(String, nullable=False)
+class User(base_class.Base):
+    username = sa.Column(sa.NCHAR(32), nullable=False, index=True, unique=True)
+    hashed_password = sa.Column(sa.BINARY(64), nullable=False)

@@ -30,8 +30,7 @@ class ServerConfiguration(BaseSettings):
     """
     ads-ml-service configuration
     """
-    API_V1_STR: Text = '/v1'
-    API_V2_STR: Text = '/v2'
+    API_V2_STR: Text = ''
 
     SECRET_KEY: Text = secrets.token_urlsafe(32)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120

@@ -93,7 +93,7 @@ def main():
                                test.loc[:, used_names[-1]])
     logger.debug(f'coefficient of determination R^2: {acc}')
 
-    with Path(__file__).resolve().parent.joinpath('miniloan-rfr-model.pkl').open(mode='wb') as fd:
+    with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
             obj=best_estimator,
             file=fd

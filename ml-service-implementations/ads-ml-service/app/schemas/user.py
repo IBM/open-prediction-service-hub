@@ -15,39 +15,33 @@
 #
 
 
-from typing import Text, Optional
-
-from pydantic import BaseModel
-
-
-# Shared properties
-class UserBase(BaseModel):
-    username: Optional[Text] = None
+import typing as tp
+import pydantic as pyd
 
 
-# Properties to receive via API on creation
+class UserBase(pyd.BaseModel):
+    username: tp.Optional[tp.Text] = None
+
+
 class UserCreate(UserBase):
-    username: Text
-    password: Text
+    username: tp.Text
+    password: tp.Text
 
 
-# Properties to receive via API on update
 class UserUpdate(UserBase):
-    password: Optional[Text] = None
+    password: tp.Optional[tp.Text] = None
 
 
 class UserInDBBase(UserBase):
-    id: Optional[int]  # Not known during creation
+    id: int
 
     class Config:
         orm_mode = True
 
 
-# Additional properties to return via API
 class User(UserInDBBase):
     pass
 
 
-# Additional properties to be storied in DB
 class UserInDB(UserInDBBase):
-    hashed_password: Text
+    hashed_password: bytes
