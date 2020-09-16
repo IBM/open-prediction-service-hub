@@ -19,3 +19,4 @@ from .crud_user import user
 from .crud_model_config import model_config
 from .crud_binary_ml_model import binary_ml_model
 from .crud_model import model
+from .crud_endpoints import endpoint

@@ -16,35 +16,66 @@
 
 
 import pickle
-from typing import NoReturn
+import typing
 
-from sqlalchemy.orm import Session
+import sqlalchemy.orm as orm
 
-from ... import crud
-from ...schemas.binary_ml_model import BinaryMLModelCreate
-
-
-def test_create_binary_ml_model(db: Session, classification_predictor, classification_config) -> NoReturn:
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    binary_1 = crud.binary_ml_model.create(db, obj_in=binary_in)
-
-    assert type(pickle.loads(binary_1.model_b64)) == type(classification_predictor)
+import app.crud as crud
+import app.models as models
+import app.schemas as schemas
 
 
-def test_get_binary_ml_model(db: Session, classification_predictor, classification_config) -> NoReturn:
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    binary_1 = crud.binary_ml_model.create(db, obj_in=binary_in)
-    binary_2 = crud.binary_ml_model.get(db, id=binary_1.id)
+def test_create_binary_ml_model(
+        db: orm.Session,
+        endpoint_in_db: models.Endpoint,
+        binary_create: schemas.BinaryMlModelCreate
+) -> typing.NoReturn:
+    binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
 
-    assert type(pickle.loads(binary_2.model_b64)) == type(classification_predictor)
+    assert binary.endpoint_id == endpoint_in_db.id
+    assert isinstance(pickle.loads(binary.model_b64), type(pickle.loads(binary_create.model_b64)))
+    assert binary.library == binary_create.library
 
 
-def test_delete_binary_ml_model(db: Session, classification_predictor, classification_config) -> NoReturn:
-    binary_in = BinaryMLModelCreate(model_b64=pickle.dumps(classification_predictor))
-    binary_1 = crud.binary_ml_model.create(db, obj_in=binary_in)
-    binary_2 = crud.binary_ml_model.delete(db, id=binary_1.id)
-    binary_3 = crud.binary_ml_model.get(db, id=binary_1.id)
+def test_get_binary_ml_model(
+        db: orm.Session,
+        endpoint_in_db: models.Endpoint,
+        binary_create: schemas.BinaryMlModelCreate
+) -> typing.NoReturn:
+    binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
+    binary_1 = crud.binary_ml_model.get(db, id=binary.id)
 
-    assert binary_3 is None
-    assert binary_2.id == binary_1.id
-    assert type(pickle.loads(binary_2.model_b64)) == type(classification_predictor)
+    assert binary_1.id == binary.id
+    assert binary_1.endpoint_id == endpoint_in_db.id
+    assert isinstance(pickle.loads(binary_1.model_b64), type(pickle.loads(binary_create.model_b64)))
+    assert binary_1.library == binary_create.library
+
+
+def test_get_binary_ml_model_by_endpoint(
+        db: orm.Session,
+        endpoint_in_db: models.Endpoint,
+        binary_create: schemas.BinaryMlModelCreate
+) -> typing.NoReturn:
+    binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
+    binary_1 = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_in_db.id)
+
+    assert binary_1.id == binary.id
+    assert binary_1.endpoint_id == endpoint_in_db.id
+    assert isinstance(pickle.loads(binary_1.model_b64), type(pickle.loads(binary_create.model_b64)))
+    assert binary_1.library == binary_create.library
+
+
+def test_delete_binary_ml_model(
+        db: orm.Session,
+        endpoint_in_db: models.Endpoint,
+        binary_create: schemas.BinaryMlModelCreate
+) -> typing.NoReturn:
+    binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
+    binary_1 = crud.binary_ml_model.delete(db, id=binary.id)
+    binary_2 = crud.binary_ml_model.get(db, id=binary.id)
+
+    assert binary_2 is None
+    assert binary_1.id == binary.id
+    assert binary_1.endpoint_id == endpoint_in_db.id
+    assert isinstance(pickle.loads(binary_1.model_b64), type(pickle.loads(binary_create.model_b64)))
+    assert binary_1.library == binary_create.library

@@ -15,43 +15,22 @@
 #
 
 
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+import fastapi
+import fastapi.responses as responses
 
-from app.api import api_v1
-from app.api import api_v2
-from app.core.configuration import get_config
+import app.api.api_v2.api as api_v2
+import app.version as ads_ml_service_version
 
-
-from app.version import __version__
-
-app: FastAPI = FastAPI(
-    version=__version__,
+app = fastapi.FastAPI(
+    version=ads_ml_service_version.__version__,
     title='Open Prediction Service',
     description='A simple Machine Learning serving environment for tests',
     openapi_url="/open-prediction-service.json"
 )
 
-app.include_router(api_v1.api.api_router, prefix=get_config().API_V1_STR)
-app.include_router(api_v2.api.api_router, prefix=get_config().API_V2_STR)
+app.include_router(api_v2.api_router)
 
 
-@app.get(
-    path=f'{get_config().API_V1_STR}/docs', include_in_schema=False
-)
-def redirect_docs():
-    return RedirectResponse(url='/docs')
-
-
-@app.get(
-    path=f'{get_config().API_V2_STR}/docs', include_in_schema=False
-)
-def redirect_docs():
-    return RedirectResponse(url='/docs')
-
-
-@app.get(
-    path='/', include_in_schema=False
-)
-def redirect_docs():
-    return RedirectResponse(url='/docs')
+@app.get(path='/', include_in_schema=False)
+def redirect_docs() -> responses.RedirectResponse:
+    return responses.RedirectResponse(url='/docs')

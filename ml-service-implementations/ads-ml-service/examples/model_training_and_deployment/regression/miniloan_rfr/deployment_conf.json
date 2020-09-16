@@ -1,51 +1,53 @@
 {
-  "name": "miniloan-rfr",
-  "version": "v0",
-  "method_name": "predict",
-  "input_schema": [
-    {
-      "name": "creditScore",
-      "order": 0,
-      "type": "int64"
-    },
-    {
-      "name": "income",
-      "order": 1,
-      "type": "float64"
-    },
-    {
-      "name": "loanAmount",
-      "order": 2,
-      "type": "float64"
-    },
-    {
-      "name": "monthDuration",
-      "order": 3,
-      "type": "float64"
-    },
-    {
-      "name": "rate",
-      "order": 4,
-      "type": "float64"
-    }
-  ],
-  "output_schema": {
-    "attributes": [
+  "model": {
+    "name": "[sample][miniloan-dataset][RandomForestRegressor] loan approval example",
+    "version": "v1",
+    "input_schema": [
       {
-        "name": "prediction",
+        "name": "creditScore",
+        "order": 0,
+        "type": "float"
+      },
+      {
+        "name": "income",
+        "order": 1,
+        "type": "float"
+      },
+      {
+        "name": "loanAmount",
+        "order": 2,
+        "type": "float"
+      },
+      {
+        "name": "monthDuration",
+        "order": 3,
+        "type": "float"
+      },
+      {
+        "name": "rate",
+        "order": 4,
         "type": "float"
       }
-    ]
-  },
-  "metadata": {
-    "description": "Evaluation of yearlyReimbursement",
-    "author": "ke",
-    "trained_at": "2020-05-04T08:13:37.282688",
-    "metrics": [
-      {
-        "name": "coefficient of determination R^2",
-        "value": 0.5296694495495735
+    ],
+    "output_schema": {
+      "result": {
+        "predict": {
+          "type": "float"
+        }
       }
-    ]
+    },
+    "metadata": {
+      "description": "Evaluation of yearlyReimbursement",
+      "metrics": [
+        {
+          "name": "coefficient of determination R^2",
+          "value": 0.5296694495495735
+        }
+      ]
+    }
+  },
+  "endpoint": {
+    "name": "[sample][miniloan-dataset][RandomForestRegressor] example endpoint for yearlyReimbursement Evaluation",
+    "status": "creating"
   }
 }

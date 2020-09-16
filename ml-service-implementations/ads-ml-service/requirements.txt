@@ -1,21 +1,29 @@
 #  Dependences for web service
 
-## Data structure
-numpy
-pandas
-pydantic
-
 ## Web interface
-pyjwt
-tenacity
-python-multipart          # File service
-passlib[bcrypt]           # Password hash
 fastapi
+sqlalchemy
 uvicorn
 gunicorn
-expiringdict
-sqlalchemy
+pyjwt
+datamodel-code-generator~=0.5.30
 
+## Cache
+cachetools
+readerwriterlock
 
-# Load pre-trained model
-requests~=2.23.0
+# Service initialization
+tenacity
+
+## File upload
+python-multipart
+
+## Password hash
+passlib[bcrypt]
+
+## Testes
+pytest
+
+# Raw interface for model serving
+--editable git+https://github.com/kubeflow/kfserving@master#egg=sklearnserver&subdirectory=python/sklearnserver
+--editable git+https://github.com/kubeflow/kfserving@master#egg=xgbserver&subdirectory=python/xgbserver

@@ -15,38 +15,32 @@
 #
 
 
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
+import typing
 
+import fastapi.encoders as encoders
+import sqlalchemy.orm as orm
+
+import app.models as models
+import app.schemas as schemas
 from .base import CRUDBase, IdType
-from ..models import ModelConfig
-from ..schemas import ModelConfigCreate, ModelConfigUpdate
 
 
-class CRUDModelConfig(CRUDBase[ModelConfig, ModelConfigCreate, ModelConfigUpdate]):
-
-    def create(self, db: Session, *, obj_in: ModelConfigCreate) -> ModelConfig:
-        db_obj = ModelConfig(
-            name=obj_in.name,
-            version=obj_in.version,
-            configuration=obj_in.dict()
+class CRUDModelConfig(CRUDBase[models.ModelConfig, schemas.ModelConfigCreate, schemas.ModelConfigUpdate]):
+    def create_with_model(
+            self, db: orm.Session, *, obj_in: schemas.ModelConfigCreate, model_id: IdType
+    ) -> models.ModelConfig:
+        # noinspection PyArgumentList
+        db_obj = self.model(
+            **encoders.jsonable_encoder(obj_in),
+            model_id=model_id
         )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
-    def create_with_model(self, db: Session, *, obj_in: ModelConfigCreate, model_id: IdType) -> ModelConfig:
-        db_obj = ModelConfig(
-            model_id=model_id,
-            name=obj_in.name,
-            version=obj_in.version,
-            configuration=jsonable_encoder(obj_in)
-        )
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+    def get_by_model(self, db: orm.Session, *, model_id: IdType) -> typing.Optional[models.ModelConfig]:
+        return db.query(self.model).filter(self.model.model_id == model_id).first()
 
 
-model_config = CRUDModelConfig(ModelConfig)
+model_config = CRUDModelConfig(models.ModelConfig)

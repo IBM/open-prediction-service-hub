@@ -15,25 +15,14 @@
 #
 
 
-from sqlalchemy import Column, String, JSON, Integer, ForeignKey
-from sqlalchemy import UniqueConstraint, Index
-from sqlalchemy.orm import relationship
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
 
-from ..db.base_class import Base
+import app.db.base_class as base_class
 
 
-class ModelConfig(Base):
-    __tablename__ = "model_config"
+class ModelConfig(base_class.Base):
+    configuration = sa.Column('configuration', sa.JSON, nullable=False)
 
-    id = Column(Integer, nullable=False, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    version = Column(String, nullable=False)
-    configuration = Column(JSON, nullable=False)
-
-    model_id = Column(Integer, ForeignKey('model.id'))
-    model = relationship('Model', back_populates='config', uselist=False)
-
-    __table_args__ = (
-        UniqueConstraint('name', 'version', name='_unique_name_ver_combination'),
-        Index('_name_ver_composite_index', 'name', 'version'),
-    )
+    model_id = sa.Column('model_id', sa.Integer, sa.ForeignKey('model.id'), nullable=False)
+    model = orm.relationship('Model', back_populates='config', uselist=False)

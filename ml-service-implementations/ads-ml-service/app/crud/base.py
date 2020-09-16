@@ -21,7 +21,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic.main import BaseModel
 from sqlalchemy.orm import Session
 
-from ..db.base_class import Base
+from app.db.base_class import Base
 
 # ModelType is a type variable that must be subclass of db.Base
 ModelType = TypeVar('ModelType', bound=Base)

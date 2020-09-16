@@ -18,9 +18,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-
-from ..core.configuration import get_config
-
+from app.core.configuration import get_config
 
 engine = create_engine(
     f'sqlite:///{get_config().MODEL_STORAGE.joinpath(get_config().DATABASE_NAME)}',

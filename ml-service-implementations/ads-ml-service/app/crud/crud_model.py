@@ -15,44 +15,44 @@
 #
 
 
-from typing import Text
+import datetime
+import typing as typ
 
-from sqlalchemy.orm import Session
+import fastapi.encoders as encoders
+import sqlalchemy.orm as orm
 
-from .base import CRUDBase, IdType
-from .crud_binary_ml_model import binary_ml_model
-from .crud_model_config import model_config
-from ..models import Model
-from ..schemas import ModelCreate, ModelUpdate
+import app.models as models
+import app.schemas as schemas
+from .base import CRUDBase
 
 
-class CRUDModel(CRUDBase[Model, ModelCreate, ModelUpdate]):
-    def create(self, db: Session, *, obj_in: ModelCreate) -> Model:
-        db_binary = binary_ml_model.create(db, obj_in=obj_in.binary)
-        db_config = model_config.create(db, obj_in=obj_in.config)
-        db_obj = Model(
-            name=obj_in.config.name,
-            version=obj_in.config.version,
-            binary=db_binary,
-            config=db_config
+class CRUDModel(CRUDBase[models.Model, schemas.ModelCreate, schemas.ModelUpdate]):
+    def create(self, db: orm.Session, *, obj_in: schemas.ModelCreate) -> models.Model:
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        # noinspection PyArgumentList
+        db_obj = self.model(
+            **encoders.jsonable_encoder(obj_in),
+            created_at=now,
+            modified_at=now
         )
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
         return db_obj
 
-    def get_by_name_and_ver(self, db: Session, *, name: Text, version: Text):
-        return db.query(Model) \
-            .filter(Model.name == name, Model.version == version).first()
+    def update(
+            self,
+            db: orm.Session,
+            *,
+            db_obj: models.Model,
+            obj_in: typ.Union[schemas.ModelUpdate, typ.Dict[typ.Text, typ.Any]]
+    ) -> models.Model:
+        update_data = obj_in if isinstance(obj_in, typ.Dict) else obj_in.dict(exclude_unset=True)
+        update_data['modified_at'] = datetime.datetime.now(tz=datetime.timezone.utc)
+        return super().update(db, db_obj=db_obj, obj_in=update_data)
 
-    def delete(self, db: Session, *, id: IdType) -> Model:
-        model = self.get(db, id=id)
-        binary = binary_ml_model.delete(db, id=model.binary.id)
-        config = model_config.delete(db, id=model.config.id)
-        model_1 = super().delete(db, id=id)
-        model_1.binary = binary
-        model_1.config = config
-        return model_1
+    def get_by_name(self, db: orm.Session, *, name: typ.Text) -> typ.Optional[models.Model]:
+        return db.query(self.model).filter(self.model.name == name).first()
 
 
-model = CRUDModel(Model)
+model = CRUDModel(models.Model)
