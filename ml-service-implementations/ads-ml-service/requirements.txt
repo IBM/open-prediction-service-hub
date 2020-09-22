@@ -25,5 +25,5 @@ passlib[bcrypt]
 pytest
 
 # Raw interface for model serving
---editable git+https://github.com/kubeflow/kfserving@master#egg=sklearnserver&subdirectory=python/sklearnserver
---editable git+https://github.com/kubeflow/kfserving@master#egg=xgbserver&subdirectory=python/xgbserver
+--editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=sklearnserver&subdirectory=python/sklearnserver
+--editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=xgbserver&subdirectory=python/xgbserver
