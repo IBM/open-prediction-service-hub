@@ -38,10 +38,10 @@ def test_get_model(
 
     assert response.status_code == 200
     assert model['id'] == str(model_with_config_and_endpoint.id)
-    assert dt.datetime.strptime(
-        model['created_at'], '%Y-%m-%dT%H:%M:%S.%f') == model_with_config_and_endpoint.created_at
-    assert dt.datetime.strptime(
-        model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f') == model_with_config_and_endpoint.modified_at
+    assert dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f%z') == \
+           model_with_config_and_endpoint.created_at.astimezone(dt.timezone.utc)
+    assert dt.datetime.strptime(model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f%z') == \
+        model_with_config_and_endpoint.modified_at.astimezone(dt.timezone.utc)
     assert all(
         [
             model[key] == classification_config[key] for key in classification_config.keys()
@@ -94,8 +94,8 @@ def test_update_model_name(
 
     assert response.status_code == 200
     assert model['name'] == 'dummy-model'
-    assert (dt.datetime.strptime(model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f') -
-            dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f')).seconds > 1
+    assert (dt.datetime.strptime(model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f%z') -
+            dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f%z')).seconds > 1
 
 
 def test_update_model_conf(
@@ -115,8 +115,8 @@ def test_update_model_conf(
 
     assert response.status_code == 200
     assert all([model.get(k) == classification_config.get(k) for k in classification_config.keys() if k != 'version'])
-    assert (dt.datetime.strptime(model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f') -
-            dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f')).seconds > 1
+    assert (dt.datetime.strptime(model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f%z') -
+            dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f%z')).seconds > 1
 
 
 def test_delete_model(
