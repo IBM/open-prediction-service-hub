@@ -17,6 +17,7 @@
 
 import enum
 import typing
+import datetime as dt
 
 import numpy
 import pydantic as pydt
@@ -81,8 +82,8 @@ class ModelImpl(ops_schemas.Model):
     def from_database(db_obj: models.Model) -> typing.Dict[typing.Text, typing.Any]:
         return {
             'id': db_obj.id,
-            'created_at': db_obj.created_at,
-            'modified_at': db_obj.modified_at,
+            'created_at': db_obj.created_at.astimezone(dt.timezone.utc).isoformat(),
+            'modified_at': db_obj.modified_at.astimezone(dt.timezone.utc).isoformat(),
             **db_obj.config.configuration,
             'links': [
                 *[
@@ -111,7 +112,7 @@ class EndpointImpl(ops_schemas.Endpoint):
         return {
             'id': e.id,
             'name': e.name,
-            'deployed_at': e.deployed_at,
+            'deployed_at': e.deployed_at.astimezone(dt.timezone.utc).isoformat(),
             'status': StatusImpl.in_service if e.binary else StatusImpl.creating,
             'links': [
                 *[
