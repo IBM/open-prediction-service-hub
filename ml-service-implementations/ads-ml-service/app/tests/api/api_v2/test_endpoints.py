@@ -35,7 +35,7 @@ def test_get_endpoint(
         client: tstc.TestClient,
         endpoint_with_model: models.Endpoint
 ) -> typ.NoReturn:
-    time.sleep(2)
+    time.sleep(3)  # To test deployed_at
     response = client.get(
         url=conf.get_config().API_V2_STR + '/endpoints' + f'/{endpoint_with_model.id}')
     endpoint = response.json()
@@ -45,7 +45,7 @@ def test_get_endpoint(
     assert endpoint['name'] == endpoint_with_model.name
     assert endpoint['status'] == 'creating'
     assert (dt.datetime.now(tz=dt.timezone.utc) -
-            dt.datetime.strptime(endpoint['deployed_at'], '%Y-%m-%dT%H:%M:%S.%f')
+            dt.datetime.strptime(endpoint['deployed_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
             .replace(tzinfo=dt.timezone.utc)).seconds > 1
 
 
