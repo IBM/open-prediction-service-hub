@@ -24,10 +24,13 @@ WORKDIR ${OPS_HOME}
 RUN \
     apt-get -qq update && \
     apt-get -qq install --assume-yes git libgomp1 && \
-    rm -rf /var/lib/apt/lists/*  && \
-    python3 -m pip install --no-cache-dir --quiet --upgrade pip && \
-    python3 -m pip install --no-cache-dir --quiet --requirement requirements-ml.txt && \
-    python3 -m pip install --no-cache-dir --quiet --requirement requirements.txt --ignore-installed
+    python3 -m pip install --no-cache-dir --upgrade pip --q && \
+    python3 -m pip install --no-cache-dir --use-feature=2020-resolver --requirement requirements.txt -q && \
+    # requirements-ml will overrides some libraries in requirements.txt which might raise some false positive
+    # incompatibility errors.
+    python3 -m pip install --no-cache-dir --use-feature=2020-resolver --requirement requirements-ml.txt -q && \
+    apt-get -qq purge --auto-remove --assume-yes git && \
+    rm -rf /var/lib/apt/lists/*
 
 
 # Install this project
