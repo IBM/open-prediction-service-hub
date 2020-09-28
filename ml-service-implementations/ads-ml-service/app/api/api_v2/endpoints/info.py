@@ -30,9 +30,22 @@ router = fastapi.APIRouter()
     response_model=ops_schemas.ServerInfo
 )
 def server_info() -> typing.Dict[typing.Text, typing.Any]:
+    ml_lib_info = {}
+    try:
+        import sklearn
+        import xgboost
+        ml_lib_info.update(
+            [
+                ('sklearn-version', sklearn.__version__),
+                ('xgboost-version', xgboost.__version__)
+            ]
+        )
+    except ImportError:
+        pass
     return {
         'info': {
-            'server-version': version.__version__
+            'server-version': version.__version__,
+            **ml_lib_info
         },
         'status': ops_schemas.Status2.ok
     }
