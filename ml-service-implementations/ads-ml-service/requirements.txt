@@ -1,29 +1,29 @@
-#  Dependences for web service
+# Dependences for web service
 
 ## Web interface
-fastapi
-sqlalchemy
-uvicorn
-gunicorn
-pyjwt
+python-multipart~=0.0.5
+sqlalchemy~=1.3.19
 datamodel-code-generator~=0.5.30
+fastapi~=0.54.1
+
+## Process management
+uvicorn~=0.11.3
+gunicorn~=20.0.4
 
 ## Cache
-cachetools
-readerwriterlock
+cachetools~=4.1.1
+readerwriterlock~=1.0.7
 
-# Service initialization
-tenacity
+## Service initialization
+tenacity~=6.2.0
 
-## File upload
-python-multipart
-
-## Password hash
-passlib[bcrypt]
+## Authentication
+pyjwt~=1.7.1
+passlib[bcrypt]~=1.7.2
 
 ## Testes
 pytest
 
-# Raw interface for model serving
+## Raw interface for model serving
 --editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=sklearnserver&subdirectory=python/sklearnserver
 --editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=xgbserver&subdirectory=python/xgbserver
