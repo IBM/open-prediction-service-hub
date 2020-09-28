@@ -19,10 +19,12 @@ import io
 import typing
 
 import cachetools
+import fastapi
 import joblib
 import kfserving
-import sqlalchemy.orm as saorm
 import readerwriterlock.rwlock as rwlock
+import sqlalchemy.orm as saorm
+import starlette.status as status
 
 import app.core.kfserving_impl as kfserving_impl
 import app.core.supported_lib as supported_lib
@@ -32,16 +34,21 @@ import app.models as models
 
 def _deserialize(db_obj: models.BinaryMlModel) -> kfserving.KFModel:
     model: kfserving.KFModel
-    if db_obj.library == supported_lib.MlLib.SKLearn:
-        model = kfserving_impl.SKLearnModelImpl(
-            predictor_binary=joblib.load(io.BytesIO(db_obj.model_b64))
-        )
-    elif db_obj.library == supported_lib.MlLib.XGBoost:
-        model = kfserving_impl.XGBoostModelImpl(
-            predictor_binary=bytearray(db_obj.model_b64)
-        )
-    else:
-        raise RuntimeError(f'ML library not supported: {db_obj.library}')
+    try:
+        if db_obj.library == supported_lib.MlLib.SKLearn:
+            model = kfserving_impl.SKLearnModelImpl(
+                predictor_binary=joblib.load(io.BytesIO(db_obj.model_b64))
+            )
+        elif db_obj.library == supported_lib.MlLib.XGBoost:
+            model = kfserving_impl.XGBoostModelImpl(
+                predictor_binary=bytearray(db_obj.model_b64)
+            )
+        else:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'ML library not supported: {db_obj.library}')
+    except ImportError:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Can not deserialize model binary')
     model.load()
     return model
 
