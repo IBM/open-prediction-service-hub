@@ -30,7 +30,7 @@ from .... import schemas
 router = APIRouter()
 
 
-@router.get('/me', response_model=schemas.User)
+@router.get('/me', response_model=schemas.User, include_in_schema=False)
 def get_user_self(
     *,
     current_user: models.User = Depends(deps.get_current_user)
@@ -41,7 +41,7 @@ def get_user_self(
     return current_user
 
 
-@router.put('/me', response_model=schemas.User)
+@router.put('/me', response_model=schemas.User, include_in_schema=False)
 def update_user_self(
     *,
     db: Session = Depends(deps.get_db),
