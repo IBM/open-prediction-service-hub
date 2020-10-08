@@ -32,7 +32,7 @@ from .... import models
 router = APIRouter()
 
 
-@router.post('/login/access-token', response_model=schemas.Token)
+@router.post('/login/access-token', response_model=schemas.Token, include_in_schema=False)
 def login_access_token(
         db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
@@ -53,7 +53,7 @@ def login_access_token(
     }
 
 
-@router.post('/login/test-token', response_model=schemas.User)
+@router.post('/login/test-token', response_model=schemas.User, include_in_schema=False)
 def test_token(
       current_user: models.User = Depends(deps.get_current_user)
 ) -> Any:

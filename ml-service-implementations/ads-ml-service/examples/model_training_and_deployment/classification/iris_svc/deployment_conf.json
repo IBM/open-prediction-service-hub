@@ -25,10 +25,8 @@
       }
     ],
     "output_schema": {
-      "result": {
-        "predict": {
-          "type": "string"
-        }
+      "predict": {
+        "type": "string"
       }
     },
     "metadata": {
