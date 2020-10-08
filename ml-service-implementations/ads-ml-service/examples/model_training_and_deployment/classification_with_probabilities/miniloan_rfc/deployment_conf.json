@@ -30,14 +30,12 @@
       }
     ],
     "output_schema": {
-      "result": {
-        "prediction": {
-          "type": "string"
-        },
-        "scores": {
-          "type": "array",
-          "items": "float"
-        }
+      "prediction": {
+        "type": "string"
+      },
+      "scores": {
+        "type": "array",
+        "items": "float"
       }
     },
     "metadata": {
