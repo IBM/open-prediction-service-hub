@@ -40,7 +40,7 @@ class Feature(BaseModel):
 
     @validator('type', always=True)
     def type_check(cls, t) -> Type:
-        if t in ('int', 'float', 'bool', 'str'):  # Python type
+        if t in ('int', 'float', 'bool', 'string'):  # Python type
             return t
         if hasattr(numpy, t) and numpy.issubdtype(t, numpy.generic):
             return t
@@ -48,7 +48,7 @@ class Feature(BaseModel):
             raise ValueError('Type not supported: {t}'.format(t=t))
 
     def get_type(self) -> Type:
-        if self.type in ('int', 'float', 'bool', 'str'):
+        if self.type in ('int', 'float', 'bool', 'string'):
             if self.type == 'int':
                 return int
             elif self.type == 'float':
