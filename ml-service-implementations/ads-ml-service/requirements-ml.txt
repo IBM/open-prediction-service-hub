@@ -1,10 +1,10 @@
 # To deserialize a prediction model, all dependencies of that model must exist in system
 
 ## Default models need scikit-learn (version 0.22.2.post1)
-scikit-learn~=0.22.0
+scikit-learn~=0.22.2.post1
 
 ## Recommanded libraries
-xgboost
+xgboost~=1.2.0
 # tensorflow
 # torch
 # Keras

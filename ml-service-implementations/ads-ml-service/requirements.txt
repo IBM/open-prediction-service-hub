@@ -1,17 +1,17 @@
 #  Dependences for web service
 
 ## Data structure
-numpy
-pandas
-pydantic
+numpy~=1.19.2
+pandas~=1.1.2
+pydantic~=1.6.1
 
 ## Web interface
-python-multipart          # file service
-fastapi
-uvicorn
-gunicorn
-expiringdict
-sqlalchemy
+python-multipart~=0.0.5          # file service
+fastapi~=0.54.1
+uvicorn~=0.11.3
+gunicorn~=20.0.4
+expiringdict~=1.2.1
+sqlalchemy~=1.3.19
 
 
 # Load pre-trained model
