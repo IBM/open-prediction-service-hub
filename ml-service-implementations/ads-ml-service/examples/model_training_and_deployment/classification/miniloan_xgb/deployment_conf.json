@@ -30,8 +30,8 @@
       }
     ],
     "output_schema": {
-      "predict": {
-        "type": "string"
+      "predictions": {
+        "type": "float"
       }
     },
     "metadata": {
