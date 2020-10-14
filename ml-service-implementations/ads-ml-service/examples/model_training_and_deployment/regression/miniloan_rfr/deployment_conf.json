@@ -30,7 +30,7 @@
       }
     ],
     "output_schema": {
-      "predict": {
+      "predictions": {
         "type": "float"
       }
     },

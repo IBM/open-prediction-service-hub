@@ -30,7 +30,7 @@
       }
     ],
     "output_schema": {
-      "prediction": {
+      "predictions": {
         "type": "string"
       },
       "scores": {
