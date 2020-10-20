@@ -31,7 +31,7 @@ class TestWMLUtil(BaseTestCase, unittest.TestCase):
             "scope": "ibm openid"
         }
 
-        expected = ("{'token': 'token', 'instance_id': '" + MOCKED_CREDENTIALS_VARS['WML_INSTANCE_ID'] + "', 'url': '" + MOCKED_CREDENTIALS_VARS['WML_URL'] + "'}")
+        expected = ("{'token': 'token', 'space_id': '" + MOCKED_CREDENTIALS_VARS['WML_SPACE_ID'] + "', 'url': '" + MOCKED_CREDENTIALS_VARS['WML_URL'] + "'}")
 
         response = get_wml_credentials()
 
