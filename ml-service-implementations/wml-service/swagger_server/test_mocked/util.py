@@ -20,14 +20,15 @@ import os
 
 
 MOCKED_CREDENTIALS_VARS = {
+    "WML_AUTH_URL": "https://iam.cloud.ibm.com/identity/token",
     "WML_API_KEY": "apikey",
-    "WML_INSTANCE_ID": "instance_id",
+    "WML_SPACE_ID": "space_id",
     "WML_URL": "url"
 }
 
 MOCKED_CREDENTIALS = {
     "token": "token",
-    "instance_id": MOCKED_CREDENTIALS_VARS["WML_INSTANCE_ID"],
+    "space_id": MOCKED_CREDENTIALS_VARS["WML_SPACE_ID"],
     "url": MOCKED_CREDENTIALS_VARS["WML_URL"]
 }
 

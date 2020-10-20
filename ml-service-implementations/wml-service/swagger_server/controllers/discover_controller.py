@@ -49,11 +49,13 @@ def get_endpoint_by_id(endpoint_id):  # noqa: E501
     try:
         wml_credentials = get_wml_credentials()
         api_version_date = get_wml_api_date_version()
-        url = wml_credentials['url'] + "/v4/deployments/" + endpoint_id + "?version=" + api_version_date
+        url = wml_credentials['url'] + "/v4/deployments/" + \
+            endpoint_id + "?version=" + \
+            api_version_date + "&space_id=" + \
+            wml_credentials['space_id']
 
         payload = {}
         headers = {
-            'ML-Instance-ID': wml_credentials['instance_id'],
             'Authorization': 'Bearer ' + wml_credentials['token']
         }
 
@@ -74,7 +76,7 @@ def get_endpoint_by_id(endpoint_id):  # noqa: E501
                 ),
                 Link(
                     rel='model',
-                    href=root_url + 'models/' + endpoint['entity']['asset']['href'].split('models/')[1].split('/')[0]
+                    href=root_url + 'models/' + endpoint['entity']['asset']['id']
                 )
             ]
         )
@@ -102,11 +104,11 @@ def get_model_by_id(model_id):  # noqa: E501
         wml_credentials = get_wml_credentials()
         api_version_date = get_wml_api_date_version()
 
-        url = wml_credentials['url'] + "/v4/models/" + model_id + "?version=" + api_version_date
+        url = wml_credentials['url'] + "/v4/models/" + model_id + "?version=" + api_version_date + "&space_id=" + \
+            wml_credentials['space_id']
 
         payload = {}
         headers = {
-            'ML-Instance-ID': wml_credentials['instance_id'],
             'Authorization': 'Bearer ' + wml_credentials['token']
         }
         # get all models
@@ -114,7 +116,8 @@ def get_model_by_id(model_id):  # noqa: E501
         response.raise_for_status()
         model = response.json()
 
-        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date + "&asset_id=" + model_id
+        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date + "&space_id=" + \
+            wml_credentials['space_id'] + "&asset_id=" + model_id
 
         # get all endpoints for this model asset
         response = requests.request("GET", url, headers=headers, data=payload)
@@ -154,7 +157,6 @@ def get_model_by_id(model_id):  # noqa: E501
             ),
             created_at=model['metadata']['created_at'],
             modified_at=model['metadata']['modified_at'],
-            version=model['metadata']['rev'],
             links=links
         )
     except requests.exceptions.HTTPError as error:
@@ -180,13 +182,13 @@ def list_endpoints(model_id=None):  # noqa: E501
     try:
         wml_credentials = get_wml_credentials()
         api_version_date = get_wml_api_date_version()
-        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date
+        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date+ "&space_id=" + \
+            wml_credentials['space_id']
         if model_id is not None:
             url += "&asset_id=" + model_id
 
         payload = {}
         headers = {
-            'ML-Instance-ID': wml_credentials['instance_id'],
             'Authorization': 'Bearer ' + wml_credentials['token']
         }
 
@@ -210,7 +212,7 @@ def list_endpoints(model_id=None):  # noqa: E501
                         ),
                         Link(
                             rel='model',
-                            href=root_url + 'models/' + endpoint['entity']['asset']['href'].split('models/')[1].split('/')[0]
+                            href=root_url + 'models/' + endpoint['entity']['asset']['id']
                         )
                     ]
                 )
@@ -239,18 +241,19 @@ def list_models():  # noqa: E501
         wml_credentials = get_wml_credentials()
         api_version_date = get_wml_api_date_version()
 
-        url = wml_credentials['url'] + "/v4/models" + "?version=" + api_version_date
+        url = wml_credentials['url'] + "/v4/models" + "?version=" + api_version_date + "&space_id=" + \
+            wml_credentials['space_id']
 
         payload = {}
         headers = {
-            'ML-Instance-ID': wml_credentials['instance_id'],
             'Authorization': 'Bearer ' + wml_credentials['token']
         }
         # get all models
         response = requests.request("GET", url, headers=headers, data=payload)
         models = response.json()["resources"]
 
-        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date
+        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date + "&space_id=" + \
+            wml_credentials['space_id']
 
         # get all endpoints
         response = requests.request("GET", url, headers=headers, data=payload)
@@ -262,7 +265,7 @@ def list_models():  # noqa: E501
         link_by_model = {}
 
         for endpoint in endpoints:
-            endpoint_model_id = endpoint['entity']['asset']['href'].split('models/')[1].split('/')[0]
+            endpoint_model_id = endpoint['entity']['asset']['id']
             link = Link(
                 rel='endpoint',
                 href=root_url + 'endpoints/' + endpoint['metadata']['id']
@@ -303,7 +306,6 @@ def list_models():  # noqa: E501
                     ),
                     created_at=model['metadata']['created_at'],
                     modified_at=model['metadata']['modified_at'],
-                    version=model['metadata']['rev'],
                     links=link_by_model[model_id]
                 )
             )

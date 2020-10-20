@@ -18,6 +18,8 @@ import connexion
 
 from swagger_server import encoder
 import argparse
+import logging
+import sys
 
 def main():
     parser = argparse.ArgumentParser()
@@ -37,4 +39,6 @@ def main():
     app.run(port=args.port)
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    logger = logging.getLogger(__name__)
     main()

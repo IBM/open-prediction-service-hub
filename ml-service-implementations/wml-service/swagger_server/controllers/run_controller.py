@@ -16,14 +16,16 @@
 
 import sys
 from swagger_server.wml_util import \
-    get_wml_credentials  # , \
-#   get_wml_api_date_version
-# NOT USED because predictions endpoint not working with specified api version
+    get_wml_credentials, \
+    get_wml_api_date_version
 from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.prediction_response import PredictionResponse  # noqa: E501
 
 import requests
 import json
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def prediction(body):  # noqa: E501
@@ -36,6 +38,7 @@ def prediction(body):  # noqa: E501
 
     :rtype: PredictionResponse
     """
+    logger.debug(f'prediction({body})')
     # Retrieve parameters
     req_data = []
     fields_data = []
@@ -57,11 +60,10 @@ def prediction(body):  # noqa: E501
 
     try:
         wml_credentials = get_wml_credentials()
-        # api_version_date = get_wml_api_date_version()
-        # 19/08/2020 Endpoint is not working when version is specified
-        # however according to https://watson-ml-v4-api.mybluemix.net/wml-restapi-cpd.html#/
-        # api version will be mandatory in the next release
-        url = wml_credentials['url'] + "/v4/deployments/" + endpoint + "/predictions"  # + "?version=" + api_version_date
+        api_version_date = get_wml_api_date_version()
+        url = wml_credentials['url'] + "/v4/deployments/" + endpoint + "/predictions" + \
+            "?version=" + api_version_date + \
+            "&space_id=" + wml_credentials['space_id']
 
         payload = {
             "input_data": [
@@ -75,7 +77,6 @@ def prediction(body):  # noqa: E501
 
         headers = {
             'Content-Type': 'application/json',
-            'ML-Instance-ID': wml_credentials['instance_id'],
             'Authorization': 'Bearer ' + wml_credentials['token']
         }
 
