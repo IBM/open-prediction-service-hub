@@ -65,7 +65,7 @@ class TestRunController(BaseTestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["url"] + '/v4/deployments/toto/predictions', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
+        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["url"] + '/v4/deployments/toto/predictions?version=2020-10-20&space_id=space_id', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
 
     @mock_wml_credentials('run_controller')
     @mock.patch("swagger_server.controllers.run_controller.requests.request")
@@ -106,7 +106,7 @@ class TestRunController(BaseTestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["url"] + '/v4/deployments/toto/predictions', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
+        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["url"] + '/v4/deployments/toto/predictions?version=2020-10-20&space_id=space_id', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
 
     @mock_wml_credentials('run_controller')
     @mock.patch("swagger_server.controllers.run_controller.requests.request")
@@ -127,7 +127,7 @@ class TestRunController(BaseTestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["url"] + '/v4/deployments/toto/predictions', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
+        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["url"] + '/v4/deployments/toto/predictions?version=2020-10-20&space_id=space_id', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
 
     @mock_wml_credentials('run_controller')
     @mock.patch("swagger_server.controllers.run_controller.requests.request")
@@ -150,7 +150,7 @@ class TestRunController(BaseTestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["url"] + '/v4/deployments/toto/predictions', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
+        mock_request.assert_called_once_with("POST", MOCKED_CREDENTIALS["url"] + '/v4/deployments/toto/predictions?version=2020-10-20&space_id=space_id', data='{"input_data": [{"fields": ["name"], "values": [[5]]}]}', headers=mock.ANY)
 
 
 if __name__ == '__main__':

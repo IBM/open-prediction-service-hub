@@ -16,8 +16,10 @@
 
 import os
 import requests
+import logging
 
-API_VER = "2020-08-07"
+API_VER = "2020-10-20"
+logger = logging.getLogger(__name__)
 
 
 def get_wml_api_date_version():
@@ -25,6 +27,7 @@ def get_wml_api_date_version():
 
 
 def get_wml_credentials():
+    logger.debug('get_wml_credentials()')
     wml_api_key = os.getenv('WML_API_KEY') or ''
 
     url = os.getenv('WML_AUTH_URL') or "https://iam.cloud.ibm.com/identity/token"
@@ -34,6 +37,7 @@ def get_wml_credentials():
         'Content-Type': 'application/x-www-form-urlencoded',
     }
 
+    logger.debug(f'auth url: {url}, key is empty: {wml_api_key == ""}')
     response = requests.request("POST", url, headers=headers, data=payload)
     response.raise_for_status()
 
@@ -42,11 +46,11 @@ def get_wml_credentials():
     if wml_url.endswith('/v4'):
         wml_url = wml_url[:-3]
         
-    wml_instance_id = os.getenv('WML_INSTANCE_ID') or ''
+    wml_space_id = os.getenv('WML_SPACE_ID') or ''
 
     wml_credentials = {
         "token": wml_token,
-        "instance_id": wml_instance_id,
+        "space_id": wml_space_id,
         "url": wml_url
     }
     return wml_credentials
