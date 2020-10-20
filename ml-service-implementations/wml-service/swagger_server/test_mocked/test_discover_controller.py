@@ -35,8 +35,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_request.return_value.json.return_value = {
             "entity": {
                 "asset": {
-                    "href": "/v3/ml_assets/models/" + model_id + "/versions/51bafd0b-3f8d-45e3-a5ec-a50612360706",
-                    "id": "51bafd0b-3f8d-45e3-a5ec-a50612360706"
+                    "id": model_id
                 },
                 "name": "Notebook import additional data",
                 "online": {
@@ -78,7 +77,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments/FakeEndpointId?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + f'/v4/deployments/FakeEndpointId?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -100,7 +99,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments/FakeEndpointId?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments/FakeEndpointId?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -122,7 +121,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments/FakeEndpointId?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments/FakeEndpointId?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -145,7 +144,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments/FakeEndpointId?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments/FakeEndpointId?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     # GET MODEL BY ID
     @mock_wml_credentials('discover_controller')
@@ -380,7 +379,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     " 'modified_at': '2020-06-05T07:20:15.802Z',\n" +
                     " 'name': 'Bank marketing (sample) test - P8 LGBMClassifierEstimator',\n" +
                     " 'output_schema': {},\n" +
-                    " 'version': 'd89e325a-c51d-48ef-9600-c4f064dae20f'}")
+                    " 'version': None}")
 
         response = get_model_by_id(model_id)
 
@@ -389,8 +388,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert mock_cred.called
 
         assert mock_request.call_count == 2
-        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models/FakeModelId?version=2020-08-07', data={}, headers=mock.ANY)
-        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07&asset_id=FakeModelId', data={}, headers=mock.ANY)
+        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models/FakeModelId?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
+        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id&asset_id=FakeModelId', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -411,7 +410,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models/FakeModelId?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models/FakeModelId?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -432,7 +431,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models/FakeModelId?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models/FakeModelId?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -583,8 +582,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert mock_cred.called
 
         assert mock_request.call_count == 2
-        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models/FakeModelId?version=2020-08-07', data={}, headers=mock.ANY)
-        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07&asset_id=FakeModelId', data={}, headers=mock.ANY)
+        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models/FakeModelId?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
+        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id&asset_id=FakeModelId', data={}, headers=mock.ANY)
 
     # LIST ENDPOINTS
     @mock_wml_credentials('discover_controller')
@@ -599,7 +598,6 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                 {
                     "entity": {
                         "asset": {
-                            "href": "/v3/ml_assets/models/59dac523-e5e0-452b-aa04-50a144beced5/versions/51bafd0b-3f8d-45e3-a5ec-a50612360706",
                             "id": "51bafd0b-3f8d-45e3-a5ec-a50612360706"
                         },
                         "name": "Notebook import additional data",
@@ -635,7 +633,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "                'id': '55c93e6f-82ac-4d51-a052-4d2249aabe7a',\n" +
                     "                'links': [{'href': 'http://localhost/endpoints/55c93e6f-82ac-4d51-a052-4d2249aabe7a',\n" +
                     "                           'rel': 'self'},\n" +
-                    "                          {'href': 'http://localhost/models/59dac523-e5e0-452b-aa04-50a144beced5',\n" +
+                    "                          {'href': 'http://localhost/models/51bafd0b-3f8d-45e3-a5ec-a50612360706',\n" +
                     "                           'rel': 'model'}],\n" +
                     "                'name': 'Notebook import additional data',\n" +
                     "                'status': 'in_service'}]}")
@@ -646,7 +644,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -662,8 +660,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                 {
                     "entity": {
                         "asset": {
-                            "href": "/v3/ml_assets/models/" + modelId + "/versions/51bafd0b-3f8d-45e3-a5ec-a50612360706",
-                            "id": "51bafd0b-3f8d-45e3-a5ec-a50612360706"
+                            "id": modelId
                         },
                         "name": "Notebook import additional data",
                         "online": {
@@ -709,7 +706,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07&asset_id=FakeModelId', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id&asset_id=FakeModelId', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -732,7 +729,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07&asset_id=FakeModelId', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id&asset_id=FakeModelId', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -751,7 +748,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -770,7 +767,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -790,7 +787,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     # LIST MODELS
     @mock_wml_credentials('discover_controller')
@@ -937,8 +934,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                 {
                     "entity": {
                         "asset": {
-                            "href": "/v3/ml_assets/models/" + model_id + "/versions/51bafd0b-3f8d-45e3-a5ec-a50612360706",
-                            "id": "51bafd0b-3f8d-45e3-a5ec-a50612360706"
+                            "id": model_id
                         },
                         "name": "Notebook import additional data",
                         "online": {
@@ -997,7 +993,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "             'name': 'Bank marketing (sample) test - P8 '\n" +
                     "                     'LGBMClassifierEstimator',\n" +
                     "             'output_schema': {},\n" +
-                    "             'version': 'd89e325a-c51d-48ef-9600-c4f064dae20f'}]}")
+                    "             'version': None}]}")
 
         response = list_models()
 
@@ -1006,8 +1002,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert mock_cred.called
 
         assert mock_request.call_count == 2
-        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-08-07', data={}, headers=mock.ANY)
-        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
+        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -1212,7 +1208,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "             'name': 'Bank marketing (sample) test - P8 '\n" +
                     "                     'LGBMClassifierEstimator',\n" +
                     "             'output_schema': {},\n" +
-                    "             'version': 'd89e325a-c51d-48ef-9600-c4f064dae20f'}]}")
+                    "             'version': None}]}")
 
         response = list_models()
 
@@ -1221,8 +1217,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert mock_cred.called
 
         assert mock_request.call_count == 2
-        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-08-07', data={}, headers=mock.ANY)
-        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
+        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -1370,8 +1366,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                 {
                     "entity": {
                         "asset": {
-                            "href": "/v3/ml_assets/models/" + model_id + "/versions/51bafd0b-3f8d-45e3-a5ec-a50612360706",
-                            "id": "51bafd0b-3f8d-45e3-a5ec-a50612360706"
+                            "id": model_id
                         },
                         "name": "Notebook import additional data",
                         "online": {
@@ -1402,8 +1397,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                 {
                     "entity": {
                         "asset": {
-                            "href": "/v3/ml_assets/models/" + model_id + "/versions/51bafd0b-3f8d-45e3-a5ec-a50612360706",
-                            "id": "51bafd0b-3f8d-45e3-a5ec-a50612360706"
+                            "id": model_id
                         },
                         "name": "Notebook import additional data",
                         "online": {
@@ -1464,7 +1458,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "             'name': 'Bank marketing (sample) test - P8 '\n" +
                     "                     'LGBMClassifierEstimator',\n" +
                     "             'output_schema': {},\n" +
-                    "             'version': 'd89e325a-c51d-48ef-9600-c4f064dae20f'}]}")
+                    "             'version': None}]}")
 
         response = list_models()
 
@@ -1473,8 +1467,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert mock_cred.called
 
         assert mock_request.call_count == 2
-        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-08-07', data={}, headers=mock.ANY)
-        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_any_call("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
+        mock_request.assert_called_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -1493,7 +1487,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -1512,7 +1506,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('discover_controller')
     @mock.patch("swagger_server.controllers.discover_controller.requests.request")
@@ -1533,7 +1527,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/models?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
 
 if __name__ == '__main__':

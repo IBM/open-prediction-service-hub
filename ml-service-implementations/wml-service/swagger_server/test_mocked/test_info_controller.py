@@ -42,8 +42,7 @@ class TestInfoController(BaseTestCase):
                 {
                     "entity": {
                         "asset": {
-                            "href": "/v3/ml_assets/models/59dac523-e5e0-452b-aa04-50a144beced5/versions/51bafd0b-3f8d-45e3-a5ec-a50612360706",
-                            "id": "51bafd0b-3f8d-45e3-a5ec-a50612360706"
+                            "id": "59dac523-e5e0-452b-aa04-50a144beced5"
                         },
                         "name": "Notebook import additional data",
                         "online": {
@@ -81,7 +80,7 @@ class TestInfoController(BaseTestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
     @mock_wml_credentials('info_controller')
     @mock.patch("swagger_server.controllers.info_controller.requests.request")
@@ -99,7 +98,7 @@ class TestInfoController(BaseTestCase):
         assert str(response) == expected, 'response is not matching expected response'
         assert mock_cred.called
 
-        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-08-07', data={}, headers=mock.ANY)
+        mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)
 
 
 if __name__ == '__main__':

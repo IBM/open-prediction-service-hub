@@ -46,11 +46,11 @@ def get_info():  # noqa: E501
     try:
         wml_credentials = get_wml_credentials()
         api_version_date = get_wml_api_date_version()
-        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date
+        url = wml_credentials['url'] + "/v4/deployments" + "?version=" + api_version_date + "&space_id=" + \
+            wml_credentials['space_id']
 
         payload = {}
         headers = {
-            'ML-Instance-ID': wml_credentials['instance_id'],
             'Authorization': 'Bearer ' + wml_credentials['token']
         }
 
