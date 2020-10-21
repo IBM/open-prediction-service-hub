@@ -34,8 +34,7 @@
         "type": "string"
       },
       "scores": {
-        "type": "array",
-        "items": "float"
+        "type": "[float]"
       }
     },
     "metadata": {
