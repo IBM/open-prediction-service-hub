@@ -31,7 +31,7 @@
     ],
     "output_schema": {
       "predictions": {
-        "type": "float"
+        "type": "string"
       }
     },
     "metadata": {
