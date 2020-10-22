@@ -18,6 +18,8 @@
 from __future__ import annotations
 
 import logging
+import typing
+import numpy as np
 from logging import Logger
 from pathlib import Path
 from typing import Text, Any, Dict
@@ -42,3 +44,13 @@ def to_dataframe_compatible(kv_pair: Dict[Text: Any]) -> Dict:
         key: [val]
         for key, val in kv_pair.items()
     }
+
+
+def data_to_str(data: typing.Any) -> typing.Text:
+    result: typing.Text
+    if np.issubdtype(type(data), np.number):
+        # numpy numbers to string: https://github.com/numpy/numpy/pull/9941
+        result = repr(data)
+    else:
+        result = str(data)
+    return result

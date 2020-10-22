@@ -19,6 +19,7 @@ from operator import itemgetter
 from typing import List, Text
 
 import numpy as np
+import typing
 from fastapi import APIRouter, Depends
 
 from ...deps import get_ml_service
@@ -27,6 +28,7 @@ from ....core.util import to_dataframe_compatible
 from ....core.open_prediction_service import OpenPredictionService
 from ....schemas.request import RequestBody
 from ....schemas.prediction import Probability, Prediction
+from ....core.util import data_to_str
 
 router = APIRouter()
 
@@ -53,7 +55,7 @@ def predict(
         data=to_dataframe_compatible(ml_req.get_data())
     )
 
-    res: np.ndaary = res_matrix[0]  # one input -> one output
+    res: typing.Union[int, float, bool, str, np.generic, np.ndarray] = res_matrix[0]  # one input -> one output
 
     if model.info.method_name == 'predict_proba' and isinstance(res, np.ndarray):
         feature_names: List[Text] = [
@@ -69,4 +71,4 @@ def predict(
             ]
         )
     else:
-        return Prediction(prediction=res, probabilities=None)
+        return Prediction(prediction=data_to_str(res), probabilities=None)
