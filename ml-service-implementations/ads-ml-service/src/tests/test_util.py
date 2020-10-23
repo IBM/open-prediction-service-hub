@@ -18,6 +18,7 @@
 import pytest
 import typing
 import numpy as np
+import fastapi
 
 import predictions.schemas.prediction as prediction
 import predictions.core.util as util
@@ -72,3 +73,29 @@ def test_output_data_mapping(type_str: typing.Text):
     p = prediction.Prediction(prediction=instance_str)
     reverse = typ(p.prediction)
     assert reverse == instance
+
+
+@pytest.mark.parametrize(
+    'model_output',
+    [
+        20,
+        1.5,
+        False,
+        'working',
+        np.int64(20),
+        np.float64(1.5),
+        np.bool_(False),
+        np.str_('working'),
+        np.array([20]),
+        np.array([1.5]),
+        np.array([False]),
+        np.array(['working']),
+    ]
+)
+def test_good_output_shape(model_output):
+    prediction.Prediction(prediction=util.retrieve_data_from_output(util.data_to_str(model_output)))
+
+
+def test_bad_output_shape():
+    with pytest.raises(fastapi.HTTPException):
+        util.retrieve_data_from_output(np.array([[1]]))
