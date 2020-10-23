@@ -24,6 +24,9 @@ from logging import Logger
 from pathlib import Path
 from typing import Text, Any, Dict
 
+from fastapi import HTTPException
+import starlette.status as http_status
+
 
 def rmdir(
         directory: Path
@@ -54,3 +57,20 @@ def data_to_str(data: typing.Any) -> typing.Text:
     else:
         result = str(data)
     return result
+
+
+def retrieve_data_from_output(
+        output: typing.Union[int, float, bool, str, np.generic, np.ndarray]
+) -> typing.Union[int, float, bool, str, np.generic]:
+    typ: typing.Type = type(output)
+    if typ in [int, float, bool, str]:
+        return output
+    elif np.issubdtype(typ, np.number) or np.issubdtype(typ, np.bool_) or np.issubdtype(typ, np.character):
+        return output
+    elif np.issubdtype(type(output), np.generic) and output.shape == (1,):
+        return output[0]
+    else:
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f'model output not supported : {data_to_str(output)}'
+        )

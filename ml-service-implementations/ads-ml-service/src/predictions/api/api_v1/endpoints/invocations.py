@@ -28,7 +28,7 @@ from ....core.util import to_dataframe_compatible
 from ....core.open_prediction_service import OpenPredictionService
 from ....schemas.request import RequestBody
 from ....schemas.prediction import Probability, Prediction
-from ....core.util import data_to_str
+from ....core.util import data_to_str, retrieve_data_from_output
 
 router = APIRouter()
 
@@ -71,4 +71,5 @@ def predict(
             ]
         )
     else:
-        return Prediction(prediction=data_to_str(res), probabilities=None)
+        retrieved = retrieve_data_from_output(res)
+        return Prediction(prediction=data_to_str(retrieved), probabilities=None)
