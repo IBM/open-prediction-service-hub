@@ -1,1 +1,4 @@
 /**/*.pkl
+!classification/miniloan_linear_svc/miniloan-linear-svc-archive.pkl
+!classification_with_probabilities/miniloan_rfc/miniloan-rfc-archive.pkl
+!regression/miniloan_rfr/miniloan-rfr-archive.pkl

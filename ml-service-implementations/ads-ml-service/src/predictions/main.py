@@ -23,7 +23,7 @@ from starlette.responses import RedirectResponse
 from .api.api_v1.api import api_router
 
 app: FastAPI = FastAPI(
-    version='0.0.1',
+    version='0.1.1',
     title='Open Prediction Service',
     description='A simple Machine Learning serving environment for tests',
     openapi_url="/open-prediction-service.json"
