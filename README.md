@@ -78,6 +78,15 @@ Those endpoints will return the selected resources. Model is the
 input/output signature of predictive model and Endpoint is the "binary model".
 A predictive model is the combination of a model and an endpoint.
 
+### *run* section
+
+#### `/predictions` `POST`
+
+![ops-predictions-post](doc/ops-predictions-post.png)
+
+This endpoint serves all prediction requests. 
+Each invocation needs to contain endpoint information and model inputs that represented as key-value pairs.
+
 ##### Upload `POST`
 
 ![ops-post-models](doc/ops-post-models.jpg)
@@ -89,12 +98,6 @@ This endpoint will allow to upload a pickle file as a new serving model.
 ##### ![ops-delete-models](doc/ops-delete-models.jpg)
 
 This endpoint will remove a given model.
-
-#### *ML* section
-
-##### Call prediction `/v1/invocations` `POST`
-
-![ops-post-invocations](doc/ops-post-invocations.jpg)
 
 ### License
 Apache License Version 2.0, January 2004.
