@@ -48,13 +48,21 @@ pytest api-tests/ --url http://localhost:8080/
 
 ![OpenAPI](doc/OPS-OpenApi.png)
 
-### *Admin* section
+### *info* section
 
-#### Status `/v1/status` `GET`
+#### `/capabilities` `GET`
 
-![status](doc/ops-status.jpg)
+![capabilities](doc/ops-capabilities-get.png)
 
-This endpoint can be used to test the availability of the service. It returns the number of models it is serving.
+This endpoint can be used to get a list of supported operation 
+(any subset of `{info, discover, manage, run}`) of the service.
+
+#### `/info` `GET`
+
+![info](doc/ops-info-get.png)
+
+This endpoint can be used to test the availability of the service. 
+It returns runtime information.
 
 #### Models `/v1/models`
 
