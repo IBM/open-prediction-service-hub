@@ -37,9 +37,9 @@ To check that you have a running container
 docker ps ads-ml-service
 ```
 
-> Your predictive service is available at [http://localhost:8080/v1](http://localhost:8080/v1).
+> Your predictive service is available at [http://localhost:8080/](http://localhost:8080/).
 
-> Swagger UI documentation is available at [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs) or [http://0.0.0.0:8080/v1/redoc](http://0.0.0.0:8080/v1/redoc)
+> Swagger UI documentation is available at [http://localhost:8080/docs](http://localhost:8080/docs) or [http://0.0.0.0:8080/redoc](http://0.0.0.0:8080/redoc)
 
 ### Stop the microservice
 To stop the container
@@ -49,16 +49,16 @@ docker stop ads-ml-service
 
 ## Open Prediction Service
 
-Different endpoints are available and documented at [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs).
+Different endpoints are available and documented at [http://localhost:8080/docs](http://localhost:8080/docs).
 
 ![OpenApi](doc/OPS-OpenApi.jpg)
 
 For example you can list all added models by running:
 ```sh
-curl -X GET "http://localhost:8080/v1/models" -H "accept: application/json"
+curl -X GET "http://localhost:8080/models" -H "accept: application/json"
 ```
 
-### Adding a model - POST /v1/models
+### Adding a model - POST /models
 
 The request body of the adding model request is an archive pickle file.
 
@@ -283,7 +283,7 @@ Note: json does not support int as mapping key. For this reason,
 in the example we used `"0"` and `"1"` instead of `0` and `1`.
 
 
-### Invoking a model - POST /v1/invocations
+### Invoking a model - POST /invocations
 
 The request body of the adding model request is a JSON object with the following structure.
 ```
