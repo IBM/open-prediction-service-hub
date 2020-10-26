@@ -87,17 +87,14 @@ A predictive model is the combination of a model and an endpoint.
 This endpoint serves all prediction requests. 
 Each invocation needs to contain endpoint information and model inputs that represented as key-value pairs.
 
-##### Upload `POST`
+### *manage* section
 
-![ops-post-models](doc/ops-post-models.jpg)
+The section `manage` is not mandatory for OPS compatible implementations. It 
+is designed to facilitate the usage of non-proxy OPS implementations.
 
-This endpoint will allow to upload a pickle file as a new serving model.
+This section allows model & endpoint to be created, altered, deleted at the runtime. 
 
-##### Remove `DELETE`
-
-##### ![ops-delete-models](doc/ops-delete-models.jpg)
-
-This endpoint will remove a given model.
+![ops-manage](doc/ops-manage.png)
 
 ### License
 Apache License Version 2.0, January 2004.
