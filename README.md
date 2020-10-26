@@ -26,10 +26,12 @@ Instructions to build an use are inside the [ops-client-sdk](ops-client-sdk) fol
 
 ## Open API specification
 
-The Open Prediction Service is available as an [Open API v3 specification](open-prediction-service.json). The specification has two main sections:
+The Open Prediction Service is available as an [Open API v3 specification](open-prediction-service.yaml). The specification has four main sections:
 
-- *Admin* section for describing endpoints for uploading, getting or deleting models into the the server.
-- *ML* section that covers the prediction call endpoint
+- *info* section for getting server information and capabilities.
+- *discover* section for getting models and endpoints.
+- *manage* section for adding, altering or deleting models and endpoints (If implemented).
+- *run* section for model invocation
 
 All the types manipulated by the different endpoints are described in the *Schemas* section below.
 
@@ -44,7 +46,7 @@ pytest api-tests/ --url http://localhost:8080/
 ```
 -->
 
-![OpenAPI](doc/ops-OpenApi.jpg)
+![OpenAPI](doc/OPS-OpenApi.png)
 
 ### *Admin* section
 
