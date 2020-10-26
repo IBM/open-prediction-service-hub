@@ -64,13 +64,19 @@ This endpoint can be used to get a list of supported operation
 This endpoint can be used to test the availability of the service. 
 It returns runtime information.
 
-#### Models `/v1/models`
+### *discovery* section
 
-##### Retrieve `GET` 
+This section is used to retrieve model & endpoint information. 
 
-![ops-get-models](doc/ops-get-models.jpg)
+* `/models[/{model_id}]` `GET`
+* `/endpoints[/{endpoint_id}]` `GET`
 
-This endpoint will return the list of the models it is serving.
+![ops-get-models](doc/ops-models-get.png)
+![ops-get-endpoints](doc/ops-endpoints-get.png)
+
+Those endpoints will return the selected resources. Model is the
+input/output signature of predictive model and Endpoint is the "binary model".
+A predictive model is the combination of a model and an endpoint.
 
 ##### Upload `POST`
 
