@@ -1,70 +1,82 @@
-FROM python:3.7-slim
+FROM python:3.7-slim AS python-base
 
-
-# build args
-ARG OPS_HOME="/app"
-
-# ENV variables used by server
-ENV PYTHONPATH="${OPS_HOME}:${PYTHONPATH}"
-ENV OPS_HOME=${OPS_HOME}
-ENV MODEL_STORAGE=${OPS_HOME}
-ENV RETRAIN_MODELS=FALSE
-ENV SSL_SETTINGS=${OPS_HOME}
-ENV ENABLE_SSL=FALSE
-## ENV GUNICORN_TIMEOUT=30
-## ENV GUNICORN_WORKER_NUM=16
-
-
-# add service user
-RUN \
-    adduser --quiet --shell /bin/false --gid 0 --system ops
-
-
-# Install dependences
-COPY requirements.txt requirements-ml.txt ${OPS_HOME}/
+ENV \
+    OPS_HOME="/usr/src/ads-ml-service" \
+    VIRTUAL_ENV="/opt/ads-ml-service/venv" \
+    CUSTOM_MODULES='/var/lib/ads-ml-service/custom'
+ENV \
+    PATH="${VIRTUAL_ENV}/bin:${PATH}" \
+    PYTHONPATH="${CUSTOM_MODULES}:${OPS_HOME}:${PYTHONPATH}"
 WORKDIR ${OPS_HOME}
-RUN \
-    apt-get -qq clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get -qq clean && \
-    apt-get -qq update && \
-    apt-get -qq install --assume-yes --fix-missing git libgomp1 && \
-    python3 -m pip install --no-cache-dir --upgrade pip --q && \
-    python3 -m pip install --no-cache-dir --use-feature=2020-resolver --requirement requirements.txt -q && \
-    # requirements-ml will overrides some libraries in requirements.txt which might raise some false positive
-    # incompatibility errors.
-    python3 -m pip install --no-cache-dir --use-feature=2020-resolver --requirement requirements-ml.txt -q && \
-    apt-get -qq purge --auto-remove --assume-yes git && \
-    rm -rf /var/lib/apt/lists/*
 
 
-# Install this project
-COPY . ${OPS_HOME}
-COPY entrypoint.sh /entrypoint.sh
+FROM python-base AS codegen-image
+
+COPY app/gen/. app/gen/
 RUN \
+    python3 -m pip install -q --no-cache-dir --upgrade pip && \
+    python3 -m pip install -q datamodel-code-generator~=0.5.30 && \
     datamodel-codegen \
 		--input app/gen/tmp.schemas.ops.yaml \
 		--input-file-type openapi \
 		--target-python-version 3.7 \
-		--output app/gen/schemas/ops_schemas.py && \
+		--output app/gen/schemas/ops_schemas.py
+
+
+FROM python-base AS build-image
+
+COPY requirements.txt requirements-ml.txt ${OPS_HOME}/
+RUN \
+    apt-get -q update && \
+    apt-get -q install --assume-yes git && \
+    rm -rf /var/lib/apt/lists/* && \
+    python3 -m venv ${VIRTUAL_ENV} && \
+    python3 -m pip install -q --no-cache-dir --upgrade pip && \
+    python3 -m pip install -q --no-cache-dir --use-feature=2020-resolver --requirement requirements.txt && \
+    # requirements-ml will overrides some libraries in requirements.txt. This procedure might raise some false positive
+    # incompatibility errors.
+    python3 -m pip install -q --no-cache-dir --use-feature=2020-resolver --requirement requirements-ml.txt
+
+
+FROM python-base AS runtime-image
+
+ENV \
+    MODEL_STORAGE="/var/lib/ads-ml-service" \
+    RETRAIN_MODELS=FALSE \
+    SSL_SETTINGS="/etc/ads-ml-service" \
+    ENABLE_SSL=FALSE
+    # ENV GUNICORN_TIMEOUT=30
+    # ENV GUNICORN_WORKER_NUM=16
+
+COPY . ${OPS_HOME}
+COPY custom_modules ${CUSTOM_MODULES}
+COPY --from=codegen-image ${OPS_HOME}/app/gen/. ${OPS_HOME}/app/gen/
+COPY --from=build-image ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY entrypoint.sh /entrypoint.sh
+RUN \
+    apt-get -q update && \
+    apt-get -q install --assume-yes libgomp1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    adduser --quiet --shell /bin/false --gid 0 --system ops && \
     chown ops:root /entrypoint.sh && \
     chmod u+x /entrypoint.sh && \
     chmod g=u /entrypoint.sh && \
     chown --recursive ops:root ${OPS_HOME} && \
-    chmod --recursive g=u ${OPS_HOME}
-
-
-ENV CUSTOM_MODULES='/var/lib/ads-ml-service/custom'
-ENV PYTHONPATH="${CUSTOM_MODULES}:${PYTHONPATH}"
-COPY custom_modules ${CUSTOM_MODULES}
-RUN chown --recursive ops:root ${CUSTOM_MODULES} && \
+    chmod --recursive g=u ${OPS_HOME} && \
+    mkdir -p ${MODEL_STORAGE} && \
+    chown --recursive ops:root ${MODEL_STORAGE} && \
+    chmod --recursive g=u ${MODEL_STORAGE} && \
+    mkdir -p ${SSL_SETTINGS} && \
+    chown --recursive ops:root ${SSL_SETTINGS} && \
+    chmod --recursive g=u ${SSL_SETTINGS} && \
+    chown --recursive ops:root ${CUSTOM_MODULES} && \
     chmod --recursive g=u ${CUSTOM_MODULES}
-VOLUME ${CUSTOM_MODULES}
 
+VOLUME ${MODEL_STORAGE}
+VOLUME ${SSL_SETTINGS}
+VOLUME ${CUSTOM_MODULES}
 
 USER ops
 EXPOSE 8080
-WORKDIR ${OPS_HOME}/app
-
 
 ENTRYPOINT ["/entrypoint.sh"]

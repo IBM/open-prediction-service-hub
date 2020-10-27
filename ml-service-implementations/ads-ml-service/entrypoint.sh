@@ -28,5 +28,5 @@ fi
 #   Uvicorn worker class is required by Fastapi
 exec gunicorn \
             --worker-class=uvicorn.workers.UvicornWorker \
-            --config=file:gunicorn.init.py \
-            main:app
+            --config=file:"${OPS_HOME}"/app/gunicorn.init.py \
+            app.main:app
