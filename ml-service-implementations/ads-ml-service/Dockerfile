@@ -24,8 +24,11 @@ RUN \
 COPY requirements.txt requirements-ml.txt ${OPS_HOME}/
 WORKDIR ${OPS_HOME}
 RUN \
+    apt-get -qq clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get -qq clean && \
     apt-get -qq update && \
-    apt-get -qq install --assume-yes git libgomp1 && \
+    apt-get -qq install --assume-yes --fix-missing git libgomp1 && \
     python3 -m pip install --no-cache-dir --upgrade pip --q && \
     python3 -m pip install --no-cache-dir --use-feature=2020-resolver --requirement requirements.txt -q && \
     # requirements-ml will overrides some libraries in requirements.txt which might raise some false positive
