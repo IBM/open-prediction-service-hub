@@ -67,6 +67,38 @@ A very good analogy is that model defines an function interface and
 endpoint defines different implementations of the interface. For this reason,
 before adding an endpoint, we need to define the model.
 
+#### Add a model `/models` `POST`
+
+The request body of the model adding request is a simple json object.
+
+Structure of json object:
+
+```
+└── Dict
+    ├── 'name': 'model name'    // required
+    ├── 'input_schema'          // although not required, It is recommended to configure the input scheme
+        └── Array
+            └── Dict
+                ├── 'name'
+                ├── 'order'
+                └── 'type'
+    ├── 'output_schema':        // not required
+        └── Dict
+            └── feature_name
+                └── Dict
+                    └── 'type'
+    └── 'metadata':             // although not required, it is recommended to add some metedata for model
+        └── Dict                // metadata accepts all key-value pairs
+            ├── 'description': 'model description'
+            ├── 'author': 'model author'
+            ├── 'trained_at': '2020-03-17 13:25:23'
+            └── 'metrics':
+                └── Array
+                    └── Dict
+                        ├── 'name'
+                        └── 'value'
+```
+
 The request body of the adding model request is an archive pickle file.
 
 Structure of archive file:
