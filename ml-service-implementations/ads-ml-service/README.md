@@ -51,7 +51,7 @@ docker stop ads-ml-service
 
 Different endpoints are available and documented at [http://localhost:8080/docs](http://localhost:8080/docs).
 
-![OpenApi](doc/OPS-OpenApi.jpg)
+![OpenApi](doc/OPS-OpenApi.png)
 
 For example you can list all added models by running:
 ```sh
