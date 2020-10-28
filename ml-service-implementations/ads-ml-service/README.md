@@ -58,7 +58,14 @@ For example you can list all added models by running:
 curl -X GET "http://localhost:8080/models" -H "accept: application/json"
 ```
 
-### Adding a model - POST /models
+### Configuring a predictive model
+
+The predictive model is a combination of a model and an endpoint. A model
+represents the question for which the predictive model needs to solve. An endpoint
+contains a trained model which solves a specific question. 
+A very good analogy is that model defines an function interface and 
+endpoint defines different implementations of the interface. For this reason,
+before adding an endpoint, we need to define the model.
 
 The request body of the adding model request is an archive pickle file.
 
