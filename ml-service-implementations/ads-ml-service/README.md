@@ -123,11 +123,12 @@ forget chose the type of binary (`skl`: scikit-learn predictor, `xgb`: XGBoost s
 
 #### Configuration example for miniloan fraud detection
 
+Model Configuration:
+
 ```json
 {
-  "name": "miniloan-rfc",
-  "version": "v0",
-  "method_name": "predict",
+  "name": "[sample][miniloan-dataset][RandomForestClassifier] loan approval example",
+  "version": "v1",
   "input_schema": [
     {
       "name": "creditScore",
@@ -156,25 +157,17 @@ forget chose the type of binary (`skl`: scikit-learn predictor, `xgb`: XGBoost s
     }
   ],
   "output_schema": {
-        "attributes": [
-            {
-                "name": "prediction",
-                "type": "string"
-            },
-            {
-                "name": "probabilities",
-                "type": "[Probability]"
-            }
-        ]
+      "predictions": {
+        "type": "string"
+      },
+      "scores": {
+        "type": "[float]"
+      }
   },
   "metadata": {
     "description": "Loan payment classification",
     "author": "Somebody",
     "trained_at": "2020-03-17 13:25:23",
-    "class_names": {
-      "0": "false",
-      "1": "true"
-    },
     "metrics": [
       {
         "name":  "accuracy",
@@ -185,23 +178,14 @@ forget chose the type of binary (`skl`: scikit-learn predictor, `xgb`: XGBoost s
 }
 ```
 
-ML model is uniquely identified by its `name` and its `version`.
+Endpoint configuration:
 
-ML models are python classes. Local provider needs to know the `method_name` of prediction method.
-
-`input_schema` is used as lookup table which local provider use to find type/position of
-each feature. `type` needs to be a type alias in `numpy`module.
-
-`output_schema` configures result formats for the most common use cases.
-
-`metadata` needs to have `description`, `trained_at`, `author` and associated `metrics`.
-
-`class_names` is optional. It is a lookup table defined as class index <-> class name.
-It is used in classifications when the output relies on class index.
-
-Note: json does not support int as mapping key. For this reason,
-in the example we used `"0"` and `"1"` instead of `0` and `1`.
-
+```json
+{
+    "name": "[sample][miniloan-dataset][RandomForestClassifier] example endpoint for loan approval",
+    "status": "creating"
+}
+```
 
 ### Invoking a model - POST /invocations
 
