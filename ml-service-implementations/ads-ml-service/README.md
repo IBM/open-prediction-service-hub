@@ -99,146 +99,27 @@ Structure of json object:
                         └── 'value'
 ```
 
-The request body of the adding model request is an archive pickle file.
+#### Add an endpoint `/endpoints` `POST`
 
-Structure of archive file:
-```
-<archive-file-name>.pkl
-    └── Dict
-        ├── 'model': ml_model
-        └── 'model_config': configuration
-```
-where:
-- `ml_model`: trained python class model to be added
-- `configuration`: json object with the below structure
+After adding model information, if success, it can be listed by `/models` `GET`.
+This will give you important information about model which is added 
+during model creation: the "id" of the model.
+
+The request body of the endpoint adding request is also a simple json object.
+
+Structure of json object:
+
 ```
 └── Dict
-    ├── 'name': 'model name'     // name & version uniquely define model
-    ├── 'version': 'v0'          // name & version uniquely define model
-    ├── 'method_name': 'predict' // method name to be called for predictions
-    ├── 'input_schema'           // input features schema
-        └── Array
-            └── Dict
-                ├── 'name'
-                ├── 'order'
-                └── 'type'
-    ├── 'output_schema':        // output format of most common use cases
-        └── Dict
-            ├── 'attributes'
-                └── Array
-                    └── Dict
-                        ├── 'name'
-                        └── 'type'
-    └── 'metadata':
-        └── Dict
-            ├── 'description': 'model description'
-            ├── 'author': 'model author'
-            ├── 'trained_at': '2020-03-17 13:25:23'
-            ├── 'class_names':              // OPTIONAL
-                └── Dict                    // classification labels
-                        ├── '0': 'label_0'  // "VALUE": "LABEL"
-                        └── '1': 'label_1'
-            └── 'metrics':
-                └── Array
-                    └── Dict
-                        ├── 'name'
-                        └── 'value'
-            
+    ├── 'name': 'model name'    // required
+    ├── 'status': 'creating'    // required
 ```
-#### Available Output formats
 
+After adding endpoint metadata, if success, it can be listed by `/endpoints` `GET`.
+You can also get the `ìd` of the previous added endpoint.
 
-<table>
-    <tr>
-        <th>output type</th>
-        <th>format</th>
-        <th>
-            corresponding output 
-            example
-        </th>
-    </tr>
-<tr>
-<td>
-regression
-</td>
-<td>
-<pre lang="json">
-[
-    {
-        "name": "prediction",
-        "type": "float"
-    }
-]
-</pre>
-</td>
-<td>
-<pre lang="json">
-{
-  "prediction": 128.0
-}
-</pre>
-</tr>
-<tr>
-<td>
-classification
-</td>
-<td>
-<pre lang="json">
-[
-    {
-        "name": "prediction",
-        "type": "string"
-    }
-]
-</pre>
-</td>
-<td>
-<pre lang="json">
-{
-  "prediction": "true"
-}
-</pre>
-</tr>
-<tr>
-<td>
-classification
-with probabilities
-</td>
-<td>
-<pre lang="json">
-[
-    {
-        "name": "prediction",
-        "type": "string"
-    },
-    {
-        "name": "probabilities",
-        "type": "[Probability]"
-    }
-]
-</pre>
-</td>
-<td>
-<pre lang="json">
-{
-    "prediction": "true",
-    "probabilities": [
-        {
-          "class_name": "true",
-          "class_index": 1,
-          "value": 0.66
-        },
-        {
-          "class_name": "false",
-          "class_index": 0,
-          "value": 0.34
-        }
-    ]
-}
-</pre>
-</tr>
-</table>
-
+The last step is to upload model binary to `/endpoints/{endpoint_id}` `POST`. Do not
+forget chose the type of binary (`skl`: scikit-learn predictor, `xgb`: XGBoost saved model)
 
 #### Configuration example for miniloan fraud detection
 
