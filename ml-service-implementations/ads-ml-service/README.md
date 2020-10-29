@@ -187,64 +187,67 @@ Endpoint configuration:
 }
 ```
 
-### Invoking a model - POST /invocations
+### Invoking a model - `/predictions` `POST`
 
-The request body of the adding model request is a JSON object with the following structure.
+The request body of the invocation request is a JSON object with the following structure.
 ```
 └── Dict
-    ├── 'model_name': 'model name'     // name & version uniquely define model
-    ├── 'model_version': 'v0'          // name & version uniquely define model
-    └── 'params'                       // input features names and values
+    ├── 'target'
+        └── Array
+            └── Dict
+                ├── 'ref': 'endpoint'
+                └── 'href' 'href': '/endpoints/{id}'
+    └── 'params'
         └── Array
             └── Dict
                 ├── 'name'
-                └── 'value'  
+                └── 'value'
 ```
+
+`{id}` is the id of the endpoint
 
 #### Example of model invocation
 
 Request body
 ```json
 {
-  "model_name": "miniloan-rfc",
-  "model_version": "v0",
-  "params": [
-        {
-            "name": "creditScore",
-            "value": 400
-        }, {
-            "name": "income",
-            "value": 45000
-        }, {
-            "name": "loanAmount",
-            "value": 100000
-        }, {
-            "name": "monthDuration",
-            "value": 24
-        }, {
-            "name": "rate",
-            "value": 2.0
-        }
-    ]
+  "target": [
+    {
+      "rel": "endpoint",
+      "href": "/endpoints/4"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "creditScore",
+      "value": 200
+    },{
+      "name": "income",
+      "value": 50000
+    },{
+      "name": "loanAmount",
+      "value": 50000
+    },{
+      "name": "monthDuration",
+      "value": 48
+    },{
+      "name": "rate",
+      "value": 2.8
+    }
+  ]
 }
 ```
 
 Response body may look like:
 ```json
 {
-    "prediction": "true",
-    "probabilities": [
-        {
-          "class_name": "true",
-          "class_index": 1,
-          "value": 0.66
-        },
-        {
-          "class_name": "false",
-          "class_index": 0,
-          "value": 0.34
-        }
-    ]   
+  "result": {
+    "predictions": "true",
+    "scores": [
+      0.2016910870991424,
+      0.7983089129008577
+    ]
+  }
 }
 ```
 
