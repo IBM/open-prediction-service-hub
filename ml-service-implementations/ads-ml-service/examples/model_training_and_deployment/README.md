@@ -15,29 +15,17 @@ inside `<type>/` is a separate deployment project.
 
 ### Deployment projects
 
-Each project contains 2 python scripts and 1 example configuration file. 
+Each project contains a python scripts and an example configuration file. 
 
 project structure:
 ```
 **/<type>/project
     └── training.py
-    ├── deployment.py
     └── deployment_conf.json
 ```
 
 `training.py` trains an example ML model and stores the model in
-`<dataset>-<algo>-model.pkl`. `deployment.py` uses trained model and
-`deployment_conf.json` to generated an archive `<dataset>-<algo>-archive.pkl`. 
-This archive can be later uploaded to the web service.
- 
-
-Structure of archive file:
-```
-<dataset>-<algo>-archive.pkl
-    └── Dict
-        ├── 'model': ml_model
-        └── 'model_config': configurations
-```
+`model.[pkl, bst]`.
 
 Documents for `deployment_conf.json` can be found:
 [Configuration](../../README.md#Open-Prediction-Service)
