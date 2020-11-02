@@ -23,7 +23,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import train_test_split
 
 
 def main():
@@ -60,42 +60,25 @@ def main():
     logger.debug(f'training size: {len(train)}')
     logger.debug(f'validation size: {len(test)}')
 
-    params = {
-        'estimator': RandomForestRegressor(random_state=0),
-        'cv': 3,
-        'verbose': 0,
-        'n_jobs': -1,
-        'error_score': 'raise',
-        'random_state': 42,
-        'n_iter': 10,
-        'param_distributions': {
-            'criterion': ['mse'],
-            'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
-            'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
-            'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
-        }
-    }
-
-    parameter_estimator = RandomizedSearchCV(**params)
-
     x_train = train.loc[:, used_names[:-1]]
     y_train = train.loc[:, used_names[-1]]
 
-    parameter_estimator.fit(x_train, y_train)
-    best_estimator = RandomForestRegressor(
+    estimator = RandomForestRegressor(
         random_state=42,
-        **parameter_estimator.best_params_
+        n_estimators=500,
+        min_samples_split=8,
+        min_samples_leaf=5
     )
 
-    best_estimator.fit(x_train, y_train)
+    estimator.fit(x_train, y_train)
 
-    acc = best_estimator.score(test.loc[:, used_names[:-1]],
-                               test.loc[:, used_names[-1]])
-    logger.debug(f'coefficient of determination R^2: {acc}')
+    score = estimator.score(test.loc[:, used_names[:-1]],
+                            test.loc[:, used_names[-1]])
+    logger.debug(f'coefficient of determination R^2: {score}')
 
     with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
-            obj=best_estimator,
+            obj=estimator,
             file=fd
         )
 
