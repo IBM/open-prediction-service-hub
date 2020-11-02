@@ -22,7 +22,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import LinearSVC
 
 
@@ -60,47 +62,32 @@ def main():
     logger.debug(f'training size: {len(train)}')
     logger.debug(f'validation size: {len(test)}')
 
-    params = {
-        'estimator': LinearSVC(random_state=42, dual=False),
-        'cv': 3,
-        'verbose': 0,
-        'n_jobs': -1,
-        'random_state': 21,
-        'n_iter': 5e03,
-        'scoring': 'accuracy',
-        'error_score': 'raise',
-        'param_distributions': {
-            'penalty': ['l1'],
-            'loss': ['squared_hinge'],
-            'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
-            'C': [x for x in np.linspace(1e-5, 1.0, num=1000)]
-        },
-    }
-
-    parameter_estimator = RandomizedSearchCV(**params)
-
     x_train = train.loc[:, used_names[:-1]]
     y_train = train.loc[:, used_names[-1]]
 
-    parameter_estimator.fit(x_train, y_train)
-    best_estimator = LinearSVC(
+    estimator = LinearSVC(
         random_state=42,
         dual=False,
-        **parameter_estimator.best_params_
+        penalty='l1',
+        loss='squared_hinge'
     )
+    steps = [('scaler', StandardScaler()),
+             ('model', estimator)]
+    pipeline = Pipeline(steps)
 
-    best_estimator.fit(x_train, y_train)
+    pipeline.fit(x_train, y_train)
 
-    acc = best_estimator.score(test.loc[:, used_names[:-1]],
+    acc = pipeline.score(test.loc[:, used_names[:-1]],
                                test.loc[:, used_names[-1]])
-    logger.debug(f'accuracy: {acc}')
+    logger.info(f'accuracy: {acc}')
 
     with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
-            obj=best_estimator,
+            obj=pipeline,
             file=fd
         )
 
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     main()
