@@ -24,6 +24,8 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
 
@@ -52,19 +54,23 @@ def main():
     logger.debug(f'training size: {len(train)}')
     logger.debug(f'validation size: {len(test)}')
 
+    steps = [('scaler', StandardScaler()),
+             ('m', SVC(random_state=42))]
+    pipeline = Pipeline(steps)
+
     params = {
-        'estimator': SVC(random_state=42),
+        'estimator': pipeline,
         'cv': 3,
         'random_state': 21,
-        'n_iter': 5e03,
+        'n_iter': 1000,
         'scoring': 'accuracy',
         'error_score': 'raise',
         'param_distributions': {
-            'C': [x for x in np.linspace(1e-5, 1.0, num=1000)],
-            'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
-            'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'rbf']
+            'm__C': [x for x in np.linspace(1e-5, 1.0, num=1000)],
+            'm__tol': [x for x in np.linspace(1e-5, 1.0, num=1000)],
+            'm__kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'rbf']
         },
-        'verbose': 0,
+        'verbose': 1,
         'n_jobs': -1
     }
 
@@ -74,16 +80,11 @@ def main():
     y_train = train.loc[:, col_names[-1]]
 
     parameter_estimator.fit(x_train, y_train)
-    best_estimator = SVC(
-        random_state=42,
-        **parameter_estimator.best_params_
-    )
-
-    best_estimator.fit(x_train, y_train)
+    best_estimator = parameter_estimator.best_estimator_
 
     acc = best_estimator.score(test.loc[:, col_names[:-1]],
                                test.loc[:, col_names[-1]])
-    logger.debug(f'accuracy: {acc}')
+    logger.info(f'accuracy: {acc}')
 
     with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
@@ -93,4 +94,5 @@ def main():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     main()
