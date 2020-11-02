@@ -64,29 +64,7 @@ def main():
     logger.info(f'training size: {len(x_test)}')
     logger.info(f'validation size: {len(y_test)}')
 
-    params = {
-        'estimator': xgboost.XGBClassifier(random_state=42),
-        'cv': 3,
-        'verbose': 0,
-        'n_jobs': -1,
-        'random_state': 21,
-        'n_iter': 5e02,
-        'scoring': 'accuracy',
-        'error_score': 'raise',
-        'param_distributions': {
-            'colsample_bytree': [x for x in np.linspace(1E-4, 1.0, num=1000)],
-            'learning_rate': [x for x in np.linspace(1E-4, 1.0, num=1000)],
-            'max_depth': [int(x) for x in np.linspace(3, 20, num=10)],
-        },
-    }
-
-    parameter_estimator = model_selection.RandomizedSearchCV(**params)
-
-    parameter_estimator.fit(x_train, y_train)
-    best_estimator = xgboost.XGBClassifier(
-        random_state=42,
-        **parameter_estimator.best_params_
-    )
+    best_estimator = xgboost.XGBClassifier(random_state=42)
 
     best_estimator.fit(x_train, y_train)
 
