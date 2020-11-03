@@ -1,0 +1,12 @@
+{
+  "model": {
+    "name": "[IdentityPredictor] Model for custom ml model example",
+    "metadata": {
+      "description": "Return the same input to output"
+    }
+  },
+  "endpoint": {
+    "name": "[IdentityPredictor] Endpoint for custom model",
+    "status": "creating"
+  }
+}
