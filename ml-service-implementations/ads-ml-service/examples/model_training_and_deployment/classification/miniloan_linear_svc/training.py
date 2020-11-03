@@ -18,24 +18,21 @@
 import logging
 import pickle
 import sys
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pandas as pd
-from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import LinearSVC
+import sklearn.model_selection as model_selection
+import sklearn.pipeline as skl_pipeline
+import sklearn.preprocessing as skl_preprocessing
+import sklearn.svm as skl_svm
 
 
 def main():
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    logger = logging.getLogger(__name__)
-
     names = ['name', 'creditScore', 'income', 'loanAmount', 'monthDuration', 'approval', 'rate', 'yearlyReimbursement']
     used_names = ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'approval']
 
-    miniloan_file = Path(__file__).resolve().parents[3].joinpath('data').joinpath('miniloan-decisions-ls-10K.csv')
+    miniloan_file = pathlib.Path(__file__).resolve().parents[3].joinpath('data').joinpath('miniloan-decisions-ls-10K.csv')
 
     data = pd.read_csv(
         miniloan_file,
@@ -57,37 +54,50 @@ def main():
         [np.inf, -np.inf], np.nan
     ).dropna().loc[:, used_names]
 
-    train, test = train_test_split(data, random_state=7)
+    train, test = model_selection.train_test_split(data, random_state=7)
 
-    logger.debug(f'training size: {len(train)}')
-    logger.debug(f'validation size: {len(test)}')
+    logger.info(f'Training size: {len(train)}')
+    logger.info(f'Validation size: {len(test)}')
 
     x_train = train.loc[:, used_names[:-1]]
     y_train = train.loc[:, used_names[-1]]
 
-    estimator = LinearSVC(
-        random_state=42,
-        dual=False,
-        penalty='l1',
-        loss='squared_hinge'
+    steps = [('scale', skl_preprocessing.StandardScaler()),
+             ('model', skl_svm.LinearSVC(random_state=42))]
+    pipeline = skl_pipeline.Pipeline(steps)
+
+    parameter_estimator = model_selection.RandomizedSearchCV(
+        **{
+            'estimator': pipeline,
+            'cv': 3,
+            'verbose': 1,
+            'n_jobs': -1,
+            'random_state': 7,
+            'n_iter': 1000,
+            'error_score': 'raise',
+            'param_distributions': {
+                'model__loss': ['squared_hinge'],
+                'model__tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
+                'model__C': [x for x in np.linspace(1e-5, 1.0, num=1000)]
+            }
+        }
     )
-    steps = [('scaler', StandardScaler()),
-             ('model', estimator)]
-    pipeline = Pipeline(steps)
+    parameter_estimator.fit(x_train, y_train)
+    logger.info(f'Best parameters: {parameter_estimator.best_params_}')
+    estimator = parameter_estimator.best_estimator_
 
-    pipeline.fit(x_train, y_train)
-
-    acc = pipeline.score(test.loc[:, used_names[:-1]],
-                               test.loc[:, used_names[-1]])
+    acc = estimator.score(test.loc[:, used_names[:-1]],
+                         test.loc[:, used_names[-1]])
     logger.info(f'accuracy: {acc}')
 
-    with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
+    with pathlib.Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
-            obj=pipeline,
+            obj=estimator,
             file=fd
         )
 
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    logger = logging.getLogger(__name__)
     main()
