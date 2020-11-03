@@ -26,7 +26,6 @@ import pandas as pd
 import sklearn.model_selection as model_selection
 import xgboost
 
-logger = logging.getLogger(__name__)
 FILE_PATH = pathlib.Path(__file__).resolve()
 
 
@@ -61,18 +60,44 @@ def main():
     y = data.loc[:, used_names[-1]].to_numpy()
     x_train, x_test, y_train, y_test = model_selection.train_test_split(x, y, random_state=7)
 
-    logger.info(f'training size: {len(x_test)}')
-    logger.info(f'validation size: {len(y_test)}')
+    logger.info(f'Training size: {len(y_train)}')
+    logger.info(f'Validation size: {len(y_test)}')
 
-    best_estimator = xgboost.XGBClassifier(random_state=42)
+    # parameter_estimator = model_selection.RandomizedSearchCV(
+    #     **{
+    #         'estimator': xgboost.XGBClassifier(random_state=42),
+    #         'cv': 3,
+    #         'verbose': 1,
+    #         'n_jobs': -1,
+    #         'random_state': 7,
+    #         'n_iter': 1000,
+    #         'error_score': 'raise',
+    #         'param_distributions': {
+    #             'colsample_bytree': [x for x in np.linspace(1E-4, 1.0, num=100)],
+    #             'learning_rate': [x for x in np.linspace(1E-4, 1.0, num=100)],
+    #             'max_depth': [int(x) for x in np.linspace(2, 20, num=10)]
+    #         }
+    #     }
+    # )
+    # parameter_estimator.fit(x_train, y_train)
+    # logger.info(f'Best parameters: {parameter_estimator.best_params_}')
+    # estimator = parameter_estimator.best_estimator_
 
-    best_estimator.fit(x_train, y_train)
+    # Uncomment lines above to activate HPO
+    estimator = xgboost.XGBClassifier(
+        max_depth=6,
+        learning_rate=0.6667,
+        colsample_bytree=0.8686999999999999
+    )
 
-    logger.info(f'accuracy: {best_estimator.score(x_test, y_test)}')
+    estimator.fit(x_train, y_train)
 
-    best_estimator.save_model(fname=FILE_PATH.parent.joinpath('model.bst').__str__())
+    logger.info(f'Accuracy: {estimator.score(x_test, y_test)}')
+
+    estimator.save_model(fname=FILE_PATH.parent.joinpath('model.bst').__str__())
 
 
 if __name__ == '__main__':
+    logger = logging.getLogger(__name__)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     main()
