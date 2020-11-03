@@ -21,6 +21,7 @@ import pathlib
 import subprocess
 import typing as typ
 
+import yaml
 import fastapi.encoders as encoders
 import sqlalchemy.orm as saorm
 
@@ -118,13 +119,13 @@ def load_models(
 def init_db(db: saorm.Session):
     db_base.Base.metadata.create_all(bind=db_session.engine)
 
+    with PROJECT_ROOT.joinpath('preload-conf.yaml').open(mode='r') as fd:
+        project_paths = yaml.load(fd)
+
     # load example ml model
     load_models(
         db, [
-            EXAMPLES_ROOT.joinpath('classification', 'miniloan_linear_svc'),
-            EXAMPLES_ROOT.joinpath('classification', 'miniloan_xgb'),
-            EXAMPLES_ROOT.joinpath('regression', 'miniloan_rfr'),
-            EXAMPLES_ROOT.joinpath('classification_with_probabilities', 'miniloan_rfc')
+             PROJECT_ROOT.joinpath(p) for p in project_paths
         ]
     )
 
