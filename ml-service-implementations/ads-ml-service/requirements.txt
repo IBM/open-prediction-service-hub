@@ -21,8 +21,11 @@ tenacity~=6.2.0
 pyjwt~=1.7.1
 passlib[bcrypt]~=1.7.2
 
+# Read configuration files
+PyYAML~=5.3.1
+
 ## Testes
-pytest
+pytest~=6.1.1
 
 ## Raw interface for model serving
 --editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=sklearnserver&subdirectory=python/sklearnserver

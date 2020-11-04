@@ -21,6 +21,7 @@ import pathlib
 import subprocess
 import typing as typ
 
+import yaml
 import fastapi.encoders as encoders
 import sqlalchemy.orm as saorm
 
@@ -118,15 +119,16 @@ def load_models(
 def init_db(db: saorm.Session):
     db_base.Base.metadata.create_all(bind=db_session.engine)
 
-    # load example ml model
-    load_models(
-        db, [
-            EXAMPLES_ROOT.joinpath('classification', 'miniloan_linear_svc'),
-            EXAMPLES_ROOT.joinpath('classification', 'miniloan_xgb'),
-            EXAMPLES_ROOT.joinpath('regression', 'miniloan_rfr'),
-            EXAMPLES_ROOT.joinpath('classification_with_probabilities', 'miniloan_rfc')
-        ]
-    )
+    with PROJECT_ROOT.joinpath('preload-conf.yaml').open(mode='r') as fd:
+        preload_conf = yaml.load(fd, yaml.SafeLoader)
+
+    if preload_conf.get('models') is not None and len(preload_conf.get('models')) > 0:
+        # load example ml model
+        load_models(
+            db, [
+                 PROJECT_ROOT.joinpath(p) for p in preload_conf.get('models')
+            ]
+        )
 
     user = crud.user.get_by_username(db, username=conf.get_config().DEFAULT_USER)
     if user is None:
