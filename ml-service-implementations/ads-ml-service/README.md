@@ -360,3 +360,12 @@ If new dependencies are added, you need to stop the running container and build 
 You can find examples of models ready to be added to your OPS instance in 
 [examples/model_training_and_deployment/](examples/model_training_and_deployment/README.md) folder.
 
+
+## Configure pre-loaded model
+ads-ml-service preloads some sample models. This behaviour can be configured by
+`preload-conf.yaml`.
+
+A pre-loaded model needs to:
+1. have a deployment configuration file `deployment_conf.json` located in the same directory
+2. have a binary model `model.pkl` or `model.bst` (**\[Optional\]** binary model can be replaced by a `train.py`)
+3. register its relative (relative to `ads-ml-service/`) path in `preload-conf.yaml`
