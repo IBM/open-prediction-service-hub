@@ -43,7 +43,7 @@ FROM python-base AS runtime-image
 ENV \
     MODEL_STORAGE="/var/lib/ads-ml-service" \
     RETRAIN_MODELS=FALSE \
-    SSL_SETTINGS="/etc/ads-ml-service" \
+    SETTINGS="/etc/ads-ml-service" \
     ENABLE_SSL=FALSE
     # ENV GUNICORN_TIMEOUT=30
     # ENV GUNICORN_WORKER_NUM=16
@@ -66,14 +66,14 @@ RUN \
     mkdir -p ${MODEL_STORAGE} && \
     chown --recursive ops:root ${MODEL_STORAGE} && \
     chmod --recursive g=u ${MODEL_STORAGE} && \
-    mkdir -p ${SSL_SETTINGS} && \
-    chown --recursive ops:root ${SSL_SETTINGS} && \
-    chmod --recursive g=u ${SSL_SETTINGS} && \
+    mkdir -p ${SETTINGS} && \
+    chown --recursive ops:root ${SETTINGS} && \
+    chmod --recursive g=u ${SETTINGS} && \
     chown --recursive ops:root ${CUSTOM_MODULES} && \
     chmod --recursive g=u ${CUSTOM_MODULES}
 
 VOLUME ${MODEL_STORAGE}
-VOLUME ${SSL_SETTINGS}
+VOLUME ${SETTINGS}
 VOLUME ${CUSTOM_MODULES}
 
 USER ops
