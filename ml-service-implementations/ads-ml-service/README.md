@@ -29,7 +29,7 @@ docker build -t ads-ml-service .
 To run the microservice
 
 ```sh
-docker run --rm -it -p 8080:8080 --name ads-ml-service ads-ml-service
+docker run --rm --read-only -it -p 8080:8080 --name ads-ml-service ads-ml-service
 ```
 
 To check that you have a running container
