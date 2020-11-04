@@ -369,3 +369,7 @@ A pre-loaded model needs to:
 1. have a deployment configuration file `deployment_conf.json` located in the same directory
 2. have a binary model `model.pkl` or `model.bst` (**\[Optional\]** binary model can be replaced by a `train.py`)
 3. register its relative (relative to `ads-ml-service/`) path in `preload-conf.yaml`
+
+## Configure custom python modules
+Additional python modules can be added in `custom_modules`. Modules and packages in this
+directory can be imported during model invocation. 
