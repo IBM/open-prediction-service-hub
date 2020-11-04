@@ -45,7 +45,7 @@ def test_cascade_delete_with_binary(
 ) -> typing.NoReturn:
     binary_in = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(classification_predictor),
-        library=supported_lib.MlLib.SKLearn
+        library=supported_lib.MlLib.NDARRAY_SKL
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_in, endpoint_id=endpoint_in_db.id)
     crud.endpoint.delete(db, id=endpoint_in_db.id)
