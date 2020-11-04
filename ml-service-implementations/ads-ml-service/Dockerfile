@@ -54,6 +54,14 @@ RUN \
     chmod --recursive g=u ${OPS_HOME}
 
 
+ENV CUSTOM_MODULES='/var/lib/ads-ml-service/custom'
+ENV PYTHONPATH="${CUSTOM_MODULES}:${PYTHONPATH}"
+COPY custom_modules ${CUSTOM_MODULES}
+RUN chown --recursive ops:root ${CUSTOM_MODULES} && \
+    chmod --recursive g=u ${CUSTOM_MODULES}
+VOLUME ${CUSTOM_MODULES}
+
+
 USER ops
 EXPOSE 8080
 WORKDIR ${OPS_HOME}/app
