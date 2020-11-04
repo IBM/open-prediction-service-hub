@@ -22,9 +22,11 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
-from sklearn.svm import SVC
+import sklearn.datasets as skl_datasets
+import sklearn.model_selection as skl_model_selection
+import sklearn.pipeline as skl_pipeline
+import sklearn.preprocessing as skl_preprocessing
+import sklearn.svm as skl_svm
 
 
 def main():
@@ -34,7 +36,7 @@ def main():
     col_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'target']
 
     data = pd.DataFrame(
-        data=np.c_[load_iris()['data'], load_iris()['target']],
+        data=np.c_[skl_datasets.load_iris()['data'], skl_datasets.load_iris()['target']],
         columns=col_names
     ).replace(
         [np.inf, -np.inf],
@@ -42,48 +44,46 @@ def main():
     ).dropna().replace(
         {
             'target': {
-                i: val for i, val in enumerate(load_iris().target_names)
+                i: val for i, val in enumerate(skl_datasets.load_iris().target_names)
             }
         }
     )
 
-    train, test = train_test_split(data, random_state=7)
+    train, test = skl_model_selection.train_test_split(data, random_state=7)
 
-    logger.debug(f'training size: {len(train)}')
-    logger.debug(f'validation size: {len(test)}')
+    logger.info(f'Training size: {len(train)}')
+    logger.info(f'Validation size: {len(test)}')
 
-    params = {
-        'estimator': SVC(random_state=42),
-        'cv': 3,
-        'random_state': 21,
-        'n_iter': 5e03,
-        'scoring': 'accuracy',
-        'error_score': 'raise',
-        'param_distributions': {
-            'C': [x for x in np.linspace(1e-5, 1.0, num=1000)],
-            'tol': [x for x in np.linspace(1e-5, 5e-1, num=1000)],
-            'kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'rbf']
-        },
-        'verbose': 0,
-        'n_jobs': -1
-    }
-
-    parameter_estimator = RandomizedSearchCV(**params)
+    steps = [('scale', skl_preprocessing.StandardScaler()),
+             ('model', skl_svm.SVC(random_state=42))]
+    pipeline = skl_pipeline.Pipeline(steps)
 
     x_train = train.loc[:, col_names[:-1]]
     y_train = train.loc[:, col_names[-1]]
 
-    parameter_estimator.fit(x_train, y_train)
-    best_estimator = SVC(
-        random_state=42,
-        **parameter_estimator.best_params_
+    parameter_estimator = skl_model_selection.RandomizedSearchCV(
+        **{
+            'estimator': pipeline,
+            'cv': 3,
+            'verbose': 1,
+            'n_jobs': -1,
+            'random_state': 7,
+            'n_iter': 5000,
+            'error_score': 'raise',
+            'param_distributions': {
+                'model__C': [x for x in np.linspace(1e-5, 1.0, num=1000)],
+                'model__tol': [x for x in np.linspace(1e-5, 1.0, num=1000)],
+                'model__kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'rbf']
+            }
+        }
     )
 
-    best_estimator.fit(x_train, y_train)
+    parameter_estimator.fit(x_train, y_train)
+    best_estimator = parameter_estimator.best_estimator_
 
     acc = best_estimator.score(test.loc[:, col_names[:-1]],
                                test.loc[:, col_names[-1]])
-    logger.debug(f'accuracy: {acc}')
+    logger.info(f'Accuracy: {acc}')
 
     with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
@@ -93,4 +93,5 @@ def main():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     main()

@@ -1,6 +1,6 @@
 {
   "model": {
-    "name": "[sample][miniloan-dataset][RandomForestRegressor] loan approval example",
+    "name": "[RandomForestRegressor] loan approval example",
     "version": "v1",
     "input_schema": [
       {
@@ -45,7 +45,7 @@
     }
   },
   "endpoint": {
-    "name": "[sample][miniloan-dataset][RandomForestRegressor] example endpoint for yearlyReimbursement Evaluation",
+    "name": "[RandomForestRegressor] example endpoint for yearlyReimbursement Evaluation",
     "status": "creating"
   }
 }

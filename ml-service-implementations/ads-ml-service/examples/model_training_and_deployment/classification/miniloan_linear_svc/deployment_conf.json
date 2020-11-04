@@ -1,6 +1,6 @@
 {
   "model": {
-    "name": "[sample][miniloan-dataset][LinearSVC] loan approval example",
+    "name": "[LinearSVC] loan approval example",
     "version": "v1",
     "input_schema": [
       {
@@ -45,7 +45,7 @@
     }
   },
   "endpoint": {
-    "name": "[sample][miniloan-dataset][LinearSVC] example endpoint for loan approval",
+    "name": "[LinearSVC] example endpoint for loan approval",
     "status": "creating"
   }
 }
