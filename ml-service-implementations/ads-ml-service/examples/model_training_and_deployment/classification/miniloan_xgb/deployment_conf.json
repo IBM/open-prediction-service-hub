@@ -1,6 +1,6 @@
 {
   "model": {
-    "name": "[sample][miniloan-dataset][XGBClassifier] loan approval example",
+    "name": "[XGBClassifier] loan approval example",
     "version": "v1",
     "input_schema": [
       {
@@ -45,7 +45,7 @@
     }
   },
   "endpoint": {
-    "name": "[sample][miniloan-dataset][XGBClassifier] example endpoint for loan approval",
+    "name": "[XGBClassifier] example endpoint for loan approval",
     "status": "creating"
   }
 }

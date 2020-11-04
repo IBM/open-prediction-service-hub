@@ -1,6 +1,6 @@
 {
   "model": {
-    "name": "[sample][iris-dataset][SVC] iris classification example",
+    "name": "[SVC] iris classification example",
     "version": "v1",
     "input_schema": [
       {
@@ -40,7 +40,7 @@
     }
   },
   "endpoint": {
-    "name": "[sample][iris-dataset][SVC] example endpoint for iris classification",
+    "name": "[SVC] example endpoint for iris classification",
     "status": "creating"
   }
 }

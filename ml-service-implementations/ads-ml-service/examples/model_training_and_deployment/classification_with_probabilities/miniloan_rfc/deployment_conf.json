@@ -1,6 +1,6 @@
 {
   "model": {
-    "name": "[sample][miniloan-dataset][RandomForestClassifier] loan approval example",
+    "name": "[RandomForestClassifier] loan approval example",
     "version": "v1",
     "input_schema": [
       {
@@ -48,7 +48,7 @@
     }
   },
   "endpoint": {
-    "name": "[sample][miniloan-dataset][RandomForestClassifier] example endpoint for loan approval",
+    "name": "[RandomForestClassifier] example endpoint for loan approval",
     "status": "creating"
   }
 }

@@ -18,22 +18,19 @@
 import logging
 import pickle
 import sys
-from pathlib import Path
+import pathlib
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+import sklearn.model_selection as model_selection
+import sklearn.ensemble as skl_ensemble
 
 
 def main():
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    logger = logging.getLogger(__name__)
-
     names = ['name', 'creditScore', 'income', 'loanAmount', 'monthDuration', 'approval', 'rate', 'yearlyReimbursement']
     used_names = ['creditScore', 'income', 'loanAmount', 'monthDuration', 'rate', 'approval']
 
-    miniloan_file = Path(__file__).resolve().parents[3].joinpath('data').joinpath('miniloan-decisions-ls-10K.csv')
+    miniloan_file = pathlib.Path(__file__).resolve().parents[3].joinpath('data').joinpath('miniloan-decisions-ls-10K.csv')
 
     data = pd.read_csv(
         miniloan_file,
@@ -55,51 +52,57 @@ def main():
         [np.inf, -np.inf], np.nan
     ).dropna().loc[:, used_names]
 
-    train, test = train_test_split(data, random_state=7)
+    train, test = model_selection.train_test_split(data, random_state=7)
 
-    logger.debug(f'training size: {len(train)}')
-    logger.debug(f'validation size: {len(test)}')
-
-    params = {
-        'estimator': RandomForestClassifier(random_state=42),
-        'cv': 3,
-        'verbose': 0,
-        'n_jobs': -1,
-        'random_state': 21,
-        'n_iter': 5,
-        'scoring': 'accuracy',
-        'error_score': 'raise',
-        'param_distributions': {
-            'criterion': ['gini'],
-            'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
-            'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
-            'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
-        }
-    }
-
-    parameter_estimator = RandomizedSearchCV(**params)
+    logger.info(f'Training size: {len(train)}')
+    logger.info(f'Validation size: {len(test)}')
 
     x_train = train.loc[:, used_names[:-1]]
     y_train = train.loc[:, used_names[-1]]
 
-    parameter_estimator.fit(x_train, y_train)
-    best_estimator = RandomForestClassifier(
+    # parameter_estimator = model_selection.RandomizedSearchCV(
+    #     **{
+    #         'estimator': skl_ensemble.RandomForestClassifier(random_state=42),
+    #         'cv': 3,
+    #         'verbose': 1,
+    #         'n_jobs': -1,
+    #         'random_state': 7,
+    #         'n_iter': 1000,
+    #         'error_score': 'raise',
+    #         'param_distributions': {
+    #             'criterion': ['gini'],
+    #             'n_estimators': [int(x) for x in np.linspace(50, 1000, num=20)],
+    #             'min_samples_split': [int(x) for x in np.linspace(2, 64, num=50)],
+    #             'min_samples_leaf': [int(x) for x in np.linspace(1, 32, num=20)]
+    #         }
+    #     }
+    # )
+    # parameter_estimator.fit(x_train, y_train)
+    # logger.info(f'Best parameters: {parameter_estimator.best_params_}')
+    # estimator = parameter_estimator.best_estimator_
+
+    # Uncomment lines above to activate HPO
+    estimator = skl_ensemble.RandomForestClassifier(
         random_state=42,
-        **parameter_estimator.best_params_
+        n_estimators=650,
+        min_samples_split=2,
+        min_samples_leaf=1
     )
 
-    best_estimator.fit(x_train, y_train)
+    estimator.fit(x_train, y_train)
 
-    acc = best_estimator.score(test.loc[:, used_names[:-1]],
-                               test.loc[:, used_names[-1]])
-    logger.debug(f'accuracy: {acc}')
+    acc = estimator.score(test.loc[:, used_names[:-1]],
+                          test.loc[:, used_names[-1]])
+    logger.info(f'Accuracy: {acc}')
 
-    with Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
+    with pathlib.Path(__file__).resolve().parent.joinpath('model.pkl').open(mode='wb') as fd:
         pickle.dump(
-            obj=best_estimator,
+            obj=estimator,
             file=fd
         )
 
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    logger = logging.getLogger(__name__)
     main()
