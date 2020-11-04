@@ -26,13 +26,16 @@ Instructions to build an use are inside the [ops-client-sdk](ops-client-sdk) fol
 
 ## Open API specification
 
-The Open Prediction Service is available as an [Open API v3 specification](open-prediction-service.json). The specification has two main sections:
+The Open Prediction Service is available as an [Open API v3 specification](open-prediction-service.yaml). The specification has four main sections:
 
-- *Admin* section for describing endpoints for uploading, getting or deleting models into the the server.
-- *ML* section that covers the prediction call endpoint
+- *info* section for getting server information and capabilities.
+- *discover* section for getting models and endpoints.
+- *manage* section for adding, altering or deleting models and endpoints (If implemented).
+- *run* section for model invocation
 
 All the types manipulated by the different endpoints are described in the *Schemas* section below.
 
+<!---
 Python tests based on *pytest* are provided to insure integration in Decision Designer or Decision Runtime.
 
 ``` bash
@@ -41,42 +44,57 @@ pytest api-tests/ --url <ENPOINT_URL>
 # For example:
 pytest api-tests/ --url http://localhost:8080/
 ```
+-->
 
-![OpenAPI](doc/ops-OpenApi.jpg)
+![OpenAPI](doc/OPS-OpenApi.png)
 
-### *Admin* section
+### *info* section
 
-#### Status `/v1/status` `GET`
+#### `/capabilities` `GET`
 
-![status](doc/ops-status.jpg)
+![capabilities](doc/ops-capabilities-get.png)
 
-This endpoint can be used to test the availability of the service. It returns the number of models it is serving.
+This endpoint can be used to get a list of supported operation 
+(any subset of `{info, discover, manage, run}`) of the service.
 
-#### Models `/v1/models`
+#### `/info` `GET`
 
-##### Retrieve `GET` 
+![info](doc/ops-info-get.png)
 
-![ops-get-models](doc/ops-get-models.jpg)
+This endpoint can be used to test the availability of the service. 
+It returns runtime information.
 
-This endpoint will return the list of the models it is serving.
+### *discovery* section
 
-##### Upload `POST`
+This section is used to retrieve model & endpoint information. 
 
-![ops-post-models](doc/ops-post-models.jpg)
+* `/models[/{model_id}]` `GET`
+* `/endpoints[/{endpoint_id}]` `GET`
 
-This endpoint will allow to upload a pickle file as a new serving model.
+![ops-get-models](doc/ops-models-get.png)
+![ops-get-endpoints](doc/ops-endpoints-get.png)
 
-##### Remove `DELETE`
+Those endpoints will return the selected resources. Model is the
+input/output signature of predictive model and Endpoint is the "binary model".
+A predictive model is the combination of a model and an endpoint.
 
-##### ![ops-delete-models](doc/ops-delete-models.jpg)
+### *run* section
 
-This endpoint will remove a given model.
+#### `/predictions` `POST`
 
-#### *ML* section
+![ops-predictions-post](doc/ops-predictions-post.png)
 
-##### Call prediction `/v1/invocations` `POST`
+This endpoint serves all prediction requests. 
+Each invocation needs to contain endpoint information and model inputs that represented as key-value pairs.
 
-![ops-post-invocations](doc/ops-post-invocations.jpg)
+### *manage* section
+
+The section `manage` is not mandatory for OPS compatible implementations. It 
+is designed to facilitate the usage of non-proxy OPS implementations.
+
+This section allows model & endpoint to be created, altered, deleted at the runtime. 
+
+![ops-manage](doc/ops-manage.png)
 
 ### License
 Apache License Version 2.0, January 2004.
