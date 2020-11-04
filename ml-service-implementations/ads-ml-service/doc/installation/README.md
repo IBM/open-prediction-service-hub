@@ -150,7 +150,10 @@ ibm-cloud.kubernetes.io/external-ip: xxx.xxx.xxx.xxx
 ads-ml-service is available at `xxx.xxx.xxx.xxx` on port `30000`.
 
 
-# Security configuration
+# Security configuration [Experimental]
+
+<strong>This is an experimental feature and is not activated by default. Interfaces might change
+during development.</strong>
 
 Authentication and authorization is achieved by using username/password and 
 JWT tokens. Meanwhile, to prevent man-in-the-middle attack,
