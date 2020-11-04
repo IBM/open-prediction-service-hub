@@ -120,14 +120,15 @@ def init_db(db: saorm.Session):
     db_base.Base.metadata.create_all(bind=db_session.engine)
 
     with PROJECT_ROOT.joinpath('preload-conf.yaml').open(mode='r') as fd:
-        project_paths = yaml.load(fd)
+        preload_conf = yaml.load(fd, yaml.SafeLoader)
 
-    # load example ml model
-    load_models(
-        db, [
-             PROJECT_ROOT.joinpath(p) for p in project_paths
-        ]
-    )
+    if preload_conf.get('models') is not None and len(preload_conf.get('models')) > 0:
+        # load example ml model
+        load_models(
+            db, [
+                 PROJECT_ROOT.joinpath(p) for p in preload_conf.get('models')
+            ]
+        )
 
     user = crud.user.get_by_username(db, username=conf.get_config().DEFAULT_USER)
     if user is None:
