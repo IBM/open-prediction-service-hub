@@ -47,7 +47,7 @@ def _deserialize(db_obj: models.BinaryMlModel) -> kfserving_impl.InMemoryKFModel
             model.load()
         elif db_obj.library == supported_lib.MlLib.DATAFRAME_SKL:
             model = pipeline_model_wrapper.DataframeModel(
-                predictor_binary=bytearray(db_obj.model_b64)
+                predictor_binary=joblib.load(io.BytesIO(db_obj.model_b64))
             )
         else:
             raise fastapi.HTTPException(
