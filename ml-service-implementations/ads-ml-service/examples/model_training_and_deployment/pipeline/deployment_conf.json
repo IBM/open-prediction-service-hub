@@ -92,5 +92,8 @@
   "endpoint": {
     "name": "[RandomForestClassifier] Pipeline example using census dataset",
     "status": "creating"
+  },
+  "binary": {
+    "lib": "DATAFRAME_SKL"
   }
 }
