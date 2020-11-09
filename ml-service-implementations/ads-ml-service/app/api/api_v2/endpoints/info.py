@@ -16,6 +16,7 @@
 
 
 import typing
+import multiprocessing
 
 import fastapi
 
@@ -29,7 +30,7 @@ router = fastapi.APIRouter()
     path='/info',
     response_model=ops_schemas.ServerInfo
 )
-def server_info() -> typing.Dict[typing.Text, typing.Any]:
+async def server_info() -> typing.Dict[typing.Text, typing.Any]:
     ml_lib_info = {}
     try:
         import sklearn
@@ -41,10 +42,11 @@ def server_info() -> typing.Dict[typing.Text, typing.Any]:
             ]
         )
     except ImportError:
-        pass
+        sklearn, xgboost = None, None
     return {
         'info': {
             'server-version': version.__version__,
+            'cpu_count': multiprocessing.cpu_count(),
             **ml_lib_info
         },
         'status': ops_schemas.Status2.ok
