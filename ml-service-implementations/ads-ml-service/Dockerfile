@@ -62,6 +62,14 @@ RUN chown --recursive ops:root ${CUSTOM_MODULES} && \
 VOLUME ${CUSTOM_MODULES}
 
 
+ENV LOG_DIR="/var/log/ads-ml-service"
+RUN \
+    mkdir -p "${LOG_DIR}" && \
+    chown --recursive ops:root ${LOG_DIR} && \
+    chmod --recursive g=u ${LOG_DIR}
+VOLUME ${LOG_DIR}
+
+
 USER ops
 EXPOSE 8080
 WORKDIR ${OPS_HOME}/app
