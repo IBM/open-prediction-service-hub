@@ -29,4 +29,4 @@ fi
 exec gunicorn \
             --worker-class=uvicorn.workers.UvicornWorker \
             --config=file:gunicorn.init.py \
-            main:app
+            "main:get_app()"
