@@ -16,6 +16,7 @@
 
 
 import io
+import logging
 import typing
 
 import cachetools
@@ -30,6 +31,8 @@ import app.core.kfserving_impl as kfserving_impl
 import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _deserialize(db_obj: models.BinaryMlModel) -> kfserving.KFModel:
@@ -60,16 +63,21 @@ class ModelCache(object):
             cachetools.TTLCache(maxsize=max_len, ttl=max_age_seconds)
 
     def get_deserialized_model(self, db: saorm.Session, endpoint_id: int) -> typing.Optional[kfserving.KFModel]:
+        LOGGER.debug('Loading binary for endpoint id: %s', endpoint_id)
         try:
             with self.__cache_lock__.gen_rlock():
-                return self.__cache__[endpoint_id]
+                cached_model = self.__cache__[endpoint_id]
+                LOGGER.debug('Model cache hit')
+                return cached_model
         except KeyError:
+            LOGGER.debug('Model cache miss')
             with self.__cache_lock__.gen_wlock():
                 # already added by other thread
                 if endpoint_id in self.__cache__:
                     return self.__cache__[endpoint_id]
                 archive = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
                 if not archive:
+                    LOGGER.error('Model not exist', exc_info=True)
                     return None
                 deserialized = _deserialize(db_obj=archive)
                 self.__cache__[endpoint_id] = deserialized
