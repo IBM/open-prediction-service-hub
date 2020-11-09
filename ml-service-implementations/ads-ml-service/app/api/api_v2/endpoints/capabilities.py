@@ -28,7 +28,7 @@ router = fastapi.APIRouter()
     path='/capabilities',
     response_model=ops_model.Capabilities
 )
-def server_capabilities() -> typing.Dict[typing.Text, typing.Any]:
+async def server_capabilities() -> typing.Dict[typing.Text, typing.Any]:
     return {
         'capabilities': [
             ops_model.Capability.info,
