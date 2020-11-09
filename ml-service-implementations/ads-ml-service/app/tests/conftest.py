@@ -252,8 +252,10 @@ def client(db, tmp_path) -> Generator[TestClient, None, None]:
     def _db_override():
         return db
 
-    from app.main import app
+    from app.main import get_app
     from app.api.deps import get_db
+
+    app = get_app()
 
     app.dependency_overrides[get_db] = _db_override
 
