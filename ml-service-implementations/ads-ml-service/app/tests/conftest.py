@@ -244,6 +244,7 @@ def db(tmp_path) -> Generator[Session, None, None]:
 def client(db, tmp_path) -> Generator[TestClient, None, None]:
     os.environ['DEFAULT_USER'] = get_config().DEFAULT_USER
     os.environ['DEFAULT_USER_PWD'] = get_config().DEFAULT_USER
+    os.environ['LOG_DIR'] = tmp_path.__str__()
 
     user = crud.user.create(db, obj_in=UserCreate(
         username=get_config().DEFAULT_USER, password=get_config().DEFAULT_USER_PWD))
