@@ -15,6 +15,7 @@
 #
 
 
+import logging
 import typing
 
 import fastapi
@@ -29,6 +30,7 @@ import app.gen.schemas.ops_schemas as ops_schemas
 import app.schemas.impl as impl
 
 router = fastapi.APIRouter()
+LOGGER = logging.getLogger(__name__)
 
 
 @router.post(
@@ -39,6 +41,8 @@ def predict(
         pre_in: impl.PredictionImpl,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
+    LOGGER.info('Prediction input: %s', pre_in)
+
     endpoint_resource_list = list(filter(lambda link: link.rel == 'endpoint', pre_in.target))
     if len(endpoint_resource_list) != 1:
         raise fastapi.HTTPException(
@@ -66,13 +70,13 @@ def predict(
         raise fastapi.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Model file not found')
 
-    ml_output = deserialized.predict(
-        {'instances': [[pair.value for pair in pre_in.parameters]]}
-    )
+    ml_input = [[pair.value for pair in pre_in.parameters]]
+    LOGGER.info('ML input: %s', ml_input)
 
+    ml_output = deserialized.predict({'instances': ml_input})
+    LOGGER.info('ML output: %s', ml_output)
+
+    prediction_output = {'result': {**{k: v[0] for k, v in ml_output.items()}}}
+    LOGGER.info('Prediction output : %s', prediction_output)
     # return flatmap
-    return {
-        'result': {
-            **{k: v[0] for k, v in ml_output.items()}
-        }
-    }
+    return prediction_output
