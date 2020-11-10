@@ -43,7 +43,7 @@ def get_app() -> fastapi.FastAPI:
     )
 
     @app.get(path='/', include_in_schema=False)
-    def redirect_docs() -> responses.RedirectResponse:
+    async def redirect_docs() -> responses.RedirectResponse:
         return responses.RedirectResponse(url='/docs')
 
     app.include_router(api_v2.api_router)
