@@ -51,19 +51,6 @@ class FeatureImpl(ops_schemas.Feature):
         else:
             raise ValueError('Type not supported: {t}'.format(t=t))
 
-    def get_type(self) -> typing.Type:
-        if self.type in ('int', 'float', 'bool', 'str'):
-            if self.type == 'int':
-                return int
-            elif self.type == 'float':
-                return float
-            elif self.type == 'bool':
-                return bool
-            else:
-                return str
-        else:
-            return getattr(numpy, self.type)
-
 
 class ModelCreateImpl(ops_schemas.ModelCreation):
     version: typing.Optional[str] = pydt.Field('v1', description='version of the model')
