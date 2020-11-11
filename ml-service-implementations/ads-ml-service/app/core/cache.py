@@ -68,16 +68,16 @@ class ModelCache(object):
             if endpoint_id in self.__cache__:
                 LOGGER.debug('Model cache hit')
                 return self.__cache__.get(endpoint_id)
+        LOGGER.debug('Model cache miss')
+        archive = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
+        if not archive:
+            LOGGER.error('Binary not exist', exc_info=True)
+            return None
+        deserialized = _deserialize(db_obj=archive)
         with self.__cache_lock__.gen_wlock():
-            LOGGER.debug('Model cache miss')
             # already added by other thread
             if endpoint_id in self.__cache__:
                 return self.__cache__[endpoint_id]
-            archive = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
-            if not archive:
-                LOGGER.error('Binary not exist', exc_info=True)
-                return None
-            deserialized = _deserialize(db_obj=archive)
             self.__cache__[endpoint_id] = deserialized
             return deserialized
 
