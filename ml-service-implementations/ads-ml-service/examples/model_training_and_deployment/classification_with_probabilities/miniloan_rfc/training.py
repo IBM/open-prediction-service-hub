@@ -15,6 +15,7 @@
 #
 
 
+import json
 import logging
 import pickle
 import sys
@@ -100,6 +101,13 @@ def main():
             obj=estimator,
             file=fd
         )
+
+    with pathlib.Path(__file__).resolve().parent.joinpath('deployment_conf.json').open(mode='r') as fd:
+        configs = json.load(fd)
+    class_names = estimator.classes_.tolist()
+    configs['model']['metadata']['additional_info'] = {'names': class_names}
+    with pathlib.Path(__file__).resolve().parent.joinpath('deployment_conf.json').open(mode='w') as fd:
+        json.dump(configs, fd)
 
 
 if __name__ == '__main__':
