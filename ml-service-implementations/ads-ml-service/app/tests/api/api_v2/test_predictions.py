@@ -129,3 +129,27 @@ def test_pmml_prediction(
 
     assert response.status_code == 200
     assert response.json()['result']
+
+
+def test_prediction_with_additional_info(
+        db: saorm.Session,
+        client: tstc.TestClient,
+        endpoint_with_model_and_binary_and_additional_info: models.Endpoint
+) -> typ.NoReturn:
+    ops_cache.cache.clear()
+    response = client.post(
+        url=conf.get_config().API_V2_STR + '/predictions',
+        json={
+            'parameters': [{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 0.5}],
+            'target': [
+                {'rel': 'endpoint', 'href': ops_uri.TEMPLATE.format(
+                    resource_type='endpoints', resource_id=endpoint_with_model_and_binary_and_additional_info.id)}
+            ]
+        }
+    )
+    content = response.json()
+    additional_info = content['result']
+
+    assert response.status_code == 200
+    assert additional_info['names']
+    assert additional_info['names'] == ['x', 'y']
