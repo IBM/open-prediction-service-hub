@@ -44,15 +44,15 @@ class FeatureImpl(ops_schemas.Feature):
 
     @pydt.validator('type')
     def type_check(cls, t) -> typing.Type:
-        if t in ('int', 'float', 'bool', 'str'):  # Python type
+        if t in ('int', 'float', 'bool', 'str', 'string'):  # Python type
             return t
-        if hasattr(numpy, t) and numpy.issubdtype(getattr(numpy, t), numpy.generic):
+        elif hasattr(numpy, t) and numpy.issubdtype(getattr(numpy, t), numpy.generic):
             return t
         else:
             raise ValueError('Type not supported: {t}'.format(t=t))
 
     def get_type(self) -> typing.Type:
-        if self.type in ('int', 'float', 'bool', 'str'):
+        if self.type in ('int', 'float', 'bool', 'str', 'string'):
             if self.type == 'int':
                 return int
             elif self.type == 'float':

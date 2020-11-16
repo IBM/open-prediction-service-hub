@@ -289,7 +289,7 @@ def endpoint_with_model_and_binary(
 ) -> models.Endpoint:
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(obj=classification_predictor),
-        library=supported_lib.MlLib.SKLearn
+        library=supported_lib.MlLib.NDARRAY_SKL
     ), endpoint_id=endpoint_with_model.id)
     return endpoint_with_model
 
@@ -313,7 +313,7 @@ def endpoint_with_identity_predictor(
 ) -> models.Endpoint:
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(obj=IdentityPredictor()),
-        library=supported_lib.MlLib.SKLearn
+        library=supported_lib.MlLib.NDARRAY_SKL
     ), endpoint_id=endpoint_with_model.id)
     return endpoint_with_model
 
@@ -329,6 +329,6 @@ def endpoint_with_xgb_predictor(
     xgb_classification_predictor.save_model(fname=model_path.__str__())
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=model_path.read_binary(),
-        library=supported_lib.MlLib.XGBoost
+        library=supported_lib.MlLib.NDARRAY_XGB
     ), endpoint_id=endpoint_with_model.id)
     return endpoint_with_model

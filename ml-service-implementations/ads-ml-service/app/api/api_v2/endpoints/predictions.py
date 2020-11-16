@@ -20,6 +20,7 @@ import typing
 import fastapi
 import sqlalchemy.orm as saorm
 import starlette.status as status
+import pandas as pd
 
 import app.api.deps as deps
 import app.core.cache as ops_cache
@@ -66,8 +67,9 @@ def predict(
         raise fastapi.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Model file not found')
 
+    ml_input = pd.DataFrame.from_dict({param.name: [param.value] for param in pre_in.parameters})
     ml_output = deserialized.predict(
-        {'instances': [[pair.value for pair in pre_in.parameters]]}
+        {'instances': ml_input}
     )
 
     # return flatmap

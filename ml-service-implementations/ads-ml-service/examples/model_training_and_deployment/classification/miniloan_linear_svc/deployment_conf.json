@@ -47,5 +47,8 @@
   "endpoint": {
     "name": "[LinearSVC] example endpoint for loan approval",
     "status": "creating"
+  },
+  "binary": {
+    "lib": "NDARRAY_SKL"
   }
 }

@@ -42,5 +42,8 @@
   "endpoint": {
     "name": "[SVC] example endpoint for iris classification",
     "status": "creating"
+  },
+  "binary": {
+    "lib": "NDARRAY_SKL"
   }
 }
