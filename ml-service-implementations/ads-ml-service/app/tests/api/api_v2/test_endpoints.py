@@ -128,7 +128,7 @@ def test_add_binary(
     response = client.post(
         url=conf.get_config().API_V2_STR + '/endpoints' + f'/{endpoint_with_model.id}',
         files={'file': pickle.dumps(classification_predictor)},
-        data={'lib': supported_lib.MlLib.SKLearn.value.encode()}
+        data={'lib': supported_lib.MlLib.NDARRAY_SKL.value.encode()}
     )
     response_1 = client.get(
         url=conf.get_config().API_V2_STR + '/endpoints' + f'/{endpoint_with_model.id}')

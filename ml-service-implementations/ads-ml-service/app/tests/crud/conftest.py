@@ -32,7 +32,7 @@ import app.tests.utils.utils as utils
 def binary_create(classification_predictor: object) -> schemas.BinaryMlModelCreate:
     return schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(classification_predictor),
-        library=supported_lib.MlLib.SKLearn
+        library=supported_lib.MlLib.NDARRAY_SKL
     )
 
 

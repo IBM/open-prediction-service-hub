@@ -27,21 +27,27 @@ import sqlalchemy.orm as saorm
 import starlette.status as status
 
 import app.core.kfserving_impl as kfserving_impl
+import app.core.pipeline_model_wrapper as pipeline_model_wrapper
 import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 
 
-def _deserialize(db_obj: models.BinaryMlModel) -> kfserving.KFModel:
-    model: kfserving.KFModel
+def _deserialize(db_obj: models.BinaryMlModel) -> kfserving_impl.InMemoryKFModel:
     try:
-        if db_obj.library == supported_lib.MlLib.SKLearn:
+        if db_obj.library == supported_lib.MlLib.NDARRAY_SKL:
             model = kfserving_impl.SKLearnModelImpl(
                 predictor_binary=joblib.load(io.BytesIO(db_obj.model_b64))
             )
-        elif db_obj.library == supported_lib.MlLib.XGBoost:
+            model.load()
+        elif db_obj.library == supported_lib.MlLib.NDARRAY_XGB:
             model = kfserving_impl.XGBoostModelImpl(
                 predictor_binary=bytearray(db_obj.model_b64)
+            )
+            model.load()
+        elif db_obj.library == supported_lib.MlLib.DATAFRAME_SKL:
+            model = pipeline_model_wrapper.DataframeModel(
+                predictor_binary=joblib.load(io.BytesIO(db_obj.model_b64))
             )
         else:
             raise fastapi.HTTPException(
@@ -49,7 +55,6 @@ def _deserialize(db_obj: models.BinaryMlModel) -> kfserving.KFModel:
     except ImportError:
         raise fastapi.HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'Can not deserialize model binary')
-    model.load()
     return model
 
 

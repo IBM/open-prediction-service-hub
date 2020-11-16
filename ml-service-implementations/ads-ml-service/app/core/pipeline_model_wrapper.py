@@ -15,11 +15,17 @@
 #
 
 
-import enum
-import typing
+import app.core.kfserving_impl as kfserving_impl
+import pandas as pd
+import typing as typ
 
 
-class MlLib(typing.Text, enum.Enum):
-    DATAFRAME_SKL = 'dataframe_skl'
-    NDARRAY_SKL = 'ndarray_skl'
-    NDARRAY_XGB = 'ndarray_xgb'
+class DataframeModel(kfserving_impl.InMemoryKFModel):
+    def predict(self, request: typ.Dict[typ.Text, pd.DataFrame]) -> typ.Dict:
+        instances = request['instances']
+        try:
+            model_output = self.binary.predict(instances)
+        except Exception as e:
+            raise Exception(f'Failed to predict {e}')
+        result = model_output.tolist()
+        return {'predictions': result}
