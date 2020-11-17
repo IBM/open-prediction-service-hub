@@ -14,6 +14,7 @@ install_jre() {
 
 install_PyPMML() {
   python3 -m pip install --no-cache-dir --use-feature=2020-resolver pypmml~=0.9.7
+  # python3 -m pip install --no-cache-dir --use-feature=2020-resolver nyoka~=4.3.0  # Used for testes
 }
 
 install_jre
