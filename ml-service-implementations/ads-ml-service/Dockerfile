@@ -84,6 +84,12 @@ RUN \
 VOLUME ${LOG_DIR}
 
 
+COPY scripts ${OPS_HOME}/scripts/
+RUN \
+    chmod u+x ${OPS_HOME}/scripts/pmml-env.sh && \
+    ${OPS_HOME}/scripts/pmml-env.sh
+
+
 USER ops
 EXPOSE 8080
 
