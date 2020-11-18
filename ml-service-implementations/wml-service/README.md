@@ -28,7 +28,7 @@ docker build -t wml-service .
 To run the microservice, you will need to provide the following parameters:
 - WML_API_KEY : your Watson Machine Learning service apikey
 - WML_URL : your Watson Machine Learning service url
-- WML_INSTANCE_ID : your Watson Machine Learning service instance id
+- WML_SPACE_ID : your Watson Machine Learning service space id
 
 
 ```sh
@@ -36,7 +36,7 @@ docker run \
     -p 8080:8080 \
     -e WML_API_KEY=<WML_API_KEY> \
     -e WML_URL=<WML_URL> \
-    -e WML_INSTANCE_ID=<WML_INSTANCE_ID> \
+    -e WML_SPACE_ID=<WML_SPACE_ID> \
     --name wml-service \
     wml-service
 ```
@@ -46,7 +46,7 @@ docker run \
     -p <PORT>:8080 \
     -e WML_API_KEY=<WML_API_KEY> \
     -e WML_URL=<WML_URL> \
-    -e WML_INSTANCE_ID=<WML_INSTANCE_ID> \
+    -e WML_SPACE_ID=<WML_SPACE_ID> \
     --name wml-service \
     wml-service
 ```
@@ -88,7 +88,7 @@ __To launch tests on your WML instance:__
 First, make sure you have a working and configured environment with the following global variables:
 - WML_API_KEY : your Watson Machine Learning service apikey
 - WML_URL : your Watson Machine Learning service url
-- WML_INSTANCE_ID : your Watson Machine Learning service instance id
+- WML_SPACE_ID : your Watson Machine Learning service space id
 
 
 Then, run tests using tox:

@@ -280,3 +280,7 @@ A pre-loaded model needs to:
 ## Configure custom python modules
 Additional python modules can be added in `custom_modules`. Modules and packages in this
 directory can be imported during model invocation. 
+
+## Scikit-learn pipelines
+Some pipelines require `DataFrame` as input array type. To use this kind of pipelines,
+make sure toggle `dataframe_skl` option for binary.

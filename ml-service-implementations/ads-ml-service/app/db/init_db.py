@@ -101,12 +101,7 @@ def load_models(
             obj_in=schemas.EndpointCreate(name=endpoint_config.name),
             model_id=model.id
         )
-        if p[1].suffix in ('.joblib', '.pkl', '.pickle'):
-            lib = supported_lib.MlLib.SKLearn
-        elif p[1].suffix == '.bst':
-            lib = supported_lib.MlLib.XGBoost
-        else:
-            raise RuntimeError('Unknown suffix')
+        lib = supported_lib.MlLib[config['binary']['lib']]
         bin_db = crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
             model_b64=binary,
             library=lib
