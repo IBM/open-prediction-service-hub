@@ -43,6 +43,7 @@ class ServerConfiguration(BaseSettings):
     MODEL_CACHE_SIZE: int = 16
     CACHE_TTL: int = 20
     MODEL_STORAGE: Path
+    SETTINGS: Path
 
     @validator('MODEL_STORAGE')
     def storage_check(cls: ServerConfiguration, p: Path) -> Path:
