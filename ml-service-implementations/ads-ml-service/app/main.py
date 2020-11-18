@@ -15,22 +15,36 @@
 #
 
 
+import logging.config
+import os
+import pathlib
+
 import fastapi
 import fastapi.responses as responses
+import yaml
 
 import app.api.api_v2.api as api_v2
 import app.version as ads_ml_service_version
 
-app = fastapi.FastAPI(
-    version=ads_ml_service_version.__version__,
-    title='Open Prediction Service',
-    description='A simple Machine Learning serving environment for tests',
-    openapi_url="/open-prediction-service.json"
-)
 
-app.include_router(api_v2.api_router)
+def get_app() -> fastapi.FastAPI:
+    with pathlib.Path(__file__).resolve().parents[1].joinpath('logging.yaml').open(mode='r') as fd:
+        conf = yaml.safe_load(fd)
+        for _, handler in conf['handlers'].items():
+            if 'filename' in handler:
+                handler['filename'] = handler['filename'].replace('{{LOG_DIR}}', os.getenv('LOG_DIR'))
+        logging.config.dictConfig(conf)
 
+    app = fastapi.FastAPI(
+        version=ads_ml_service_version.__version__,
+        title='Open Prediction Service',
+        description='A simple Machine Learning serving environment for tests',
+        openapi_url="/open-prediction-service.json"
+    )
 
-@app.get(path='/', include_in_schema=False)
-def redirect_docs() -> responses.RedirectResponse:
-    return responses.RedirectResponse(url='/docs')
+    @app.get(path='/', include_in_schema=False)
+    async def redirect_docs() -> responses.RedirectResponse:
+        return responses.RedirectResponse(url='/docs')
+
+    app.include_router(api_v2.api_router)
+    return app
