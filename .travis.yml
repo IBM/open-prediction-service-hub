@@ -17,6 +17,7 @@ jobs:
       script:
         - cd ml-service-implementations/ads-ml-service
         - pip3 install --quiet --upgrade pip
+        - pip3 install --quiet datamodel-code-generator~=0.5.30
         - pip3 install --quiet -r requirements-ml.txt
         - pip3 install --quiet -r requirements.txt --ignore-installed
         - cp ../../open-prediction-service.yaml app/gen/tmp.schemas.ops.yaml

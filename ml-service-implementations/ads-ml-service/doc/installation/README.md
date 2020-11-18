@@ -72,6 +72,7 @@ As you expect, simply run the image
 
 ```shell script
 docker run --detach --restart=always \
+  --read-only \
   --publish 80:8080 \
   --name open-prediction \
   open-prediction:latest
@@ -213,6 +214,7 @@ Replace the command by:
 ```shell script
 docker run --detach --restart=always \
   --publish 80:8080 \
+  --read-only \
   --name open-prediction \
   -e DEFAULT_USER=toto \
   -e DEFAULT_USER_PWD=titi \
@@ -243,4 +245,4 @@ Ingress controller configuration is platform dependent. Contact your K8S provide
 It is highly recommended to configure a TLS termination proxy (e.g [traefik](https://docs.traefik.io/))
 to easily and securely manage HTTPS configurations. For testing purposes,
 you can mount a volume containing `server.key`, `server.crt`, `ca.crt`, point
-`SSL_SETTINGS` to its path and set `ENABLE_SSL=TRUE` to enable HTTPS.
+`SETTINGS` to its path and set `ENABLE_SSL=TRUE` to enable HTTPS.

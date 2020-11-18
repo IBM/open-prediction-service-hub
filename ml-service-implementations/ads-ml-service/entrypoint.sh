@@ -9,7 +9,7 @@ set -e
 . "${OPS_HOME}"/prestart.sh
 
 
-if [ ! -f "${SSL_SETTINGS}/server.key" ] || [ ! -f "${SSL_SETTINGS}/server.crt" ] || [ ! -f "${SSL_SETTINGS}/ca.crt" ]; then
+if [ ! -f "${SETTINGS}/server.key" ] || [ ! -f "${SETTINGS}/server.crt" ] || [ ! -f "${SETTINGS}/ca.crt" ]; then
   # default certificate
   echo "[INFO] SSL certificates not found"
   echo "[INFO] Creating default certificates"
@@ -18,8 +18,8 @@ if [ ! -f "${SSL_SETTINGS}/server.key" ] || [ ! -f "${SSL_SETTINGS}/server.crt" 
     -nodes \
     -subj '/CN=localhost' \
     -days 365 \
-    -keyout "${SSL_SETTINGS}/server.key" -out "${SSL_SETTINGS}/server.crt"
-  cp "${SSL_SETTINGS}/server.crt" "${SSL_SETTINGS}/ca.crt"
+    -keyout "${SETTINGS}/server.key" -out "${SETTINGS}/server.crt"
+  cp "${SETTINGS}/server.crt" "${SETTINGS}/ca.crt"
   echo "[INFO] Created self-signed certificates"
 fi
 
@@ -28,5 +28,5 @@ fi
 #   Uvicorn worker class is required by Fastapi
 exec gunicorn \
             --worker-class=uvicorn.workers.UvicornWorker \
-            --config=file:gunicorn.init.py \
-            main:app
+            --config=file:"${OPS_HOME}"/app/gunicorn.init.py \
+            app.main:app
