@@ -76,6 +76,14 @@ VOLUME ${MODEL_STORAGE}
 VOLUME ${SETTINGS}
 VOLUME ${CUSTOM_MODULES}
 
+ENV LOG_DIR="/var/log/ads-ml-service"
+RUN \
+    mkdir -p "${LOG_DIR}" && \
+    chown --recursive ops:root ${LOG_DIR} && \
+    chmod --recursive g=u ${LOG_DIR}
+VOLUME ${LOG_DIR}
+
+
 USER ops
 EXPOSE 8080
 

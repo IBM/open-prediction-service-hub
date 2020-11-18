@@ -16,6 +16,7 @@
 
 
 import io
+import logging
 import typing
 
 import cachetools
@@ -31,6 +32,8 @@ import app.core.pipeline_model_wrapper as pipeline_model_wrapper
 import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _deserialize(db_obj: models.BinaryMlModel) -> kfserving_impl.InMemoryKFModel:
@@ -65,20 +68,23 @@ class ModelCache(object):
             cachetools.TTLCache(maxsize=max_len, ttl=max_age_seconds)
 
     def get_deserialized_model(self, db: saorm.Session, endpoint_id: int) -> typing.Optional[kfserving.KFModel]:
-        try:
-            with self.__cache_lock__.gen_rlock():
+        LOGGER.debug('Loading binary for endpoint id: %s', endpoint_id)
+        with self.__cache_lock__.gen_rlock():
+            if endpoint_id in self.__cache__:
+                LOGGER.debug('Model cache hit')
+                return self.__cache__.get(endpoint_id)
+        LOGGER.debug('Model cache miss')
+        archive = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
+        if not archive:
+            LOGGER.error('Binary not exist', exc_info=True)
+            return None
+        deserialized = _deserialize(db_obj=archive)
+        with self.__cache_lock__.gen_wlock():
+            # already added by other thread
+            if endpoint_id in self.__cache__:
                 return self.__cache__[endpoint_id]
-        except KeyError:
-            with self.__cache_lock__.gen_wlock():
-                # already added by other thread
-                if endpoint_id in self.__cache__:
-                    return self.__cache__[endpoint_id]
-                archive = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
-                if not archive:
-                    return None
-                deserialized = _deserialize(db_obj=archive)
-                self.__cache__[endpoint_id] = deserialized
-                return deserialized
+            self.__cache__[endpoint_id] = deserialized
+            return deserialized
 
     def clear(self):
         with self.__cache_lock__.gen_wlock():
