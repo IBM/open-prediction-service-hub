@@ -8,5 +8,8 @@
   "endpoint": {
     "name": "[IdentityPredictor] Endpoint for custom model",
     "status": "creating"
+  },
+  "binary": {
+    "lib": "NDARRAY_SKL"
   }
 }

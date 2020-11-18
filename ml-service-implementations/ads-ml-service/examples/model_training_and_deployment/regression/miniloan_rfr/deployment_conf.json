@@ -47,5 +47,8 @@
   "endpoint": {
     "name": "[RandomForestRegressor] example endpoint for yearlyReimbursement Evaluation",
     "status": "creating"
+  },
+  "binary": {
+    "lib": "NDARRAY_SKL"
   }
 }
