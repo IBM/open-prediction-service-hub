@@ -10,11 +10,14 @@ build: prepare-schemas-gen
 
 # Launch a testing server
 launch: build
-	docker run --rm -it -p 8080:8080 --name ads-ml-service ads-ml-service:latest
+	docker run --rm --read-only -it -p 8080:8080 --name ads-ml-service ads-ml-service:latest
 
 # Test
 test: build
-	docker run --rm -it --entrypoint="python3"  -e RETRAIN_MODELS=1 ads-ml-service -m pytest -v /app/app/tests
+	docker run --rm -it --entrypoint="python3" -e RETRAIN_MODELS=1 ads-ml-service -m pytest -v app/tests
+
+debug: build
+	docker run --rm --read-only -it --entrypoint="bash" --user 0 ads-ml-service
 
 # Launch stress test server
 locust:
