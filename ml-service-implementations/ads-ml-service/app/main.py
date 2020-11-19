@@ -39,7 +39,8 @@ def get_app() -> fastapi.FastAPI:
         version=ads_ml_service_version.__version__,
         title='Open Prediction Service',
         description='A simple Machine Learning serving environment for tests',
-        openapi_url="/open-prediction-service.json"
+        openapi_url='/open-prediction-service.json',
+        default_response_class=responses.ORJSONResponse
     )
 
     @app.get(path='/', include_in_schema=False)
