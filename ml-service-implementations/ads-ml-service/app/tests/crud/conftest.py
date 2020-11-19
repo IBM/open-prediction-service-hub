@@ -15,25 +15,15 @@
 #
 
 
-import pickle
 import typing
 
 import pytest
 import sqlalchemy.orm as orm
 
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 import app.schemas as schemas
 import app.tests.utils.utils as utils
-
-
-@pytest.fixture()
-def binary_create(classification_predictor: object) -> schemas.BinaryMlModelCreate:
-    return schemas.BinaryMlModelCreate(
-        model_b64=pickle.dumps(classification_predictor),
-        library=supported_lib.MlLib.NDARRAY_SKL
-    )
 
 
 @pytest.fixture()
