@@ -19,17 +19,21 @@ import typing
 
 import pydantic as pyd
 
-import app.core.supported_lib as supported_lib
+import app.schemas.mapping as mapping
 
 
 class BinaryMlModelBase(pyd.BaseModel):
     model_b64: typing.Optional[bytes] = None
-    library: typing.Optional[supported_lib.MlLib] = None
+    input_handling: typing.Optional[mapping.ModelInput] = None
+    output_handling: typing.Optional[mapping.ModelOutput] = None
+    loader: typing.Optional[mapping.ModelLoader] = None
 
 
 class BinaryMlModelCreate(BinaryMlModelBase):
     model_b64: bytes
-    library: supported_lib.MlLib
+    input_handling: mapping.ModelInput
+    output_handling: mapping.ModelOutput
+    loader: mapping.ModelLoader
 
 
 class BinaryMlModelUpdate(BinaryMlModelBase):
@@ -39,7 +43,9 @@ class BinaryMlModelUpdate(BinaryMlModelBase):
 class BinaryMlModelInDBBase(BinaryMlModelBase):
     id: int
     model_b64: bytes
-    library: supported_lib.MlLib
+    input_handling: mapping.ModelInput
+    output_handling: mapping.ModelOutput
+    loader: mapping.ModelLoader
     endpoint_id: int
 
     class Config:
