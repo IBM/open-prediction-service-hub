@@ -34,7 +34,7 @@ def from_list(
         else:
             return output
     else:
-        # A 1-dimensional list
+        # A N-dimensional list
         if len(output) == 1 and len(output[0]) == 1:
             # Singleton list
             return output[0][0]
