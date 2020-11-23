@@ -28,7 +28,3 @@ PyYAML~=5.3.1
 requests~=2.25.0
 pytest~=6.1.1
 nyoka~=4.3.0
-
-## Raw interface for model serving
---editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=sklearnserver&subdirectory=python/sklearnserver
---editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=xgbserver&subdirectory=python/xgbserver
