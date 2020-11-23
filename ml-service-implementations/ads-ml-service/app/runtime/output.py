@@ -35,9 +35,14 @@ def from_list(
             return output
     else:
         # A N-dimensional list
-        if len(output) == 1 and len(output[0]) == 1:
+        if len(output) == 1:
             # Singleton list
-            return output[0][0]
+            if len(output[0]) == 1:
+                # Row element is not array
+                return output[0][0]
+            else:
+                # Row element is array
+                return output[0]
         else:
             return output
 
