@@ -19,15 +19,15 @@ import sqlalchemy as sql
 import sqlalchemy.orm as sql_orm
 
 import app.db.base_class as base_class
-import app.schemas.mapping as mapping
+import app.schemas.binary_config as app_binary_config
 
 
 class BinaryMlModel(base_class.Base):
     id = sql.Column('id', sql.Integer, sql.ForeignKey('endpoint.id'),
                     nullable=False, unique=True, index=True, primary_key=True)
     model_b64 = sa.Column('model_b64', sa.LargeBinary, nullable=False)
-    input_handling = sa.Column('input_handling', sa.Enum(mapping.ModelInput), nullable=False)
-    output_handling = sa.Column('output_handling', sa.Enum(mapping.ModelOutput), nullable=False)
-    loader = sa.Column('loader', sa.Enum(mapping.ModelLoader), nullable=False)
+    input_handling = sa.Column('input_handling', sa.Enum(app_binary_config.ModelInput), nullable=False)
+    output_handling = sa.Column('output_handling', sa.Enum(app_binary_config.ModelOutput), nullable=False)
+    loader = sa.Column('loader', sa.Enum(app_binary_config.ModelWrapper), nullable=False)
 
     endpoint = sql_orm.relationship('Endpoint', back_populates='binary', uselist=False)

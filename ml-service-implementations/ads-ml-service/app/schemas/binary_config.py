@@ -22,16 +22,18 @@ import typing as typ
 class ModelInput(typ.Text, enum.Enum):
     DATAFRAME = 'DataFrame'
     NUMPY_ARRAY = 'ndarray'
-    PYTHON_LIST = 'list'
+    DMATRIX = 'DMatrix'
+    LIST = 'list'
 
 
 class ModelOutput(typ.Text, enum.Enum):
+    AUTO = 'auto'
     NUMPY_ARRAY = 'ndarray'
     DATAFRAME = 'DataFrame'
-    PYTHON_LIST = 'list'
+    LIST = 'list'
 
 
-class ModelLoader(typ.Text, enum.Enum):
+class ModelWrapper(typ.Text, enum.Enum):
     JOBLIB = 'joblib'
     PMML = 'pmml'
     BST = 'bst'
