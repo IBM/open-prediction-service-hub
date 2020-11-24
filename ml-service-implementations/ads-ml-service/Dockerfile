@@ -58,7 +58,8 @@ COPY entrypoint.sh /entrypoint.sh
 COPY logging.yaml ${SETTINGS}/
 RUN \
     apt-get -q update && \
-    apt-get -q install --assume-yes libgomp1 && \
+    mkdir -p /usr/share/man/man1 && \
+    apt-get -q install --assume-yes libgomp1 default-jre-headless && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p ${MODEL_STORAGE} && \
     mkdir -p "${LOG_DIR}" && \
@@ -81,11 +82,6 @@ VOLUME ${MODEL_STORAGE}
 VOLUME ${SETTINGS}
 VOLUME ${CUSTOM_MODULES}
 VOLUME ${LOG_DIR}
-
-# Activate pmml support
-RUN \
-    chmod u+x scripts/pmml-env.sh && \
-    scripts/pmml-env.sh
 
 
 USER ops
