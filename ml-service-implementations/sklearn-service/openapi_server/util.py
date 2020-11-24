@@ -4,7 +4,6 @@ import six
 import typing
 from openapi_server import typing_utils
 
-
 def _deserialize(data, klass):
     """Deserializes dict, list, str into an object.
 
@@ -15,6 +14,12 @@ def _deserialize(data, klass):
     """
     if data is None:
         return None
+    
+    try:
+        if klass.__name__=='_check_and_get_type':
+            klass=klass(data)
+    except AttributeError:
+        pass
 
     if klass in six.integer_types or klass in (float, str, bool, bytearray):
         return _deserialize_primitive(data, klass)
@@ -103,7 +108,7 @@ def deserialize_model(data, klass):
 
     if not instance.openapi_types:
         return data
-
+    
     for attr, attr_type in six.iteritems(instance.openapi_types):
         if data is not None \
                 and instance.attribute_map[attr] in data \
