@@ -15,12 +15,28 @@
 #
 
 
-import enum
+import pathlib
 import typing
 
+import yaml
+from sklearn.base import BaseEstimator
 
-class MlLib(typing.Text, enum.Enum):
-    DATAFRAME_SKL = 'dataframe_skl'
-    DATAFRAME_PMML = 'dataframe_pmml'
-    NDARRAY_SKL = 'ndarray_skl'
-    NDARRAY_XGB = 'ndarray_xgb'
+
+class IdentityPredictor(BaseEstimator):
+    def __init__(self):
+        pass
+
+    def fit(self, x, y) -> typing.NoReturn:
+        pass
+
+    def predict(self, x) -> typing.Any:
+        return x
+
+
+def get_conf() -> typing.Dict[typing.Text, typing.Any]:
+    with pathlib.Path(__file__).resolve().parent.joinpath('deployment_config.yaml').open(mode='r') as fd:
+        return yaml.safe_load(fd)
+
+
+def get_identity_predictor() -> IdentityPredictor:
+    return IdentityPredictor()

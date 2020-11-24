@@ -1,0 +1,8 @@
+model:
+  name: 'skl predictor model'
+endpoint:
+  name: 'skl predictor endpoint'
+binary:
+  input_handling: 'DataFrame'
+  output_handling: 'auto'
+  loader: 'joblib'

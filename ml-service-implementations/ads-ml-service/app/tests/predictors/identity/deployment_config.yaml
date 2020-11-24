@@ -1,0 +1,8 @@
+model:
+  name: 'identity predictor model'
+endpoint:
+  name: 'identity predictor endpoint'
+binary:
+  input_handling: 'DataFrame'
+  output_handling: 'auto'
+  loader: 'joblib'
