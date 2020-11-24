@@ -52,6 +52,8 @@
     "status": "creating"
   },
   "binary": {
-    "lib": "NDARRAY_SKL"
+    "input_handling": "DataFrame",
+    "output_handling": "ndarray",
+    "loader": "joblib"
   }
 }

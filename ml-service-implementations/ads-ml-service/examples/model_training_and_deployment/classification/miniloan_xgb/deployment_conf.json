@@ -49,6 +49,8 @@
     "status": "creating"
   },
   "binary": {
-    "lib": "NDARRAY_XGB"
+    "input_handling": "DMatrix",
+    "output_handling": "ndarray",
+    "loader": "bst"
   }
 }
