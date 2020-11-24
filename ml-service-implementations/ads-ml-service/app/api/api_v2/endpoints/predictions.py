@@ -67,10 +67,6 @@ async def predict(
 
     params = [param for param in pre_in.parameters]
     prediction_output = deserialized.predict(params)
-    score_output = deserialized.predict_proba(params)
 
-    LOGGER.info('Prediction output: %s, Score output: %s', prediction_output, score_output)
-    if score_output is not None:
-        return {'result': {'predictions': prediction_output, 'scores': score_output}}
-    else:
-        return {'result': {'predictions': prediction_output}}
+    LOGGER.info('Prediction output: %s', prediction_output)
+    return prediction_output

@@ -44,6 +44,9 @@ class InMemoryModel:
     def __init__(self, model: typ.Any):
         self.model = model
 
+    def has_method(self, method_name: typ.Text):
+        return hasattr(self.model, method_name)
+
     def predict(self, request: typ.Any) -> typ.Any:
         try:
             return self.model.predict(request)
@@ -109,27 +112,19 @@ class ModelInvocationExecutor:
         self.model_wrapper = WRAPPERS[binary_format]
 
         self.loaded_model = self.model_wrapper.load(model)
+        self.can_predict_proba = self.loaded_model.has_method('predict_proba')
 
     def predict(self, request: typ.Any) -> typ.Any:
         prepared_data = self.input_handler(request)
         LOGGER.debug('ML input: %s', prepared_data)
 
-        ml_output = self.loaded_model.predict(prepared_data)
-
-        LOGGER.debug('ML output: %s', ml_output)
-        prepared_resp = self.output_handler(ml_output)
-
-        return prepared_resp
-
-    def predict_proba(self, request: typ.Any) -> typ.Any:
-        prepared_data = self.input_handler(request)
-        LOGGER.debug('ML input: %s', prepared_data)
-
-        ml_output = self.loaded_model.predict_proba(prepared_data)
-        if ml_output is None:
-            return None
-
-        LOGGER.debug('ML output: %s', ml_output)
-        prepared_resp = self.output_handler(ml_output)
-
-        return prepared_resp
+        predict = self.loaded_model.predict(prepared_data)
+        LOGGER.debug('ML output: %s', predict)
+        formatted_predict = self.output_handler(predict)
+        if not self.can_predict_proba:
+            return {'result': {'predictions': formatted_predict}}
+        else:
+            predict_proba = self.loaded_model.predict_proba(prepared_data)
+            LOGGER.debug('ML output(scores): %s', predict_proba)
+            formatted_predict_proba = self.output_handler(predict_proba)
+            return {'result': {'predictions': formatted_predict, 'scores': formatted_predict_proba}}
