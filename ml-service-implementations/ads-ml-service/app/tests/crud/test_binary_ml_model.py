@@ -23,20 +23,20 @@ import sqlalchemy.orm as orm
 import app.crud as crud
 import app.models as models
 import app.schemas as schemas
-import app.schemas.mapping as mapping
-import app.tests.predictors.common as app_tests_common
+import app.schemas.binary_config as mapping
+import app.tests.predictors.scikit_learn.model
 
 
 def test_create_binary_ml_model(
         db: orm.Session,
         endpoint_in_db: models.Endpoint
 ) -> typing.NoReturn:
-    predictor = app_tests_common.get_classification_predictor()
+    predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_create = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
         input_handling=mapping.ModelInput.DATAFRAME,
         output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelLoader.JOBLIB
+        loader=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
 
@@ -51,12 +51,12 @@ def test_get_binary_ml_model(
         db: orm.Session,
         endpoint_in_db: models.Endpoint
 ) -> typing.NoReturn:
-    predictor = app_tests_common.get_classification_predictor()
+    predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_create = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
         input_handling=mapping.ModelInput.DATAFRAME,
         output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelLoader.JOBLIB
+        loader=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
     binary_1 = crud.binary_ml_model.get(db, id=binary.id)
@@ -73,12 +73,12 @@ def test_get_binary_ml_model_by_endpoint(
         db: orm.Session,
         endpoint_in_db: models.Endpoint
 ) -> typing.NoReturn:
-    predictor = app_tests_common.get_classification_predictor()
+    predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_create = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
         input_handling=mapping.ModelInput.DATAFRAME,
         output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelLoader.JOBLIB
+        loader=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
     binary_1 = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_in_db.id)
@@ -95,12 +95,12 @@ def test_delete_binary_ml_model(
         db: orm.Session,
         endpoint_in_db: models.Endpoint
 ) -> typing.NoReturn:
-    predictor = app_tests_common.get_classification_predictor()
+    predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_create = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
         input_handling=mapping.ModelInput.DATAFRAME,
         output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelLoader.JOBLIB
+        loader=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
     binary_1 = crud.binary_ml_model.delete(db, id=binary.id)

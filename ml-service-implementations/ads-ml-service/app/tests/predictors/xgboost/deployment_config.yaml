@@ -1,5 +1,5 @@
 model:
-  name: 'pmml'
+  name: 'xgboost'
   version: 'v1'
   input_schema:
     - name: 'x'
@@ -12,10 +12,10 @@ model:
     predictions:
       type: 'string'
   metadata:
-    description: 'pmml model for test'
+    description: 'xgboost model for test'
 endpoint:
-  name: 'pmml endpoint for test'
+  name: 'xgboost endpoint for test'
 binary:
-  input_handling: 'DataFrame'
+  input_handling: 'DMatrix'
   output_handling: 'auto'
-  loader: 'pmml'
+  loader: 'bst'

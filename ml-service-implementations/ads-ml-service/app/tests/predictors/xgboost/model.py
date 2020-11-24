@@ -15,16 +15,24 @@
 #
 
 
+import pathlib
+import typing
+
 import numpy as np
-import pandas as pd
-import sklearn.ensemble as skl_ensemble
+import xgboost
+import yaml
 
-import app.tests.utils.utils as app_utils
+from app.tests.utils import utils as app_utils
 
 
-def get_classification_predictor() -> skl_ensemble.RandomForestClassifier:
-    classifier = skl_ensemble.RandomForestClassifier(random_state=42)
-    x_random = pd.DataFrame(data=np.random.rand(10, 2), columns=['x', 'y'])
+def get_conf() -> typing.Dict[typing.Text, typing.Any]:
+    with pathlib.Path(__file__).resolve().parent.joinpath('deployment_config.yaml').open(mode='r') as fd:
+        return yaml.safe_load(fd)
+
+
+def get_xgboost_classification_predictor() -> xgboost.XGBClassifier:
+    classifier = xgboost.XGBClassifier(random_state=42)
+    x_random = np.random.rand(10, 2)
     y_random = np.array([app_utils.random_string() for _ in range(10)])
     classifier.fit(x_random, y_random)
     return classifier

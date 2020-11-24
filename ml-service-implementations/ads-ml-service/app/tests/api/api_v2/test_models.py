@@ -29,12 +29,12 @@ import app.core.configuration as conf
 import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
+import app.tests.predictors.scikit_learn.model as app_test_skl
 
 
 def test_get_model(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
         model_with_config_and_endpoint: models.Model
 ) -> typing.NoReturn:
     response = client.get(url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config_and_endpoint.id}')
@@ -48,7 +48,7 @@ def test_get_model(
         model_with_config_and_endpoint.modified_at.astimezone(dt.timezone.utc)
     assert all(
         [
-            model[key] == classification_config[key] for key in classification_config.keys()
+            model[key] == app_test_skl.get_conf()['model'][key] for key in app_test_skl.get_conf()['model'].keys()
         ]
     )
 
@@ -56,7 +56,6 @@ def test_get_model(
 def test_get_models(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
         model_with_config_and_endpoint: models.Model
 ) -> typing.NoReturn:
     response = client.get(url=conf.get_config().API_V2_STR + '/models')
@@ -69,22 +68,21 @@ def test_get_models(
 def test_add_model(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any]
 ) -> typing.NoReturn:
     response = client.post(
         url=conf.get_config().API_V2_STR + '/models',
-        json=classification_config
+        json=app_test_skl.get_conf()['model']
     )
     model = response.json()
 
     assert response.status_code == 200
-    assert all([model.get(k) == classification_config.get(k) for k in classification_config.keys()])
+    assert all(
+        [model.get(k) == app_test_skl.get_conf()['model'].get(k) for k in app_test_skl.get_conf()['model'].keys()])
 
 
 def test_update_model_name(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
         model_with_config_and_endpoint: models.Model
 ) -> typing.NoReturn:
     time.sleep(3)
@@ -105,7 +103,6 @@ def test_update_model_name(
 def test_update_model_conf(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
         model_with_config_and_endpoint: models.Model
 ) -> typing.NoReturn:
     time.sleep(3)
@@ -118,7 +115,12 @@ def test_update_model_conf(
     model = response.json()
 
     assert response.status_code == 200
-    assert all([model.get(k) == classification_config.get(k) for k in classification_config.keys() if k != 'version'])
+    assert all(
+        [
+            model.get(k) == app_test_skl.get_conf()['model'].get(k) for k in
+            app_test_skl.get_conf()['model'].keys() if k != 'version'
+        ]
+    )
     assert (dt.datetime.strptime(model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f%z') -
             dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f%z')).seconds > 1
 
@@ -126,7 +128,6 @@ def test_update_model_conf(
 def test_delete_model(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
         model_with_config_and_endpoint: models.Model
 ) -> typing.NoReturn:
     response = client.delete(url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config_and_endpoint.id}')
