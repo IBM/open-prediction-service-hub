@@ -26,7 +26,7 @@ import app.schemas.impl as app_schema_impl
 
 
 def to_list(
-        input_: typ.Union[typ.List[typ.List[app_schema_impl.FeatureImpl]], typ.List[app_schema_impl.FeatureImpl]]
+        input_: typ.Union[typ.List[typ.List[app_schema_impl.ParameterImpl]], typ.List[app_schema_impl.ParameterImpl]]
 ) -> typ.Union[typ.List[typ.List[typ.Any]], typ.List[typ.Any]]:
     if isinstance(input_[0], typ.List):
         return [[col.value for col in row] for row in input_]
@@ -35,13 +35,13 @@ def to_list(
 
 
 def to_ndarray(
-        input_: typ.Union[typ.List[typ.List[app_schema_impl.FeatureImpl]], typ.List[app_schema_impl.FeatureImpl]]
+        input_: typ.Union[typ.List[typ.List[app_schema_impl.ParameterImpl]], typ.List[app_schema_impl.ParameterImpl]]
 ) -> np.ndarray:
     return np.array(to_list(input_))
 
 
 def to_dataframe(
-        input_: typ.Union[typ.List[typ.List[app_schema_impl.FeatureImpl]], typ.List[app_schema_impl.FeatureImpl]]
+        input_: typ.Union[typ.List[typ.List[app_schema_impl.ParameterImpl]], typ.List[app_schema_impl.ParameterImpl]]
 ) -> pd.DataFrame:
     if isinstance(input_[0], typ.List):
         return pd.DataFrame(to_list(input_), columns=[col.name for col in input_[0]])
@@ -50,7 +50,7 @@ def to_dataframe(
 
 
 def to_dmatrix(
-        input_: typ.Union[typ.List[typ.List[app_schema_impl.FeatureImpl]], typ.List[app_schema_impl.FeatureImpl]]
+        input_: typ.Union[typ.List[typ.List[app_schema_impl.ParameterImpl]], typ.List[app_schema_impl.ParameterImpl]]
 ) -> xgb.DMatrix:
     return xgb.DMatrix(to_ndarray(input_), nthread=4)
 
