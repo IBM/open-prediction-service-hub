@@ -27,7 +27,7 @@ class Parameter(Model):
 
         self.openapi_types = {
             'name': str,
-            'value': check_and_get_type(int,float,str,bool)
+            'value': check_and_get_type('Parameter.value',int,float,str,bool)
         }
 
         self.attribute_map = {
