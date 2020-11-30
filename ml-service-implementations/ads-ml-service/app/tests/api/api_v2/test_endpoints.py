@@ -75,13 +75,13 @@ def test_get_endpoints(
 def test_add_endpoint(
         db: saorm.Session,
         client: tstc.TestClient,
-        model_with_config_and_endpoint
+        model_with_config
 ) -> typ.NoReturn:
     endpoint_name = utils.random_string()
     response = client.post(
         url=conf.get_config().API_V2_STR + '/endpoints',
         json={'name': endpoint_name, 'status': 'creating'},
-        params={'model_id': model_with_config_and_endpoint.id}
+        params={'model_id': model_with_config.id}
     )
 
     endpoint = response.json()
