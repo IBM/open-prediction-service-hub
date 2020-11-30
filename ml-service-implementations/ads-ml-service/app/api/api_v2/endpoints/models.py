@@ -37,7 +37,7 @@ router = fastapi.APIRouter()
     response_model=impl.ModelsImpl,
     tags=['discover']
 )
-def get_ml_models_configs(
+def get_models(
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
     return {
@@ -53,7 +53,7 @@ def get_ml_models_configs(
     response_model=impl.ModelImpl,
     tags=['discover']
 )
-def get_ml_models_configs(
+def get_model(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
@@ -115,7 +115,7 @@ def patch_model(
     status_code=status.HTTP_204_NO_CONTENT,
     tags=['manage']
 )
-def get_ml_models_configs(
+def delete_model(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> responses.Response:
