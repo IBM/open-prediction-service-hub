@@ -16,7 +16,6 @@
 
 
 import datetime as dt
-import time
 import typing
 
 import sqlalchemy.orm as orm
@@ -30,9 +29,9 @@ import app.tests.utils.utils as utils
 def test_create_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
     model = crud.model.create(db, obj_in=model_create)
 
-    assert model.name == model_create.name
-    assert (dt.datetime.now(tz=dt.timezone.utc) - model.created_at.replace(tzinfo=dt.timezone.utc)).seconds < 1
-    assert (dt.datetime.now(tz=dt.timezone.utc) - model.modified_at.replace(tzinfo=dt.timezone.utc)).seconds < 1
+    assert model
+    assert (dt.datetime.now(tz=dt.timezone.utc) - model.created_at.replace(tzinfo=dt.timezone.utc)).total_seconds() < 1
+    assert (dt.datetime.now(tz=dt.timezone.utc) - model.modified_at.replace(tzinfo=dt.timezone.utc)).total_seconds() < 1
 
 
 def test_get_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
@@ -40,32 +39,8 @@ def test_get_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing
     model_1 = crud.model.get(db, id=model.id)
 
     assert model_1.id == model.id
-    assert model_1.name == model_create.name
     assert model_1.created_at == model.created_at
     assert model_1.modified_at == model.modified_at
-
-
-def test_get_model_by_name(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
-    model = crud.model.create(db, obj_in=model_create)
-    model_1 = crud.model.get_by_name(db, name=model_create.name)
-
-    assert model_1.id == model.id
-    assert model_1.name == model_create.name
-    assert model_1.created_at == model.created_at
-    assert model_1.modified_at == model.modified_at
-
-
-def test_update_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
-    model = crud.model.create(db, obj_in=model_create)
-    new_model_name = utils.random_string()
-    time.sleep(3)
-    model_1 = crud.model.update(db, db_obj=model, obj_in=schemas.ModelUpdate(name=new_model_name))
-
-    assert model_1.id == model.id
-    assert model_1.name == new_model_name
-    assert model_1.created_at == model.created_at
-    assert (dt.datetime.now(tz=dt.timezone.utc) - model.created_at.replace(tzinfo=dt.timezone.utc)).seconds > 1
-    assert (dt.datetime.now(tz=dt.timezone.utc) - model.modified_at.replace(tzinfo=dt.timezone.utc)).seconds < 1
 
 
 def test_delete_model(db: orm.Session, model_create: schemas.ModelCreate) -> typing.NoReturn:
@@ -75,7 +50,6 @@ def test_delete_model(db: orm.Session, model_create: schemas.ModelCreate) -> typ
 
     assert model_2 is None
     assert model_1.id == model.id
-    assert model_1.name == model_create.name
     assert model_1.created_at == model.created_at
     assert model_1.modified_at == model.modified_at
 

@@ -18,15 +18,15 @@
 import re
 from typing import Text
 
-from sqlalchemy import Column, Integer
-from sqlalchemy.ext.declarative import as_declarative, declared_attr
+import sqlalchemy as sql
+import sqlalchemy.ext.declarative as sql_declarative
 
 
-@as_declarative()
+@sql_declarative.as_declarative()
 class Base:
-    id = Column(Integer, nullable=False, primary_key=True, index=True)
+    # id = sql.Column('id', sql.Integer, nullable=False, unique=True, index=True, primary_key=True)
     __table_name_pattern__ = re.compile(r'(?<!^)(?=[A-Z])')
 
-    @declared_attr
+    @sql_declarative.declared_attr
     def __tablename__(cls) -> Text:
         return Base.__table_name_pattern__.sub('_', cls.__name__).lower()
