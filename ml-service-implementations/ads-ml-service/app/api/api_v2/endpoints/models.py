@@ -70,7 +70,7 @@ def add_model(
         m_in: impl.ModelCreateImpl,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=m_in.name))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db,
         obj_in=schemas.ModelConfigCreate(
@@ -95,12 +95,10 @@ def patch_model(
 ) -> typing.Dict[typing.Text, typing.Any]:
     update_data = m_in.dict(exclude_unset=True)
     model = crud.model.get(db, id=model_id)
-    new_name = m_in.name if m_in.name else model.name
     new_config = {
         field: update_data[field] if field in update_data else model.config.configuration[field]
         for field in model.config.configuration
     }
-    crud.model.update(db, db_obj=model, obj_in=schemas.ModelUpdate(name=new_name))
     crud.model_config.update(
         db,
         db_obj=model.config,
