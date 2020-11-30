@@ -23,7 +23,6 @@ import sqlalchemy.orm as saorm
 import starlette.status as status
 
 import app.api.deps as deps
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.gen.schemas.ops_schemas as ops_schemas
 import app.schemas as schemas
@@ -53,7 +52,7 @@ def get_endpoints(
     response_model=ops_schemas.Endpoint,
     tags=['discover']
 )
-def get_endpoints(
+def get_endpoint(
         endpoint_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
@@ -80,37 +79,12 @@ def add_endpoint(
     )
 
 
-@router.post(
-    path='/endpoints/{endpoint_id}',
-    status_code=status.HTTP_204_NO_CONTENT,
-    tags=['manage']
-)
-def add_binary(
-        endpoint_id: int,
-        lib: supported_lib.MlLib = fastapi.Form(...),
-        file: fastapi.UploadFile = fastapi.File(...),
-        db: saorm.Session = fastapi.Depends(deps.get_db)
-) -> responses.Response:
-    endpoint = crud.endpoint.get(db, id=endpoint_id)
-    if not endpoint:
-        raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Endpoint not found')
-    crud.binary_ml_model.create_with_endpoint(
-        db,
-        obj_in=schemas.BinaryMlModelCreate(
-            model_b64=file.file.read(),
-            library=lib
-        ),
-        endpoint_id=endpoint_id
-    )
-    return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
 @router.patch(
     path='/endpoints/{endpoint_id}',
     response_model=ops_schemas.Endpoint,
     tags=['manage']
 )
-def add_endpoint(
+def patch_endpoint(
         endpoint_id: int,
         e_in: ops_schemas.EndpointUpdate,
         db: saorm.Session = fastapi.Depends(deps.get_db)
