@@ -16,13 +16,17 @@
 
 
 import datetime as dt
+import pickle
 import time
 import typing
+import typing as typ
 
 import fastapi.testclient as tstc
 import sqlalchemy.orm as orm
+import sqlalchemy.orm as saorm
 
 import app.core.configuration as conf
+import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 
@@ -132,3 +136,21 @@ def test_delete_model(
     assert response.status_code == 204
     assert response_1.status_code == 204
     assert model is None
+
+
+def test_add_binary(
+        db: saorm.Session,
+        client: tstc.TestClient,
+        model_with_config: models.Model,
+        classification_predictor: object
+) -> typ.NoReturn:
+    response = client.post(
+        url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config.id}',
+        files={'file': pickle.dumps(classification_predictor)},
+        data={'lib': supported_lib.MlLib.NDARRAY_SKL.value.encode()}
+    )
+    response_1 = client.get(
+        url=conf.get_config().API_V2_STR + '/endpoints' + f'/{model_with_config.id}')
+
+    assert response.status_code == 204
+    assert response_1.json()['status'] == 'in_service'
