@@ -32,10 +32,8 @@ import app.tests.utils.utils as utils
 def model_with_config_and_endpoint(
         db: orm.Session,
         classification_config: typing.Dict[typing.Text, typing.Any],
+        model_with_config: models.Model
 ) -> models.Model:
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
-    crud.model_config.create_with_model(
-        db, obj_in=schemas.ModelConfigCreate(configuration=classification_config), model_id=model.id
-    )
-    crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model.id)
-    return model
+    crud.endpoint.create_with_model(
+        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_with_config.id)
+    return model_with_config

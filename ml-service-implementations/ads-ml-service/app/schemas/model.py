@@ -16,17 +16,16 @@
 
 
 import datetime as dt
-import typing
 
 import pydantic as pyd
 
 
 class ModelBase(pyd.BaseModel):
-    name: typing.Optional[typing.Text] = None
+    pass
 
 
 class ModelCreate(ModelBase):
-    name: typing.Text
+    pass
 
 
 class ModelUpdate(ModelBase):
@@ -35,7 +34,6 @@ class ModelUpdate(ModelBase):
 
 class ModelInDBBase(ModelBase):
     id: int
-    name: typing.Text
     created_at: dt.datetime
     modified_at: dt.datetime
 
