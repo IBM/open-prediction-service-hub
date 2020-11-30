@@ -15,17 +15,27 @@
 #
 
 
-import pickle
 import typing
 
 import pytest
 import sqlalchemy.orm as orm
 
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 import app.schemas as schemas
 import app.tests.utils.utils as utils
+
+
+@pytest.fixture()
+def model_with_config(
+        db: orm.Session,
+        classification_config: typing.Dict[typing.Text, typing.Any],
+) -> models.Model:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=classification_config), model_id=model.id
+    )
+    return model
 
 
 @pytest.fixture()
