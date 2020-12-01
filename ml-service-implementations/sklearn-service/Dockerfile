@@ -1,16 +1,39 @@
-FROM python:3-alpine
+# The build-stage image:
+FROM continuumio/miniconda3 AS build
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN conda update -n base -c defaults conda
 
-COPY requirements.txt /usr/src/app/
+# Install the package as normal:
+COPY environment.yml .
+RUN conda env create -f environment.yml
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+# Install conda-pack:
+RUN conda install -c conda-forge conda-pack
 
-COPY . /usr/src/app
+# Use conda-pack to create a standalone enviornment
+# in /venv:
+RUN conda-pack -n sklearn-service -o /tmp/env.tar && \
+  mkdir /venv && cd /venv && tar xf /tmp/env.tar && \
+  rm /tmp/env.tar
+
+# We've put venv in same path it'll be in final image,
+# so now fix up paths:
+RUN /venv/bin/conda-unpack
+
+
+# The runtime-stage image; we can use Debian as the
+# base image since the Conda env also includes Python
+# for us.
+FROM debian:buster AS runtime
+
+# Copy /venv from the previous stage:
+COPY --from=build /venv /venv
+COPY . /app
 
 EXPOSE 8080
 
-ENTRYPOINT ["python3"]
+SHELL ["/bin/bash", "-c"]
 
-CMD ["-m", "openapi_server"]
+ENTRYPOINT source /venv/bin/activate && \
+           cd /app && \
+           python -m openapi_server
