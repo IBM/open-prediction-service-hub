@@ -51,8 +51,11 @@ ENV \
 
 COPY . ./
 COPY custom_modules ${CUSTOM_MODULES}
-COPY --from=codegen-image ${OPS_HOME}/app/gen/schemas/ops_schemas.py app/gen/schemas/
-COPY --from=build-image ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+# COPY --from=codegen-image ${OPS_HOME}/app/gen/schemas/ops_schemas.py app/gen/schemas/
+# COPY --from=build-image ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+# OpenShift 4.3 does not support ENV variables in COPY
+COPY --from=codegen-image /usr/src/ads-ml-service/app/gen/schemas/ops_schemas.py app/gen/schemas/
+COPY --from=build-image /opt/ads-ml-service/venv /opt/ads-ml-service/venv
 COPY scripts/. scripts/
 COPY entrypoint.sh /entrypoint.sh
 COPY logging.yaml ${SETTINGS}/
