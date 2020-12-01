@@ -52,6 +52,14 @@ def _deserialize(db_obj: models.BinaryMlModel) -> kfserving_impl.InMemoryKFModel
             model = pipeline_model_wrapper.DataframeModel(
                 predictor_binary=joblib.load(io.BytesIO(db_obj.model_b64))
             )
+        elif db_obj.library == supported_lib.MlLib.DATAFRAME_PMML:
+            try:
+                import pypmml
+            except ImportError:
+                raise RuntimeError('Package pypmml not installed')
+            model = pipeline_model_wrapper.DataframeModel(
+                predictor_binary=pypmml.Model.load(io.BytesIO(db_obj.model_b64))
+            )
         else:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'ML library not supported: {db_obj.library}')

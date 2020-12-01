@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.IBM Confidential
 #
-
-
+import pathlib
 import pickle
 import typing
 
@@ -26,6 +25,7 @@ import app.crud as crud
 import app.models as models
 import app.schemas as schemas
 import app.tests.utils.utils as utils
+import app.tests.predictors.pmml.pmml as app_test_pmml
 
 
 @pytest.fixture()
@@ -38,4 +38,25 @@ def model_with_config_and_endpoint(
         db, obj_in=schemas.ModelConfigCreate(configuration=classification_config), model_id=model.id
     )
     crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model.id)
+    return model
+
+
+@pytest.fixture()
+def pmml_endpoint(
+        db: orm.Session,
+        tmp_path: pathlib.Path
+) -> models.Model:
+    config = app_test_pmml.get_conf()
+    pmml_path = app_test_pmml.get_pmml_file(tmp_path)
+    with pmml_path.open(mode='rb') as fd:
+        pmml_file = fd.read()
+    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=config['model']['name']))
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
+    )
+    endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']), model_id=model.id)
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=pmml_file,
+        library=supported_lib.MlLib[config['binary']['lib']]
+    ), endpoint_id=endpoint.id)
     return model
