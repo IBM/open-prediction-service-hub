@@ -32,10 +32,10 @@ RUN \
     rm -rf /var/lib/apt/lists/* && \
     python3 -m venv ${VIRTUAL_ENV} && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
-    python3 -m pip install -q --no-cache-dir --use-feature=2020-resolver --requirement requirements.txt && \
+    python3 -m pip install -q --no-cache-dir --requirement requirements.txt && \
     # requirements-ml will overrides some libraries in requirements.txt. This procedure might raise some false positive
     # incompatibility errors.
-    python3 -m pip install -q --no-cache-dir --use-feature=2020-resolver --requirement requirements-ml.txt
+    python3 -m pip install -q --no-cache-dir --requirement requirements-ml.txt
 
 
 FROM python-base AS runtime-image
