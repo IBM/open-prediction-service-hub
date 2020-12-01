@@ -25,7 +25,6 @@ import sqlalchemy.orm as saorm
 import app.core.configuration as conf
 import app.crud as crud
 import app.models as models
-import app.tests.utils.utils as utils
 
 
 def test_get_endpoint(
@@ -68,39 +67,6 @@ def test_get_endpoints(
 
     assert response.status_code == 200
     assert endpoints['endpoints'][0]['id'] == str(endpoint_with_model_and_binary.id)
-
-
-def test_add_endpoint(
-        db: saorm.Session,
-        client: tstc.TestClient,
-        model_with_config
-) -> typ.NoReturn:
-    endpoint_name = utils.random_string()
-    response = client.post(
-        url=conf.get_config().API_V2_STR + '/endpoints',
-        json={'name': endpoint_name, 'status': 'creating'},
-        params={'model_id': model_with_config.id}
-    )
-
-    endpoint = response.json()
-    assert endpoint['name'] == endpoint_name
-    assert endpoint['status'] == 'creating'
-
-
-def test_update_endpoint(
-        db: saorm.Session,
-        client: tstc.TestClient,
-        endpoint_with_model
-) -> typ.NoReturn:
-    new_name = utils.random_string()
-    response = client.patch(
-        url=conf.get_config().API_V2_STR + '/endpoints' + f'/{endpoint_with_model.id}',
-        json={'name': new_name}
-    )
-
-    endpoint = response.json()
-    assert endpoint['name'] == new_name
-    assert endpoint['status'] == 'creating'
 
 
 def test_delete_endpoint(

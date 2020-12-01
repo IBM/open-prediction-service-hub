@@ -25,7 +25,6 @@ import starlette.status as status
 import app.api.deps as deps
 import app.crud as crud
 import app.gen.schemas.ops_schemas as ops_schemas
-import app.schemas as schemas
 import app.schemas.impl as impl
 
 router = fastapi.APIRouter()
@@ -58,46 +57,6 @@ def get_endpoint(
 ) -> typing.Dict[typing.Text, typing.Any]:
     return impl.EndpointImpl.from_database(
         e=crud.endpoint.get(db, id=endpoint_id)
-    )
-
-
-@router.post(
-    path='/endpoints',
-    response_model=ops_schemas.Endpoint,
-    tags=['manage']
-)
-def add_endpoint(
-        model_id: int,
-        m_in: ops_schemas.EndpointCreation,
-        db: saorm.Session = fastapi.Depends(deps.get_db)
-) -> typing.Dict[typing.Text, typing.Any]:
-    model = crud.model.get(db, id=model_id)
-    if not model:
-        raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Model not found')
-    return impl.EndpointImpl.from_database(
-        e=crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=m_in.name), model_id=model_id)
-    )
-
-
-@router.patch(
-    path='/endpoints/{endpoint_id}',
-    response_model=ops_schemas.Endpoint,
-    tags=['manage']
-)
-def patch_endpoint(
-        endpoint_id: int,
-        e_in: ops_schemas.EndpointUpdate,
-        db: saorm.Session = fastapi.Depends(deps.get_db)
-) -> typing.Dict[typing.Text, typing.Any]:
-    endpoint = crud.endpoint.get(db, id=endpoint_id)
-    if not endpoint:
-        raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Endpoint not found')
-    return impl.EndpointImpl.from_database(
-        e=crud.endpoint.update(
-            db,
-            db_obj=endpoint,
-            obj_in=schemas.EndpointUpdate(name=e_in.name)
-        )
     )
 
 
