@@ -6,7 +6,7 @@ Stp by step guide to create this server
 
 There is a maven command to execute swagger code generation:
 
-`mvn generate-source`
+`mvn -P generate generate-source`
 
 ## Correct generated code
 
