@@ -77,7 +77,10 @@ def predict(
     ml_output = deserialized.predict({'instances': ml_input})
     LOGGER.debug('ML output: %s', ml_output)
 
-    prediction_output = {'result': {**{k: v[0] for k, v in ml_output.items()}}}
+    try:
+        prediction_output = {'result': {**{k: v[0] for k, v in ml_output.items()}}}
+    except KeyError:
+        prediction_output = {'result': ml_output}
     LOGGER.info('Prediction output : %s', prediction_output)
     # return flatmap
     return prediction_output

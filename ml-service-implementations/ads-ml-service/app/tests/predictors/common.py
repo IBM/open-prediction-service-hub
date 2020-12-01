@@ -15,12 +15,16 @@
 #
 
 
-import enum
-import typing
+import numpy as np
+import pandas as pd
+import sklearn.ensemble as skl_ensemble
+
+import app.tests.utils.utils as app_utils
 
 
-class MlLib(typing.Text, enum.Enum):
-    DATAFRAME_SKL = 'dataframe_skl'
-    DATAFRAME_PMML = 'dataframe_pmml'
-    NDARRAY_SKL = 'ndarray_skl'
-    NDARRAY_XGB = 'ndarray_xgb'
+def get_classification_predictor() -> skl_ensemble.RandomForestClassifier:
+    classifier = skl_ensemble.RandomForestClassifier(random_state=42)
+    x_random = pd.DataFrame(data=np.random.rand(10, 2), columns=['x', 'y'])
+    y_random = np.array([app_utils.random_string() for _ in range(10)])
+    classifier.fit(x_random, y_random)
+    return classifier

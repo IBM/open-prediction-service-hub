@@ -3,7 +3,8 @@ FROM python:3.7-slim AS python-base
 ENV \
     OPS_HOME="/usr/src/ads-ml-service" \
     VIRTUAL_ENV="/opt/ads-ml-service/venv" \
-    CUSTOM_MODULES='/var/lib/ads-ml-service/custom'
+    CUSTOM_MODULES='/var/lib/ads-ml-service/custom' \
+    LOG_DIR="/var/log/ads-ml-service"
 ENV \
     PATH="${VIRTUAL_ENV}/bin:${PATH}" \
     PYTHONPATH="${CUSTOM_MODULES}:${OPS_HOME}:${PYTHONPATH}"
@@ -25,7 +26,7 @@ RUN \
 
 FROM python-base AS build-image
 
-COPY requirements.txt requirements-ml.txt ${OPS_HOME}/
+COPY requirements.txt requirements-ml.txt ./
 RUN \
     apt-get -q update && \
     apt-get -q install --assume-yes git && \
@@ -48,39 +49,38 @@ ENV \
     # ENV GUNICORN_TIMEOUT=30
     # ENV GUNICORN_WORKER_NUM=16
 
-COPY . ${OPS_HOME}
+COPY . ./
 COPY custom_modules ${CUSTOM_MODULES}
-COPY --from=codegen-image ${OPS_HOME}/app/gen/. ${OPS_HOME}/app/gen/
+COPY --from=codegen-image ${OPS_HOME}/app/gen/schemas/ops_schemas.py app/gen/schemas/
 COPY --from=build-image ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY scripts/. scripts/
 COPY entrypoint.sh /entrypoint.sh
+COPY logging.yaml ${SETTINGS}/
 RUN \
     apt-get -q update && \
-    apt-get -q install --assume-yes libgomp1 && \
+    mkdir -p /usr/share/man/man1 && \
+    apt-get -q install --assume-yes libgomp1 default-jre-headless && \
     rm -rf /var/lib/apt/lists/* && \
+    mkdir -p ${MODEL_STORAGE} && \
+    mkdir -p "${LOG_DIR}" && \
     adduser --quiet --shell /bin/false --gid 0 --system ops && \
     chown ops:root /entrypoint.sh && \
     chmod u+x /entrypoint.sh && \
     chmod g=u /entrypoint.sh && \
     chown --recursive ops:root ${OPS_HOME} && \
     chmod --recursive g=u ${OPS_HOME} && \
-    mkdir -p ${MODEL_STORAGE} && \
     chown --recursive ops:root ${MODEL_STORAGE} && \
     chmod --recursive g=u ${MODEL_STORAGE} && \
-    mkdir -p ${SETTINGS} && \
     chown --recursive ops:root ${SETTINGS} && \
     chmod --recursive g=u ${SETTINGS} && \
     chown --recursive ops:root ${CUSTOM_MODULES} && \
-    chmod --recursive g=u ${CUSTOM_MODULES}
+    chmod --recursive g=u ${CUSTOM_MODULES} && \
+    chown --recursive ops:root ${LOG_DIR} && \
+    chmod --recursive g=u ${LOG_DIR}
 
 VOLUME ${MODEL_STORAGE}
 VOLUME ${SETTINGS}
 VOLUME ${CUSTOM_MODULES}
-
-ENV LOG_DIR="/var/log/ads-ml-service"
-RUN \
-    mkdir -p "${LOG_DIR}" && \
-    chown --recursive ops:root ${LOG_DIR} && \
-    chmod --recursive g=u ${LOG_DIR}
 VOLUME ${LOG_DIR}
 
 

@@ -17,6 +17,7 @@
 
 import app.core.kfserving_impl as kfserving_impl
 import pandas as pd
+import numpy as np
 import typing as typ
 
 
@@ -27,5 +28,10 @@ class DataframeModel(kfserving_impl.InMemoryKFModel):
             model_output = self.binary.predict(instances)
         except Exception as e:
             raise Exception(f'Failed to predict {e}')
-        result = model_output.tolist()
+        if isinstance(model_output, pd.DataFrame):
+            result = model_output.to_dict(orient='records')
+        elif isinstance(model_output, np.ndarray):
+            result = model_output.tolist()
+        else:
+            result = str(model_output)
         return {'predictions': result}
