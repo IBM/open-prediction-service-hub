@@ -1,20 +1,16 @@
 openapi: 3.0.3
 info:
-  description: The Open Prediction Service API is an effort to provide an Open API
-    that enables unsupported native ML Providers in Decision Designer or Decision
-    Runtime.
-  title: Open Prediction Service
-  version: 2.0.0
+  description: This is a sample implementation of an Open Prediction Service compatible service
+  title: scikit-learn service
+  version: 1.0.0
 servers:
-- url: /
+- url: http://0.0.0.0:8080
+  description: local docker instance server
 tags:
 - description: Endpoints related to the capabilities of the server
   name: info
 - description: Endpoints related to the discovery of machine learning models and deployments
   name: discover
-- description: Endpoints related to the management of machine learning models and
-    deployments
-  name: manage
 - description: Endpoints to run deployed models
   name: run
 paths:
@@ -68,67 +64,7 @@ paths:
       tags:
       - discover
       x-openapi-router-controller: openapi_server.controllers.discover_controller
-    post:
-      description: Create a Model Endpoint
-      operationId: create_endpoint
-      parameters:
-      - description: ID of model
-        explode: true
-        in: query
-        name: model_id
-        required: false
-        schema:
-          type: string
-        style: form
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EndpointCreation'
-        description: Required Endpoint definition
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Endpoint'
-          description: Successful Response
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Error
-      summary: Create Endpoint
-      tags:
-      - manage
-      x-openapi-router-controller: openapi_server.controllers.manage_controller
   /endpoints/{endpoint_id}:
-    delete:
-      operationId: delete_endpoint_by_id
-      parameters:
-      - description: ID of endpoint
-        explode: false
-        in: path
-        name: endpoint_id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "204":
-          description: Successful Response
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Error
-      summary: Delete Endpoint by Id
-      tags:
-      - manage
-      x-openapi-router-controller: openapi_server.controllers.manage_controller
     get:
       description: Returns an ML Endpoint.
       operationId: get_endpoint_by_id
@@ -158,40 +94,6 @@ paths:
       tags:
       - discover
       x-openapi-router-controller: openapi_server.controllers.discover_controller
-    patch:
-      description: update an existing Endpoint in the service
-      operationId: update_endpoint_by_endpoint_id
-      parameters:
-      - description: ID of endpoint
-        explode: false
-        in: path
-        name: endpoint_id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EndpointUpdate'
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Endpoint'
-          description: Successful Response
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Error
-      summary: Update an Endpoint
-      tags:
-      - manage
-      x-openapi-router-controller: openapi_server.controllers.manage_controller
   /info:
     get:
       description: Returns a health check of underlying service and additional information
@@ -228,58 +130,7 @@ paths:
       tags:
       - discover
       x-openapi-router-controller: openapi_server.controllers.discover_controller
-    post:
-      description: Add a Model to the service
-      operationId: add_model
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ModelCreation'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Model'
-          description: Successful Response
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Error
-      summary: Add a Model
-      tags:
-      - manage
-      x-openapi-router-controller: openapi_server.controllers.manage_controller
   /models/{model_id}:
-    delete:
-      description: Removes a model specified by Id
-      operationId: delete_model_by_model_id
-      parameters:
-      - description: ID of model
-        explode: false
-        in: path
-        name: model_id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "204":
-          description: Successful Response
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Error
-      summary: Delete Model by Id
-      tags:
-      - manage
-      x-openapi-router-controller: openapi_server.controllers.manage_controller
     get:
       description: Returns a ML model.
       operationId: get_model_by_id
@@ -309,41 +160,6 @@ paths:
       tags:
       - discover
       x-openapi-router-controller: openapi_server.controllers.discover_controller
-    patch:
-      description: update an existing Model in the service
-      operationId: update_model_by_model_id
-      parameters:
-      - description: ID of model
-        explode: false
-        in: path
-        name: model_id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ModelUpdate'
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Model'
-          description: Successful Response
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Error
-      summary: Update a Model
-      tags:
-      - manage
-      x-openapi-router-controller: openapi_server.controllers.manage_controller
   /predictions:
     post:
       operationId: prediction
@@ -855,20 +671,15 @@ components:
     ServerInfo:
       description: Information of the service
       example:
-        error: error
         info:
-          description: Sample service for scikit-learn
-          version: 1.0.0
-          owner: admin
+          description: Open Prediction Service for Scikit Learn models based on OPSv2 API
         status: ok
       properties:
         info:
           additionalProperties: true
           description: Information of the service
           example:
-            description: Sample service for scikit-learn
-            version: 1.0.0
-            owner: admin
+            description: Open Prediction Service for Scikit Learn models based on OPSv2 API
           title: Information
           type: object
         status:
@@ -891,8 +702,9 @@ components:
       description: Available capabilities from this service
       example:
         capabilities:
-        - null
-        - null
+        - info
+        - discover
+        - run
       properties:
         capabilities:
           description: Capabilities of the service
