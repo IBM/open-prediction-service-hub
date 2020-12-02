@@ -28,6 +28,11 @@ def prediction(body):  # noqa: E501
         input_args=[field["name"] for field in input_schema]
         prediction_args=[parameter.value for parameter in prediction.parameters if parameter.name in input_args]
         model=pickle.load(open(f"data/{model_id}/model.pkl","rb")) #TODO: loading should only be done once
-        prediction=model.predict([prediction_args])[0]
-        return {"output_schema": {"predictions": prediction }}
+        prediction = model.predict([prediction_args])[0]
+        if not hasattr(model, 'predict_proba'):
+            return {"output_schema": {"predictions": prediction }}
+        else:
+            scores = model.predict_proba([prediction_args])[0].tolist()
+            return {"output_schema": {"predictions": prediction, "scores": scores}}
+
     return Error("Cannot parse request")
