@@ -60,6 +60,7 @@ in `get_info()` replace `return 'do some magic!'` by
     )
     return ServerInfo(status='ok', info=info)
 ```
+
 ## Update the discover controller
 
 The discover controller gathers, at server initilization, the available models in the server.
@@ -73,7 +74,3 @@ The discover controller, in this example's implementation,  serves the endpoints
 The run controller has been modified, the function `prediction` in `openapi_server\controllers\run_controller.py` has been updated to take the argument `body` instead of the default `prediction` that doesn't work.
 
 The run controller simply executes the pickle file `model.pkl` of the model requested by the client with the supplied arguments
-
-
-
-
