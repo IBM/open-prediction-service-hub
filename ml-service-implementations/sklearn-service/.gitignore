@@ -60,8 +60,17 @@ venv/
 docs/_build/
 
 # PyBuilder
-target/
+target
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+
 .classpath
+.settings/
+.vscode/
+.openapi-generator
+.pytest_cache/
+.tox/
+.coverage
+.project
