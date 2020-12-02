@@ -1,0 +1,19 @@
+{
+  "parameters": [{
+    "name": "sepal_length",
+    "value": 20000
+  }, {
+    "name": "sepal_width",
+    "value": 3
+  }, {
+    "name": "petal_length",
+    "value": 1
+  }, {
+    "name": "petal_width",
+    "value": 2
+  }],
+  "target": [{
+    "href": "http://0.0.0.0:8080/endpoints/classification/iris_svc",
+    "rel": "endpoint"
+  }]
+}
