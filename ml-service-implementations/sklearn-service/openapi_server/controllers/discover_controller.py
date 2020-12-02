@@ -13,12 +13,14 @@ from flask import request
 
 def model_id_to_endpoint(model_id):
     endpoint_parameters=get_model_conf(model_id)["endpoint"]
-    links = [Link('self', f"{request.url_root}{path}/{model_id}") for path in ["endpoints","models"]]
+    links = [Link('self', f"{request.url_root}endpoints/{model_id}"),
+             Link('model', f"{request.url_root}models/{model_id}")]
     return Endpoint(links=links,**endpoint_parameters)
 
 def model_id_to_model(model_id):
     model_parameters=get_model_conf(model_id)["model"]
-    links = [Link('self', f"{request.url_root}{path}/{model_id}") for path in ["endpoints","models"]]
+    links = [Link('self', f"{request.url_root}models/{model_id}"),
+             Link('endpoint', f"{request.url_root}endpoints/{model_id}")]
     return Model(links=links,**model_parameters)
 
 def get_endpoint_by_id(endpoint_id):  # noqa: E501
