@@ -1,6 +1,6 @@
 # Tutorial
 
-Stp by step guide to create this server
+Step by step guide to create this server
 
 ## Generate server source code from OpenAPI
 
@@ -37,7 +37,7 @@ In the automatically generated file `openapi_server/util.py`, add Line 18:
 
 Finally copy and paste `openapi_server/models/check_and_get_type.py` to your model folder.
 
-This suggested workaround has been applied in this ops server, please feel to read source code in doubt.
+This suggested workaround has been applied in this service, please feel to read source code in doubt.
 
 ## Model change
 
@@ -71,6 +71,11 @@ The discover controller, in this example's implementation,  serves the endpoints
 
 ## Update the run controller
 
-The run controller has been modified, the function `prediction` in `openapi_server\controllers\run_controller.py` has been updated to take the argument `body` instead of the default `prediction` that doesn't work.
+The run controller has been modified, the function `prediction` in `openapi_server/controllers/run_controller.py` has been updated to take the argument `body` instead of the default `prediction` that doesn't work.
 
 The run controller simply executes the pickle file `model.pkl` of the model requested by the client with the supplied arguments
+
+## Remove the manage controller
+
+As this implementation does not manage anything, remove the file `openapi_server/controllers/manage_controller.py` and remove all endpoints tagged `manage` in the `openapi_server/openapi/openapi.yaml` to ensure that the generated swagger UI doesn't display them.
+
