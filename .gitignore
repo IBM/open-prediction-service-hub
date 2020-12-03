@@ -282,3 +282,4 @@ buildNumber.properties
 .idea
 *.iml
 .vscode
+ml-service-implementations/sklearn-service/.project
