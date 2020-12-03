@@ -55,12 +55,10 @@ class InMemoryModel:
             raise
 
     def predict_proba(self, request: typ.Any) -> typ.Any:
-        if not hasattr(self.model, 'predict_proba'):
-            return None
         try:
             return self.model.predict_proba(request)
         except Exception:
-            LOGGER.exception('Failed to predict %s', request)
+            LOGGER.exception('Failed to predict_proba %s', request)
             raise
 
 
