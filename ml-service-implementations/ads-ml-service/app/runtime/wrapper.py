@@ -84,7 +84,7 @@ class PMMLFormat(InMemoryModel):
 class SBTFormat(InMemoryModel):
     @staticmethod
     def load(binary: typ.Any) -> SBTFormat:
-        if not pypmml:
+        if not xgb:
             LOGGER.exception('xgboost is not installed')
             raise RuntimeError('xgboost is not installed')
         model = xgb.Booster(params={"nthread": 4}, model_file=bytearray(binary))
