@@ -22,6 +22,8 @@ import logging
 import typing as typ
 
 import joblib
+import numpy as np
+import pandas as pd
 
 try:
     import pypmml
@@ -36,6 +38,7 @@ except ImportError:
 import app.runtime.input as app_input
 import app.runtime.output as app_output
 import app.schemas.binary_config as app_binary_config
+import app.schemas.impl as app_schemas_impl
 
 LOGGER = logging.getLogger(__name__)
 
@@ -85,11 +88,12 @@ class SBTFormat(InMemoryModel):
         if not xgb:
             LOGGER.exception('xgboost is not installed')
             raise RuntimeError('xgboost is not installed')
-        model = xgb.Booster(params={"nthread": 4}, model_file=bytearray(binary))
+        model = xgb.Booster(model_file=bytearray(binary))
         return SBTFormat(model)
 
 
 WRAPPERS = {
+    app_binary_config.ModelWrapper.PICKLE: JoblibFormat,
     app_binary_config.ModelWrapper.JOBLIB: JoblibFormat,
     app_binary_config.ModelWrapper.PMML: PMMLFormat,
     app_binary_config.ModelWrapper.BST: SBTFormat
@@ -105,24 +109,57 @@ class ModelInvocationExecutor:
             output_type: app_binary_config.ModelOutput = app_binary_config.ModelOutput.NUMPY_ARRAY,
             binary_format: app_binary_config.ModelWrapper = app_binary_config.ModelWrapper.JOBLIB
     ):
-        self.input_handler = app_input.INPUT_HANDLING[input_type]
-        self.output_handler = app_output.OUTPUT_HANDLING[output_type]
+        self.input_handler = None \
+            if input_type is app_binary_config.ModelInput.AUTO \
+            else app_input.INPUT_HANDLING[input_type]
+        self.output_handler = None \
+            if output_type is app_binary_config.ModelOutput.AUTO \
+            else app_output.OUTPUT_HANDLING[output_type]
         self.model_wrapper = WRAPPERS[binary_format]
 
         self.loaded_model = self.model_wrapper.load(model)
         self.can_predict_proba = self.loaded_model.has_method('predict_proba')
 
+    def input_handling(
+            self,
+            input_: typ.Union[
+                typ.List[typ.List[app_schemas_impl.ParameterImpl]], typ.List[app_schemas_impl.ParameterImpl]]
+    ) -> typ.Any:
+        if self.input_handler is not None:
+            return self.input_handler(input_)
+        if self.model_wrapper is SBTFormat:
+            self.input_handler = app_input.to_dmatrix
+        else:
+            self.input_handler = app_input.to_dataframe
+        return self.input_handler(input_)
+
+    def output_handling(
+            self,
+            output: typ.Any
+    ) -> typ.Any:
+        if self.output_handler is not None:
+            return self.output_handler(output)
+        if isinstance(output, np.ndarray):
+            self.output_handler = app_output.from_ndarray
+        elif isinstance(output, pd.DataFrame):
+            self.output_handler = app_output.from_dataframe
+        elif isinstance(output, typ.List):
+            self.output_handler = app_output.from_list
+        else:
+            raise ValueError(f'Unsupported output type: {type(output)}')
+        return self.output_handler(output)
+
     def predict(self, request: typ.Any) -> typ.Any:
-        prepared_data = self.input_handler(request)
+        prepared_data = self.input_handling(request)
         LOGGER.debug('ML input: %s', prepared_data)
 
         predict = self.loaded_model.predict(prepared_data)
         LOGGER.debug('ML output: %s', predict)
-        formatted_predict = self.output_handler(predict)
+        formatted_predict = self.output_handling(predict)
         if not self.can_predict_proba:
             return {'result': {'predictions': formatted_predict}}
         else:
             predict_proba = self.loaded_model.predict_proba(prepared_data)
             LOGGER.debug('ML output(scores): %s', predict_proba)
-            formatted_predict_proba = self.output_handler(predict_proba)
+            formatted_predict_proba = self.output_handling(predict_proba)
             return {'result': {'predictions': formatted_predict, 'scores': formatted_predict_proba}}
