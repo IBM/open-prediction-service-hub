@@ -52,7 +52,7 @@ def to_dataframe(
 def to_dmatrix(
         input_: typ.Union[typ.List[typ.List[app_schema_impl.ParameterImpl]], typ.List[app_schema_impl.ParameterImpl]]
 ) -> xgb.DMatrix:
-    return xgb.DMatrix(to_ndarray(input_), nthread=4)
+    return xgb.DMatrix(to_ndarray(input_))
 
 
 INPUT_HANDLING = {
