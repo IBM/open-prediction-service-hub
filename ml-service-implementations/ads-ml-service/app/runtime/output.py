@@ -59,21 +59,7 @@ def from_dataframe(
     return from_list(output.to_dict(orient='records'))
 
 
-def auto(
-        output: typing.Any
-) -> typing.Any:
-    if isinstance(output, np.ndarray):
-        return from_ndarray(output)
-    elif isinstance(output, pd.DataFrame):
-        return from_dataframe(output)
-    elif isinstance(output, typing.List):
-        return from_list(output)
-    else:
-        raise ValueError(f'Unsupported output type: {type(output)}')
-
-
 OUTPUT_HANDLING = {
-    app_binary_config.ModelOutput.AUTO: auto,
     app_binary_config.ModelOutput.LIST: from_list,
     app_binary_config.ModelOutput.NUMPY_ARRAY: from_ndarray,
     app_binary_config.ModelOutput.DATAFRAME: from_dataframe
