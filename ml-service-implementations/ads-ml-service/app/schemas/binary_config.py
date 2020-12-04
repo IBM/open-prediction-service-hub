@@ -20,6 +20,7 @@ import typing as typ
 
 
 class ModelInput(typ.Text, enum.Enum):
+    AUTO = 'auto'
     DATAFRAME = 'DataFrame'
     NUMPY_ARRAY = 'ndarray'
     DMATRIX = 'DMatrix'
@@ -34,6 +35,7 @@ class ModelOutput(typ.Text, enum.Enum):
 
 
 class ModelWrapper(typ.Text, enum.Enum):
+    PICKLE = 'pickle'
     JOBLIB = 'joblib'
     PMML = 'pmml'
     BST = 'bst'
