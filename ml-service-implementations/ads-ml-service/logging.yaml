@@ -34,14 +34,14 @@ handlers:
 
 loggers:
   'app.api':
-    level: ERROR
+    level: INFO
     propagate: no
     handlers:
       - console
       - info_file_handler
       - error_file_handler
   'app.runtime':
-    level: ERROR
+    level: INFO
     propagate: no
     handlers:
       - console
