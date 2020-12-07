@@ -16,7 +16,6 @@
 
 
 import pathlib
-import typing
 import pickle
 
 import pytest
@@ -30,14 +29,24 @@ import app.tests.predictors.pmml.model as app_test_pmml
 import app.tests.predictors.scikit_learn.model as app_test_skl
 import app.tests.predictors.xgboost.model as app_test_xgboost
 import app.tests.utils.utils as app_test_utils
-import app.tests.predictors.pmml.pmml as app_test_pmml
-import app.tests.utils.utils as utils
+
+
+@pytest.fixture
+def model_with_config(
+        db: orm.Session
+) -> models.Model:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
+    )
+    return model
+
 
 @pytest.fixture
 def endpoint_with_model(
         db: orm.Session
 ) -> models.Endpoint:
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=app_test_skl.get_conf()['model']['name']))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
     )
@@ -47,12 +56,11 @@ def endpoint_with_model(
     return endpoint
 
 
-
 @pytest.fixture()
 def model_with_config_and_endpoint(
         db: orm.Session
 ) -> models.Model:
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=app_test_skl.get_conf()['model']['name']))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
     )
@@ -65,7 +73,7 @@ def identity_endpoint(
         db: orm.Session
 ) -> models.Endpoint:
     config = app_test_identity.get_conf()
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=config['model']['name']))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
@@ -83,7 +91,7 @@ def skl_endpoint(
         db: orm.Session
 ) -> models.Endpoint:
     config = app_test_skl.get_conf()
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=config['model']['name']))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
@@ -105,7 +113,7 @@ def pmml_endpoint(
     pmml_path = app_test_pmml.get_pmml_file(tmp_path)
     with pmml_path.open(mode='rb') as fd:
         pmml_file = fd.read()
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=config['model']['name']))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
@@ -126,7 +134,7 @@ def xgboost_endpoint(
     config = app_test_xgboost.get_conf()
     model_path = tmp_path.joinpath('model.bst')
     app_test_xgboost.get_xgboost_classification_predictor().save_model(fname=model_path.__str__())
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=config['model']['name']))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
@@ -139,14 +147,3 @@ def xgboost_endpoint(
         **config['binary']
     ), endpoint_id=endpoint.id)
     return endpoint
-
-
-@pytest.fixture()
-def model_with_config_and_endpoint(
-        db: orm.Session,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-        model_with_config: models.Model
-) -> models.Model:
-    crud.endpoint.create_with_model(
-        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_with_config.id)
-    return model_with_config

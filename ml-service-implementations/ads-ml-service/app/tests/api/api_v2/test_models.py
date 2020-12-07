@@ -26,7 +26,6 @@ import sqlalchemy.orm as orm
 import sqlalchemy.orm as saorm
 
 import app.core.configuration as conf
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 import app.tests.predictors.scikit_learn.model as app_test_skl
@@ -142,13 +141,12 @@ def test_delete_model(
 def test_add_binary(
         db: saorm.Session,
         client: tstc.TestClient,
-        model_with_config: models.Model,
-        classification_predictor: object
+        model_with_config: models.Model
 ) -> typ.NoReturn:
     response = client.post(
         url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config.id}',
-        files={'file': pickle.dumps(classification_predictor)},
-        data={'lib': supported_lib.MlLib.NDARRAY_SKL.value.encode()}
+        files={'file': pickle.dumps(app_test_skl.get_classification_predictor())},
+        data=app_test_skl.get_conf()['binary']
     )
     response_1 = client.get(
         url=conf.get_config().API_V2_STR + '/endpoints' + f'/{model_with_config.id}')

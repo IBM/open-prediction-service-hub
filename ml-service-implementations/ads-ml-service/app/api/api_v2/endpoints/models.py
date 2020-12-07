@@ -24,9 +24,9 @@ import sqlalchemy.orm as saorm
 import starlette.status as status
 
 import app.api.deps as deps
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.schemas as schemas
+import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
 
 router = fastapi.APIRouter()
@@ -133,20 +133,24 @@ def delete_model(
 )
 def add_binary(
         model_id: int,
-        lib: supported_lib.MlLib = fastapi.Form(...),
+        input_data_structure: app_binary_config.ModelInput = fastapi.Form(app_binary_config.ModelInput.AUTO),
+        output_data_structure: app_binary_config.ModelOutput = fastapi.Form(app_binary_config.ModelOutput.AUTO),
+        format: app_binary_config.ModelWrapper = fastapi.Form(app_binary_config.ModelWrapper.PICKLE),
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> responses.Response:
     model_config = crud.model_config.get(db, id=model_id)
     if not model_config:
-        raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Endpoint not found')
+        raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Model not found')
     e = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=model_config.configuration['name']),
                                         model_id=model_id)
     crud.binary_ml_model.create_with_endpoint(
         db,
         obj_in=schemas.BinaryMlModelCreate(
             model_b64=file.file.read(),
-            library=lib
+            input_data_structure=input_data_structure,
+            output_data_structure=output_data_structure,
+            format=format,
         ),
         endpoint_id=e.id
     )
