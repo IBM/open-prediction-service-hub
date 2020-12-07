@@ -26,7 +26,7 @@ import app.tests.utils.utils as utils
 
 
 @pytest.fixture()
-def model_create(classification_config: typing.Dict[typing.Text, typing.Any]) -> schemas.ModelCreate:
+def model_create() -> schemas.ModelCreate:
     return schemas.ModelCreate()
 
 
@@ -46,7 +46,7 @@ def random_user() -> schemas.UserCreate:
 def model_in_db(
         db: orm.Session
 ) -> models.Model:
-    return crud.model.create(db, obj_in=schemas.ModelCreate(name=app_test_skl.get_conf()['model']['name']))
+    return crud.model.create(db, obj_in=schemas.ModelCreate())
 
 
 @pytest.fixture
