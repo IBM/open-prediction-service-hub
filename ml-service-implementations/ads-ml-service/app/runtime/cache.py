@@ -49,9 +49,9 @@ class ModelCache(object):
             return None
         deserialized = runtime_wrapper.ModelInvocationExecutor(
             model=archive.model_b64,
-            input_type=archive.input_handling,
-            output_type=archive.output_handling,
-            binary_format=archive.loader
+            input_type=archive.input_data_structure,
+            output_type=archive.output_data_structure,
+            binary_format=archive.format
         )
         with self.__cache_lock__.gen_wlock():
             # already added by other thread

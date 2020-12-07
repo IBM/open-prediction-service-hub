@@ -49,8 +49,8 @@
     "status": "creating"
   },
   "binary": {
-    "input_handling": "DMatrix",
-    "output_handling": "ndarray",
-    "loader": "bst"
+    "input_data_structure": "DMatrix",
+    "output_data_structure": "ndarray",
+    "format": "bst"
   }
 }

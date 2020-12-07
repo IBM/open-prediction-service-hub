@@ -16,6 +16,6 @@ model:
 endpoint:
   name: 'pmml endpoint for test'
 binary:
-  input_handling: 'DataFrame'
-  output_handling: 'auto'
-  loader: 'pmml'
+  input_data_structure: 'DataFrame'
+  output_data_structure: 'auto'
+  format: 'pmml'

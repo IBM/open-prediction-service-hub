@@ -24,16 +24,16 @@ import app.schemas.binary_config as app_binary_config
 
 class BinaryMlModelBase(pyd.BaseModel):
     model_b64: typing.Optional[bytes] = None
-    input_handling: typing.Optional[app_binary_config.ModelInput] = None
-    output_handling: typing.Optional[app_binary_config.ModelOutput] = None
-    loader: typing.Optional[app_binary_config.ModelWrapper] = None
+    input_data_structure: typing.Optional[app_binary_config.ModelInput] = None
+    output_data_structure: typing.Optional[app_binary_config.ModelOutput] = None
+    format: typing.Optional[app_binary_config.ModelWrapper] = None
 
 
 class BinaryMlModelCreate(BinaryMlModelBase):
     model_b64: bytes
-    input_handling: app_binary_config.ModelInput
-    output_handling: app_binary_config.ModelOutput
-    loader: app_binary_config.ModelWrapper
+    input_data_structure: app_binary_config.ModelInput
+    output_data_structure: app_binary_config.ModelOutput
+    format: app_binary_config.ModelWrapper
 
 
 class BinaryMlModelUpdate(BinaryMlModelBase):
@@ -43,9 +43,9 @@ class BinaryMlModelUpdate(BinaryMlModelBase):
 class BinaryMlModelInDBBase(BinaryMlModelBase):
     id: int
     model_b64: bytes
-    input_handling: app_binary_config.ModelInput
-    output_handling: app_binary_config.ModelOutput
-    loader: app_binary_config.ModelWrapper
+    input_data_structure: app_binary_config.ModelInput
+    output_data_structure: app_binary_config.ModelOutput
+    format: app_binary_config.ModelWrapper
     endpoint_id: int
 
     class Config:

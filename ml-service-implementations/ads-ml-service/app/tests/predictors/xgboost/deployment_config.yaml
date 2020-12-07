@@ -16,6 +16,6 @@ model:
 endpoint:
   name: 'xgboost endpoint for test'
 binary:
-  input_handling: 'DMatrix'
-  output_handling: 'auto'
-  loader: 'bst'
+  input_data_structure: 'DMatrix'
+  output_data_structure: 'auto'
+  format: 'bst'
