@@ -32,17 +32,6 @@ import app.tests.utils.utils as app_test_utils
 
 
 @pytest.fixture
-def model_with_config(
-        db: orm.Session
-) -> models.Model:
-    model = crud.model.create(db, obj_in=schemas.ModelCreate())
-    crud.model_config.create_with_model(
-        db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
-    )
-    return model
-
-
-@pytest.fixture
 def endpoint_with_model(
         db: orm.Session
 ) -> models.Endpoint:
@@ -56,19 +45,18 @@ def endpoint_with_model(
     return endpoint
 
 
-@pytest.fixture()
-def model_with_config_and_endpoint(
+@pytest.fixture
+def model_with_config(
         db: orm.Session
 ) -> models.Model:
     model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
     )
-    crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=app_test_utils.random_string()), model_id=model.id)
     return model
 
 
-@pytest.fixture()
+@pytest.fixture
 def identity_endpoint(
         db: orm.Session
 ) -> models.Endpoint:
@@ -104,7 +92,7 @@ def skl_endpoint(
     return model
 
 
-@pytest.fixture()
+@pytest.fixture
 def pmml_endpoint(
         db: orm.Session,
         tmp_path: pathlib.Path
