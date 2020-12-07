@@ -15,16 +15,16 @@
 #
 
 
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
+import sqlalchemy as sql
+import sqlalchemy.orm as sql_orm
 
-import app.db.base_class as base_class
+import app.db.base_class as app_db_base
 
 
-class Model(base_class.Base):
-    name = sa.Column('name', sa.NCHAR(length=128), nullable=False, index=True, unique=True)
-    created_at = sa.Column('deployed_at', sa.DateTime(timezone=True), nullable=False)
-    modified_at = sa.Column('modified_at', sa.DateTime(timezone=True), nullable=False)
+class Model(app_db_base.Base):
+    id = sql.Column('id', sql.Integer, nullable=False, unique=True, index=True, primary_key=True)
+    created_at = sql.Column('deployed_at', sql.DateTime(timezone=True), nullable=False)
+    modified_at = sql.Column('modified_at', sql.DateTime(timezone=True), nullable=False)
 
-    config = orm.relationship('ModelConfig', back_populates='model', cascade='all, delete', uselist=False)
-    endpoint = orm.relationship('Endpoint', back_populates='model', cascade='all, delete')
+    config = sql_orm.relationship('ModelConfig', back_populates='model', cascade='all, delete', uselist=False)
+    endpoint = sql_orm.relationship('Endpoint', back_populates='model', cascade='all, delete', uselist=False)

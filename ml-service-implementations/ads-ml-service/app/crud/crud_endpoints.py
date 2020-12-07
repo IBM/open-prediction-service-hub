@@ -28,13 +28,13 @@ from .base import CRUDBase, IdType
 class CRUDModel(CRUDBase[models.Endpoint, schemas.EndpointCreate, schemas.EndpointUpdate]):
 
     def create_with_model(
-            self, db: orm.Session, *, obj_in: schemas.ModelConfigCreate, model_id: IdType
+            self, db: orm.Session, *, obj_in: schemas.EndpointCreate, model_id: IdType
     ) -> models.Endpoint:
         # noinspection PyArgumentList
         db_obj = self.model(
             **encoders.jsonable_encoder(obj_in),
             deployed_at=dt.datetime.now(tz=dt.timezone.utc),
-            model_id=model_id
+            id=model_id
         )
         db.add(db_obj)
         db.commit()

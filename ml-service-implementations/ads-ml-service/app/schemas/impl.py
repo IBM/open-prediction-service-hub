@@ -73,18 +73,21 @@ class ModelImpl(ops_schemas.Model):
             'modified_at': db_obj.modified_at.astimezone(dt.timezone.utc).isoformat(),
             **db_obj.config.configuration,
             'links': [
-                *[
-                    {
-                        'rel': 'self',
-                        'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=db_obj.id)
-                    }
-                ],
-                *[
-                    {
-                        'rel': 'endpoint',
-                        'href': app_uri.TEMPLATE.format(resource_type='endpoints', resource_id=endpoint.id)
-                    } for endpoint in db_obj.endpoint
-                ]
+                {
+                    'rel': 'self',
+                    'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=db_obj.id)
+                }
+                ,
+                {
+                    'rel': 'endpoint',
+                    'href': app_uri.TEMPLATE.format(resource_type='endpoints', resource_id=db_obj.endpoint.id)
+                }
+
+            ] if db_obj.endpoint is not None else [
+                {
+                    'rel': 'self',
+                    'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=db_obj.id)
+                }
             ]
         }
 
@@ -102,18 +105,15 @@ class EndpointImpl(ops_schemas.Endpoint):
             'deployed_at': e.deployed_at.astimezone(dt.timezone.utc).isoformat(),
             'status': StatusImpl.in_service if e.binary else StatusImpl.creating,
             'links': [
-                *[
-                    {
-                        'rel': 'self',
-                        'href': app_uri.TEMPLATE.format(resource_type='endpoints', resource_id=e.id)
-                    }
-                ],
-                *[
-                    {
-                        'rel': 'model',
-                        'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=e.model_id)
-                    }
-                ]
+                {
+                    'rel': 'self',
+                    'href': app_uri.TEMPLATE.format(resource_type='endpoints', resource_id=e.id)
+                },
+                {
+                    'rel': 'model',
+                    'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=e.id)
+                }
+
             ]
         }
 

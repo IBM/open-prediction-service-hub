@@ -11,17 +11,17 @@
 #
 
 
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
+import sqlalchemy as sql
+import sqlalchemy.orm as sql_orm
 
 import app.db.base_class as base_class
 
 
 class Endpoint(base_class.Base):
-    name = sa.Column('name', sa.NCHAR(length=128), nullable=False)
-    deployed_at = sa.Column('deployed_at', sa.DateTime(timezone=True), nullable=False)
+    id = sql.Column('id', sql.Integer, sql.ForeignKey('model.id'),
+                    nullable=False, unique=True, index=True, primary_key=True)
+    name = sql.Column('name', sql.NCHAR(length=128), nullable=False)
+    deployed_at = sql.Column('deployed_at', sql.DateTime(timezone=True), nullable=False)
 
-    model_id = sa.Column('model_id', sa.Integer, sa.ForeignKey('model.id'))
-    model = orm.relationship('Model', back_populates='endpoint', uselist=False)
-
-    binary = orm.relationship('BinaryMlModel', back_populates='endpoint', cascade='all, delete', uselist=False)
+    model = sql_orm.relationship('Model', back_populates='endpoint', uselist=False)
+    binary = sql_orm.relationship('BinaryMlModel', back_populates='endpoint', cascade='all, delete', uselist=False)

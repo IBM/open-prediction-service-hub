@@ -31,7 +31,7 @@ class CRUDBinaryMLModel(CRUDBase[models.BinaryMlModel, schemas.BinaryMlModelCrea
         # noinspection PyArgumentList
         db_obj = self.model(
             **obj_in.dict(),
-            endpoint_id=endpoint_id
+            id=endpoint_id
         )
         db.add(db_obj)
         db.commit()
@@ -39,7 +39,7 @@ class CRUDBinaryMLModel(CRUDBase[models.BinaryMlModel, schemas.BinaryMlModelCrea
         return db_obj
 
     def get_by_endpoint(self, db: orm.Session, *, endpoint_id: IdType) -> typing.Optional[models.Endpoint]:
-        return db.query(self.model).filter(self.model.endpoint_id == endpoint_id).first()
+        return db.query(self.model).filter(self.model.id == endpoint_id).first()
 
 
 binary_ml_model = CRUDBinaryMLModel(models.BinaryMlModel)

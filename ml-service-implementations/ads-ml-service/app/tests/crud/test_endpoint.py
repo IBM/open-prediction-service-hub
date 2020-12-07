@@ -34,7 +34,7 @@ def test_create_endpoint(db: orm.Session, model_in_db: models.Model) -> typing.N
     endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
 
     assert endpoint.name == endpoint_name
-    assert endpoint.model_id == model_in_db.id
+    assert endpoint.id == model_in_db.id
     assert (dt.datetime.now(tz=dt.timezone.utc) - endpoint.deployed_at.replace(tzinfo=dt.timezone.utc)).seconds < 1
 
 
