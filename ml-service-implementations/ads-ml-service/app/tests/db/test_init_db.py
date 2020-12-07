@@ -46,7 +46,7 @@ def test_load_models(
     loaded = init_db.load_models(db=db, project_dirs=[project_dir])
     with loaded[0][2].open(mode='r') as fd:
         config = json.load(fd)
-    model = crud.model.get_by_name(db, name=config['model']['name'])
+    model = crud.model.get_all(db)[0]
 
     assert model is not None
     assert model.config is not None
@@ -55,5 +55,5 @@ def test_load_models(
             model.config.configuration[key] == config['model'][key] for key in config['model'].keys()
         ]
     )
-    assert model.endpoint[0].name == config['endpoint']['name']
-    assert model.endpoint[0].binary is not None
+    assert model.endpoint.name == config['endpoint']['name']
+    assert model.endpoint.binary is not None

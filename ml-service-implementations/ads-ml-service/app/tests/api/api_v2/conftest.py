@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.IBM Confidential
 #
+
+
 import pathlib
-import pickle
 import typing
 
 import pytest
@@ -24,20 +25,19 @@ import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 import app.schemas as schemas
-import app.tests.utils.utils as utils
 import app.tests.predictors.pmml.pmml as app_test_pmml
+import app.tests.utils.utils as utils
 
 
 @pytest.fixture()
-def model_with_config_and_endpoint(
+def model_with_config(
         db: orm.Session,
         classification_config: typing.Dict[typing.Text, typing.Any],
 ) -> models.Model:
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=classification_config), model_id=model.id
     )
-    crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model.id)
     return model
 
 
@@ -60,3 +60,14 @@ def pmml_endpoint(
         library=supported_lib.MlLib[config['binary']['lib']]
     ), endpoint_id=endpoint.id)
     return model
+
+
+@pytest.fixture()
+def model_with_config_and_endpoint(
+        db: orm.Session,
+        classification_config: typing.Dict[typing.Text, typing.Any],
+        model_with_config: models.Model
+) -> models.Model:
+    crud.endpoint.create_with_model(
+        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_with_config.id)
+    return model_with_config

@@ -24,6 +24,7 @@ import sqlalchemy.orm as saorm
 import starlette.status as status
 
 import app.api.deps as deps
+import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.schemas as schemas
 import app.schemas.impl as impl
@@ -36,7 +37,7 @@ router = fastapi.APIRouter()
     response_model=impl.ModelsImpl,
     tags=['discover']
 )
-def get_ml_models_configs(
+def get_models(
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
     return {
@@ -52,7 +53,7 @@ def get_ml_models_configs(
     response_model=impl.ModelImpl,
     tags=['discover']
 )
-def get_ml_models_configs(
+def get_model(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
@@ -70,7 +71,7 @@ def add_model(
         m_in: impl.ModelCreateImpl,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=m_in.name))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db,
         obj_in=schemas.ModelConfigCreate(
@@ -95,12 +96,10 @@ def patch_model(
 ) -> typing.Dict[typing.Text, typing.Any]:
     update_data = m_in.dict(exclude_unset=True)
     model = crud.model.get(db, id=model_id)
-    new_name = m_in.name if m_in.name else model.name
     new_config = {
         field: update_data[field] if field in update_data else model.config.configuration[field]
         for field in model.config.configuration
     }
-    crud.model.update(db, db_obj=model, obj_in=schemas.ModelUpdate(name=new_name))
     crud.model_config.update(
         db,
         db_obj=model.config,
@@ -116,7 +115,7 @@ def patch_model(
     status_code=status.HTTP_204_NO_CONTENT,
     tags=['manage']
 )
-def get_ml_models_configs(
+def delete_model(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> responses.Response:
@@ -124,4 +123,31 @@ def get_ml_models_configs(
     if not model:
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
     crud.model.delete(db, id=model_id)
+    return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    path='/models/{model_id}',
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=['manage']
+)
+def add_binary(
+        model_id: int,
+        lib: supported_lib.MlLib = fastapi.Form(...),
+        file: fastapi.UploadFile = fastapi.File(...),
+        db: saorm.Session = fastapi.Depends(deps.get_db)
+) -> responses.Response:
+    model_config = crud.model_config.get(db, id=model_id)
+    if not model_config:
+        raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Endpoint not found')
+    e = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=model_config.configuration['name']),
+                                        model_id=model_id)
+    crud.binary_ml_model.create_with_endpoint(
+        db,
+        obj_in=schemas.BinaryMlModelCreate(
+            model_b64=file.file.read(),
+            library=lib
+        ),
+        endpoint_id=e.id
+    )
     return responses.Response(status_code=status.HTTP_204_NO_CONTENT)

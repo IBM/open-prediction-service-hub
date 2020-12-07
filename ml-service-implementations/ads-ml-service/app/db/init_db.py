@@ -90,7 +90,7 @@ def load_models(
         endpoint_config = ops_schemas.EndpointCreation(
             **config['endpoint']
         )
-        model = crud.model.create(db, obj_in=schemas.ModelCreate(name=model_config.name))
+        model = crud.model.create(db, obj_in=schemas.ModelCreate())
         model_config = crud.model_config.create_with_model(
             db,
             obj_in=schemas.ModelConfigCreate(configuration=encoders.jsonable_encoder(obj=model_config)),
