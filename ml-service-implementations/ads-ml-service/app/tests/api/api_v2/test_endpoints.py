@@ -23,12 +23,8 @@ import fastapi.testclient as tstc
 import sqlalchemy.orm as saorm
 
 import app.core.configuration as conf
-import app.models as models
-import app.tests.predictors.scikit_learn.model
-import app.tests.utils.utils as utils
 import app.crud as crud
 import app.models as models
-import app.tests.predictors.scikit_learn.model as app_tests_skl
 
 
 def test_get_endpoint(
@@ -53,9 +49,9 @@ def test_get_endpoint(
 def test_get_endpoint_with_binary(
         db: saorm.Session,
         client: tstc.TestClient,
-        endpoint_with_model_and_binary: models.Endpoint
+        skl_endpoint: models.Endpoint
 ) -> typ.NoReturn:
-    response = client.get(url=conf.get_config().API_V2_STR + '/endpoints' + f'/{endpoint_with_model_and_binary.id}')
+    response = client.get(url=conf.get_config().API_V2_STR + '/endpoints' + f'/{skl_endpoint.id}')
     endpoint = response.json()
 
     assert endpoint['status'] == 'in_service'
@@ -64,13 +60,13 @@ def test_get_endpoint_with_binary(
 def test_get_endpoints(
         db: saorm.Session,
         client: tstc.TestClient,
-        endpoint_with_model_and_binary: models.Endpoint
+        skl_endpoint: models.Endpoint
 ) -> typ.NoReturn:
     response = client.get(url=conf.get_config().API_V2_STR + '/endpoints')
     endpoints = response.json()
 
     assert response.status_code == 200
-    assert endpoints['endpoints'][0]['id'] == str(endpoint_with_model_and_binary.id)
+    assert endpoints['endpoints'][0]['id'] == str(skl_endpoint.id)
 
 
 def test_delete_endpoint(
