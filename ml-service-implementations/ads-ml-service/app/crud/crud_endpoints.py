@@ -20,15 +20,14 @@ import datetime as dt
 import fastapi.encoders as encoders
 import sqlalchemy.orm as orm
 
+import app.crud.base as app_crud_base
 import app.models as models
 import app.schemas as schemas
-from .base import CRUDBase, IdType
 
 
-class CRUDModel(CRUDBase[models.Endpoint, schemas.EndpointCreate, schemas.EndpointUpdate]):
-
+class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, schemas.EndpointUpdate]):
     def create_with_model(
-            self, db: orm.Session, *, obj_in: schemas.EndpointCreate, model_id: IdType
+            self, db: orm.Session, *, obj_in: schemas.EndpointCreate, model_id: app_crud_base.IdType
     ) -> models.Endpoint:
         # noinspection PyArgumentList
         db_obj = self.model(

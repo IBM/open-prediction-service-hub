@@ -25,9 +25,9 @@ import app.schemas.binary_config as app_binary_config
 class BinaryMlModel(base_class.Base):
     id = sql.Column('id', sql.Integer, sql.ForeignKey('endpoint.id'),
                     nullable=False, unique=True, index=True, primary_key=True)
-    model_b64 = sa.Column('model_b64', sa.LargeBinary, nullable=False)
-    input_data_structure = sa.Column('input_data_structure', sa.Enum(app_binary_config.ModelInput), nullable=False)
-    output_data_structure = sa.Column('output_data_structure', sa.Enum(app_binary_config.ModelOutput), nullable=False)
-    format = sa.Column('format', sa.Enum(app_binary_config.ModelWrapper), nullable=False)
+    model_b64 = sql.Column('model_b64', sql.LargeBinary, nullable=False)
+    input_data_structure = sql.Column('input_data_structure', sql.Enum(app_binary_config.ModelInput), nullable=False)
+    output_data_structure = sql.Column('output_data_structure', sql.Enum(app_binary_config.ModelOutput), nullable=False)
+    format = sql.Column('format', sql.Enum(app_binary_config.ModelWrapper), nullable=False)
 
     endpoint = sql_orm.relationship('Endpoint', back_populates='binary', uselist=False)
