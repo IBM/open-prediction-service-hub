@@ -46,9 +46,9 @@ def test_cascade_delete_with_binary(
     predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_in = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
-        input_handling=mapping.ModelInput.DATAFRAME,
-        output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelWrapper.JOBLIB
+        input_data_structure=mapping.ModelInput.DATAFRAME,
+        output_data_structure=mapping.ModelOutput.NUMPY_ARRAY,
+        format=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_in, endpoint_id=endpoint_in_db.id)
     crud.endpoint.delete(db, id=endpoint_in_db.id)

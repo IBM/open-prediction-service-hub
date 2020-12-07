@@ -44,8 +44,8 @@
     "status": "creating"
   },
   "binary": {
-    "input_handling": "DataFrame",
-    "output_handling": "ndarray",
-    "loader": "joblib"
+    "input_data_structure": "DataFrame",
+    "output_data_structure": "ndarray",
+    "format": "joblib"
   }
 }

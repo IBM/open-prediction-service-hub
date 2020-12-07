@@ -3,6 +3,6 @@ model:
 endpoint:
   name: 'identity predictor endpoint'
 binary:
-  input_handling: 'DataFrame'
-  output_handling: 'auto'
-  loader: 'joblib'
+  input_data_structure: 'DataFrame'
+  output_data_structure: 'auto'
+  format: 'joblib'

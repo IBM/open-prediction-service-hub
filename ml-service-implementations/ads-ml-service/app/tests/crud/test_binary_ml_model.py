@@ -34,17 +34,17 @@ def test_create_binary_ml_model(
     predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_create = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
-        input_handling=mapping.ModelInput.DATAFRAME,
-        output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelWrapper.JOBLIB
+        input_data_structure=mapping.ModelInput.DATAFRAME,
+        output_data_structure=mapping.ModelOutput.NUMPY_ARRAY,
+        format=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
 
     assert binary.id == endpoint_in_db.id
     assert isinstance(pickle.loads(binary.model_b64), type(pickle.loads(binary_create.model_b64)))
-    assert binary.input_handling == binary_create.input_handling
-    assert binary.output_handling == binary_create.output_handling
-    assert binary.loader == binary_create.loader
+    assert binary.input_data_structure == binary_create.input_data_structure
+    assert binary.output_data_structure == binary_create.output_data_structure
+    assert binary.format == binary_create.format
 
 
 def test_get_binary_ml_model(
@@ -54,9 +54,9 @@ def test_get_binary_ml_model(
     predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_create = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
-        input_handling=mapping.ModelInput.DATAFRAME,
-        output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelWrapper.JOBLIB
+        input_data_structure=mapping.ModelInput.DATAFRAME,
+        output_data_structure=mapping.ModelOutput.NUMPY_ARRAY,
+        format=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
     binary_1 = crud.binary_ml_model.get(db, id=binary.id)
@@ -64,9 +64,9 @@ def test_get_binary_ml_model(
     assert binary_1.id == binary.id
     assert binary_1.id == endpoint_in_db.id
     assert isinstance(pickle.loads(binary_1.model_b64), type(pickle.loads(binary_create.model_b64)))
-    assert binary_1.input_handling == binary_create.input_handling
-    assert binary_1.output_handling == binary_create.output_handling
-    assert binary_1.loader == binary_create.loader
+    assert binary_1.input_data_structure == binary_create.input_data_structure
+    assert binary_1.output_data_structure == binary_create.output_data_structure
+    assert binary_1.format == binary_create.format
 
 
 def test_get_binary_ml_model_by_endpoint(
@@ -76,9 +76,9 @@ def test_get_binary_ml_model_by_endpoint(
     predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_create = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
-        input_handling=mapping.ModelInput.DATAFRAME,
-        output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelWrapper.JOBLIB
+        input_data_structure=mapping.ModelInput.DATAFRAME,
+        output_data_structure=mapping.ModelOutput.NUMPY_ARRAY,
+        format=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
     binary_1 = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_in_db.id)
@@ -86,9 +86,9 @@ def test_get_binary_ml_model_by_endpoint(
     assert binary_1.id == binary.id
     assert binary_1.id == endpoint_in_db.id
     assert isinstance(pickle.loads(binary_1.model_b64), type(pickle.loads(binary_create.model_b64)))
-    assert binary_1.input_handling == binary_create.input_handling
-    assert binary_1.output_handling == binary_create.output_handling
-    assert binary_1.loader == binary_create.loader
+    assert binary_1.input_data_structure == binary_create.input_data_structure
+    assert binary_1.output_data_structure == binary_create.output_data_structure
+    assert binary_1.format == binary_create.format
 
 
 def test_delete_binary_ml_model(
@@ -98,9 +98,9 @@ def test_delete_binary_ml_model(
     predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_create = schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(predictor),
-        input_handling=mapping.ModelInput.DATAFRAME,
-        output_handling=mapping.ModelOutput.NUMPY_ARRAY,
-        loader=mapping.ModelWrapper.JOBLIB
+        input_data_structure=mapping.ModelInput.DATAFRAME,
+        output_data_structure=mapping.ModelOutput.NUMPY_ARRAY,
+        format=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_create, endpoint_id=endpoint_in_db.id)
     binary_1 = crud.binary_ml_model.delete(db, id=binary.id)
@@ -110,6 +110,6 @@ def test_delete_binary_ml_model(
     assert binary_1.id == binary.id
     assert binary_1.id == endpoint_in_db.id
     assert isinstance(pickle.loads(binary_1.model_b64), type(pickle.loads(binary_create.model_b64)))
-    assert binary_1.input_handling == binary_create.input_handling
-    assert binary_1.output_handling == binary_create.output_handling
-    assert binary_1.loader == binary_create.loader
+    assert binary_1.input_data_structure == binary_create.input_data_structure
+    assert binary_1.output_data_structure == binary_create.output_data_structure
+    assert binary_1.format == binary_create.format
