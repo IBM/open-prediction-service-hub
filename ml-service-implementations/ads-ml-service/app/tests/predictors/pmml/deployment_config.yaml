@@ -1,0 +1,19 @@
+model:
+  name: 'pmml'
+  version: 'v1'
+  input_schema:
+    - name: 'x'
+      order: 0
+      type: 'double'
+    - name: 'y'
+      order: 1
+      type: 'double'
+  output_schema:
+    predictions:
+      type: 'string'
+  metadata:
+    description: 'pmml model for test'
+endpoint:
+  name: 'pmml endpoint for test'
+binary:
+  lib: 'DATAFRAME_PMML'

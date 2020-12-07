@@ -16,6 +16,7 @@
 
 
 import os
+import pathlib
 import pickle
 import random
 import typing
@@ -242,9 +243,9 @@ def db(tmp_path) -> Generator[Session, None, None]:
 
 @pytest.fixture
 def client(db, tmp_path) -> Generator[TestClient, None, None]:
-    os.environ['DEFAULT_USER'] = get_config().DEFAULT_USER
-    os.environ['DEFAULT_USER_PWD'] = get_config().DEFAULT_USER
     os.environ['LOG_DIR'] = tmp_path.__str__()
+    os.environ['SETTINGS'] = tmp_path.__str__()
+    tmp_path.joinpath('logging.yaml').write_text(pathlib.Path(__file__).parents[2].joinpath('logging.yaml').read_text())
 
     user = crud.user.create(db, obj_in=UserCreate(
         username=get_config().DEFAULT_USER, password=get_config().DEFAULT_USER_PWD))

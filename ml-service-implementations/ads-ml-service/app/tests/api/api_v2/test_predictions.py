@@ -100,3 +100,24 @@ def test_prediction(
 
     assert response.status_code == 200
     assert isinstance(prediction, typ.Text)
+
+
+def test_pmml_prediction(
+        db: saorm.Session,
+        client: tstc.TestClient,
+        pmml_endpoint: models.Endpoint
+) -> typ.NoReturn:
+    ops_cache.cache.clear()
+    response = client.post(
+        url=conf.get_config().API_V2_STR + '/predictions',
+        json={
+            'parameters': [{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 0.5}],
+            'target': [
+                {'rel': 'endpoint', 'href': ops_uri.TEMPLATE.format(
+                    resource_type='endpoints', resource_id=pmml_endpoint.id)}
+            ]
+        }
+    )
+
+    assert response.status_code == 200
+    assert response.json()['result']
