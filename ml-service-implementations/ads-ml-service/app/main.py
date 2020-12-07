@@ -17,18 +17,18 @@
 
 import logging.config
 import os
-import pathlib
 
 import fastapi
 import fastapi.responses as responses
 import yaml
 
 import app.api.api_v2.api as api_v2
+import app.core.configuration as app_cong
 import app.version as ads_ml_service_version
 
 
 def get_app() -> fastapi.FastAPI:
-    with pathlib.Path(__file__).resolve().parents[1].joinpath('logging.yaml').open(mode='r') as fd:
+    with app_cong.get_config().SETTINGS.joinpath('logging.yaml').open(mode='r') as fd:
         conf = yaml.safe_load(fd)
         for _, handler in conf['handlers'].items():
             if 'filename' in handler:
@@ -39,7 +39,8 @@ def get_app() -> fastapi.FastAPI:
         version=ads_ml_service_version.__version__,
         title='Open Prediction Service',
         description='A simple Machine Learning serving environment for tests',
-        openapi_url="/open-prediction-service.json"
+        openapi_url='/open-prediction-service.json',
+        default_response_class=responses.ORJSONResponse
     )
 
     @app.get(path='/', include_in_schema=False)

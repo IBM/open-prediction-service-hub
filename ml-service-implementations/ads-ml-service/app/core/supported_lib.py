@@ -21,5 +21,6 @@ import typing
 
 class MlLib(typing.Text, enum.Enum):
     DATAFRAME_SKL = 'dataframe_skl'
+    DATAFRAME_PMML = 'dataframe_pmml'
     NDARRAY_SKL = 'ndarray_skl'
     NDARRAY_XGB = 'ndarray_xgb'
