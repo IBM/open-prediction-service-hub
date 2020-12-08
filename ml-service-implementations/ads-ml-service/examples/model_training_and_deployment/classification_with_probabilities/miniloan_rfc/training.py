@@ -105,7 +105,7 @@ def main():
     with pathlib.Path(__file__).resolve().parent.joinpath('deployment_conf.json').open(mode='r') as fd:
         configs = json.load(fd)
     class_names = estimator.classes_.tolist()
-    configs['model']['metadata']['additional_info'] = {'names': class_names}
+    configs['model']['metadata']['additional'] = {'names': class_names}
     with pathlib.Path(__file__).resolve().parent.joinpath('deployment_conf.json').open(mode='w') as fd:
         json.dump(configs, fd)
 
