@@ -40,5 +40,30 @@ class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, 
         db.refresh(db_obj)
         return db_obj
 
+    def create_with_model_and_binary(
+            self,
+            db: orm.Session,
+            *,
+            ec: schemas.EndpointCreate,
+            bc: schemas.BinaryMlModelCreate,
+            model_id: app_crud_base.IdType,
+    ):
+        # noinspection PyArgumentList
+        endpoint_db_obj = self.model(
+            **encoders.jsonable_encoder(ec),
+            id=model_id,
+            deployed_at=dt.datetime.now(tz=dt.timezone.utc)
+        )
+        # noinspection PyArgumentList
+        binary_db_obj = models.BinaryMlModel(
+            **bc.dict(),
+            id=model_id
+        )
+        db.add(endpoint_db_obj)
+        db.add(binary_db_obj)
+        db.commit()
+        db.refresh(endpoint_db_obj)
+        return endpoint_db_obj
+
 
 endpoint = CRUDModel(models.Endpoint)

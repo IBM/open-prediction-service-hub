@@ -27,8 +27,8 @@ import sqlalchemy.orm as saorm
 
 import app.core.configuration as conf
 import app.crud as crud
-import app.models as models
 import app.schemas as schemas
+import app.tests.predictors.identity.model as app_tests_identity
 import app.tests.predictors.scikit_learn.model as app_test_skl
 
 
@@ -157,3 +157,32 @@ def test_add_binary(
 
     assert response.status_code == 204
     assert response_1.json()['status'] == 'in_service'
+
+
+def test_update_binary(
+        db: saorm.Session,
+        client: tstc.TestClient
+) -> typ.NoReturn:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
+    )
+    response = client.post(
+        url=conf.get_config().API_V2_STR + '/models' + f'/{model.id}',
+        files={'file': pickle.dumps(app_test_skl.get_classification_predictor())},
+        data=app_test_skl.get_conf()['binary']
+    )
+    response_1 = client.get(
+        url=conf.get_config().API_V2_STR + '/endpoints' + f'/{model.id}')
+    response_2 = client.post(
+        url=conf.get_config().API_V2_STR + '/models' + f'/{model.id}',
+        files={'file': pickle.dumps(app_tests_identity.get_identity_predictor())},
+        data=app_test_skl.get_conf()['binary']
+    )
+    response_3 = client.get(
+        url=conf.get_config().API_V2_STR + '/endpoints' + f'/{model.id}')
+
+    assert response.status_code == 204
+    assert response_1.json()['status'] == 'in_service'
+    assert response_2.status_code == 204
+    assert response_3.json()['status'] == 'in_service'
