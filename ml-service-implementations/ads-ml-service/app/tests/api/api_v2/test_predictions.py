@@ -134,16 +134,16 @@ def test_pmml_prediction(
 def test_prediction_with_additional_info(
         db: saorm.Session,
         client: tstc.TestClient,
-        endpoint_with_model_and_binary_and_additional_info: models.Endpoint
+        skl_endpoint_with_metadata_for_binary: app_models.Endpoint
 ) -> typ.NoReturn:
-    ops_cache.cache.clear()
+    app_cache.cache.clear()
     response = client.post(
-        url=conf.get_config().API_V2_STR + '/predictions',
+        url=app_conf.get_config().API_V2_STR + '/predictions',
         json={
             'parameters': [{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 0.5}],
             'target': [
-                {'rel': 'endpoint', 'href': ops_uri.TEMPLATE.format(
-                    resource_type='endpoints', resource_id=endpoint_with_model_and_binary_and_additional_info.id)}
+                {'rel': 'endpoint', 'href': app_uri.TEMPLATE.format(
+                    resource_type='endpoints', resource_id=skl_endpoint_with_metadata_for_binary.id)}
             ]
         }
     )

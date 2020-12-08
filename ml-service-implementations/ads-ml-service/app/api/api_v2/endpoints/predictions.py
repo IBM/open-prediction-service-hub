@@ -30,7 +30,6 @@ import app.schemas.impl as impl
 
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
-ADDITIONAL_INFO_NAME = 'additional_info'
 
 
 @router.post(
@@ -66,14 +65,7 @@ async def predict(
         raise fastapi.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Resource not found')
 
-    params = [param for param in pre_in.parameters]
-    prediction_output = deserialized.predict(params)
-
-    model = crud.model_config.get(db, id=endpoint.id)  # The model exists since the endpoint exists
-    metadata = model.configuration.get('metadata')
-    additional_metadata = {} if \
-        not metadata or not metadata.get(ADDITIONAL_INFO_NAME) else \
-        metadata[ADDITIONAL_INFO_NAME]
+    prediction_output = deserialized.predict(pre_in.parameters)
 
     LOGGER.info('Prediction output: %s', prediction_output)
     return prediction_output
