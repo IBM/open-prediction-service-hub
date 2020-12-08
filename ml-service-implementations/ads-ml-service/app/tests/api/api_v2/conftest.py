@@ -100,7 +100,7 @@ def skl_endpoint_with_metadata_for_binary(
     config = app_test_skl.get_conf()
     classification_config_with_additional_info = {
         **config['model'],
-        'metadata': {app_runtime_cache.ADDITIONAL_INFO_NAME: {'names': ['x', 'y']}}
+        'metadata': {app_runtime_cache.METADATA_FIELD: {'names': ['x', 'y']}}
     }
     model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(

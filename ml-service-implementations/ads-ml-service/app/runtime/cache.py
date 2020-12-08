@@ -22,11 +22,12 @@ import cachetools
 import readerwriterlock.rwlock as rwlock
 import sqlalchemy.orm as saorm
 
+import app.core.configuration as app_core_config
 import app.crud as crud
 import app.runtime.wrapper as runtime_wrapper
 
 LOGGER = logging.getLogger(__name__)
-ADDITIONAL_INFO_NAME = 'additional'
+METADATA_FIELD = app_core_config.get_config().ADDITIONAL_INFO_FIELD
 
 
 class ModelCache(object):
@@ -48,7 +49,7 @@ class ModelCache(object):
         model_binary = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
         model_config = crud.model_config.get(db, id=endpoint_id)
         metadata = model_config.configuration.get('metadata')
-        additional_metadata = {} if not metadata else metadata.get(ADDITIONAL_INFO_NAME)
+        additional_metadata = {} if not metadata else metadata.get(METADATA_FIELD)
 
         if not model_binary:
             LOGGER.error('Binary not exist', exc_info=True)
@@ -72,4 +73,7 @@ class ModelCache(object):
             self.__cache__.clear()
 
 
-cache = ModelCache(max_len=64, max_age_seconds=60)
+cache = ModelCache(
+    max_len=app_core_config.get_config().CACHE_TTL,
+    max_age_seconds=app_core_config.get_config().MODEL_CACHE_SIZE
+)
