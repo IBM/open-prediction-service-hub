@@ -107,7 +107,8 @@ class ModelInvocationExecutor:
             model: typ.Any,
             input_type: app_binary_config.ModelInput = app_binary_config.ModelInput.DATAFRAME,
             output_type: app_binary_config.ModelOutput = app_binary_config.ModelOutput.NUMPY_ARRAY,
-            binary_format: app_binary_config.ModelWrapper = app_binary_config.ModelWrapper.JOBLIB
+            binary_format: app_binary_config.ModelWrapper = app_binary_config.ModelWrapper.JOBLIB,
+            info: typ.Optional[typ.Dict] = None
     ):
         self.input_handler = None \
             if input_type is app_binary_config.ModelInput.AUTO \
@@ -116,6 +117,7 @@ class ModelInvocationExecutor:
             if output_type is app_binary_config.ModelOutput.AUTO \
             else app_output.OUTPUT_HANDLING[output_type]
         self.model_wrapper = WRAPPERS[binary_format]
+        self.info = info or {}
 
         self.loaded_model = self.model_wrapper.load(model)
         self.can_predict_proba = self.loaded_model.has_method('predict_proba')
@@ -157,9 +159,9 @@ class ModelInvocationExecutor:
         LOGGER.debug('ML output: %s', predict)
         formatted_predict = self.output_handling(predict)
         if not self.can_predict_proba:
-            return {'result': {'predictions': formatted_predict}}
+            return {'result': {'predictions': formatted_predict, **self.info}}
         else:
             predict_proba = self.loaded_model.predict_proba(prepared_data)
             LOGGER.debug('ML output(scores): %s', predict_proba)
             formatted_predict_proba = self.output_handling(predict_proba)
-            return {'result': {'predictions': formatted_predict, 'scores': formatted_predict_proba}}
+            return {'result': {'predictions': formatted_predict, 'scores': formatted_predict_proba, **self.info}}

@@ -26,6 +26,7 @@ import app.crud as crud
 import app.runtime.wrapper as runtime_wrapper
 
 LOGGER = logging.getLogger(__name__)
+ADDITIONAL_INFO_NAME = 'additional'
 
 
 class ModelCache(object):
@@ -43,15 +44,21 @@ class ModelCache(object):
                 LOGGER.debug('Model cache hit')
                 return self.__cache__.get(endpoint_id)
         LOGGER.debug('Model cache miss')
-        archive = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
-        if not archive:
+
+        model_binary = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
+        model_config = crud.model_config.get(db, id=endpoint_id)
+        metadata = model_config.configuration.get('metadata')
+        additional_metadata = {} if not metadata else metadata.get(ADDITIONAL_INFO_NAME)
+
+        if not model_binary:
             LOGGER.error('Binary not exist', exc_info=True)
             return None
         deserialized = runtime_wrapper.ModelInvocationExecutor(
-            model=archive.model_b64,
-            input_type=archive.input_data_structure,
-            output_type=archive.output_data_structure,
-            binary_format=archive.format
+            model=model_binary.model_b64,
+            input_type=model_binary.input_data_structure,
+            output_type=model_binary.output_data_structure,
+            binary_format=model_binary.format,
+            info=additional_metadata
         )
         with self.__cache_lock__.gen_wlock():
             # already added by other thread

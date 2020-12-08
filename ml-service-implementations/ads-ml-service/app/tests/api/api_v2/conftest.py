@@ -23,6 +23,7 @@ import sqlalchemy.orm as orm
 
 import app.crud as crud
 import app.models as models
+import app.runtime.cache as app_runtime_cache
 import app.schemas as schemas
 import app.tests.predictors.identity.model as app_test_identity
 import app.tests.predictors.pmml.model as app_test_pmml
@@ -93,6 +94,29 @@ def skl_endpoint(
 
 
 @pytest.fixture
+def skl_endpoint_with_metadata_for_binary(
+        db: orm.Session
+) -> models.Endpoint:
+    config = app_test_skl.get_conf()
+    classification_config_with_additional_info = {
+        **config['model'],
+        'metadata': {app_runtime_cache.ADDITIONAL_INFO_NAME: {'names': ['x', 'y']}}
+    }
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=classification_config_with_additional_info),
+        model_id=model.id
+    )
+    endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
+                                               model_id=model.id)
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=pickle.dumps(app_test_skl.get_classification_predictor()),
+        **config['binary']
+    ), endpoint_id=endpoint.id)
+    return model
+
+
+@pytest.fixture
 def pmml_endpoint(
         db: orm.Session,
         tmp_path: pathlib.Path
@@ -135,37 +159,3 @@ def xgboost_endpoint(
         **config['binary']
     ), endpoint_id=endpoint.id)
     return endpoint
-
-
-@pytest.fixture
-def endpoint_with_model_and_additional_info(
-        db: orm.Session,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-) -> models.Endpoint:
-    import app.api.api_v2.endpoints.predictions as app_predictions
-    classification_config_with_additional_info = {
-        **classification_config,
-        'metadata': {app_predictions.ADDITIONAL_INFO_NAME: {'names': ['x', 'y']}}
-    }
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config_with_additional_info['name']))
-    crud.model_config.create_with_model(
-        db, obj_in=schemas.ModelConfigCreate(configuration=classification_config_with_additional_info),
-        model_id=model.id
-    )
-    endpoint = crud.endpoint.create_with_model(
-        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model.id
-    )
-    return endpoint
-
-
-@pytest.fixture
-def endpoint_with_model_and_binary_and_additional_info(
-        db: orm.Session,
-        endpoint_with_model_and_additional_info: models.Endpoint,
-        classification_predictor: object,
-) -> models.Endpoint:
-    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
-        model_b64=pickle.dumps(obj=classification_predictor),
-        library=supported_lib.MlLib.NDARRAY_SKL
-    ), endpoint_id=endpoint_with_model_and_additional_info.id)
-    return endpoint_with_model_and_additional_info
