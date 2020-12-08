@@ -26,7 +26,6 @@ import fastapi.encoders as encoders
 import sqlalchemy.orm as saorm
 
 import app.core.configuration as conf
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.db.base as db_base
 import app.db.session as db_session
@@ -101,10 +100,9 @@ def load_models(
             obj_in=schemas.EndpointCreate(name=endpoint_config.name),
             model_id=model.id
         )
-        lib = supported_lib.MlLib[config['binary']['lib']]
         bin_db = crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
             model_b64=binary,
-            library=lib
+            **config['binary']
         ), endpoint_id=endpoint.id)
 
         assert all(obj for obj in (model, model_config, endpoint, bin_db))

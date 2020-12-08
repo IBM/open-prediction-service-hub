@@ -25,6 +25,8 @@ import starlette.status as status
 import app.api.deps as deps
 import app.crud as crud
 import app.gen.schemas.ops_schemas as ops_schemas
+import app.schemas as schemas
+import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
 
 router = fastapi.APIRouter()

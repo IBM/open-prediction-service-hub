@@ -19,14 +19,15 @@ import typing
 
 import sqlalchemy.orm as orm
 
+import app.crud.base as app_crud_base
 import app.models as models
 import app.schemas as schemas
-from .base import CRUDBase, IdType
 
 
-class CRUDBinaryMLModel(CRUDBase[models.BinaryMlModel, schemas.BinaryMlModelCreate, schemas.BinaryMlModelUpdate]):
+class CRUDBinaryMLModel(app_crud_base.CRUDBase[
+                            models.BinaryMlModel, schemas.BinaryMlModelCreate, schemas.BinaryMlModelUpdate]):
     def create_with_endpoint(
-            self, db: orm.Session, *, obj_in: schemas.BinaryMlModelCreate, endpoint_id: IdType
+            self, db: orm.Session, *, obj_in: schemas.BinaryMlModelCreate, endpoint_id: app_crud_base.IdType
     ) -> models.BinaryMlModel:
         # noinspection PyArgumentList
         db_obj = self.model(
@@ -38,7 +39,7 @@ class CRUDBinaryMLModel(CRUDBase[models.BinaryMlModel, schemas.BinaryMlModelCrea
         db.refresh(db_obj)
         return db_obj
 
-    def get_by_endpoint(self, db: orm.Session, *, endpoint_id: IdType) -> typing.Optional[models.Endpoint]:
+    def get_by_endpoint(self, db: orm.Session, *, endpoint_id: app_crud_base.IdType) -> typing.Optional[models.Endpoint]:
         return db.query(self.model).filter(self.model.id == endpoint_id).first()
 
 

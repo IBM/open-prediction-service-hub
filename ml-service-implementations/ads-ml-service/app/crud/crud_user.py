@@ -20,12 +20,12 @@ import typing
 import sqlalchemy.orm as orm
 
 import app.core.security as security
+import app.crud.base as app_crud_base
 import app.models as models
 import app.schemas as schemas
-from .base import CRUDBase
 
 
-class CRUDUser(CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
+class CRUDUser(app_crud_base.CRUDBase[models.User, schemas.UserCreate, schemas.UserUpdate]):
     def get_by_username(self, db: orm.Session, *, username: typing.Text) -> typing.Optional[models.User]:
         return db.query(self.model).filter(self.model.username == username).first()
 

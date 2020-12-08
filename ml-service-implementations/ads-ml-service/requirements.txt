@@ -5,6 +5,7 @@ python-multipart~=0.0.5
 sqlalchemy~=1.3.19
 fastapi~=0.62.0
 orjson~=3.4.3
+pandas~=1.1.2
 
 ## Process management
 uvicorn[standard]~=0.12.3
@@ -28,7 +29,3 @@ PyYAML~=5.3.1
 requests~=2.25.0
 pytest~=6.1.1
 nyoka~=4.3.0
-
-## Raw interface for model serving
---editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=sklearnserver&subdirectory=python/sklearnserver
---editable git+https://github.com/kubeflow/kfserving@v0.4.0#egg=xgbserver&subdirectory=python/xgbserver

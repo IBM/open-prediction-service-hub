@@ -16,32 +16,83 @@
 
 
 import pathlib
-import typing
+import pickle
 
 import pytest
 import sqlalchemy.orm as orm
 
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 import app.schemas as schemas
-import app.tests.predictors.pmml.pmml as app_test_pmml
-import app.tests.utils.utils as utils
+import app.tests.predictors.identity.model as app_test_identity
+import app.tests.predictors.pmml.model as app_test_pmml
+import app.tests.predictors.scikit_learn.model as app_test_skl
+import app.tests.predictors.xgboost.model as app_test_xgboost
+import app.tests.utils.utils as app_test_utils
 
 
-@pytest.fixture()
+@pytest.fixture
+def endpoint_with_model(
+        db: orm.Session
+) -> models.Endpoint:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
+    )
+    endpoint = crud.endpoint.create_with_model(
+        db, obj_in=schemas.EndpointCreate(name=app_test_utils.random_string()), model_id=model.id
+    )
+    return endpoint
+
+
+@pytest.fixture
 def model_with_config(
-        db: orm.Session,
-        classification_config: typing.Dict[typing.Text, typing.Any],
+        db: orm.Session
 ) -> models.Model:
     model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
-        db, obj_in=schemas.ModelConfigCreate(configuration=classification_config), model_id=model.id
+        db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
     )
     return model
 
 
-@pytest.fixture()
+@pytest.fixture
+def identity_endpoint(
+        db: orm.Session
+) -> models.Endpoint:
+    config = app_test_identity.get_conf()
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
+    )
+    endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
+                                               model_id=model.id)
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=pickle.dumps(obj=app_test_identity.get_identity_predictor()),
+        **config['binary']
+    ), endpoint_id=endpoint.id)
+    return endpoint
+
+
+@pytest.fixture
+def skl_endpoint(
+        db: orm.Session
+) -> models.Endpoint:
+    config = app_test_skl.get_conf()
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
+    )
+    endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
+                                               model_id=model.id)
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=pickle.dumps(app_test_skl.get_classification_predictor()),
+        **config['binary']
+    ), endpoint_id=endpoint.id)
+    return model
+
+
+@pytest.fixture
 def pmml_endpoint(
         db: orm.Session,
         tmp_path: pathlib.Path
@@ -50,24 +101,37 @@ def pmml_endpoint(
     pmml_path = app_test_pmml.get_pmml_file(tmp_path)
     with pmml_path.open(mode='rb') as fd:
         pmml_file = fd.read()
-    model = crud.model.create(db, obj_in=schemas.ModelCreate(name=config['model']['name']))
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
     crud.model_config.create_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
-    endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']), model_id=model.id)
+    endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
+                                               model_id=model.id)
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=pmml_file,
-        library=supported_lib.MlLib[config['binary']['lib']]
+        **config['binary']
     ), endpoint_id=endpoint.id)
     return model
 
 
-@pytest.fixture()
-def model_with_config_and_endpoint(
+@pytest.fixture
+def xgboost_endpoint(
+        tmp_path,
         db: orm.Session,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-        model_with_config: models.Model
-) -> models.Model:
-    crud.endpoint.create_with_model(
-        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_with_config.id)
-    return model_with_config
+) -> models.Endpoint:
+    config = app_test_xgboost.get_conf()
+    model_path = tmp_path.joinpath('model.bst')
+    app_test_xgboost.get_xgboost_classification_predictor().save_model(fname=model_path.__str__())
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
+    )
+    endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
+                                               model_id=model.id)
+    with model_path.open(mode='rb') as fd:
+        content = fd.read()
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=content,
+        **config['binary']
+    ), endpoint_id=endpoint.id)
+    return endpoint

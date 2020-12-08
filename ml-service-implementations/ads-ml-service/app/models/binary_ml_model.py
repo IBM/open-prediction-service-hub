@@ -19,13 +19,15 @@ import sqlalchemy as sql
 import sqlalchemy.orm as sql_orm
 
 import app.db.base_class as base_class
-import app.core.supported_lib as supported_lib
+import app.schemas.binary_config as app_binary_config
 
 
 class BinaryMlModel(base_class.Base):
     id = sql.Column('id', sql.Integer, sql.ForeignKey('endpoint.id'),
                     nullable=False, unique=True, index=True, primary_key=True)
     model_b64 = sql.Column('model_b64', sql.LargeBinary, nullable=False)
-    library = sql.Column('library', sql.Enum(supported_lib.MlLib), nullable=False)
+    input_data_structure = sql.Column('input_data_structure', sql.Enum(app_binary_config.ModelInput), nullable=False)
+    output_data_structure = sql.Column('output_data_structure', sql.Enum(app_binary_config.ModelOutput), nullable=False)
+    format = sql.Column('format', sql.Enum(app_binary_config.ModelWrapper), nullable=False)
 
     endpoint = sql_orm.relationship('Endpoint', back_populates='binary', uselist=False)

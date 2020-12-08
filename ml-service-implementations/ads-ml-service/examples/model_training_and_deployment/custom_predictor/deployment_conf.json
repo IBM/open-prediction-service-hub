@@ -10,6 +10,8 @@
     "status": "creating"
   },
   "binary": {
-    "lib": "NDARRAY_SKL"
+    "input_data_structure": "DataFrame",
+    "output_data_structure": "ndarray",
+    "format": "joblib"
   }
 }
