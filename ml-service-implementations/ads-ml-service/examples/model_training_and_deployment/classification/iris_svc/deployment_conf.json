@@ -39,10 +39,6 @@
       ]
     }
   },
-  "endpoint": {
-    "name": "[SVC] example endpoint for iris classification",
-    "status": "creating"
-  },
   "binary": {
     "input_data_structure": "DataFrame",
     "output_data_structure": "ndarray",

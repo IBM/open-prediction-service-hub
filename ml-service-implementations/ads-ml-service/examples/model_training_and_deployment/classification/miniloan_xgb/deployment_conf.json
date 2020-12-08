@@ -44,10 +44,6 @@
       ]
     }
   },
-  "endpoint": {
-    "name": "[XGBClassifier] example endpoint for loan approval",
-    "status": "creating"
-  },
   "binary": {
     "input_data_structure": "DMatrix",
     "output_data_structure": "ndarray",

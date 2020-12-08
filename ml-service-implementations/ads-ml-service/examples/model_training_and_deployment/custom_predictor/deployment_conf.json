@@ -2,16 +2,12 @@
   "model": {
     "name": "[IdentityPredictor] Model for custom ml model example",
     "metadata": {
-      "description": "Return the same input to output"
+      "description": "Return the same input to output (Echo)"
     }
-  },
-  "endpoint": {
-    "name": "[IdentityPredictor] Endpoint for custom model",
-    "status": "creating"
   },
   "binary": {
     "input_data_structure": "DataFrame",
     "output_data_structure": "ndarray",
-    "format": "joblib"
+    "format": "pickle"
   }
 }
