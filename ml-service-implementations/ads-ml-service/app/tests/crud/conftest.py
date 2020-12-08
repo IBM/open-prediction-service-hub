@@ -15,35 +15,24 @@
 #
 
 
-import pickle
-import typing
-
 import pytest
 import sqlalchemy.orm as orm
 
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 import app.schemas as schemas
+import app.tests.predictors.scikit_learn.model as app_test_skl
 import app.tests.utils.utils as utils
 
 
 @pytest.fixture()
-def binary_create(classification_predictor: object) -> schemas.BinaryMlModelCreate:
-    return schemas.BinaryMlModelCreate(
-        model_b64=pickle.dumps(classification_predictor),
-        library=supported_lib.MlLib.NDARRAY_SKL
-    )
-
-
-@pytest.fixture()
-def model_create(classification_config: typing.Dict[typing.Text, typing.Any]) -> schemas.ModelCreate:
+def model_create() -> schemas.ModelCreate:
     return schemas.ModelCreate()
 
 
 @pytest.fixture()
-def model_config_create(classification_config: typing.Dict[typing.Text, typing.Any]) -> schemas.ModelConfigCreate:
-    return schemas.ModelConfigCreate(configuration=classification_config)
+def model_config_create() -> schemas.ModelConfigCreate:
+    return schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model'])
 
 
 @pytest.fixture
@@ -55,9 +44,9 @@ def random_user() -> schemas.UserCreate:
 
 @pytest.fixture
 def model_in_db(
-        db: orm.Session, classification_config: typing.Dict[typing.Text, typing.Any]
+        db: orm.Session
 ) -> models.Model:
-    return crud.model.create(db, obj_in=schemas.ModelCreate(name=classification_config['name']))
+    return crud.model.create(db, obj_in=schemas.ModelCreate())
 
 
 @pytest.fixture

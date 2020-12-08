@@ -22,13 +22,13 @@ import nyoka
 import sklearn.pipeline as skl_pipeline
 import yaml
 
-import app.tests.predictors.common as predictors_common
+import app.tests.predictors.scikit_learn.model
 
 
 def get_pmml_file(tmp: pathlib.Path) -> pathlib.Path:
     if not tmp.is_dir():
         raise ValueError(f'{tmp} is not directory')
-    predictor = predictors_common.get_classification_predictor()
+    predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     dest = tmp.joinpath('model.pmml')
     nyoka.skl_to_pmml(
         pipeline=skl_pipeline.Pipeline([("model", predictor)]),

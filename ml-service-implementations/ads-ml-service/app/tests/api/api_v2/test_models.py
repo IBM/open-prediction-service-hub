@@ -26,29 +26,29 @@ import sqlalchemy.orm as orm
 import sqlalchemy.orm as saorm
 
 import app.core.configuration as conf
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
+import app.schemas as schemas
+import app.tests.predictors.scikit_learn.model as app_test_skl
 
 
 def test_get_model(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-        model_with_config_and_endpoint: models.Model
+        model_with_config
 ) -> typing.NoReturn:
-    response = client.get(url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config_and_endpoint.id}')
+    response = client.get(url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config.id}')
     model = response.json()
 
     assert response.status_code == 200
-    assert model['id'] == str(model_with_config_and_endpoint.id)
+    assert model['id'] == str(model_with_config.id)
     assert dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f%z') == \
-           model_with_config_and_endpoint.created_at.astimezone(dt.timezone.utc)
+           model_with_config.created_at.astimezone(dt.timezone.utc)
     assert dt.datetime.strptime(model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f%z') == \
-        model_with_config_and_endpoint.modified_at.astimezone(dt.timezone.utc)
+           model_with_config.modified_at.astimezone(dt.timezone.utc)
     assert all(
         [
-            model[key] == classification_config[key] for key in classification_config.keys()
+            model[key] == app_test_skl.get_conf()['model'][key] for key in app_test_skl.get_conf()['model'].keys()
         ]
     )
 
@@ -56,40 +56,38 @@ def test_get_model(
 def test_get_models(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-        model_with_config_and_endpoint: models.Model
+        model_with_config
 ) -> typing.NoReturn:
     response = client.get(url=conf.get_config().API_V2_STR + '/models')
     rst = response.json()
 
     assert response.status_code == 200
-    assert rst['models'][0]['id'] == str(model_with_config_and_endpoint.id)
+    assert rst['models'][0]['id'] == str(model_with_config.id)
 
 
 def test_add_model(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any]
 ) -> typing.NoReturn:
     response = client.post(
         url=conf.get_config().API_V2_STR + '/models',
-        json=classification_config
+        json=app_test_skl.get_conf()['model']
     )
     model = response.json()
 
     assert response.status_code == 200
-    assert all([model.get(k) == classification_config.get(k) for k in classification_config.keys()])
+    assert all(
+        [model.get(k) == app_test_skl.get_conf()['model'].get(k) for k in app_test_skl.get_conf()['model'].keys()])
 
 
 def test_update_model_name(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-        model_with_config_and_endpoint: models.Model
+        model_with_config
 ) -> typing.NoReturn:
     time.sleep(3)
     response = client.patch(
-        url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config_and_endpoint.id}',
+        url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config.id}',
         json={
             'name': 'dummy-model'
         }
@@ -105,12 +103,11 @@ def test_update_model_name(
 def test_update_model_conf(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-        model_with_config_and_endpoint: models.Model
+        model_with_config
 ) -> typing.NoReturn:
     time.sleep(3)
     response = client.patch(
-        url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config_and_endpoint.id}',
+        url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config.id}',
         json={
             'version': 'dummy'
         }
@@ -118,7 +115,12 @@ def test_update_model_conf(
     model = response.json()
 
     assert response.status_code == 200
-    assert all([model.get(k) == classification_config.get(k) for k in classification_config.keys() if k != 'version'])
+    assert all(
+        [
+            model.get(k) == app_test_skl.get_conf()['model'].get(k) for k in
+            app_test_skl.get_conf()['model'].keys() if k != 'version'
+        ]
+    )
     assert (dt.datetime.strptime(model['modified_at'], '%Y-%m-%dT%H:%M:%S.%f%z') -
             dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f%z')).seconds > 1
 
@@ -126,12 +128,11 @@ def test_update_model_conf(
 def test_delete_model(
         db: orm.Session,
         client: tstc.TestClient,
-        classification_config: typing.Dict[typing.Text, typing.Any],
-        model_with_config_and_endpoint: models.Model
+        model_with_config
 ) -> typing.NoReturn:
-    response = client.delete(url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config_and_endpoint.id}')
-    response_1 = client.delete(url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config_and_endpoint.id}')
-    model = crud.model.get(db, id=model_with_config_and_endpoint.id)
+    response = client.delete(url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config.id}')
+    response_1 = client.delete(url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config.id}')
+    model = crud.model.get(db, id=model_with_config.id)
 
     assert response.status_code == 204
     assert response_1.status_code == 204
@@ -140,17 +141,19 @@ def test_delete_model(
 
 def test_add_binary(
         db: saorm.Session,
-        client: tstc.TestClient,
-        model_with_config: models.Model,
-        classification_predictor: object
+        client: tstc.TestClient
 ) -> typ.NoReturn:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
+    )
     response = client.post(
-        url=conf.get_config().API_V2_STR + '/models' + f'/{model_with_config.id}',
-        files={'file': pickle.dumps(classification_predictor)},
-        data={'lib': supported_lib.MlLib.NDARRAY_SKL.value.encode()}
+        url=conf.get_config().API_V2_STR + '/models' + f'/{model.id}',
+        files={'file': pickle.dumps(app_test_skl.get_classification_predictor())},
+        data=app_test_skl.get_conf()['binary']
     )
     response_1 = client.get(
-        url=conf.get_config().API_V2_STR + '/endpoints' + f'/{model_with_config.id}')
+        url=conf.get_config().API_V2_STR + '/endpoints' + f'/{model.id}')
 
     assert response.status_code == 204
     assert response_1.json()['status'] == 'in_service'

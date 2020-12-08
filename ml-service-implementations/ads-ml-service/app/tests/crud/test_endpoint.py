@@ -21,10 +21,11 @@ import typing
 
 import sqlalchemy.orm as orm
 
-import app.core.supported_lib as supported_lib
 import app.crud as crud
 import app.models as models
 import app.schemas as schemas
+import app.schemas.binary_config as mapping
+import app.tests.predictors.scikit_learn.model
 import app.tests.utils.utils as utils
 
 
@@ -41,11 +42,13 @@ def test_create_endpoint(db: orm.Session, model_in_db: models.Model) -> typing.N
 def test_cascade_delete_with_binary(
         db: orm.Session,
         endpoint_in_db: models.Model,
-        classification_predictor: object
 ) -> typing.NoReturn:
+    predictor = app.tests.predictors.scikit_learn.model.get_classification_predictor()
     binary_in = schemas.BinaryMlModelCreate(
-        model_b64=pickle.dumps(classification_predictor),
-        library=supported_lib.MlLib.NDARRAY_SKL
+        model_b64=pickle.dumps(predictor),
+        input_data_structure=mapping.ModelInput.DATAFRAME,
+        output_data_structure=mapping.ModelOutput.NUMPY_ARRAY,
+        format=mapping.ModelWrapper.JOBLIB
     )
     binary = crud.binary_ml_model.create_with_endpoint(db, obj_in=binary_in, endpoint_id=endpoint_in_db.id)
     crud.endpoint.delete(db, id=endpoint_in_db.id)

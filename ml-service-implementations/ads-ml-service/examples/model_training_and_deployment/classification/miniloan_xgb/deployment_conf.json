@@ -49,6 +49,8 @@
     "status": "creating"
   },
   "binary": {
-    "lib": "NDARRAY_XGB"
+    "input_data_structure": "DMatrix",
+    "output_data_structure": "ndarray",
+    "format": "bst"
   }
 }

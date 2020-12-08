@@ -40,8 +40,8 @@ loggers:
       - console
       - info_file_handler
       - error_file_handler
-  'app.core':
-    level: ERROR
+  'app.runtime':
+    level: INFO
     propagate: no
     handlers:
       - console
