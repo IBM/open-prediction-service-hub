@@ -44,10 +44,6 @@
       ]
     }
   },
-  "endpoint": {
-    "name": "[RandomForestRegressor] example endpoint for yearlyReimbursement Evaluation",
-    "status": "creating"
-  },
   "binary": {
     "input_data_structure": "DataFrame",
     "output_data_structure": "ndarray",

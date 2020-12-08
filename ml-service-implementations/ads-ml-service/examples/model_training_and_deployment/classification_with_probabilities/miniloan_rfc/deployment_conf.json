@@ -53,10 +53,6 @@
       }
     }
   },
-  "endpoint": {
-    "name": "[RandomForestClassifier] example endpoint for loan approval",
-    "status": "creating"
-  },
   "binary": {
     "input_data_structure": "DataFrame",
     "output_data_structure": "ndarray",
