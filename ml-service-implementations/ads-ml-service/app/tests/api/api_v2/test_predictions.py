@@ -24,7 +24,6 @@ import sqlalchemy.orm as saorm
 import app.core.configuration as app_conf
 import app.core.uri as app_uri
 import app.models as app_models
-import app.runtime.cache as app_cache
 
 
 @pytest.mark.parametrize(
@@ -49,6 +48,7 @@ def test_identity_prediction(
         model_input: typ.List[typ.Dict[typ.Text, typ.Any]],
         output
 ) -> typ.Any:
+    import app.runtime.cache as app_cache
     app_cache.cache.clear()
     response = client.post(
         url=app_conf.get_config().API_V2_STR + '/predictions',
@@ -70,6 +70,7 @@ def test_xgboost_prediction(
         client: tstc.TestClient,
         xgboost_endpoint: app_models.Endpoint
 ) -> typ.NoReturn:
+    import app.runtime.cache as app_cache
     app_cache.cache.clear()
     response = client.post(
         url=app_conf.get_config().API_V2_STR + '/predictions',
@@ -92,6 +93,7 @@ def test_skl_prediction(
         client: tstc.TestClient,
         skl_endpoint
 ) -> typ.NoReturn:
+    import app.runtime.cache as app_cache
     app_cache.cache.clear()
     response = client.post(
         url=app_conf.get_config().API_V2_STR + '/predictions',
@@ -115,6 +117,7 @@ def test_pmml_prediction(
         client: tstc.TestClient,
         pmml_endpoint: app_models.Endpoint
 ) -> typ.NoReturn:
+    import app.runtime.cache as app_cache
     app_cache.cache.clear()
     response = client.post(
         url=app_conf.get_config().API_V2_STR + '/predictions',
@@ -136,6 +139,7 @@ def test_prediction_with_additional_info(
         client: tstc.TestClient,
         skl_endpoint_with_metadata_for_binary: app_models.Endpoint
 ) -> typ.NoReturn:
+    import app.runtime.cache as app_cache
     app_cache.cache.clear()
     response = client.post(
         url=app_conf.get_config().API_V2_STR + '/predictions',

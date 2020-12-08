@@ -23,7 +23,6 @@ import sqlalchemy.orm as orm
 
 import app.crud as crud
 import app.models as models
-import app.runtime.cache as app_runtime_cache
 import app.schemas as schemas
 import app.tests.predictors.identity.model as app_test_identity
 import app.tests.predictors.pmml.model as app_test_pmml
@@ -97,6 +96,7 @@ def skl_endpoint(
 def skl_endpoint_with_metadata_for_binary(
         db: orm.Session
 ) -> models.Endpoint:
+    import app.runtime.cache as app_runtime_cache
     config = app_test_skl.get_conf()
     classification_config_with_additional_info = {
         **config['model'],
