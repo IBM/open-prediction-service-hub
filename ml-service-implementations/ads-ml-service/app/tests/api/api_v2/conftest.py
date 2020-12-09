@@ -93,6 +93,30 @@ def skl_endpoint(
 
 
 @pytest.fixture
+def skl_endpoint_with_metadata_for_binary(
+        db: orm.Session
+) -> models.Endpoint:
+    import app.runtime.cache as app_runtime_cache
+    config = app_test_skl.get_conf()
+    classification_config_with_additional_info = {
+        **config['model'],
+        'metadata': {app_runtime_cache.METADATA_FIELD: {'names': ['x', 'y']}}
+    }
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=classification_config_with_additional_info),
+        model_id=model.id
+    )
+    endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
+                                               model_id=model.id)
+    crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
+        model_b64=pickle.dumps(app_test_skl.get_classification_predictor()),
+        **config['binary']
+    ), endpoint_id=endpoint.id)
+    return model
+
+
+@pytest.fixture
 def pmml_endpoint(
         db: orm.Session,
         tmp_path: pathlib.Path

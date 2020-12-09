@@ -86,9 +86,6 @@ def load_models(
             config = json.load(fd)
 
         model_config = impl.ModelCreateImpl(**config['model'])
-        endpoint_config = ops_schemas.EndpointCreation(
-            **config['endpoint']
-        )
         model = crud.model.create(db, obj_in=schemas.ModelCreate())
         model_config = crud.model_config.create_with_model(
             db,
@@ -97,7 +94,7 @@ def load_models(
         )
         endpoint = crud.endpoint.create_with_model(
             db,
-            obj_in=schemas.EndpointCreate(name=endpoint_config.name),
+            obj_in=schemas.EndpointCreate(name=model_config.configuration['name']),
             model_id=model.id
         )
         bin_db = crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(

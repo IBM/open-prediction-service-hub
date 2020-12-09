@@ -38,10 +38,11 @@ class ServerConfiguration(BaseSettings):
     DEFAULT_USER: Text = 'admin'
     DEFAULT_USER_PWD: Text = 'password'
 
+    ADDITIONAL_INFO_FIELD: Text = 'additional'
     DATABASE_NAME: Text = 'EML.db'
     RETRAIN_MODELS: bool = False
-    MODEL_CACHE_SIZE: int = 16
-    CACHE_TTL: int = 20
+    MODEL_CACHE_SIZE: int = 64
+    CACHE_TTL: int = 60
     MODEL_STORAGE: Path
     SETTINGS: Path
 

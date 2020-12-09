@@ -65,8 +65,7 @@ async def predict(
         raise fastapi.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Resource not found')
 
-    params = [param for param in pre_in.parameters]
-    prediction_output = deserialized.predict(params)
+    prediction_output = deserialized.predict(pre_in.parameters)
 
     LOGGER.info('Prediction output: %s', prediction_output)
     return prediction_output

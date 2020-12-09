@@ -55,5 +55,5 @@ def test_load_models(
             model.config.configuration[key] == config['model'][key] for key in config['model'].keys()
         ]
     )
-    assert model.endpoint.name == config['endpoint']['name']
+    assert model.endpoint.name == config['model']['name']
     assert model.endpoint.binary is not None

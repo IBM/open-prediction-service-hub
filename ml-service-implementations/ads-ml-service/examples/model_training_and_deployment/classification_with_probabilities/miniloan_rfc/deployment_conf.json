@@ -44,12 +44,14 @@
           "name": "accuracy",
           "value": 0.9759807846277022
         }
-      ]
+      ],
+      "additional": {
+        "names": [
+          "false",
+          "true"
+        ]
+      }
     }
-  },
-  "endpoint": {
-    "name": "[RandomForestClassifier] example endpoint for loan approval",
-    "status": "creating"
   },
   "binary": {
     "input_data_structure": "DataFrame",
