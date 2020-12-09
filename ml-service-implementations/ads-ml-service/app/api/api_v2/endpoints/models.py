@@ -15,6 +15,7 @@
 #
 
 
+import logging
 import typing
 
 import fastapi
@@ -30,6 +31,7 @@ import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
 
 router = fastapi.APIRouter()
+LOGGER = logging.getLogger(__name__)
 
 
 @router.get(
@@ -139,19 +141,35 @@ def add_binary(
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> responses.Response:
+    LOGGER.info('Adding binary for model %s', model_id)
     model_config = crud.model_config.get(db, id=model_id)
     if not model_config:
         raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Model not found')
-    e = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(name=model_config.configuration['name']),
-                                        model_id=model_id)
-    crud.binary_ml_model.create_with_endpoint(
-        db,
-        obj_in=schemas.BinaryMlModelCreate(
-            model_b64=file.file.read(),
-            input_data_structure=input_data_structure,
-            output_data_structure=output_data_structure,
-            format=format,
-        ),
-        endpoint_id=e.id
-    )
-    return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+    endpoint = crud.endpoint.get(db, id=model_id)
+    if not endpoint:
+        LOGGER.info('Endpoint not exist, creating')
+        # Creation
+        crud.endpoint.create_with_model_and_binary(
+            db,
+            model_id=model_id,
+            ec=schemas.EndpointCreate(name=model_config.configuration['name']),
+            bc=schemas.BinaryMlModelCreate(
+                model_b64=file.file.read(),
+                input_data_structure=input_data_structure,
+                output_data_structure=output_data_structure,
+                format=format))
+        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+    else:
+        LOGGER.info('Endpoint exist, updating')
+        # Update
+        crud.binary_ml_model.update(
+            db,
+            db_obj=endpoint,
+            obj_in=schemas.BinaryMlModelUpdate(
+                model_b64=file.file.read(),
+                input_data_structure=input_data_structure,
+                output_data_structure=output_data_structure,
+                format=format
+            )
+        )
+        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
