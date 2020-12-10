@@ -66,6 +66,17 @@ Your image is now available for non-local environments.
 
 ## Create service
 
+### Volumes
+
+Data, custom modules and configuration files are stored in docker volumes and could be
+persisted. There are four of them:
+
+1. `/var/lib/ads-ml-service` is used to store models and model configurations.
+2. `/var/lib/ads-ml-service/custom` is used to store customized python modules. This path will be appended 
+   to `PYTHONPATH` before launch the service.
+3. `/etc/ads-ml-service` is used to store application configurations and certificates
+4. `/var/log/ads-ml-service` is used to store logs
+
 ### 1. Local service
 
 As you expect, simply run the image
