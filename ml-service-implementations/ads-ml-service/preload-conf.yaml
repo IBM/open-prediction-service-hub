@@ -1,9 +1,0 @@
-# Machine learning models that needs to be pre-loaded
-models:
-   - examples/model_training_and_deployment/classification/miniloan_linear_svc
-   - examples/model_training_and_deployment/classification/miniloan_xgb
-   - examples/model_training_and_deployment/regression/miniloan_rfr
-   - examples/model_training_and_deployment/classification_with_probabilities/miniloan_rfc
-#   - examples/model_training_and_deployment/pipeline
-#   - examples/model_training_and_deployment/classification/iris_svc
-#   - examples/model_training_and_deployment/custom_predictor

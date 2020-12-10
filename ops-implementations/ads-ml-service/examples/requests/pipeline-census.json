@@ -1,0 +1,66 @@
+{
+  "parameters": [
+    {
+        "name": "age",
+        "value": 25
+      },
+      {
+        "name": "workclass",
+        "value": "Private"
+      },
+      {
+        "name": "fnlwgt",
+        "value": 226802
+      },
+      {
+        "name": "education",
+        "value": "11th"
+      },
+      {
+        "name": "education-num",
+        "value": 7
+      },
+      {
+        "name": "marital-status",
+        "value": "Never-married"
+      },
+      {
+        "name": "occupation",
+        "value": "Machine-op-inspct"
+      },
+      {
+        "name": "relationship",
+        "value": "Own-child"
+      },
+      {
+        "name": "race",
+        "value": "Black"
+      },
+      {
+        "name": "sex",
+        "value": "Male"
+      },
+      {
+        "name": "capital-gain",
+        "value": 0
+      },
+      {
+        "name": "capital-loss",
+        "value": 0
+      },
+      {
+        "name": "hours-per-week",
+        "value": 40
+      },
+      {
+        "name": "native-country",
+        "value": "United-States"
+      }
+  ],
+  "target": [
+    {
+      "rel": "endpoint",
+      "href": "/endpoints/{census_endpoint_id}"
+    }
+  ]
+}
