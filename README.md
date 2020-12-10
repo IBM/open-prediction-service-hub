@@ -1,6 +1,6 @@
 # Open Prediction Service
 
-The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
+The [Open Prediction Service API](gh.com/extensions) is an effort to provide an OpenAPI that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 
 Thanks to this service, as any third party ML tools can be integrated to match the API specifications, third party ML tools can be reached out the same way for ML model discovery and invocation in Decision Designer or Decision Runtime.
 The Open Prediction Service API is suitable for both ML proxy service and custom ML service which provides a lot of flexibility and different level support.
@@ -24,9 +24,9 @@ We also provide a Java SDK based on the Open Prediction Service API to enable an
 
 Instructions to build an use are inside the [ops-client-sdk](ops-client-sdk) folder.
 
-## Open API specification
+## OpenAPI specification
 
-The Open Prediction Service is available as an [Open API v3 specification](open-prediction-service.yaml). The specification has four main sections:
+The Open Prediction Service is available as an [OpenAPI v3 specification](open-prediction-service.yaml). The specification has four main sections:
 
 - *info* section for getting server information and capabilities.
 - *discover* section for getting models and endpoints.

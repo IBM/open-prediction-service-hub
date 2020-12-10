@@ -1,0 +1,63 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simple:
+    format: '%(asctime)s [%(process)d] [%(levelname)s] %(message)s'
+    datefmt: '[%Y-%m-%d %H:%M:%S %z]'
+    class: logging.Formatter
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+
+  info_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: simple
+    filename: '{{LOG_DIR}}/info.log'
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+  error_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: simple
+    filename: '{{LOG_DIR}}/error.log'
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+loggers:
+  'app.api':
+    level: INFO
+    propagate: no
+    handlers:
+      - console
+      - info_file_handler
+      - error_file_handler
+  'app.runtime':
+    level: INFO
+    propagate: no
+    handlers:
+      - console
+      - info_file_handler
+      - error_file_handler
+  'app':
+    level: ERROR
+    propagate: no
+    handlers:
+      - console
+      - info_file_handler
+      - error_file_handler
+
+root:
+  level: INFO
+  handlers:
+    - console
+    - info_file_handler
+    - error_file_handler
