@@ -62,7 +62,7 @@ docker push your_username/open-prediction:0.1.0
 docker push your_username/open-prediction:latest
 ```
 
-Your image is now available for non local environments.
+Your image is now available for non-local environments.
 
 ## Create service
 
