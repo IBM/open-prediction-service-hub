@@ -100,6 +100,11 @@ docker ps | grep open-prediction
 Then you will see some thing like
 ![OpenApi](ops_docker.png)
 
+If you have changed some configurations and want to reload the server
+```shell
+docker kill --signal=HUP open-prediction
+```
+
 ### 2. Kubernetes/OpenShift cluster
 
 This part is not designed to offer a fine tuned ops cluster, but
