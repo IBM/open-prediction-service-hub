@@ -85,6 +85,17 @@ def load_models(
         with p[2].open(mode='r') as fd:
             config = json.load(fd)
 
+        found = False
+        for c in crud.model_config.get_all(db):
+            if c.configuration['name'] == config['model']['name']:
+                found = True
+                break
+        if found:
+            logger.info(f'Model {config["model"]["name"]} exist, skipping')
+            continue
+        else:
+            logger.info(f'Model {config["model"]["name"]} not exist, loading')
+
         model_config = impl.ModelCreateImpl(**config['model'])
         model = crud.model.create(db, obj_in=schemas.ModelCreate())
         model_config = crud.model_config.create_with_model(
