@@ -1,0 +1,97 @@
+{
+  "model": {
+    "name": "[RandomForestClassifier] Pipeline example using census dataset",
+    "version": "v1",
+    "input_schema": [
+      {
+        "name": "age",
+        "order": 0,
+        "type": "float"
+      },
+      {
+        "name": "workclass",
+        "order": 1,
+        "type": "string"
+      },
+      {
+        "name": "fnlwgt",
+        "order": 2,
+        "type": "float"
+      },
+      {
+        "name": "education",
+        "order": 3,
+        "type": "string"
+      },
+      {
+        "name": "education-num",
+        "order": 4,
+        "type": "float"
+      },
+      {
+        "name": "marital-status",
+        "order": 5,
+        "type": "string"
+      },
+      {
+        "name": "occupation",
+        "order": 6,
+        "type": "string"
+      },
+      {
+        "name": "relationship",
+        "order": 7,
+        "type": "string"
+      },
+      {
+        "name": "race",
+        "order": 8,
+        "type": "string"
+      },
+      {
+        "name": "sex",
+        "order": 9,
+        "type": "string"
+      },
+      {
+        "name": "capital-gain",
+        "order": 10,
+        "type": "float"
+      },
+      {
+        "name": "capital-loss",
+        "order": 11,
+        "type": "float"
+      },
+      {
+        "name": "hours-per-week",
+        "order": 12,
+        "type": "float"
+      },
+      {
+        "name": "native-country",
+        "order": 13,
+        "type": "string"
+      }
+    ],
+    "output_schema": {
+      "predictions": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "description": "Pipeline example using census data",
+      "metrics": [
+        {
+          "name": "accuracy",
+          "value": 0.8520975370063264
+        }
+      ]
+    }
+  },
+  "binary": {
+    "input_data_structure": "DataFrame",
+    "output_data_structure": "ndarray",
+    "format": "joblib"
+  }
+}
