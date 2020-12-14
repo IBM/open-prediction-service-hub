@@ -17,12 +17,14 @@
 
 from __future__ import annotations
 
+import functools
 import os
 import secrets
-from functools import lru_cache
+import typing
 from pathlib import Path
 from typing import Text
 
+import pydantic
 from pydantic import validator, BaseSettings
 
 
@@ -39,22 +41,40 @@ class ServerConfiguration(BaseSettings):
     DEFAULT_USER_PWD: Text = 'password'
 
     ADDITIONAL_INFO_FIELD: Text = 'additional'
-    DATABASE_NAME: Text = 'EML.db'
+    DATABASE_NAME: Text = 'db.sqlite'
     RETRAIN_MODELS: bool = False
     MODEL_CACHE_SIZE: int = 64
     CACHE_TTL: int = 60
-    MODEL_STORAGE: Path
     SETTINGS: Path
 
+    USE_SQLITE: bool = True
+    MODEL_STORAGE: typing.Optional[Path] = None
+    DB_URL: typing.Optional[pydantic.AnyUrl] = None
+    # Additional args for sqlalchemy.create_engine()
+    DB_ARGS: typing.Optional[pydantic.Json] = None
+
     @validator('MODEL_STORAGE')
-    def storage_check(cls: ServerConfiguration, p: Path) -> Path:
+    def storage_check(
+            cls, p: typing.Optional[Path], values: typing.Dict[typing.Text, typing.Any]) -> typing.Optional[Path]:
+        if values['USE_SQLITE'] and p is None:
+            raise ValueError(f'MODEL_STORAGE is None')
         if not p.exists() or not p.is_dir():
             raise ValueError(f'{p} is not a directory')
         if not os.access(path=str(p.resolve()), mode=os.R_OK) or not os.access(path=str(p.resolve()), mode=os.W_OK):
             raise PermissionError('R/W permission needed')
         return p
 
+    @validator('DB_URL')
+    def db_url_check(
+            cls,
+            p: typing.Optional[pydantic.AnyUrl],
+            values: typing.Dict[typing.Text, typing.Any]
+    ) -> typing.Optional[pydantic.AnyUrl]:
+        if not values['USE_SQLITE'] and p is None:
+            raise ValueError(f'DB_URL is None')
+        return p
 
-@lru_cache()
+
+@functools.lru_cache()
 def get_config() -> ServerConfiguration:
     return ServerConfiguration()
