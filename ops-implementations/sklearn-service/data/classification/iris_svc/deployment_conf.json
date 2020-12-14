@@ -1,0 +1,49 @@
+{
+  "model": {
+    "name": "[SVC] iris classification example",
+    "version": "v1",
+    "input_schema": [
+      {
+        "name": "sepal_length",
+        "order": 0,
+        "type": "float"
+      },
+      {
+        "name": "sepal_width",
+        "order": 1,
+        "type": "float"
+      },
+      {
+        "name": "petal_length",
+        "order": 2,
+        "type": "float"
+      },
+      {
+        "name": "petal_width",
+        "order": 3,
+        "type": "float"
+      }
+    ],
+    "output_schema": {
+      "predictions": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "description": "Iris classification",
+      "metrics": [
+        {
+          "name": "accuracy",
+          "value": 0.92
+        }
+      ]
+    }
+  },
+  "endpoint": {
+    "name": "[SVC] example endpoint for iris classification",
+    "status": "creating"
+  },
+  "binary": {
+    "lib": "NDARRAY_SKL"
+  }
+}

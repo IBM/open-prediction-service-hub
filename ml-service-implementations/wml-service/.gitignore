@@ -1,8 +1,0 @@
-.pytest*
-.coverage
-src/sklearnserver
-src/xgbserver
-node_modules
-*_scan-results
-package-finder*
-wicked_cli*
