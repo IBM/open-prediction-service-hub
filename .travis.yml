@@ -9,7 +9,7 @@ services:
 stages:
   - name: testing
   - name: deploy
-    if: branch IN (master, develop, release/2020Q3)
+    if: branch IN (master, develop, release/2020Q3) AND env(DOCKER_REGISTRY_URL) IS present
 
 jobs:
   include:
@@ -34,12 +34,12 @@ jobs:
       - pip3 install --quiet tox
       - tox
       name: "sagemaker-proxy-test"
-    - script: ops-implementations/deploy.sh wml-service
-      name: "wml-proxy-deploy"
-    - script: ops-implementations/deploy.sh sagemaker-service
-      name: "sagemaker-proxy-deploy"
     - stage: deploy
       script:
         - cp open-prediction-service.yaml ops-implementations/ads-ml-service/app/gen/tmp.schemas.ops.yaml
         - ops-implementations/deploy.sh ads-ml-service
       name: "ads-ml-service-deploy"
+    - script: ops-implementations/deploy.sh wml-service
+      name: "wml-proxy-deploy"
+    - script: ops-implementations/deploy.sh sagemaker-service
+      name: "sagemaker-proxy-deploy"
