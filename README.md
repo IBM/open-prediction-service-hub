@@ -1,77 +1,100 @@
-<!-- This should be the location of the title of the repository, normally the short name -->
-# repo-template
+# Open Prediction Service
 
-<!-- Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
-<!-- [![Build Status](https://travis-ci.org/jjasghar/ibm-cloud-cli.svg?branch=master)](https://travis-ci.org/jjasghar/ibm-cloud-cli) -->
+The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 
-<!-- Not always needed, but a scope helps the user understand in a short sentance like below, why this repo exists -->
-## Scope
+Thanks to this service, as any third party ML tools can be integrated to match the API specifications, third party ML tools can be reached out the same way for ML model discovery and invocation in Decision Designer or Decision Runtime.
+The Open Prediction Service API is suitable for both ML proxy service and custom ML service which provides a lot of flexibility and different level support.
 
-The purpose of this project is to provide a template for new open source repositories.
+![OPS](doc/ops.png)
 
-<!-- A more detailed Usage or detailed explaination of the repository here -->
-## Usage
+In this repository we provide:
+- a reference implementation for [scikit-learn](https://scikit-learn.org/) and [XGBoost](https://xgboost.ai/)
+- an Open Prediction Service Java Client SDK
 
-This repository contains some example best practices for open source repositories:
+### Reference implementation for [scikit-learn](https://scikit-learn.org/) and [XGBoost](https://xgboost.ai/)
 
-* [LICENSE](LICENSE)
-* [README.md](README.md)
-* [CONTRIBUTING.md](CONTRIBUTING.md)
-* [MAINTAINERS.md](MAINTAINERS.md)
-<!-- A Changelog allows you to track major changes and things that happen, https://github.com/github-changelog-generator/github-changelog-generator can help automate the process -->
-* [CHANGELOG.md](CHANGELOG.md)
+We provide an Open Source implementation of this service based on two well known python Machine Learning SDK : [scikit-learn](https://scikit-learn.org/) and [XGBoost](https://xgboost.ai/) based on a docker container for easier deployments.
 
-> These are optional
+This reference implementation is called `ads-ml-service`.
 
-<!-- The following are OPTIONAL, but strongly suggested to have in your repository. -->
-* [dco.yml](.github/dco.yml) - This enables DCO bot for you, please take a look https://github.com/probot/dco for more details.
-* [travis.yml](.travis.yml) - This is a example `.travis.yml`, please take a look https://docs.travis-ci.com/user/tutorial/ for more details.
+Instructions to build an use are inside the [ml-service-implementations/ads-ml-service](ml-service-implementations/ads-ml-service/README.md) folder.
 
-These may be copied into a new or existing project to make it easier for developers not on a project team to collaborate.
+### Open Prediction Service Java Client SDK
+We also provide a Java SDK based on the Open Prediction Service API to enable any java based application to use this Open architecture.
 
-<!-- A notes section is useful for anything that isn't covered in the Usage or Scope. Like what we have below. -->
-## Notes
+Instructions to build an use are inside the [ops-client-sdk](ops-client-sdk) folder.
 
-**NOTE: While this boilerplate project uses the Apache 2.0 license, when
-establishing a new repo using this template, please use the
-license that was approved for your project.**
+## Open API specification
 
-**NOTE: This repository has been configured with the [DCO bot](https://github.com/probot/dco).
-When you set up a new repository that uses the Apache license, you should
-use the DCO to manage contributions. The DCO bot will help enforce that.
-Please contact one of the IBM GH Org stewards.**
+The Open Prediction Service is available as an [Open API v3 specification](open-prediction-service.yaml). The specification has four main sections:
 
-<!-- Questions can be useful but optional, this gives you a place to say, "This is how to contact this project maintainers or create PRs -->
-If you have any questions or issues you can create a new [issue here][issues].
+- *info* section for getting server information and capabilities.
+- *discover* section for getting models and endpoints.
+- *manage* section for adding, altering or deleting models and endpoints (If implemented).
+- *run* section for model invocation
 
-Pull requests are very welcome! Make sure your patches are well tested.
-Ideally create a topic branch for every separate change you make. For
-example:
+All the types manipulated by the different endpoints are described in the *Schemas* section below.
 
-1. Fork the repo
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+<!---
+Python tests based on *pytest* are provided to insure integration in Decision Designer or Decision Runtime.
 
-## License
+``` bash
+pytest api-tests/ --url <ENPOINT_URL>
 
-All source files must include a Copyright and License header. The SPDX license header is 
-preferred because it can be easily scanned.
-
-If you would like to see the detailed LICENSE click [here](LICENSE).
-
-```text
-#
-# Copyright 2020- IBM Inc. All rights reserved
-# SPDX-License-Identifier: Apache2.0
-#
+# For example:
+pytest api-tests/ --url http://localhost:8080/
 ```
-## Authors
+-->
 
-Optionally, you may include a list of authors, though this is redundant with the built-in
-GitHub list of contributors.
+![OpenAPI](doc/OPS-OpenApi.png)
 
-- Author: New OpenSource IBMer <new-opensource-ibmer@ibm.com>
+### *info* section
 
-[issues]: https://github.com/IBM/repo-template/issues/new
+#### `/capabilities` `GET`
+
+![capabilities](doc/ops-capabilities-get.png)
+
+This endpoint can be used to get a list of supported operation 
+(any subset of `{info, discover, manage, run}`) of the service.
+
+#### `/info` `GET`
+
+![info](doc/ops-info-get.png)
+
+This endpoint can be used to test the availability of the service. 
+It returns runtime information.
+
+### *discovery* section
+
+This section is used to retrieve model & endpoint information. 
+
+* `/models[/{model_id}]` `GET`
+* `/endpoints[/{endpoint_id}]` `GET`
+
+![ops-get-models](doc/ops-models-get.png)
+![ops-get-endpoints](doc/ops-endpoints-get.png)
+
+Those endpoints will return the selected resources. Model is the
+input/output signature of predictive model and Endpoint is the "binary model".
+A predictive model is the combination of a model and an endpoint.
+
+### *run* section
+
+#### `/predictions` `POST`
+
+![ops-predictions-post](doc/ops-predictions-post.png)
+
+This endpoint serves all prediction requests. 
+Each invocation needs to contain endpoint information and model inputs that represented as key-value pairs.
+
+### *manage* section
+
+The section `manage` is not mandatory for OPS compatible implementations. It 
+is designed to facilitate the usage of non-proxy OPS implementations.
+
+This section allows model & endpoint to be created, altered, deleted at the runtime. 
+
+![ops-manage](doc/ops-manage.png)
+
+### License
+Apache License Version 2.0, January 2004.

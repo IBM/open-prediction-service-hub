@@ -1,23 +1,45 @@
-language: ruby
+language: python
+python:
+  - "3.7"
 
-before_install:
-  - echo "#"
-  - echo "#"
-  - echo "TravisCI is unbelively powerful, but you need to do your research first."
-  - echo "#"
-  - echo "#"
+# Additional services for testing and deployment
+services:
+  - docker
 
-script:
-  - echo "#"
-  - echo "#"
-  - echo "Please take a look https://docs.travis-ci.com/user/tutorial/ for you options."
-  - echo "#"
-  - echo "#"
+stages:
+  - name: testing
+  - name: deploy
+    if: branch IN (master, develop, release/2020Q3)
 
-
-after_success:
-  - echo "#"
-  - echo "#"
-  - echo "Don't forget to enable it in the GitHub repository also.."
-  - echo "#"
-  - echo "#"
+jobs:
+  include:
+    - stage: testing
+      script:
+        - cd ml-service-implementations/ads-ml-service
+        - pip3 install --quiet --upgrade pip
+        - pip3 install --quiet datamodel-code-generator~=0.5.30
+        - pip3 install --quiet -r requirements-ml.txt
+        - pip3 install --quiet -r requirements.txt --ignore-installed
+        - cp ../../open-prediction-service.yaml app/gen/tmp.schemas.ops.yaml
+        - datamodel-codegen --input app/gen/tmp.schemas.ops.yaml --input-file-type openapi --target-python-version 3.7 --output app/gen/schemas/ops_schemas.py
+        - python3 -m pytest -v app/tests
+      name: "ads-ml-service-test"
+    - script:
+      - cd ml-service-implementations/wml-service
+      - pip3 install --quiet tox
+      - tox
+      name: "wml-proxy-test"
+    - script:
+      - cd ml-service-implementations/sagemaker-service
+      - pip3 install --quiet tox
+      - tox
+      name: "sagemaker-proxy-test"
+    - stage: deploy
+      script:
+        - cp open-prediction-service.yaml ml-service-implementations/ads-ml-service/app/gen/tmp.schemas.ops.yaml
+        - ml-service-implementations/deploy.sh ads-ml-service
+      name: "ads-ml-service-deploy"
+    -  script: ml-service-implementations/deploy.sh wml-service
+       name: "wml-proxy-deploy"
+    -  script: ml-service-implementations/deploy.sh sagemaker-service
+       name: "sagemaker-proxy-deploy"

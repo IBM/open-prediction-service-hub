@@ -1,0 +1,13 @@
+{
+  "name": "automation-decision-services-extensions",
+  "version": "1.1.1",
+  "description": "Wicked 3rd parties report generation",
+  "repository": "https://github.ibm.com/dba/ads-ml-service",
+  "scripts": {
+    "wicked-cli": "node node_modules/@wicked/cli/cli.js -s target/docker -p wml-service --silent"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@wicked/cli": "^2.3.1"
+  }
+}
