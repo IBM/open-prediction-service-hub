@@ -15,7 +15,7 @@ jobs:
   include:
     - stage: testing
       script:
-        - cd ml-service-implementations/ads-ml-service
+        - cd ops-implementations/ads-ml-service
         - pip3 install --quiet --upgrade pip
         - pip3 install --quiet datamodel-code-generator~=0.5.30
         - pip3 install --quiet -r requirements-ml.txt
@@ -25,21 +25,21 @@ jobs:
         - python3 -m pytest -v app/tests
       name: "ads-ml-service-test"
     - script:
-      - cd ml-service-implementations/wml-service
+      - cd ops-implementations/wml-service
       - pip3 install --quiet tox
       - tox
       name: "wml-proxy-test"
     - script:
-      - cd ml-service-implementations/sagemaker-service
+      - cd ops-implementations/sagemaker-service
       - pip3 install --quiet tox
       - tox
       name: "sagemaker-proxy-test"
+    - script: ops-implementations/deploy.sh wml-service
+      name: "wml-proxy-deploy"
+    - script: ops-implementations/deploy.sh sagemaker-service
+      name: "sagemaker-proxy-deploy"
     - stage: deploy
       script:
-        - cp open-prediction-service.yaml ml-service-implementations/ads-ml-service/app/gen/tmp.schemas.ops.yaml
-        - ml-service-implementations/deploy.sh ads-ml-service
+        - cp open-prediction-service.yaml ops-implementations/ads-ml-service/app/gen/tmp.schemas.ops.yaml
+        - ops-implementations/deploy.sh ads-ml-service
       name: "ads-ml-service-deploy"
-    -  script: ml-service-implementations/deploy.sh wml-service
-       name: "wml-proxy-deploy"
-    -  script: ml-service-implementations/deploy.sh sagemaker-service
-       name: "sagemaker-proxy-deploy"
