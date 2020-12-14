@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ibm.decision.ops</groupId>
+        <artifactId>ml-service-implementations</artifactId>
+        <version>LATEST-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>wml-service</artifactId>
+    <packaging>docker-build</packaging>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <!-- <contextDir>${project.directory}</contextDir> -->
+                    <verbose>true</verbose>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>wicked</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>%g/%a:%l</name>
+                                </image>
+                            </images>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>save</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>save</goal>
+                                </goals>
+                                <configuration>
+                                    <saveFile>${project.build.directory}/docker/image-to-scan.tar</saveFile>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>0.0.26</version>
+                        <configuration>
+                            <nodeVersion>v12.8.0</nodeVersion>
+                            <npmVersion>6.10.2</npmVersion>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                            <installDirectory>${project.build.directory}/node-v12.8.0</installDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <phase>initialize</phase>
+                            </execution>
+                            <execution>
+                                <id>npm install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <arguments>--userconfig ${user.home}/.npmrc install</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate 3rd parties report and diff with Wicked</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>verify</phase>
+                                <configuration>
+                                    <arguments>run wicked-cli</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>2.5</version>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>${wicked.scan.directory}</directory>
+                                    <directory>${wicked.ref.directory}</directory>
+                                    <directory>node_modules</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
