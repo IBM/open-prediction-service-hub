@@ -29,7 +29,6 @@ import app.core.configuration as conf
 import app.crud as crud
 import app.db.base as db_base
 import app.db.session as db_session
-import app.gen.schemas.ops_schemas as ops_schemas
 import app.schemas as schemas
 import app.schemas.impl as impl
 
@@ -118,7 +117,7 @@ def load_models(
 
 
 def init_db(db: saorm.Session):
-    db_base.Base.metadata.create_all(bind=db_session.engine)
+    db_base.Base.metadata.create_all(bind=db_session.get_engine())
 
     with PROJECT_ROOT.joinpath('preload-conf.yaml').open(mode='r') as fd:
         preload_conf = yaml.load(fd, yaml.SafeLoader)
