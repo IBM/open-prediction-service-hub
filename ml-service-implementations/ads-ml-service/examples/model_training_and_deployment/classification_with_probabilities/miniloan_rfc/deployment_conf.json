@@ -1,0 +1,61 @@
+{
+  "model": {
+    "name": "[RandomForestClassifier] loan approval example",
+    "version": "v1",
+    "input_schema": [
+      {
+        "name": "creditScore",
+        "order": 0,
+        "type": "float"
+      },
+      {
+        "name": "income",
+        "order": 1,
+        "type": "float"
+      },
+      {
+        "name": "loanAmount",
+        "order": 2,
+        "type": "float"
+      },
+      {
+        "name": "monthDuration",
+        "order": 3,
+        "type": "float"
+      },
+      {
+        "name": "rate",
+        "order": 4,
+        "type": "float"
+      }
+    ],
+    "output_schema": {
+      "predictions": {
+        "type": "string"
+      },
+      "scores": {
+        "type": "[float]"
+      }
+    },
+    "metadata": {
+      "description": "Loan approval example",
+      "metrics": [
+        {
+          "name": "accuracy",
+          "value": 0.9759807846277022
+        }
+      ],
+      "additional": {
+        "names": [
+          "false",
+          "true"
+        ]
+      }
+    }
+  },
+  "binary": {
+    "input_data_structure": "DataFrame",
+    "output_data_structure": "ndarray",
+    "format": "joblib"
+  }
+}

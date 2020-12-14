@@ -1,0 +1,21 @@
+model:
+  name: 'xgboost'
+  version: 'v1'
+  input_schema:
+    - name: 'x'
+      order: 0
+      type: 'double'
+    - name: 'y'
+      order: 1
+      type: 'double'
+  output_schema:
+    predictions:
+      type: 'string'
+  metadata:
+    description: 'xgboost model for test'
+endpoint:
+  name: 'xgboost endpoint for test'
+binary:
+  input_data_structure: 'DMatrix'
+  output_data_structure: 'auto'
+  format: 'bst'
