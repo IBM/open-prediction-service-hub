@@ -66,4 +66,4 @@ def list_models():  # noqa: E501
 
     :rtype: Models
     """
-    return [model_id_to_model(model_id) for model_id in supported_models]
+    return Models(models=[model_id_to_model(model_id) for model_id in supported_models])
