@@ -4,9 +4,21 @@
 set -e
 
 
-# Load data in database
-# shellcheck disable=SC1090
-. "${OPS_HOME}"/prestart.sh
+if [ ! -f "${SETTINGS}/logging.yaml" ]; then
+  # default database
+  echo "[INFO] database not found"
+  echo "[INFO] loading default database"
+  # shellcheck disable=SC1090
+  . "${OPS_HOME}"/prestart.sh
+fi
+
+
+if [ ! -f "${SETTINGS}/EML.db" ]; then
+  # default logging settings
+  echo "[INFO] log configuration not found"
+  echo "[INFO] loading default log configuration"
+  cp "${OPS_HOME}/logging.yaml" "${SETTINGS}/logging.yaml"
+fi
 
 
 if [ ! -f "${SETTINGS}/server.key" ] || [ ! -f "${SETTINGS}/server.crt" ] || [ ! -f "${SETTINGS}/ca.crt" ]; then
