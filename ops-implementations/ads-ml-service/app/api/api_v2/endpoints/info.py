@@ -35,14 +35,16 @@ async def server_info() -> typing.Dict[typing.Text, typing.Any]:
     try:
         import sklearn
         import xgboost
-        ml_lib_info.update(
-            [
-                ('sklearn-version', sklearn.__version__),
-                ('xgboost-version', xgboost.__version__)
-            ]
-        )
+        import pypmml
+        ml_lib_info = {
+            'libraries': {
+                'scikit-learn': sklearn.__version__,
+                'xgboost': xgboost.__version__,
+                'pypmml': pypmml.__version__
+            }
+        }
     except ImportError:
-        sklearn, xgboost = None, None
+        sklearn, xgboost, pypmml = None, None, None
     return {
         'info': {
             'server-version': version.__version__,
