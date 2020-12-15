@@ -15,8 +15,6 @@
 
 package com.ibm.decision.ops.client;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.ibm.decision.ops.client.model.*;
 import org.junit.Before;
 import org.junit.Test;

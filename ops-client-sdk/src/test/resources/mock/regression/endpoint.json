@@ -1,0 +1,15 @@
+{
+  "name": "[RandomForestRegressor] example endpoint for yearlyReimbursement Evaluation",
+  "status": "in_service",
+  "links": [
+    {
+      "rel": "self",
+      "href": "http://localhost:8080/endpoints/regression"
+    },
+    {
+      "rel": "model",
+      "href": "http://localhost:8080/models/regression"
+    }
+  ],
+  "id": "regression"
+}

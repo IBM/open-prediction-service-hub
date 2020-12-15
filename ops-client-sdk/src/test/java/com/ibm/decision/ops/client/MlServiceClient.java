@@ -19,24 +19,17 @@ import com.ibm.decision.ops.client.api.InfoApi;
 import com.ibm.decision.ops.client.api.RunApi;
 
 public class MlServiceClient {
-    private final String url;
     private final InfoApi infoApi;
     private final DiscoverApi discoverApi;
     private final RunApi runApi;
 
-    public MlServiceClient(String url) {
-        this.url = url;
-
-        ApiClient apiClient = Configuration.getDefaultApiClient().setBasePath(this.url);
-
-        this.infoApi = new InfoApi(apiClient);
-        this.discoverApi = new DiscoverApi(apiClient);
-        this.runApi = new RunApi(apiClient);
-    }
-
     public MlServiceClient() {
-        this("http://localhost:8080");
+
+        this.infoApi = new InfoApiMock();
+        this.discoverApi = new DiscoverApiMock();
+        this.runApi = new RunApiMock();
     }
+
 
     public DiscoverApi getDiscoverApi() {
         return discoverApi;
