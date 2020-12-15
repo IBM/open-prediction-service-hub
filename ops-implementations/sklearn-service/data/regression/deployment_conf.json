@@ -45,8 +45,6 @@
     }
   },
   "endpoint": {
-    "deployed_at":"22/11/2020",
-    "id":"regression",
     "name": "[RandomForestRegressor] example endpoint for yearlyReimbursement Evaluation",
     "status": "in_service"
   },

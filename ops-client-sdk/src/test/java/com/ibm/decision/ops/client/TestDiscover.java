@@ -17,9 +17,7 @@ package com.ibm.decision.ops.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.ibm.decision.ops.client.model.Feature;
-import com.ibm.decision.ops.client.model.Model;
-import com.ibm.decision.ops.client.model.Models;
+import com.ibm.decision.ops.client.model.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +26,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class TestGetModels {
+public class TestDiscover {
     MlServiceClient client;
 
     @Before
@@ -36,19 +34,19 @@ public class TestGetModels {
         client = new MlServiceClient();
     }
 
-    /**
-     * Get Models
-     * <p>
-     * Returns the list of ML models.
-     */
     @Test
-    public void getModelTest() throws ApiException {
+    public void getModelsTest() throws ApiException {
 
         Models response = client.getDiscoverApi().listModels();
 
         Model loan_approval_rfr = response.getModels().stream().filter(m -> m.getName().equals("[RandomForestRegressor] loan approval example")).findFirst().get();
 
+
         assertNotNull(loan_approval_rfr);
+
+        Model loan_approval_rfr_by_id = client.getDiscoverApi().getModelById(loan_approval_rfr.getId());
+
+        assertEquals(loan_approval_rfr, loan_approval_rfr_by_id);
 
         assertEquals("v1", loan_approval_rfr.getVersion());
 
@@ -61,5 +59,34 @@ public class TestGetModels {
         assertEquals((new Feature().name("rate").order(4).type("float")), inputSchema.get(4));
 
         assertEquals("Evaluation of yearlyReimbursement", loan_approval_rfr.getMetadata().get("description"));
+    }
+
+    @Test
+    public void getEndpointsTest() throws ApiException {
+
+        Models models = client.getDiscoverApi().listModels();
+
+        Model model = models.getModels().stream().filter(m -> m.getName().equals("[RandomForestRegressor] loan approval example")).findFirst().get();
+
+        assertNotNull(model);
+
+        Endpoints endpoints = client.getDiscoverApi().listEndpoints(model.getId());
+
+        assertNotNull(endpoints);
+
+        assertEquals(1, endpoints.getEndpoints().size());
+
+        Endpoint endpoint = endpoints.getEndpoints().get(0);
+
+        assertNotNull(endpoint);
+
+        final String model_endpoint_href = model.getLinks().stream().filter(link -> link.getRel().equals("endpoint")).findFirst().get().getHref();
+        final String model_self_href = model.getLinks().stream().filter(link -> link.getRel().equals("self")).findFirst().get().getHref();
+
+        final String endpoint_model_href = endpoint.getLinks().stream().filter(link -> link.getRel().equals("model")).findFirst().get().getHref();
+        final String endpoint_self_href = endpoint.getLinks().stream().filter(link -> link.getRel().equals("self")).findFirst().get().getHref();
+
+        assertEquals(model_endpoint_href, endpoint_self_href);
+        assertEquals(model_self_href, endpoint_model_href);
     }
 }
