@@ -1,6 +1,6 @@
 # Installation
 
-OPS is a containerized service. Installation consist of three steps: 
+ADS-ML-Service is a containerized service. Installation consist of three steps: 
 1. Building an image from source code.
 2. Registering image to image registry (Optional for local deployment).
 3. Creating services using registered/local image.
@@ -10,10 +10,10 @@ OPS is a containerized service. Installation consist of three steps:
 First clone the project to retrieve the files locally and then build an image.
 ```shell script
 # Clone the project
-git clone https://github.com/icp4a/automation-decision-services-extensions.git automation-decision-services-extensions
+git clone <git-url-of-this-project>
 
 # Build image
-cd automation-decision-services-extensions/open-prediction-service/ml-service-implementations/ads-ml-service
+cd <sub-directory-containing-Dockerfile>
 docker build -t open-prediction:0.1.0 -t open-prediction:latest -f Dockerfile .
 ```
 The image is then built and can be identified by two tags: `0.1.0` and `latest`.
@@ -23,7 +23,8 @@ To verify, run
 docker images | grep open-prediction
 ```
 
-and you will see:
+And you will see:
+
 ![OpenApi](build_image.png)
 
 ## Register image to image registry (Optional for local deployment)
@@ -66,6 +67,12 @@ Your image is now available for non-local environments.
 
 ## Create service
 
+This tutorial will not cover more advanced topics such as creating a K8S 
+service with cloud platform provided database and ingress controller.
+The OpenShift/K8S example is a single node service with local storage. It could
+be extended but that is more advanced than this tutorial.
+Instead, this tutorial will focus on local deployment with Docker/docker-compose.
+
 ### Volumes
 
 Data and configuration files are stored in docker volumes and could be
@@ -77,7 +84,13 @@ persisted. There are three of them:
 
 ### 1. Local service
 
-As you expect, simply run the image
+ADS-ML-Service can use internal storage (`/var/lib/ads-ml-service/models`)
+or external database. Let's begin with the simplest use case, ADS-ML-Service
+with internal storage.
+
+#### Run service with local storage
+
+Run this command in the same directory of this README file. 
 
 ```shell script
 docker run \
@@ -86,6 +99,7 @@ docker run \
   --restart=always \
   --publish 80:8080 \
   --name open-prediction \
+  --env USE_SQLITE="True" \
   --volume $(pwd)/example_volume/models:/var/lib/ads-ml-service/models \
   --volume $(pwd)/example_volume/logs:/var/log/ads-ml-service \
   --volume $(pwd)/example_volume/configs:/etc/ads-ml-service \
@@ -97,18 +111,47 @@ To verify, run
 docker ps | grep open-prediction
 ```
 
-Then you will see some thing like
+Then you will see something like
 ![OpenApi](ops_docker.png)
 
-If you have changed some configurations and want to reload the server
+If you want to change logging/ssl configuration at runtime, you can change files
+under `./example_volume/configs` and then reload the service by 
+`docker kill --signal=HUP open-prediction`
+
+#### Run service with remote database
+
+Local storage approach fails when multi-node supported is needed. Each instance
+of ADS-ML-Service uses its own database thus the synchronization will be lost.
+The solution is to let them share the same database.
+
+There are three environment variables to be configured:
+1. `USE_SQLITE=False` disable local storage
+2. `DB_URL` database URL
+3. `DB_ARGS` additional arguments for `sqlalchemy`
+
+Here is a docker-compose example of ADS-ML-Service with postgresql.
+Run this command in the same directory of this README file.
+
 ```shell
-docker kill --signal=HUP open-prediction
+export POSTGRES_PASSWORD="<database password>"
+export VIRTUAL_HOST="<host-name>"
+docker-compose up --scale serving=4
 ```
+
+There are two additional parameters:
+1. `POSTGRES_PASSWORD` used to init a database. In this example it can be 
+   as simple as `my_db_passwd`
+2. `VIRTUAL_HOST` used by nginx for load balancing. 
+   In this example it can be `localhost`
+   
+You will get 4 instances of ADS-ML-Service after this command.
+
+Services created by both method can be accessed through `http://localhost`. 
 
 ### 2. Kubernetes/OpenShift cluster
 
-This part is not designed to offer a fine tuned ops cluster, but
-a minimum example of working ops instance.
+This part is not designed to offer a fine-tuned ops cluster, but
+a minimum example of working ops instance (local storage).
 
 #### 2.1 OpenShift
 
