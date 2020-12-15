@@ -15,18 +15,39 @@
 #
 
 
+import logging
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.core.configuration import get_config
 
-engine = create_engine(
-    f'sqlite:///{get_config().MODEL_STORAGE.joinpath(get_config().DATABASE_NAME)}',
-    connect_args={"check_same_thread": False}
-)
+logger = logging.getLogger(__name__)
+
+
+def get_engine():
+    if get_config().USE_SQLITE:
+        logger.info('Using SQLITE database')
+        engine = create_engine(
+            f'sqlite:///{get_config().MODEL_STORAGE.joinpath(get_config().DATABASE_NAME)}',
+            connect_args={"check_same_thread": False}
+        )
+    else:
+        logger.info('Using customized database')
+        if get_config().DB_ARGS is not None:
+            engine = create_engine(
+                get_config().DB_URL,
+                **get_config().DB_ARGS
+            )
+        else:
+            engine = create_engine(
+                get_config().DB_URL
+            )
+    return engine
+
 
 SessionLocal = sessionmaker(
         autocommit=False,
         autoflush=False,
-        bind=engine
+        bind=get_engine()
 )
