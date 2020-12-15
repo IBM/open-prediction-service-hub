@@ -68,24 +68,27 @@ Your image is now available for non-local environments.
 
 ### Volumes
 
-Data, custom modules and configuration files are stored in docker volumes and could be
-persisted. There are four of them:
+Data and configuration files are stored in docker volumes and could be
+persisted. There are three of them:
 
-1. `/var/lib/ads-ml-service` is used to store models and model configurations.
-2. `/var/lib/ads-ml-service/custom` is used to store customized python modules. This path will be appended 
-   to `PYTHONPATH` before launch the service.
-3. `/etc/ads-ml-service` is used to store application configurations and certificates
-4. `/var/log/ads-ml-service` is used to store logs
+1. `/var/lib/ads-ml-service/models` is used to store models and model configurations.
+2. `/etc/ads-ml-service` is used to store application configurations and certificates
+3. `/var/log/ads-ml-service` is used to store logs
 
 ### 1. Local service
 
 As you expect, simply run the image
 
 ```shell script
-docker run --detach --restart=always \
+docker run \
   --read-only \
+  --detach \
+  --restart=always \
   --publish 80:8080 \
   --name open-prediction \
+  --volume $(pwd)/example_volume/models:/var/lib/ads-ml-service/models \
+  --volume $(pwd)/example_volume/logs:/var/log/ads-ml-service \
+  --volume $(pwd)/example_volume/configs:/etc/ads-ml-service \
   open-prediction:latest
 ```
 
