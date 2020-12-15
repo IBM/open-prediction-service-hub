@@ -23,4 +23,5 @@ import app.db.base_class as base_class
 class User(base_class.Base):
     id = sql.Column('id', sql.Integer, nullable=False, unique=True, index=True, primary_key=True)
     username = sql.Column(sql.NCHAR(32), nullable=False, index=True, unique=True)
-    hashed_password = sql.Column(sql.BINARY(64), nullable=False)
+    # hashed_password = sql.Column(sql.BINARY(64), nullable=False)
+    hashed_password = sql.Column(sql.String(128), nullable=False)

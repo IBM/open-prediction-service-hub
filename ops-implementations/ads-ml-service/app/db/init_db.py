@@ -29,7 +29,6 @@ import app.core.configuration as conf
 import app.crud as crud
 import app.db.base as db_base
 import app.db.session as db_session
-import app.gen.schemas.ops_schemas as ops_schemas
 import app.schemas as schemas
 import app.schemas.impl as impl
 
@@ -85,6 +84,17 @@ def load_models(
         with p[2].open(mode='r') as fd:
             config = json.load(fd)
 
+        found = False
+        for c in crud.model_config.get_all(db):
+            if c.configuration['name'] == config['model']['name']:
+                found = True
+                break
+        if found:
+            logger.info(f'Model {config["model"]["name"]} exist, skipping')
+            continue
+        else:
+            logger.info(f'Model {config["model"]["name"]} not exist, loading')
+
         model_config = impl.ModelCreateImpl(**config['model'])
         model = crud.model.create(db, obj_in=schemas.ModelCreate())
         model_config = crud.model_config.create_with_model(
@@ -107,7 +117,7 @@ def load_models(
 
 
 def init_db(db: saorm.Session):
-    db_base.Base.metadata.create_all(bind=db_session.engine)
+    db_base.Base.metadata.create_all(bind=db_session.get_engine())
 
     with PROJECT_ROOT.joinpath('preload-conf.yaml').open(mode='r') as fd:
         preload_conf = yaml.load(fd, yaml.SafeLoader)

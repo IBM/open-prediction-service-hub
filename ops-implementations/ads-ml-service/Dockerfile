@@ -42,7 +42,7 @@ RUN \
 FROM python-base AS runtime-image
 
 ENV \
-    MODEL_STORAGE="/var/lib/ads-ml-service" \
+    MODEL_STORAGE="/var/lib/ads-ml-service/models" \
     RETRAIN_MODELS=FALSE \
     SETTINGS="/etc/ads-ml-service" \
     ENABLE_SSL=FALSE
@@ -50,7 +50,7 @@ ENV \
     # ENV GUNICORN_WORKER_NUM=16
 
 COPY . ./
-COPY custom_modules ${CUSTOM_MODULES}
+COPY custom_modules/. ${CUSTOM_MODULES}/
 # COPY --from=codegen-image ${OPS_HOME}/app/gen/schemas/ops_schemas.py app/gen/schemas/
 # COPY --from=build-image ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 # OpenShift 4.3 does not support ENV variables in COPY
@@ -83,7 +83,6 @@ RUN \
 
 VOLUME ${MODEL_STORAGE}
 VOLUME ${SETTINGS}
-VOLUME ${CUSTOM_MODULES}
 VOLUME ${LOG_DIR}
 
 
