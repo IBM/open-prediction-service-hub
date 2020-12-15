@@ -20,7 +20,7 @@ services:
       USE_SQLITE: 'False'
       DB_URL: 'postgresql://postgres:${POSTGRES_PASSWORD}@db/serving'
       DB_ARGS: '{"pool_pre_ping": true}'
-      VIRTUAL_HOST: 'localhost'
+      VIRTUAL_HOST: '${VIRTUAL_HOST}'
     restart: always
     depends_on:
       - db
