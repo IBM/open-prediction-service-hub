@@ -135,7 +135,7 @@ Run this command in the same directory of this README file.
 ```shell
 export POSTGRES_PASSWORD="<database password>"
 export VIRTUAL_HOST="<host-name>"
-docker-compose up --scale serving=4
+docker-compose up
 ```
 
 There are two additional parameters:
@@ -144,7 +144,7 @@ There are two additional parameters:
 2. `VIRTUAL_HOST` used by nginx for load balancing. 
    In this example it can be `localhost`
    
-You will get 4 instances of ADS-ML-Service after this command.
+You will get a working ADS-ML-Service instance after this command.
 
 Services created by both method can be accessed through `http://localhost`. 
 
