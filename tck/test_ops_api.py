@@ -125,9 +125,18 @@ class TestOPSApi():
                 rel_model_href = href
             else:
                 rel_self_href = href
-        
+
         assert rel_self_href == endpoint_href
         assert rel_model_href == model_href
+
+    def build_parameters_from_model(self, model):
+        parameters = []
+        for field in model['input_schema']:
+            value = 0
+            if field['type'] == 'str':
+                value = ""
+            parameters.append({"name": field['name'], "value": value})
+        return parameters
 
     def test_models_and_endpoints_predictions(self, url):
         request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
@@ -153,17 +162,8 @@ class TestOPSApi():
 
             if endpoint_href:
                 request_url = urllib.parse.urljoin(url, self.RUN_ENDPOINT)
-
-                parameters = []
-                for field in model['input_schema']:
-                    value = 0
-                    if field['type'] == 'str':
-                        value = ""
-                    parameters.append({ "name": field['name'], "value": value })
-
-                    
                 response = requests.post(request_url, json={
-                    "parameters": parameters,
+                    "parameters": self.build_parameters_from_model(model),
                     "target": [{
                         "href": endpoint_href,
                         "rel": "endpoint"
