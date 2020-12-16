@@ -153,36 +153,23 @@ class TestOPSApi():
 
             if endpoint_href:
                 request_url = urllib.parse.urljoin(url, self.RUN_ENDPOINT)
+
+                parameters = []
+                for field in model['input_schema']:
+                    value = 0
+                    if field['type'] == 'str':
+                        value = ""
+                    parameters.append({ "name": field['name'], "value": value })
+
+                    
                 response = requests.post(request_url, json={
-                    "parameters": [{
-                        "name": "creditScore",
-                        "value": 400
-                    },
-                        {
-                        "name": "income",
-                        "value": 10000
-                    },
-                        {
-                        "name": "loanAmount",
-                        "value": 1000000
-                    },
-                        {
-                        "name": "monthDuration",
-                        "value": 12
-                    },
-                        {
-                        "name": "rate",
-                        "value": 2
-                    }
-                    ],
+                    "parameters": parameters,
                     "target": [{
                         "href": endpoint_href,
                         "rel": "endpoint"
                     }]
                 })
 
-                logging.warning(response.text)
+                logging.warning(response.json())
 
                 assert response.status_code == 200
-
-                logging.warning(response.json())

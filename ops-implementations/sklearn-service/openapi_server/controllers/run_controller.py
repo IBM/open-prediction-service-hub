@@ -1,6 +1,7 @@
 from urllib.parse import unquote, unquote_plus
 import connexion
 import six
+import logging
 
 from openapi_server.models.error import Error  # noqa: E501
 from openapi_server.models.prediction import Prediction  # noqa: E501
@@ -31,11 +32,19 @@ def prediction(body):  # noqa: E501
         model_dir = model_decode(model_id)
         # TODO: loading should only be done once
         model = pickle.load(open(f"data/{model_dir}/model.pkl", "rb"))
-        prediction = model.predict([prediction_args])[0]
-        if not hasattr(model, 'predict_proba'):
-            return {"result": {"predictions": prediction }}
-        else:
-            scores = model.predict_proba([prediction_args])[0].tolist()
-            return {"result": {"predictions": prediction, "scores": scores}}
+
+        try:
+            prediction = model.predict([prediction_args])[0]
+            if not hasattr(model, 'predict_proba'):
+                return {"result": {"prediction": prediction }}
+            else:
+                scores = model.predict_proba([prediction_args])[0].tolist()
+                return {"result": {"prediction": prediction, "scores": scores}}
+        except Exception as e:
+            logging.warning(input_schema)
+            logging.warning(input_args)
+            logging.warning(prediction_args)
+            logging.error(e)
+            return Error(error=e.__str__)
 
     return Error("Cannot parse request")
