@@ -5,9 +5,6 @@ import urllib.parse
 import os
 import json
 import logging
-from jsonschema import validate
-
-SPEC_RELATIVE_PATH = './../open-prediction-service.yaml'
 
 
 class TestOPSApi():
@@ -58,6 +55,12 @@ class TestOPSApi():
 
         assert 'run' in response.json()['capabilities']
 
+    def has_manage_capabilities(self, url):
+        request_url = urllib.parse.urljoin(url, self.CAPABILITIES_ENDPOINT)
+        response = requests.get(request_url)
+        assert response.status_code == 200
+        return 'manage' in response.json()['capabilities']
+
     def get_first_model(self, url):
         request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
         response = requests.get(request_url)
@@ -102,10 +105,14 @@ class TestOPSApi():
                     model_href = href
 
             if endpoint_href and model_href:
-                self.get_and_validate_endpoint(endpoint_href, model_href)
+                self.get_and_validate_endpoint(url, endpoint_href, model_href)
 
-    def get_and_validate_endpoint(self, endpoint_href, model_href):
-        response = requests.get(endpoint_href)
+    def get_and_validate_endpoint(self, url, endpoint_href, model_href):
+        endpoint_url = endpoint_href
+        if not endpoint_url.startswith("http"):
+            endpoint_url = urllib.parse.urljoin(url, endpoint_href)
+
+        response = requests.get(endpoint_url)
         assert response.status_code == 200
 
         endpoint = response.json()
@@ -133,8 +140,13 @@ class TestOPSApi():
         parameters = []
         for field in model['input_schema']:
             value = 0
-            if field['type'] == 'str':
+            if field['type'] == 'str' or field['type'] == 'string':
                 value = ""
+            elif field['type'] == 'bool' or field['type'] == 'boolean':
+                value = False
+            elif field['type'].startswith('['):
+                value = []
+
             parameters.append({"name": field['name'], "value": value})
         return parameters
 
@@ -173,3 +185,45 @@ class TestOPSApi():
                 logging.warning(response.json())
 
                 assert response.status_code == 200
+
+    def test_model_creation_deletion(self, url):
+        if self.has_manage_capabilities(url):
+            request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
+
+            model_json = {
+                "name": "test model creation",
+                "input_schema": [
+                    {
+                        "name": "paramater",
+                        "order": 0,
+                        "type": "double"
+                    }
+                ],
+                "output_schema": {
+                    "prediction": {
+                        "type": "double"
+                    }
+                },
+                "version": "v1",
+                "metadata": {
+                    "description": "test model creation description"
+                }
+            }
+
+            response = requests.post(request_url, json=model_json)
+
+            assert response.status_code == 200
+
+            model_created = response.json()
+
+            assert model_json['name'] == model_created['name']
+
+            # delete model
+            request_url = urllib.parse.urljoin(
+                request_url, self.MODELS_ENDPOINT + '/' + model_created['id'])
+
+            logging.warning(request_url)
+
+            response = requests.delete(request_url)
+
+            assert response.status_code == 204
