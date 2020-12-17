@@ -1,4 +1,4 @@
-FROM python:3.7-slim AS python-base
+FROM python:3.7 AS python-base
 
 ENV \
     OPS_HOME="/usr/src/ads-ml-service" \
@@ -28,9 +28,6 @@ FROM python-base AS build-image
 
 COPY requirements.txt requirements-ml.txt ./
 RUN \
-    apt-get -q update && \
-    apt-get -q install --assume-yes git && \
-    rm -rf /var/lib/apt/lists/* && \
     python3 -m venv ${VIRTUAL_ENV} && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
     python3 -m pip install -q --no-cache-dir --requirement requirements.txt && \
