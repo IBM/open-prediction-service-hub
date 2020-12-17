@@ -81,6 +81,7 @@ def add_model(
         ),
         model_id=model.id
     )
+    LOGGER.info('Created model \'%s\'', model.id)
     return impl.ModelImpl.from_database(
         db_obj=model
     )
@@ -121,8 +122,10 @@ def delete_model(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> responses.Response:
+    LOGGER.info('Deleting model %s', model_id)
     model = crud.model.get(db, id=model_id)
     if not model:
+        LOGGER.info('Model %s not found', model_id)
         return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
     crud.model.delete(db, id=model_id)
     return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
