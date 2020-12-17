@@ -6,4 +6,4 @@ This is a tool that will allow to verify that an Open Prediction Service impleme
 
 install requirements, run tests.
 
-`pytest`
+Run `pytest` with option `--url OPS_URL` if you don't want to test the default url `http://localhost:8080` used in our sample docker images.
