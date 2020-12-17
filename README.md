@@ -1,4 +1,6 @@
-# Open Prediction Service
+# Open Prediction Service HUB
+
+This repository contains material and guidelines related to implementing [Open Prediction Service API](https://github.com/icp4a/automation-decision-services-extensions/tree/master/open-prediction-service) services.
 
 The [Open Prediction Service API](https://github.com/icp4a/automation-decision-services-extensions/tree/master/open-prediction-service) is an effort to provide an OpenAPI that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 
@@ -41,7 +43,7 @@ We provide two Open Source proxy implementation, based on a docker container for
 
 ## TCK
 
-We provide a Python TCK (Technology Compatibility Kit) here [tck/README.md]
+We provide a Python TCK (Technology Compatibility Kit) [here](tck/README.md)
 
 ## Open Prediction Service Java Client SDK
 
@@ -49,7 +51,10 @@ We also provide a Java SDK based on the Open Prediction Service API to enable an
 
 Instructions to build an use are inside the [ops-client-sdk](ops-client-sdk) folder.
 
+## Contribute
 
+Please read our [CONTRIBUTE](CONTRIBUTE.md) guidelines if you were to raise an issue, propose a new feature or contribute some code or documentation.
 
 ### License
+
 Apache License Version 2.0, January 2004.
