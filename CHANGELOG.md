@@ -4,7 +4,7 @@
 
 - Updated some dependencies due to vulnerability issues in sagemaker service
 
-## 2.0.0 
+## 2.0.0
 
 - Releasing OPS v2
 
