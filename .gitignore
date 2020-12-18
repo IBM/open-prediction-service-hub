@@ -283,3 +283,4 @@ buildNumber.properties
 *.iml
 .vscode
 ml-service-implementations/sklearn-service/.project
+.hypothesis
