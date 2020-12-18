@@ -1,0 +1,26 @@
+{
+  "parameters": [
+    {
+      "name": "creditScore",
+      "value": 200
+    },{
+      "name": "income",
+      "value": 50000
+    },{
+      "name": "loanAmount",
+      "value": 50000
+    },{
+      "name": "monthDuration",
+      "value": 48
+    },{
+      "name": "rate",
+      "value": 2.8
+    }
+  ],
+  "target": [
+    {
+      "rel": "endpoint",
+      "href": "/endpoints/{miniloan_endpoint_id}"
+    }
+  ]
+}

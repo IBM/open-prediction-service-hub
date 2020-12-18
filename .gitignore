@@ -281,3 +281,6 @@ buildNumber.properties
 # ------- This project ----------------
 .idea
 *.iml
+.vscode
+ml-service-implementations/sklearn-service/.project
+.hypothesis

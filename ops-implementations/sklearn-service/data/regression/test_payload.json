@@ -1,0 +1,22 @@
+{
+  "parameters": [{
+    "name": "creditScore",
+    "value": 200
+  }, {
+    "name": "income",
+    "value": 35000
+  }, {
+    "name": "loanAmount",
+    "value": 10000
+  }, {
+    "name": "monthDuration",
+    "value": 48
+  }, {
+    "name": "rate",
+    "value": 2
+  }],
+  "target": [{
+    "href": "http://0.0.0.0:8080/endpoints/regression",
+    "rel": "endpoint"
+  }]
+}

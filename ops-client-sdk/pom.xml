@@ -6,7 +6,7 @@
 
     <groupId>com.ibm.decision</groupId>
     <artifactId>ops-client-sdk</artifactId>
-    <version>0.1.0</version>
+    <version>2.0.0</version>
     <inceptionYear>2020</inceptionYear>
     <build>
         <plugins>
@@ -14,7 +14,7 @@
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <!-- RELEASE_VERSION -->
-                <version>4.3.0</version>
+                <version>5.0.0-beta</version>
                 <!-- /RELEASE_VERSION -->
                 <executions>
                     <execution>
@@ -22,9 +22,10 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/../open-prediction-service.json</inputSpec>
+                            <inputSpec>${project.basedir}/../open-prediction-service.yaml</inputSpec>
                             <generatorName>java</generatorName>
                             <output>${project.build.directory}/generated-sources</output>
+                            <library>okhttp-gson</library>
                             <configOptions>
                                 <dateLibrary>
                                     java8
