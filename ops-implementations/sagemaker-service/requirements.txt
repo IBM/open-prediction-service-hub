@@ -1,7 +1,7 @@
 connexion == 2.2.0
 python_dateutil == 2.6.0
 setuptools >= 21.0.0
-Werkzeug == 0.12.2
+Werkzeug == 0.15.3
 flask == 0.10.1
 
 
