@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13.1
+    restart: always
+    environment:
+      POSTGRES_DB: 'serving'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+      - ./example_volume/postgres:/var/lib/postgresql/data
+
+  serving:
+    image: open-prediction:latest
+    volumes:
+      - ./example_volume/logs:/var/log/ads-ml-service
+      - ./example_volume/configs:/etc/ads-ml-service
+    environment:
+      USE_SQLITE: 'False'
+      DB_URL: 'postgresql://postgres:${POSTGRES_PASSWORD}@db/serving'
+      DB_ARGS: '{"pool_pre_ping": true}'
+      VIRTUAL_HOST: '${VIRTUAL_HOST}'
+    restart: always
+    depends_on:
+      - db
+    expose:
+      - '8080'
+
+  nginx:
+    image: jwilder/nginx-proxy
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+    depends_on:
+      - serving
+    ports:
+      - '80:80'

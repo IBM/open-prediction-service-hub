@@ -1,0 +1,10 @@
+connexion == 2.2.0
+python_dateutil == 2.6.0
+setuptools >= 21.0.0
+Werkzeug == 0.12.2
+flask == 0.10.1
+
+
+boto3 == 1.14.13
+botocore == 1.17.13
+sagemaker == 1.67.0

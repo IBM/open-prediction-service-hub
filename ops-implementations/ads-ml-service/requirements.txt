@@ -1,0 +1,32 @@
+# Dependences for web service
+
+## Web interface
+python-multipart~=0.0.5
+sqlalchemy~=1.3.19
+psycopg2-binary~=2.8.6
+fastapi~=0.62.0
+orjson~=3.4.3
+pandas~=1.1.2
+
+## Process management
+uvicorn[standard]~=0.12.3
+gunicorn~=20.0.4
+
+## Cache
+cachetools~=4.1.1
+readerwriterlock~=1.0.7
+
+## Service initialization
+tenacity~=6.2.0
+
+## Authentication
+pyjwt~=1.7.1
+passlib[bcrypt]~=1.7.2
+
+## Read configuration files
+PyYAML~=5.3.1
+
+## Testes
+requests~=2.25.0
+pytest~=6.1.1
+nyoka~=4.3.0

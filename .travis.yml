@@ -1,41 +1,45 @@
-dist: bionic
 language: python
 python:
   - "3.7"
 
-notifications:
-  email: false
-
+# Additional services for testing and deployment
 services:
   - docker
 
-before_install:
-  - cd ml-service-implementations/ads-ml-service
-  - pip3 install --quiet --upgrade pip
-  - pip3 install --quiet -r requirements-test.txt
-  - pip3 install --quiet -r requirements-ml.txt
-  - pip3 install --quiet -r requirements.txt
+stages:
+  - name: testing
+  - name: deploy
+    if: branch IN (master, develop, release/2020Q3) AND env(DOCKER_REGISTRY_URL) IS NOT blank
 
-install:
-  - python3 setup.py install --quiet
-
-script:
-  - python3 -m pytest -v src/tests
-
-
-before_deploy:
-  - export DEPLOY_TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
-  # example: demo:20190405-171003-4-master
-  # '/' is replaces by -
-  - docker build -t open-prediction:${DEPLOY_TIMESTAMP}-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]/-} -t open-prediction:latest -f Dockerfile .
-
-# Needed to install IBM cloud cli
-sudo: required
-
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: chmod +x kubernetes/* && kubernetes/ibm_image_registry.sh
-    on:
-      all_branches: true
-      condition: ${TRAVIS_BRANCH} =~ ^release.*$
+jobs:
+  include:
+    - stage: testing
+      script:
+        - cd ops-implementations/ads-ml-service
+        - pip3 install --quiet --upgrade pip
+        - pip3 install --quiet datamodel-code-generator~=0.5.30
+        - pip3 install --quiet -r requirements-ml.txt
+        - pip3 install --quiet -r requirements.txt --ignore-installed
+        - cp ../../open-prediction-service.yaml app/gen/tmp.schemas.ops.yaml
+        - datamodel-codegen --input app/gen/tmp.schemas.ops.yaml --input-file-type openapi --target-python-version 3.7 --output app/gen/schemas/ops_schemas.py
+        - python3 -m pytest -v app/tests
+      name: "ads-ml-service-test"
+    - script:
+      - cd ops-implementations/wml-service
+      - pip3 install --quiet tox
+      - tox
+      name: "wml-proxy-test"
+    - script:
+      - cd ops-implementations/sagemaker-service
+      - pip3 install --quiet tox
+      - tox
+      name: "sagemaker-proxy-test"
+    - stage: deploy
+      script:
+        - cp open-prediction-service.yaml ops-implementations/ads-ml-service/app/gen/tmp.schemas.ops.yaml
+        - ops-implementations/deploy.sh ads-ml-service
+      name: "ads-ml-service-deploy"
+    - script: ops-implementations/deploy.sh wml-service
+      name: "wml-proxy-deploy"
+    - script: ops-implementations/deploy.sh sagemaker-service
+      name: "sagemaker-proxy-deploy"

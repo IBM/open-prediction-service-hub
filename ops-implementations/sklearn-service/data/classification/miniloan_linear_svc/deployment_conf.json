@@ -1,0 +1,54 @@
+{
+  "model": {
+    "name": "[LinearSVC] loan approval example",
+    "version": "v1",
+    "input_schema": [
+      {
+        "name": "creditScore",
+        "order": 0,
+        "type": "float"
+      },
+      {
+        "name": "income",
+        "order": 1,
+        "type": "float"
+      },
+      {
+        "name": "loanAmount",
+        "order": 2,
+        "type": "float"
+      },
+      {
+        "name": "monthDuration",
+        "order": 3,
+        "type": "float"
+      },
+      {
+        "name": "rate",
+        "order": 4,
+        "type": "float"
+      }
+    ],
+    "output_schema": {
+      "predictions": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "description": "Loan approval example",
+      "metrics": [
+        {
+          "name": "accuracy",
+          "value": 0.95
+        }
+      ]
+    }
+  },
+  "endpoint": {
+    "name": "[LinearSVC] example endpoint for loan approval",
+    "status": "creating"
+  },
+  "binary": {
+    "lib": "NDARRAY_SKL"
+  }
+}
