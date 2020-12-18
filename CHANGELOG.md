@@ -1,6 +1,10 @@
-# Open Prediction Service
+# Open Prediction Service HUB
 
-## 2.0.0
+## 2.0.1
+
+- Updated some dependencies due to vulnerability issues in sagemaker service
+
+## 2.0.0 
 
 - Releasing OPS v2
 
