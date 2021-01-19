@@ -7,8 +7,11 @@ import json
 import logging
 
 
-class TestOPSApi():
+LOGGER = logging.getLogger(__name__)
 
+
+class TestInfoSection:
+    INFO_ENDPOINT = '/info'
     CAPABILITIES_ENDPOINT = '/capabilities'
     MODELS_ENDPOINT = '/models'
     RUN_ENDPOINT = '/predictions'
@@ -20,11 +23,11 @@ class TestOPSApi():
     #    "status": "ok"
     # }
     def test_get_info(self, url):
-        request_url = urllib.parse.urljoin(url, '/info')
+        request_url = urllib.parse.urljoin(url, self.INFO_ENDPOINT)
         response = requests.get(request_url)
         assert response.status_code == 200
 
-        logging.debug(response.json())
+        LOGGER.debug(response.json())
 
         assert response.json()['status'] == 'ok'
 
@@ -33,7 +36,7 @@ class TestOPSApi():
         response = requests.get(request_url)
         assert response.status_code == 200
 
-        logging.debug(response.json())
+        LOGGER.debug(response.json())
 
         assert 'info' in response.json()['capabilities']
 
@@ -42,7 +45,7 @@ class TestOPSApi():
         response = requests.get(request_url)
         assert response.status_code == 200
 
-        logging.debug(response.json())
+        LOGGER.debug(response.json())
 
         assert 'discover' in response.json()['capabilities']
 
@@ -51,7 +54,7 @@ class TestOPSApi():
         response = requests.get(request_url)
         assert response.status_code == 200
 
-        logging.debug(response.json())
+        LOGGER.debug(response.json())
 
         assert 'run' in response.json()['capabilities']
 
@@ -72,7 +75,7 @@ class TestOPSApi():
         response = requests.get(request_url)
         assert response.status_code == 200
 
-        logging.debug(response.json())
+        LOGGER.debug(response.json())
 
         models = response.json()['models']
         assert len(models) > 1
@@ -182,7 +185,7 @@ class TestOPSApi():
                     }]
                 })
 
-                logging.warning(response.json())
+                LOGGER.warning(response.json())
 
                 assert response.status_code == 200
 
@@ -222,7 +225,7 @@ class TestOPSApi():
             request_url = urllib.parse.urljoin(
                 request_url, self.MODELS_ENDPOINT + '/' + model_created['id'])
 
-            logging.warning(request_url)
+            LOGGER.warning(request_url)
 
             response = requests.delete(request_url)
 
