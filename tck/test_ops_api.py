@@ -1,11 +1,7 @@
-import requests
-import warnings
-import pytest
-import urllib.parse
-import os
-import json
 import logging
+import urllib.parse
 
+import requests
 
 LOGGER = logging.getLogger(__name__)
 
@@ -13,8 +9,6 @@ LOGGER = logging.getLogger(__name__)
 class TestInfoSection:
     INFO_ENDPOINT = '/info'
     CAPABILITIES_ENDPOINT = '/capabilities'
-    MODELS_ENDPOINT = '/models'
-    RUN_ENDPOINT = '/predictions'
 
     # {
     #     "info": {
@@ -58,11 +52,9 @@ class TestInfoSection:
 
         assert 'run' in response.json()['capabilities']
 
-    def has_manage_capabilities(self, url):
-        request_url = urllib.parse.urljoin(url, self.CAPABILITIES_ENDPOINT)
-        response = requests.get(request_url)
-        assert response.status_code == 200
-        return 'manage' in response.json()['capabilities']
+
+class TestDiscoverySection:
+    MODELS_ENDPOINT = '/models'
 
     def get_first_model(self, url):
         request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
@@ -139,55 +131,16 @@ class TestInfoSection:
         assert rel_self_href == endpoint_href
         assert rel_model_href == model_href
 
-    def build_parameters_from_model(self, model):
-        parameters = []
-        for field in model['input_schema']:
-            value = 0
-            if field['type'] == 'str' or field['type'] == 'string':
-                value = ""
-            elif field['type'] == 'bool' or field['type'] == 'boolean':
-                value = False
-            elif field['type'].startswith('['):
-                value = []
 
-            parameters.append({"name": field['name'], "value": value})
-        return parameters
+class TestManageSection:
+    MODELS_ENDPOINT = '/models'
+    CAPABILITIES_ENDPOINT = '/capabilities'
 
-    def test_models_and_endpoints_predictions(self, url):
-        request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
+    def has_manage_capabilities(self, url):
+        request_url = urllib.parse.urljoin(url, self.CAPABILITIES_ENDPOINT)
         response = requests.get(request_url)
-
         assert response.status_code == 200
-
-        for model in response.json()['models']:
-            assert model['links'] is not None
-
-            endpoint_href = None
-
-            for link in model['links']:
-                href = link['href']
-                rel = link['rel']
-
-                assert rel is not None
-                assert href is not None
-                assert rel == 'self' or rel == 'endpoint'
-
-                if rel == 'endpoint':
-                    endpoint_href = href
-
-            if endpoint_href:
-                request_url = urllib.parse.urljoin(url, self.RUN_ENDPOINT)
-                response = requests.post(request_url, json={
-                    "parameters": self.build_parameters_from_model(model),
-                    "target": [{
-                        "href": endpoint_href,
-                        "rel": "endpoint"
-                    }]
-                })
-
-                LOGGER.warning(response.json())
-
-                assert response.status_code == 200
+        return 'manage' in response.json()['capabilities']
 
     def test_model_creation_deletion(self, url):
         if self.has_manage_capabilities(url):
@@ -230,3 +183,58 @@ class TestInfoSection:
             response = requests.delete(request_url)
 
             assert response.status_code == 204
+
+
+class TestRunSection:
+    MODELS_ENDPOINT = '/models'
+    RUN_ENDPOINT = '/predictions'
+
+    def test_models_and_endpoints_predictions(self, url):
+        request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
+        response = requests.get(request_url)
+
+        assert response.status_code == 200
+
+        for model in response.json()['models']:
+            assert model['links'] is not None
+
+            endpoint_href = None
+
+            for link in model['links']:
+                href = link['href']
+                rel = link['rel']
+
+                assert rel is not None
+                assert href is not None
+                assert rel == 'self' or rel == 'endpoint'
+
+                if rel == 'endpoint':
+                    endpoint_href = href
+
+            if endpoint_href:
+                request_url = urllib.parse.urljoin(url, self.RUN_ENDPOINT)
+                response = requests.post(request_url, json={
+                    "parameters": self.build_parameters_from_model(model),
+                    "target": [{
+                        "href": endpoint_href,
+                        "rel": "endpoint"
+                    }]
+                })
+
+                LOGGER.warning(response.json())
+
+                assert response.status_code == 200
+
+    def build_parameters_from_model(self, model):
+        parameters = []
+        for field in model['input_schema']:
+            value = 0
+            if field['type'] == 'str' or field['type'] == 'string':
+                value = ""
+            elif field['type'] == 'bool' or field['type'] == 'boolean':
+                value = False
+            elif field['type'].startswith('['):
+                value = []
+
+            parameters.append({"name": field['name'], "value": value})
+        return parameters
