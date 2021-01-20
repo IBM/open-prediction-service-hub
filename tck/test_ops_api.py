@@ -1,14 +1,13 @@
 import logging
 import urllib.parse
 
+import pytest
 import requests
 
 LOGGER = logging.getLogger(__name__)
 
 
 class TestInfoSection:
-    INFO_ENDPOINT = '/info'
-    CAPABILITIES_ENDPOINT = '/capabilities'
 
     # {
     #     "info": {
@@ -17,7 +16,7 @@ class TestInfoSection:
     #    "status": "ok"
     # }
     def test_get_info(self, url):
-        request_url = urllib.parse.urljoin(url, self.INFO_ENDPOINT)
+        request_url = urllib.parse.urljoin(url, pytest.INFO_ENDPOINT)
         response = requests.get(request_url)
         assert response.status_code == 200
 
@@ -26,7 +25,7 @@ class TestInfoSection:
         assert response.json()['status'] == 'ok'
 
     def test_has_info_capabilities(self, url):
-        request_url = urllib.parse.urljoin(url, self.CAPABILITIES_ENDPOINT)
+        request_url = urllib.parse.urljoin(url, pytest.CAPABILITIES_ENDPOINT)
         response = requests.get(request_url)
         assert response.status_code == 200
 
@@ -35,7 +34,7 @@ class TestInfoSection:
         assert 'info' in response.json()['capabilities']
 
     def test_has_discover_capabilities(self, url):
-        request_url = urllib.parse.urljoin(url, self.CAPABILITIES_ENDPOINT)
+        request_url = urllib.parse.urljoin(url, pytest.CAPABILITIES_ENDPOINT)
         response = requests.get(request_url)
         assert response.status_code == 200
 
@@ -44,7 +43,7 @@ class TestInfoSection:
         assert 'discover' in response.json()['capabilities']
 
     def test_has_run_capabilities(self, url):
-        request_url = urllib.parse.urljoin(url, self.CAPABILITIES_ENDPOINT)
+        request_url = urllib.parse.urljoin(url, pytest.CAPABILITIES_ENDPOINT)
         response = requests.get(request_url)
         assert response.status_code == 200
 
@@ -54,16 +53,15 @@ class TestInfoSection:
 
 
 class TestDiscoverySection:
-    MODELS_ENDPOINT = '/models'
 
     def get_first_model(self, url):
-        request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
+        request_url = urllib.parse.urljoin(url, pytest.MODELS_ENDPOINT)
         response = requests.get(request_url)
         models = response.json()['models']
         return models[0]
 
     def test_can_list_models(self, url):
-        request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
+        request_url = urllib.parse.urljoin(url, pytest.MODELS_ENDPOINT)
         response = requests.get(request_url)
         assert response.status_code == 200
 
@@ -73,7 +71,7 @@ class TestDiscoverySection:
         assert len(models) > 1
 
     def test_models_and_endpoints_have_required_fields(self, url):
-        request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
+        request_url = urllib.parse.urljoin(url, pytest.MODELS_ENDPOINT)
         response = requests.get(request_url)
 
         assert response.status_code == 200
@@ -133,64 +131,53 @@ class TestDiscoverySection:
 
 
 class TestManageSection:
-    MODELS_ENDPOINT = '/models'
-    CAPABILITIES_ENDPOINT = '/capabilities'
 
-    def has_manage_capabilities(self, url):
-        request_url = urllib.parse.urljoin(url, self.CAPABILITIES_ENDPOINT)
-        response = requests.get(request_url)
-        assert response.status_code == 200
-        return 'manage' in response.json()['capabilities']
+    def test_model_creation_deletion(self, url, skip_manage_capability_for_proxy):
+        request_url = urllib.parse.urljoin(url, pytest.MODELS_ENDPOINT)
 
-    def test_model_creation_deletion(self, url):
-        if self.has_manage_capabilities(url):
-            request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
-
-            model_json = {
-                "name": "test model creation",
-                "input_schema": [
-                    {
-                        "name": "paramater",
-                        "order": 0,
-                        "type": "double"
-                    }
-                ],
-                "output_schema": {
-                    "prediction": {
-                        "type": "double"
-                    }
-                },
-                "version": "v1",
-                "metadata": {
-                    "description": "test model creation description"
+        model_json = {
+            "name": "test model creation",
+            "input_schema": [
+                {
+                    "name": "paramater",
+                    "order": 0,
+                    "type": "double"
                 }
+            ],
+            "output_schema": {
+                "prediction": {
+                    "type": "double"
+                }
+            },
+            "version": "v1",
+            "metadata": {
+                "description": "test model creation description"
             }
+        }
 
-            response = requests.post(request_url, json=model_json)
+        response = requests.post(request_url, json=model_json)
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
-            model_created = response.json()
+        model_created = response.json()
 
-            assert model_json['name'] == model_created['name']
+        assert model_json['name'] == model_created['name']
 
-            # delete model
-            request_url = urllib.parse.urljoin(
-                request_url, self.MODELS_ENDPOINT + '/' + model_created['id'])
+        # delete model
+        request_url = urllib.parse.urljoin(
+            request_url, pytest.MODELS_ENDPOINT + '/' + model_created['id'])
 
-            LOGGER.warning(request_url)
+        LOGGER.warning(request_url)
 
-            response = requests.delete(request_url)
+        response = requests.delete(request_url)
 
-            assert response.status_code == 204
+        assert response.status_code == 204
 
 
 class TestRunSection:
-    MODELS_ENDPOINT = '/models'
-    RUN_ENDPOINT = '/predictions'
 
     def test_models_and_endpoints_predictions(self, url):
-        request_url = urllib.parse.urljoin(url, self.MODELS_ENDPOINT)
+        request_url = urllib.parse.urljoin(url, pytest.MODELS_ENDPOINT)
         response = requests.get(request_url)
 
         assert response.status_code == 200
@@ -212,7 +199,7 @@ class TestRunSection:
                     endpoint_href = href
 
             if endpoint_href:
-                request_url = urllib.parse.urljoin(url, self.RUN_ENDPOINT)
+                request_url = urllib.parse.urljoin(url, pytest.RUN_ENDPOINT)
                 response = requests.post(request_url, json={
                     "parameters": self.build_parameters_from_model(model),
                     "target": [{
