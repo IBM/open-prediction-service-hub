@@ -4,6 +4,10 @@ import urllib.parse
 import pytest
 import requests
 
+import numpy as np
+import pandas as pd
+import sklearn.ensemble as skl_ensemble
+
 CAPABILITIES_ENDPOINT = '/capabilities'
 INFO_ENDPOINT = '/info'
 MODELS_ENDPOINT = '/models'
@@ -35,3 +39,12 @@ def skip_manage_capability_for_proxy(url):
     assert response.status_code == 200
     if 'manage' not in response.json()['capabilities']:
         pytest.skip('Tested service do not provide manage capability')
+
+
+@pytest.fixture
+def regression_predictor() -> skl_ensemble.RandomForestRegressor:
+    classifier = skl_ensemble.RandomForestRegressor(random_state=42)
+    x_random = pd.DataFrame(data=np.random.rand(20, 2), columns=['x', 'y'])
+    y_random = np.random.rand(20)
+    classifier.fit(x_random, y_random)
+    return classifier
