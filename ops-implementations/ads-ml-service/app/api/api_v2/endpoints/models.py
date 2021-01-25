@@ -29,6 +29,7 @@ import app.crud as crud
 import app.schemas as schemas
 import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
+import app.gen.schemas.ops_schemas as ops_schemas
 
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
@@ -135,6 +136,7 @@ def delete_model(
 @router.post(
     path='/models/{model_id}',
     status_code=status.HTTP_201_CREATED,
+    response_model=ops_schemas.Endpoint,
     tags=['manage']
 )
 def add_binary(
@@ -144,7 +146,7 @@ def add_binary(
         format: app_binary_config.ModelWrapper = fastapi.Form(app_binary_config.ModelWrapper.PICKLE),
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
-) -> responses.Response:
+) -> ops_schemas.Endpoint:
     LOGGER.info('Adding binary for model %s', model_id)
     model_config = crud.model_config.get(db, id=model_id)
     if not model_config:
@@ -153,7 +155,7 @@ def add_binary(
     if not endpoint:
         LOGGER.info('Endpoint not exist, creating')
         # Creation
-        crud.endpoint.create_with_model_and_binary(
+        endpoint_db_obj = crud.endpoint.create_with_model_and_binary(
             db,
             model_id=model_id,
             ec=schemas.EndpointCreate(name=model_config.configuration['name']),
@@ -162,7 +164,7 @@ def add_binary(
                 input_data_structure=input_data_structure,
                 output_data_structure=output_data_structure,
                 format=format))
-        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+        return impl.EndpointImpl.from_database(endpoint_db_obj)
     else:
         LOGGER.info('Endpoint exist, updating')
         # Update
@@ -176,4 +178,5 @@ def add_binary(
                 format=format
             )
         )
-        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+        endpoint_updated = crud.endpoint.get(db, id=model_id)
+        return impl.EndpointImpl.from_database(endpoint_updated)

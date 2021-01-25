@@ -75,7 +75,7 @@ def test_add_model(
     )
     model = response.json()
 
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert all(
         [model.get(k) == app_test_skl.get_conf()['model'].get(k) for k in app_test_skl.get_conf()['model'].keys()])
 
@@ -155,7 +155,7 @@ def test_add_binary(
     response_1 = client.get(
         url=conf.get_config().API_V2_STR + '/endpoints' + f'/{model.id}')
 
-    assert response.status_code == 204
+    assert response.status_code == 201
     assert response_1.json()['status'] == 'in_service'
 
 
@@ -182,7 +182,7 @@ def test_update_binary(
     response_3 = client.get(
         url=conf.get_config().API_V2_STR + '/endpoints' + f'/{model.id}')
 
-    assert response.status_code == 204
+    assert response.status_code == 201
     assert response_1.json()['status'] == 'in_service'
-    assert response_2.status_code == 204
+    assert response_2.status_code == 201
     assert response_3.json()['status'] == 'in_service'
