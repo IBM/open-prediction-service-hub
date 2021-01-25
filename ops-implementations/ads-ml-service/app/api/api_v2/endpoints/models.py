@@ -167,16 +167,14 @@ def add_binary(
         return impl.EndpointImpl.from_database(endpoint_db_obj)
     else:
         LOGGER.info('Endpoint exist, updating')
-        # Update
-        crud.binary_ml_model.update(
+        endpoint_updated = crud.endpoint.update_binary(
             db,
-            db_obj=endpoint,
-            obj_in=schemas.BinaryMlModelUpdate(
+            e=endpoint,
+            bu=schemas.BinaryMlModelUpdate(
                 model_b64=file.file.read(),
                 input_data_structure=input_data_structure,
                 output_data_structure=output_data_structure,
                 format=format
             )
         )
-        endpoint_updated = crud.endpoint.get(db, id=model_id)
         return impl.EndpointImpl.from_database(endpoint_updated)
