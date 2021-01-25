@@ -66,6 +66,7 @@ def get_model(
 
 @router.post(
     path='/models',
+    status_code=status.HTTP_201_CREATED,
     response_model=impl.ModelImpl,
     tags=['manage']
 )
@@ -133,7 +134,7 @@ def delete_model(
 
 @router.post(
     path='/models/{model_id}',
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_201_CREATED,
     tags=['manage']
 )
 def add_binary(
