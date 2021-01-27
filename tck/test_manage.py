@@ -39,7 +39,7 @@ class TestManageSection:
 
         response = requests.post(request_url, json=self.model_json)
 
-        assert response.status_code == 200
+        assert response.status_code == 201
 
         model_created = response.json()
 
@@ -57,7 +57,7 @@ class TestManageSection:
 
     def test_add_pickle(self, url, regression_predictor, skip_manage_capability_for_proxy):
         model_create_response = requests.post(urllib.parse.urljoin(url, pytest.MODELS_ENDPOINT), json=self.model_json)
-        assert model_create_response.status_code == 200
+        assert model_create_response.status_code == 201
         model_created = model_create_response.json()
 
         binary_upload_response = requests.post(
@@ -69,7 +69,7 @@ class TestManageSection:
                 'format': 'joblib'
             }
         )
-        assert binary_upload_response.status_code == 204
+        assert binary_upload_response.status_code == 201
 
         model_get_resp = requests.get(urllib.parse.urljoin(url, f'{pytest.MODELS_ENDPOINT}/{model_created["id"]}'))
         model_get = model_get_resp.json()
