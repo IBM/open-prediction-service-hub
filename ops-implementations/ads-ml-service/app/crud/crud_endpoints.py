@@ -65,5 +65,30 @@ class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, 
         db.refresh(endpoint_db_obj)
         return endpoint_db_obj
 
+    def update_binary(
+            self,
+            db: orm.Session,
+            *,
+            e: models.Endpoint,
+            bu: schemas.BinaryMlModelUpdate
+    ):
+        endpoint_original = encoders.jsonable_encoder(e)
+        for field in endpoint_original:
+            if field == 'deployed_at':
+                setattr(e, field, dt.datetime.now(tz=dt.timezone.utc))
+        binary_in_db = db.query(models.BinaryMlModel).filter(models.BinaryMlModel.id == e.id).first()
+        assert binary_in_db is not None
+
+        update_data = bu.dict(exclude_unset=True)
+        for field in ('input_data_structure', 'output_data_structure', 'format', 'file'):
+            if field in update_data:
+                setattr(binary_in_db, field, update_data[field])
+
+        db.add(e)
+        db.add(binary_in_db)
+        db.commit()
+        db.refresh(e)
+        return e
+
 
 endpoint = CRUDModel(models.Endpoint)
