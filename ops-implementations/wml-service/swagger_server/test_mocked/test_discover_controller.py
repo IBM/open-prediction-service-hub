@@ -185,18 +185,6 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "href": "/v4/pipelines/3d9a5179-3427-4531-b5e9-9c72e2da0fc4?rev=fc547a55-3b2b-486c-88ed-17314fe2caf2",
                     "rev": "fc547a55-3b2b-486c-88ed-17314fe2caf2"
                 },
-                "import": {
-                    "location": {
-                        "bucket": "daxweatherprojecttest-donotdelete-pr-hrn0dc04uetoqa",
-                        "path": "auto_ml/af5703fc-19ec-4a40-a420-9ac7624fc4b7/wml_data/45337a4c-f2fc-4137-ad7b-3baa99ed8847/data/automl/hpo_c_output/Pipeline5/model.pickle"
-                    },
-                    "type": "s3",
-                    "connection": {
-                        "access_key_id": "5abdbfa5a8854f78b27edc400ac54b30",
-                        "secret_access_key": "***REMOVED***",
-                        "endpoint_url": "https://s3.eu-geo.objectstorage.softlayer.net"
-                    }
-                },
                 "space": {
                     "id": "e838650c-28a2-499a-a269-456da2699768",
                     "href": "/v4/spaces/e838650c-28a2-499a-a269-456da2699768"
@@ -470,18 +458,6 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "id": "3d9a5179-3427-4531-b5e9-9c72e2da0fc4",
                     "href": "/v4/pipelines/3d9a5179-3427-4531-b5e9-9c72e2da0fc4?rev=fc547a55-3b2b-486c-88ed-17314fe2caf2",
                     "rev": "fc547a55-3b2b-486c-88ed-17314fe2caf2"
-                },
-                "import": {
-                    "location": {
-                        "bucket": "daxweatherprojecttest-donotdelete-pr-hrn0dc04uetoqa",
-                        "path": "auto_ml/af5703fc-19ec-4a40-a420-9ac7624fc4b7/wml_data/45337a4c-f2fc-4137-ad7b-3baa99ed8847/data/automl/hpo_c_output/Pipeline5/model.pickle"
-                    },
-                    "type": "s3",
-                    "connection": {
-                        "access_key_id": "5abdbfa5a8854f78b27edc400ac54b30",
-                        "secret_access_key": "***REMOVED***",
-                        "endpoint_url": "https://s3.eu-geo.objectstorage.softlayer.net"
-                    }
                 },
                 "space": {
                     "id": "e838650c-28a2-499a-a269-456da2699768",
@@ -830,18 +806,6 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                             "href": "/v4/pipelines/3d9a5179-3427-4531-b5e9-9c72e2da0fc4?rev=fc547a55-3b2b-486c-88ed-17314fe2caf2",
                             "rev": "fc547a55-3b2b-486c-88ed-17314fe2caf2"
                         },
-                        "import": {
-                            "location": {
-                                "bucket": "daxweatherprojecttest-donotdelete-pr-hrn0dc04uetoqa",
-                                "path": "auto_ml/af5703fc-19ec-4a40-a420-9ac7624fc4b7/wml_data/45337a4c-f2fc-4137-ad7b-3baa99ed8847/data/automl/hpo_c_output/Pipeline5/model.pickle"
-                            },
-                            "type": "s3",
-                            "connection": {
-                                "access_key_id": "5abdbfa5a8854f78b27edc400ac54b30",
-                                "secret_access_key": "***REMOVED***",
-                                "endpoint_url": "https://s3.eu-geo.objectstorage.softlayer.net"
-                            }
-                        },
                         "space": {
                             "id": "e838650c-28a2-499a-a269-456da2699768",
                             "href": "/v4/spaces/e838650c-28a2-499a-a269-456da2699768"
@@ -1046,18 +1010,6 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                             "href": "/v4/pipelines/3d9a5179-3427-4531-b5e9-9c72e2da0fc4?rev=fc547a55-3b2b-486c-88ed-17314fe2caf2",
                             "rev": "fc547a55-3b2b-486c-88ed-17314fe2caf2"
                         },
-                        "import": {
-                            "location": {
-                                "bucket": "daxweatherprojecttest-donotdelete-pr-hrn0dc04uetoqa",
-                                "path": "auto_ml/af5703fc-19ec-4a40-a420-9ac7624fc4b7/wml_data/45337a4c-f2fc-4137-ad7b-3baa99ed8847/data/automl/hpo_c_output/Pipeline5/model.pickle"
-                            },
-                            "type": "s3",
-                            "connection": {
-                                "access_key_id": "5abdbfa5a8854f78b27edc400ac54b30",
-                                "secret_access_key": "***REMOVED***",
-                                "endpoint_url": "https://s3.eu-geo.objectstorage.softlayer.net"
-                            }
-                        },
                         "space": {
                             "id": "e838650c-28a2-499a-a269-456da2699768",
                             "href": "/v4/spaces/e838650c-28a2-499a-a269-456da2699768"
@@ -1261,18 +1213,6 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                             "id": "3d9a5179-3427-4531-b5e9-9c72e2da0fc4",
                             "href": "/v4/pipelines/3d9a5179-3427-4531-b5e9-9c72e2da0fc4?rev=fc547a55-3b2b-486c-88ed-17314fe2caf2",
                             "rev": "fc547a55-3b2b-486c-88ed-17314fe2caf2"
-                        },
-                        "import": {
-                            "location": {
-                                "bucket": "daxweatherprojecttest-donotdelete-pr-hrn0dc04uetoqa",
-                                "path": "auto_ml/af5703fc-19ec-4a40-a420-9ac7624fc4b7/wml_data/45337a4c-f2fc-4137-ad7b-3baa99ed8847/data/automl/hpo_c_output/Pipeline5/model.pickle"
-                            },
-                            "type": "s3",
-                            "connection": {
-                                "access_key_id": "5abdbfa5a8854f78b27edc400ac54b30",
-                                "secret_access_key": "***REMOVED***",
-                                "endpoint_url": "https://s3.eu-geo.objectstorage.softlayer.net"
-                            }
                         },
                         "space": {
                             "id": "e838650c-28a2-499a-a269-456da2699768",
