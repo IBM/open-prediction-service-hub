@@ -1,3 +1,7 @@
+## 2.0.2 _2021/01/28_
+* [ADSML-70] removed credentials reference, they weren't valid anyway
+
+
 # Open Prediction Service HUB
 
 ## 2.0.1
