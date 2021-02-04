@@ -10,6 +10,12 @@ from openapi_server import util
 from openapi_server.controllers.helper import supported_models, get_model_conf, model_decode
 import pickle
 
+from functools import lru_cache
+
+@lru_cache(maxsize=4)
+def get_pickle(model_dir):
+    return pickle.load(open(f"data/{model_dir}/model.pkl", "rb"))
+
 def prediction(body):  # noqa: E501
     """Call Prediction of specified Endpoint
 
@@ -30,8 +36,7 @@ def prediction(body):  # noqa: E501
         input_args=[field["name"] for field in input_schema]
         prediction_args=[parameter.value for parameter in prediction.parameters if parameter.name in input_args]
         model_dir = model_decode(model_id)
-        # TODO: loading should only be done once
-        model = pickle.load(open(f"data/{model_dir}/model.pkl", "rb"))
+        model = get_pickle(model_dir)
 
         try:
             prediction = model.predict([prediction_args])[0]
