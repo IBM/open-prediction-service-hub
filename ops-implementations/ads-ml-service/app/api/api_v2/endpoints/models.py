@@ -30,6 +30,7 @@ import app.schemas as schemas
 import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
 import app.gen.schemas.ops_schemas as ops_schemas
+import app.runtime.wrapper as app_runtime_wrapper
 
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
@@ -149,8 +150,22 @@ def add_binary(
 ) -> ops_schemas.Endpoint:
     LOGGER.info('Adding binary for model %s', model_id)
     model_config = crud.model_config.get(db, id=model_id)
+    model = file.file.read()
     if not model_config:
         raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Model not found')
+
+    # test model compatibility
+    try:
+        app_runtime_wrapper.ModelInvocationExecutor(
+            model=model,
+            input_type=input_data_structure,
+            output_type=output_data_structure,
+            binary_format=format,
+            info={}
+        )
+    except:
+        raise fastapi.HTTPException(status_code=422, detail="Can not deserialize model binary")
+
     endpoint = crud.endpoint.get(db, id=model_id)
     if not endpoint:
         LOGGER.info('Endpoint not exist, creating')
