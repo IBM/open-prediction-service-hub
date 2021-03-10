@@ -1,9 +1,7 @@
-connexion == 2.2.0
-python_dateutil == 2.6.0
-setuptools >= 21.0.0
-Werkzeug == 0.15.3
-flask == 1.0
-
+connexion[swagger-ui] == 2.7.0
+python_dateutil == 2.8.1
+setuptools == 54.1.1
+jsonschema == 3.2.0
 
 boto3 == 1.14.13
 botocore == 1.17.13
