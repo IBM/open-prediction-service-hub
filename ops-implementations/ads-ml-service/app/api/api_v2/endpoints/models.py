@@ -140,7 +140,7 @@ def delete_model(
     response_model=ops_schemas.Endpoint,
     tags=['manage']
 )
-def add_binary(
+async def add_binary(
         model_id: int,
         input_data_structure: app_binary_config.ModelInput = fastapi.Form(app_binary_config.ModelInput.AUTO),
         output_data_structure: app_binary_config.ModelOutput = fastapi.Form(app_binary_config.ModelOutput.AUTO),
@@ -150,7 +150,7 @@ def add_binary(
 ) -> ops_schemas.Endpoint:
     LOGGER.info('Adding binary for model %s', model_id)
     model_config = crud.model_config.get(db, id=model_id)
-    model = file.file.read()
+    model = await file.read()
     if not model_config:
         raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Model not found')
 
@@ -175,7 +175,7 @@ def add_binary(
             model_id=model_id,
             ec=schemas.EndpointCreate(name=model_config.configuration['name']),
             bc=schemas.BinaryMlModelCreate(
-                model_b64=file.file.read(),
+                model_b64=model,
                 input_data_structure=input_data_structure,
                 output_data_structure=output_data_structure,
                 format=format))
@@ -186,7 +186,7 @@ def add_binary(
             db,
             e=endpoint,
             bu=schemas.BinaryMlModelUpdate(
-                model_b64=file.file.read(),
+                model_b64=model,
                 input_data_structure=input_data_structure,
                 output_data_structure=output_data_structure,
                 format=format
