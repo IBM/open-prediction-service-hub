@@ -34,3 +34,20 @@ def test_get_server_capabilities(
     assert 'discover' in content['capabilities']
     assert 'manage' in content['capabilities']
     assert 'run' in content['capabilities']
+
+
+def test_get_managed_capabilities(
+        client: tstc.TestClient
+):
+    response = client.get(f'{conf.get_config().API_V2_STR}/capabilities')
+    content = response.json()
+
+    assert response.status_code == 200
+    assert content['managed_capabilities']
+    assert 'supported_input_data_structure' in content['managed_capabilities']
+    assert 'supported_output_data_structure' in content['managed_capabilities']
+    assert 'supported_format' in content['managed_capabilities']
+    assert 'auto' in content['managed_capabilities']['supported_input_data_structure']
+    assert 'auto' in content['managed_capabilities']['supported_input_data_structure']
+    assert 'joblib' in content['managed_capabilities']['supported_format']
+    assert 'pickle' in content['managed_capabilities']['supported_format']
