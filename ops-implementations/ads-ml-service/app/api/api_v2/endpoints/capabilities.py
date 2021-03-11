@@ -35,5 +35,10 @@ async def server_capabilities() -> typing.Dict[typing.Text, typing.Any]:
             ops_model.Capability.discover,
             ops_model.Capability.manage,
             ops_model.Capability.run
-        ]
+        ],
+        'managed_capabilities': {
+            'supported_input_data_structure': ['auto', 'DataFrame', 'ndarray', 'DMatrix', 'list'],
+            'supported_output_data_structure': ['auto', 'DataFrame', 'ndarray', 'list'],
+            'supported_format': ['pickle', 'joblib', 'pmml', 'bst']
+        }
     }
