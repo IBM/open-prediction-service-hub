@@ -159,6 +159,22 @@ def test_add_binary(
     assert response_1.json()['status'] == 'in_service'
 
 
+def test_add_non_compatible_binary(
+        db: saorm.Session,
+        client: tstc.TestClient
+) -> typ.NoReturn:
+    model = crud.model.create(db, obj_in=schemas.ModelCreate())
+    crud.model_config.create_with_model(
+        db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
+    )
+    response = client.post(
+        url=conf.get_config().API_V2_STR + '/models' + f'/{model.id}',
+        files={'file': 'toto'.encode()},
+        data=app_test_skl.get_conf()['binary']
+    )
+    assert response.status_code == 422
+
+
 def test_update_binary(
         db: saorm.Session,
         client: tstc.TestClient
