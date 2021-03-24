@@ -159,9 +159,15 @@ class ModelInvocationExecutor:
         LOGGER.debug('ML output: %s', predict)
         formatted_predict = self.output_handling(predict)
         if not self.can_predict_proba:
-            return {'result': {'predictions': formatted_predict, **self.info}}
+            if not isinstance(formatted_predict, typ.Dict):
+                return {'result': {'predictions': formatted_predict, **self.info}}
+            else:
+                return {'result': {**formatted_predict, **self.info}}
         else:
             predict_proba = self.loaded_model.predict_proba(prepared_data)
             LOGGER.debug('ML output(scores): %s', predict_proba)
             formatted_predict_proba = self.output_handling(predict_proba)
-            return {'result': {'predictions': formatted_predict, 'scores': formatted_predict_proba, **self.info}}
+            if not isinstance(formatted_predict, typ.Dict):
+                return {'result': {'predictions': formatted_predict, 'scores': formatted_predict_proba, **self.info}}
+            else:
+                return {'result': {**formatted_predict, 'scores': formatted_predict_proba, **self.info}}
