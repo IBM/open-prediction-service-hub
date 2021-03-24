@@ -1,0 +1,46 @@
+{
+  "model": {
+    "name": "ML-Sample-SGDClassifier-StandardScaler",
+    "version": "v1",
+    "input_schema": [
+      {
+        "name": "creditScore",
+        "order": 0,
+        "type": "float"
+      },
+      {
+        "name": "income",
+        "order": 1,
+        "type": "float"
+      },
+      {
+        "name": "loanAmount",
+        "order": 2,
+        "type": "float"
+      },
+      {
+        "name": "monthDuration",
+        "order": 3,
+        "type": "float"
+      },
+      {
+        "name": "rate",
+        "order": 4,
+        "type": "float"
+      },
+      {
+        "name": "yearlyReimbursement",
+        "order": 5,
+        "type": "float"
+      }
+    ],
+    "metadata": {
+      "description": "ML-Sample-SGDClassifier-StandardScaler"
+    }
+  },
+  "binary": {
+    "input_data_structure": "DataFrame",
+    "output_data_structure": "DataFrame",
+    "format": "pmml"
+  }
+}
