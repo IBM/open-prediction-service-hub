@@ -35,7 +35,7 @@ import app.schemas.impl as impl
 PROJECT_ROOT = pathlib.Path(__file__).resolve().parents[2].resolve()
 EXAMPLES_ROOT = PROJECT_ROOT.joinpath('examples', 'model_training_and_deployment')
 MODEL_BASENAME = 'model'
-MODEL_EXTENSIONS = ['.joblib', '.pkl', '.pickle', '.bst']
+MODEL_EXTENSIONS = ['.joblib', '.pkl', '.pickle', '.bst', '.pmml']
 
 logger = logging.getLogger(__name__)
 
