@@ -60,7 +60,7 @@ def test_identity_prediction(
             ]
         }
     )
-    prediction = response.json()['result']['predictions']
+    prediction = response.json()['result']
 
     assert prediction == output
 
