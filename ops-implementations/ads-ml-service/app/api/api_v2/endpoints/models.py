@@ -26,11 +26,11 @@ import starlette.status as status
 
 import app.api.deps as deps
 import app.crud as crud
+import app.gen.schemas.ops_schemas as ops_schemas
+import app.runtime.model_upload as app_model_upload
 import app.schemas as schemas
 import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
-import app.gen.schemas.ops_schemas as ops_schemas
-import app.runtime.wrapper as app_runtime_wrapper
 
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
@@ -148,48 +148,12 @@ async def add_binary(
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> ops_schemas.Endpoint:
-    LOGGER.info('Adding binary for model %s', model_id)
-    model_config = crud.model_config.get(db, id=model_id)
-    model = await file.read()
-    if not model_config:
-        raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Model not found')
-
-    # test model compatibility
-    try:
-        app_runtime_wrapper.ModelInvocationExecutor(
-            model=model,
-            input_type=input_data_structure,
-            output_type=output_data_structure,
-            binary_format=format,
-            info={}
-        )
-    except:
-        raise fastapi.HTTPException(status_code=422, detail="Can not deserialize model binary")
-
-    endpoint = crud.endpoint.get(db, id=model_id)
-    if not endpoint:
-        LOGGER.info('Endpoint not exist, creating')
-        # Creation
-        endpoint_db_obj = crud.endpoint.create_with_model_and_binary(
-            db,
-            model_id=model_id,
-            ec=schemas.EndpointCreate(name=model_config.configuration['name']),
-            bc=schemas.BinaryMlModelCreate(
-                model_b64=model,
-                input_data_structure=input_data_structure,
-                output_data_structure=output_data_structure,
-                format=format))
-        return impl.EndpointImpl.from_database(endpoint_db_obj)
-    else:
-        LOGGER.info('Endpoint exist, updating')
-        endpoint_updated = crud.endpoint.update_binary(
-            db,
-            e=endpoint,
-            bu=schemas.BinaryMlModelUpdate(
-                model_b64=model,
-                input_data_structure=input_data_structure,
-                output_data_structure=output_data_structure,
-                format=format
-            )
-        )
-        return impl.EndpointImpl.from_database(endpoint_updated)
+    m = await app_model_upload.upload_model(
+        db,
+        file,
+        input_data_structure=input_data_structure,
+        output_data_structure=output_data_structure,
+        format_=format,
+        model_id=model_id
+    )
+    return impl.EndpointImpl.from_database(crud.endpoint.get(db, id=m))
