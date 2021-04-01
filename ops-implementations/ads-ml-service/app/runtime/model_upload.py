@@ -41,9 +41,13 @@ async def upload_model(
         input_data_structure: app_binary_config.ModelInput = None,
         output_data_structure: app_binary_config.ModelOutput = None,
         format_: app_binary_config.ModelWrapper = None,
-        model_id: typing.Optional[int] = None
+        model_id: typing.Optional[int] = None,
+        name: typing.Optional[str] = None
 ) -> int:
-    file_name = os.path.splitext(file.filename)[0]
+
+    if not ((model_id is None) ^ (name is None)):
+        raise RuntimeError('`model_id` xor `name` needs to be true')
+
     model_binary = await file.read()
 
     # test model_binary compatibility
@@ -69,7 +73,7 @@ async def upload_model(
             obj_in=schemas.ModelConfigCreate(
                 configuration=encoders.jsonable_encoder(
                     obj=impl.ModelCreateImpl(
-                        name=file_name,
+                        name=name,
                         input_schema=[
                             impl.FeatureImpl(
                                 name=k,

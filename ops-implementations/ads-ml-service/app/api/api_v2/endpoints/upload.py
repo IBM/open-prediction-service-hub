@@ -41,9 +41,11 @@ LOGGER = logging.getLogger(__name__)
 )
 async def upload(
         format_: str = fastapi.Form(..., alias='format'),
+        name: typing.Optional[str] = fastapi.Form(None),
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
+    file_name = os.path.splitext(file.filename)[0]
     model_extension = os.path.splitext(file.filename)[1]
 
     if model_extension.lower() not in ('.pmml',):
@@ -56,7 +58,8 @@ async def upload(
         file,
         input_data_structure=app_binary_config.ModelInput.DATAFRAME,
         output_data_structure=app_binary_config.ModelOutput.DATAFRAME,
-        format_=app_binary_config.ModelWrapper.PMML
+        format_=app_binary_config.ModelWrapper.PMML,
+        name=name if name is not None else file_name
     )
 
     return impl.ModelImpl.from_database(
