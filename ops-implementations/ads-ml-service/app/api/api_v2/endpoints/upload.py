@@ -40,11 +40,15 @@ LOGGER = logging.getLogger(__name__)
     tags=['manage']
 )
 async def upload(
+        format_: str = fastapi.Form(..., alias='format'),
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
     model_extension = os.path.splitext(file.filename)[1]
+
     if model_extension.lower() not in ('.pmml',):
+        LOGGER.warning('File extension is not supported: %s', file.filename)
+    if format_.lower() not in ('pmml',):
         raise fastapi.HTTPException(status_code=422, detail="File extension not supported")
 
     m = await app_model_upload.upload_model(

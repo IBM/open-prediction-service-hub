@@ -37,7 +37,8 @@ def test_add_binary(
         pmml_model = fd.read()
     model_creation_resp = client.post(
         url=conf.get_config().API_V2_STR + '/upload',
-        files={'file': (pmml_path.name, pmml_model)}
+        files={'file': (pmml_path.name, pmml_model)},
+        data={'format': 'pmml'}
     )
     model_json = model_creation_resp.json()
     model_id = model_json['id']
