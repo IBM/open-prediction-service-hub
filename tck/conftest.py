@@ -12,6 +12,7 @@ CAPABILITIES_ENDPOINT = '/capabilities'
 INFO_ENDPOINT = '/info'
 MODELS_ENDPOINT = '/models'
 RUN_ENDPOINT = '/predictions'
+UPLOAD_ENDPOINT = '/upload'
 
 
 def pytest_addoption(parser):
@@ -25,6 +26,7 @@ def pytest_configure():
     pytest.INFO_ENDPOINT = INFO_ENDPOINT
     pytest.MODELS_ENDPOINT = MODELS_ENDPOINT
     pytest.RUN_ENDPOINT = RUN_ENDPOINT
+    pytest.UPLOAD_ENDPOINT = UPLOAD_ENDPOINT
 
 
 @pytest.fixture
