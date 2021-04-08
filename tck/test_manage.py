@@ -101,17 +101,13 @@ class TestManageSection:
 
         upload_response = requests.post(
             urllib.parse.urljoin(url, f'{pytest.UPLOAD_ENDPOINT}'),
-            files={'file': ('model.pmml', model)},
-            data={
-                'format': 'pmml',
-                'name': 'test-model'
-            }
+            files={'file': ('model.pmml', model)}
         )
         assert upload_response.status_code == 201
 
         model_created = upload_response.json()
 
-        assert model_created['name'] == 'test-model'
+        assert model_created['name'] == 'SGDClassifier'
         assert model_created['input_schema'] == [
             {
                 "name": "creditScore",
@@ -155,3 +151,12 @@ class TestManageSection:
                 "type": "double"
             }
         }
+
+        # delete model
+        request_url = urllib.parse.urljoin(
+            url, pytest.MODELS_ENDPOINT + '/' + model_created['id'])
+
+        LOGGER.warning(request_url)
+        response_del = requests.delete(request_url)
+
+        assert response_del.status_code == 204
