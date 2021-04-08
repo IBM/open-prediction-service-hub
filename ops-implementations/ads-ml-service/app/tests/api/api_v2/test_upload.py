@@ -37,11 +37,7 @@ def test_add_binary(
         pmml_model = fd.read()
     model_creation_resp = client.post(
         url=conf.get_config().API_V2_STR + '/upload',
-        files={'file': (pmml_path.name, pmml_model)},
-        data={
-            'format': 'pmml',
-            'name': 'test-model'
-        }
+        files={'file': (pmml_path.name, pmml_model)}
     )
     model_json = model_creation_resp.json()
     model_id = model_json['id']
@@ -68,7 +64,7 @@ def test_add_binary(
 
     assert model_creation_resp.status_code == 201
     assert prediction_resp.status_code == 200
-    assert model_name == 'test-model'
+    assert model_name == 'SGDClassifier'
     assert 'predicted_paymentDefault' in prediction_json['result']
     assert 'probability_0' in prediction_json['result']
     assert 'probability_1' in prediction_json['result']

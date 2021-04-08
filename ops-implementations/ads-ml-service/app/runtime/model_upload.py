@@ -16,7 +16,6 @@
 
 
 import logging
-import os
 import typing
 
 import fastapi
@@ -25,7 +24,7 @@ import sqlalchemy.orm as saorm
 import starlette.status as status
 
 import app.crud as crud
-import app.runtime.signature_inspection as app_signature_inspection
+import app.runtime.inspection as app_signature_inspection
 import app.runtime.wrapper as app_runtime_wrapper
 import app.schemas as schemas
 import app.schemas.binary_config as app_binary_config
@@ -34,32 +33,37 @@ import app.schemas.impl as impl
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
 
+SUPPORTED_FORMATS = ('.pmml',)
 
-async def upload_model(
+
+def is_compatible(
+        model: bytes,
+        format_: app_binary_config.ModelWrapper
+) -> bool:
+    # noinspection PyBroadException
+    try:
+        app_runtime_wrapper.ModelInvocationExecutor(
+            model=model,
+            input_type=app_binary_config.ModelInput.AUTO,
+            output_type=app_binary_config.ModelOutput.AUTO,
+            binary_format=format_
+        )
+    except Exception:
+        return False
+    return True
+
+
+def store_model(
         db: saorm.Session,
-        file: fastapi.UploadFile,
+        model_binary: bytes,
         input_data_structure: app_binary_config.ModelInput = None,
         output_data_structure: app_binary_config.ModelOutput = None,
         format_: app_binary_config.ModelWrapper = None,
         model_id: typing.Optional[int] = None,
         name: typing.Optional[str] = None
 ) -> int:
-
     if not ((model_id is None) ^ (name is None)):
         raise RuntimeError('`model_id` xor `name` needs to be true')
-
-    model_binary = await file.read()
-
-    # test model_binary compatibility
-    try:
-        app_runtime_wrapper.ModelInvocationExecutor(
-            model=model_binary,
-            input_type=input_data_structure,
-            output_type=output_data_structure,
-            binary_format=format_
-        )
-    except Exception:
-        raise fastapi.HTTPException(status_code=422, detail='Can not deserialize model binary')
 
     if model_id is None:
         LOGGER.info('Adding binary directly')

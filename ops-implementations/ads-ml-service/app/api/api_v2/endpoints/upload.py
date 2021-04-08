@@ -28,6 +28,7 @@ import app.crud as crud
 import app.runtime.model_upload as app_model_upload
 import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
+import app.runtime.inspection as app_inspection
 
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
@@ -40,26 +41,38 @@ LOGGER = logging.getLogger(__name__)
     tags=['manage']
 )
 async def upload(
-        format_: str = fastapi.Form(..., alias='format'),
-        name: typing.Optional[str] = fastapi.Form(None),
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
-) -> typing.Dict[typing.Text, typing.Any]:
-    file_name = os.path.splitext(file.filename)[0]
-    model_extension = os.path.splitext(file.filename)[1]
+) -> typing.Dict[str, typing.Any]:
+    file_name, file_extension = os.path.splitext(file.filename)
+    model_binary = await file.read()
 
-    if model_extension.lower() not in ('.pmml',):
-        LOGGER.warning('File extension is not supported: %s', file.filename)
-    if format_.lower() not in ('pmml',):
-        raise fastapi.HTTPException(status_code=422, detail="File extension not supported")
+    if file_extension.lower() not in app_model_upload.SUPPORTED_FORMATS:
+        LOGGER.warning(
+            'File extension is not supported: %s, expected: %s', file.filename, app_model_upload.SUPPORTED_FORMATS)
+        raise fastapi.HTTPException(
+            status_code=422,
+            detail='File extension is not supported: %s, expected: %s'.format(
+                file.filename, app_model_upload.SUPPORTED_FORMATS)
+        )
+    model_format = app_binary_config.ModelWrapper[file_extension.upper()[1:]]
 
-    m = await app_model_upload.upload_model(
+    if not app_model_upload.is_compatible(model_binary, model_format):
+        raise fastapi.HTTPException(status_code=422, detail='Can not deserialize model binary')
+
+    if model_format is app_binary_config.ModelWrapper.PMML:
+        inspected_name = app_inspection.inspect_pmml_model_name(model_binary)
+        model_name = inspected_name if inspected_name is not None else file_name
+    else:
+        model_name = file_name
+
+    m = app_model_upload.store_model(
         db,
-        file,
+        model_binary,
         input_data_structure=app_binary_config.ModelInput.DATAFRAME,
         output_data_structure=app_binary_config.ModelOutput.DATAFRAME,
         format_=app_binary_config.ModelWrapper.PMML,
-        name=name if name is not None else file_name
+        name=model_name
     )
 
     return impl.ModelImpl.from_database(

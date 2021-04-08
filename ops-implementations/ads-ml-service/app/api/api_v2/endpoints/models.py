@@ -144,16 +144,21 @@ async def add_binary(
         model_id: int,
         input_data_structure: app_binary_config.ModelInput = fastapi.Form(app_binary_config.ModelInput.AUTO),
         output_data_structure: app_binary_config.ModelOutput = fastapi.Form(app_binary_config.ModelOutput.AUTO),
-        format: app_binary_config.ModelWrapper = fastapi.Form(app_binary_config.ModelWrapper.PICKLE),
+        format_: app_binary_config.ModelWrapper = fastapi.Form(app_binary_config.ModelWrapper.PICKLE, alias='format'),
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> ops_schemas.Endpoint:
-    m = await app_model_upload.upload_model(
+    model_binary = await file.read()
+
+    if not app_model_upload.is_compatible(model_binary, format_):
+        raise fastapi.HTTPException(status_code=422, detail='Can not deserialize model binary')
+
+    m = app_model_upload.store_model(
         db,
-        file,
+        model_binary,
         input_data_structure=input_data_structure,
         output_data_structure=output_data_structure,
-        format_=format,
+        format_=format_,
         model_id=model_id
     )
     return impl.EndpointImpl.from_database(crud.endpoint.get(db, id=m))

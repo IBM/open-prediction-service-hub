@@ -17,7 +17,7 @@
 
 import pathlib
 
-import app.runtime.signature_inspection as app_signature_inspection
+import app.runtime.inspection as app_signature_inspection
 import app.tests.predictors.pmml_sample.model as app_test_pmml
 
 
