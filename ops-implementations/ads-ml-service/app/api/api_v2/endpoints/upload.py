@@ -44,6 +44,7 @@ async def upload(
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[str, typing.Any]:
+    LOGGER.info('Receiving file %s', file.filename)
     file_name, file_extension = os.path.splitext(file.filename)
     model_binary = await file.read()
 
