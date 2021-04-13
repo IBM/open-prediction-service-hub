@@ -55,10 +55,15 @@ async def upload(
             detail='File extension is not supported: %s, expected: %s'.format(
                 file.filename, app_model_upload.SUPPORTED_FORMATS)
         )
-    model_format = app_binary_config.ModelWrapper[file_extension.upper()[1:]]
+
+    formatted_extension = file_extension.upper()[1:]
+    try:
+        model_format = app_binary_config.ModelWrapper[formatted_extension]
+    except KeyError:
+        raise fastapi.HTTPException(status_code=422, detail=f'Model extension {formatted_extension} not supported')
 
     if not app_model_upload.is_compatible(model_binary, model_format):
-        raise fastapi.HTTPException(status_code=422, detail='Can not deserialize model binary')
+        raise fastapi.HTTPException(status_code=422, detail=f'Model can not be loaded. Model type: {model_format}')
 
     if model_format is app_binary_config.ModelWrapper.PMML:
         inspected_name = app_inspection.inspect_pmml_model_name(model_binary)
