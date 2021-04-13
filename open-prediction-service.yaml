@@ -743,7 +743,11 @@ components:
               type: array
               items:
                 type: string
-            supported_format:
+            supported_binary_format:
+              type: array
+              items:
+                type: string
+            supported_upload_format:
               type: array
               items:
                 type: string
