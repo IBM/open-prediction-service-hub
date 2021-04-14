@@ -44,6 +44,15 @@ def skip_manage_capability_for_proxy(url):
 
 
 @pytest.fixture
+def skip_pmml_upload_if_not_supported(url, skip_manage_capability_for_proxy):
+    request_url = urllib.parse.urljoin(url, CAPABILITIES_ENDPOINT)
+    response = requests.get(request_url)
+
+    if 'pmml' not in response.json()['managed_capabilities']['supported_upload_format']:
+        pytest.skip('Tested service do not provide pmml upload')
+
+
+@pytest.fixture
 def regression_predictor() -> skl_ensemble.RandomForestRegressor:
     classifier = skl_ensemble.RandomForestRegressor(random_state=42)
     x_random = pd.DataFrame(data=np.random.rand(20, 2), columns=['x', 'y'])

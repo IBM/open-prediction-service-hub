@@ -94,7 +94,7 @@ class TestManageSection:
         response_del = requests.delete(urllib.parse.urljoin(url, f'{pytest.MODELS_ENDPOINT}/{model_created["id"]}'))
         assert response_del.status_code == 204
 
-    def test_upload(self, url, skip_manage_capability_for_proxy):
+    def test_upload(self, url, skip_pmml_upload_if_not_supported):
         model_path = pathlib.Path(__file__).resolve().parent.joinpath('model.pmml')
         with model_path.open(mode='r') as fd:
             model = fd.read()
