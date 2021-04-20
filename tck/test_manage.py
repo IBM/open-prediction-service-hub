@@ -1,4 +1,5 @@
 import logging
+import pathlib
 import pickle
 import urllib.parse
 
@@ -91,4 +92,71 @@ class TestManageSection:
         assert type(prediction_resp.json()['result']['predictions']) is float
 
         response_del = requests.delete(urllib.parse.urljoin(url, f'{pytest.MODELS_ENDPOINT}/{model_created["id"]}'))
+        assert response_del.status_code == 204
+
+    def test_upload(self, url, skip_pmml_upload_if_not_supported):
+        model_path = pathlib.Path(__file__).resolve().parent.joinpath('model.pmml')
+        with model_path.open(mode='r') as fd:
+            model = fd.read()
+
+        upload_response = requests.post(
+            urllib.parse.urljoin(url, f'{pytest.UPLOAD_ENDPOINT}'),
+            files={'file': ('model.pmml', model)}
+        )
+        assert upload_response.status_code == 201
+
+        model_created = upload_response.json()
+
+        assert model_created['name'] == 'SGDClassifier'
+        assert model_created['input_schema'] == [
+            {
+                "name": "creditScore",
+                "order": 0,
+                "type": "double"
+            },
+            {
+                "name": "income",
+                "order": 1,
+                "type": "double"
+            },
+            {
+                "name": "loanAmount",
+                "order": 2,
+                "type": "double"
+            },
+            {
+                "name": "monthDuration",
+                "order": 3,
+                "type": "double"
+            },
+            {
+                "name": "rate",
+                "order": 4,
+                "type": "double"
+            },
+            {
+                "name": "yearlyReimbursement",
+                "order": 5,
+                "type": "double"
+            }
+        ]
+        assert model_created['output_schema'] == {
+            "predicted_paymentDefault": {
+                "type": "integer"
+            },
+            "probability_1": {
+                "type": "double"
+            },
+            "probability_0": {
+                "type": "double"
+            }
+        }
+
+        # delete model
+        request_url = urllib.parse.urljoin(
+            url, pytest.MODELS_ENDPOINT + '/' + model_created['id'])
+
+        LOGGER.warning(request_url)
+        response_del = requests.delete(request_url)
+
         assert response_del.status_code == 204
