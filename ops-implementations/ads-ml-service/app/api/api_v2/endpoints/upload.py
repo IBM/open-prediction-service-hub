@@ -53,7 +53,7 @@ async def upload(
             'File extension is not supported: %s, expected: %s', file.filename, app_model_upload.SUPPORTED_FORMATS)
         raise fastapi.HTTPException(
             status_code=422,
-            detail='File extension is not supported: %s, expected: %s'.format(
+            detail='File extension is not supported: %s, expected: %s' % (
                 file.filename, app_model_upload.SUPPORTED_FORMATS)
         )
 
