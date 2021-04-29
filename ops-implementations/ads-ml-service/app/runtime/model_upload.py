@@ -68,8 +68,22 @@ def store_model(
     if model_id is None:
         LOGGER.info('Adding binary directly')
 
-        input_schema = app_signature_inspection.inspect_pmml_input(model_binary)
-        output_schema = app_signature_inspection.inspect_pmml_output(model_binary)
+        input_schema_pmml = app_signature_inspection.inspect_pmml_input(model_binary)
+        output_schema_pmml = app_signature_inspection.inspect_pmml_output(model_binary)
+
+        input_schema_ops = None if not input_schema_pmml else [
+                            impl.FeatureImpl(
+                                name=k,
+                                order=i,
+                                type=input_schema_pmml[k]
+                            ) for i, k in enumerate(input_schema_pmml.keys())
+                        ]
+        output_schema_ops = None if not output_schema_pmml else {
+                            k: {
+                                'type': v
+                            }
+                            for k, v in output_schema_pmml.items()
+                        }
 
         model = crud.model.create(db, obj_in=schemas.ModelCreate())
         crud.model_config.create_with_model(
@@ -78,19 +92,8 @@ def store_model(
                 configuration=encoders.jsonable_encoder(
                     obj=impl.ModelCreateImpl(
                         name=name,
-                        input_schema=[
-                            impl.FeatureImpl(
-                                name=k,
-                                order=i,
-                                type=input_schema[k]
-                            ) for i, k in enumerate(input_schema.keys())
-                        ],
-                        output_schema={
-                            k: {
-                                'type': v
-                            }
-                            for k, v in output_schema.items()
-                        }
+                        input_schema=input_schema_ops,
+                        output_schema=output_schema_ops
                     )
                 )
             ),
