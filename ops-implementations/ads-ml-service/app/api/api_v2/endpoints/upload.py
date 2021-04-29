@@ -75,9 +75,9 @@ async def upload(
     m = app_model_upload.store_model(
         db,
         model_binary,
-        input_data_structure=app_binary_config.ModelInput.DATAFRAME,
-        output_data_structure=app_binary_config.ModelOutput.DATAFRAME,
-        format_=app_binary_config.ModelWrapper.PMML,
+        input_data_structure=app_binary_config.ModelInput.AUTO,
+        output_data_structure=app_binary_config.ModelOutput.AUTO,
+        format_=model_format,
         name=model_name
     )
 
