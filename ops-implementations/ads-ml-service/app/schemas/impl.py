@@ -153,6 +153,6 @@ class PredictionImpl(pydt.BaseModel):
         description='Add at least a relation to an `endpoint`to be able to call the correct prediction. Eventually add '
                     'also a `model` in case endpoints contains multiple models.',
     )
-    parameters: typing.List[ParameterImpl] = pydt.Field(
+    parameters: typing.List[typing.Union[typing.List[ParameterImpl], ParameterImpl]] = pydt.Field(
         ..., description='Model parameters', title='Parameters'
     )
