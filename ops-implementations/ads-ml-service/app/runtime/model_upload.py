@@ -69,7 +69,11 @@ def store_model(
         LOGGER.info('Adding binary directly')
 
         input_schema_pmml = app_signature_inspection.inspect_pmml_input(model_binary)
+        if input_schema_pmml is None:
+            LOGGER.warning('pmml file does not contain input schema')
         output_schema_pmml = app_signature_inspection.inspect_pmml_output(model_binary)
+        if output_schema_pmml is None:
+            LOGGER.warning('pmml file does not contain output schema')
 
         input_schema_ops = None if not input_schema_pmml else [
                             impl.FeatureImpl(
