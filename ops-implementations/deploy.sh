@@ -9,9 +9,10 @@ DEPLOY_TAG=$(date +'%Y%m%d-%H%M%S')-${TRAVIS_BUILD_NUMBER}-${TRAVIS_BRANCH//[\/]
 
 echo "DEPLOY_TAG=${DEPLOY_TAG}"
 
-if [ "$TRAVIS_BRANCH" == "master" ]; then
+if [ "$TRAVIS_BRANCH" == "main" ]; then
     DEPLOY_LATEST_TAG=stable
 fi
+echo "DEPLOY_LATEST_TAG=${DEPLOY_LATEST_TAG}"
 
 cd ${DIR}/${DEPLOY_SERVICE}
 docker build -t ${DEPLOY_SERVICE}:${DEPLOY_LATEST_TAG} -f Dockerfile .
