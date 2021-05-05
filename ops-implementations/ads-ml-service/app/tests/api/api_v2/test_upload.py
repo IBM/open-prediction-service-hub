@@ -68,3 +68,20 @@ def test_add_binary(
     assert 'predicted_paymentDefault' in prediction_json['result']
     assert 'probability_0' in prediction_json['result']
     assert 'probability_1' in prediction_json['result']
+
+
+def test_add_binary_incomplete_schema(
+        db: saorm.Session,
+        client: tstc.TestClient
+) -> typ.NoReturn:
+    import app.runtime.cache as app_cache
+    app_cache.cache.clear()
+    pmml_path = app_test_pmml.get_pmml_no_output_schema_file()
+    with pmml_path.open(mode='r') as fd:
+        pmml_model = fd.read()
+    model_creation_resp = client.post(
+        url=conf.get_config().API_V2_STR + '/upload',
+        files={'file': (pmml_path.name, pmml_model)}
+    )
+
+    assert model_creation_resp.status_code == 201
