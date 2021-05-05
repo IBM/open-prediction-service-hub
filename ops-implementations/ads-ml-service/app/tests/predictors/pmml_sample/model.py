@@ -20,3 +20,7 @@ import pathlib
 
 def get_pmml_file() -> pathlib.Path:
     return pathlib.Path(__file__).resolve().parent.joinpath('model.pmml')
+
+
+def get_pmml_no_output_schema_file() -> pathlib.Path:
+    return pathlib.Path(__file__).resolve().parent.joinpath('model-no-output-schema.pmml')
