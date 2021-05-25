@@ -1,8 +1,6 @@
 # To deserialize a prediction model, all dependencies of that model must exist in system
 
 # Sample
-numpy~=1.19.5
 xgboost~=1.2.0
 scikit-learn~=0.23.2
 pypmml~=0.9.7
-pandas~=1.1.2
