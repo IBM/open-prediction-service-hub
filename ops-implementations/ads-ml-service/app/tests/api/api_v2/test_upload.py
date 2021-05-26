@@ -15,7 +15,9 @@
 #
 
 
+import pathlib
 import typing as typ
+import pickle
 
 import fastapi.testclient as tstc
 import sqlalchemy.orm as saorm
@@ -24,6 +26,7 @@ import app.core.configuration as app_conf
 import app.core.configuration as conf
 import app.core.uri as app_uri
 import app.tests.predictors.pmml_sample.model as app_test_pmml
+import app.tests.predictors.scikit_learn.model as app_test_sklearn
 
 
 def test_add_binary(
@@ -85,3 +88,21 @@ def test_add_binary_incomplete_schema(
     )
 
     assert model_creation_resp.status_code == 201
+
+
+def test_add_pickle(
+        db: saorm.Session,
+        client: tstc.TestClient,
+        tmp_path: pathlib.Path
+) -> typ.NoReturn:
+    import app.runtime.cache as app_cache
+    app_cache.cache.clear()
+    predictor = app_test_sklearn.get_classification_predictor()
+    predictor_b = pickle.dumps(predictor)
+    model_creation_resp = client.post(
+        url=conf.get_config().API_V2_STR + '/upload',
+        files={'file': ('model.pkl', predictor_b)}
+    )
+
+    assert model_creation_resp.status_code == 201
+    assert model_creation_resp.json()['name'] == 'model'
