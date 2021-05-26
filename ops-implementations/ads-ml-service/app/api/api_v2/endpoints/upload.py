@@ -48,25 +48,20 @@ async def upload(
     file_name, file_extension = os.path.splitext(file.filename)
     model_binary = await file.read()
 
-    if file_extension.lower() not in app_model_upload.SUPPORTED_FORMATS:
-        LOGGER.warning(
-            'File extension is not supported: %s, expected: %s', file.filename, app_model_upload.SUPPORTED_FORMATS)
+    file_format = app_model_upload.infer_file_format(model_binary, file_extension)
+
+    if file_format is None:
+        LOGGER.error(
+            'Model is not supported: %s', file.filename)
         raise fastapi.HTTPException(
             status_code=422,
-            detail='File extension is not supported: %s, expected: %s' % (
-                file.filename, app_model_upload.SUPPORTED_FORMATS)
+            detail='Model is not supported: %s' % file.filename
         )
 
-    formatted_extension = file_extension.upper()[1:]
-    try:
-        model_format = app_binary_config.ModelWrapper[formatted_extension]
-    except KeyError:
-        raise fastapi.HTTPException(status_code=422, detail=f'Model extension {formatted_extension} not supported')
+    if not app_model_upload.is_compatible(model_binary, file_format):
+        raise fastapi.HTTPException(status_code=422, detail=f'Model can not be loaded. Model type: {file_format}')
 
-    if not app_model_upload.is_compatible(model_binary, model_format):
-        raise fastapi.HTTPException(status_code=422, detail=f'Model can not be loaded. Model type: {model_format}')
-
-    if model_format is app_binary_config.ModelWrapper.PMML:
+    if file_format is app_binary_config.ModelWrapper.PMML:
         inspected_name = app_inspection.inspect_pmml_model_name(model_binary)
         model_name = inspected_name if inspected_name is not None else file_name
     else:
@@ -77,7 +72,7 @@ async def upload(
         model_binary,
         input_data_structure=app_binary_config.ModelInput.AUTO,
         output_data_structure=app_binary_config.ModelOutput.AUTO,
-        format_=model_format,
+        format_=file_format,
         name=model_name
     )
 
