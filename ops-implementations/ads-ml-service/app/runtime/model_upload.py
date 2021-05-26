@@ -33,7 +33,26 @@ import app.schemas.impl as impl
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
 
-SUPPORTED_FORMATS = ('.pmml',)
+SUPPORTED_BINARY_FORMAT = ('.bst', '.pkl', '.pickle', '.joblib')
+
+
+def infer_file_format(
+        model: bytes,
+        file_extension: str
+) -> typing.Optional[app_binary_config.ModelWrapper]:
+    # Binary model needs to have correct file extension
+    if file_extension.lower() in SUPPORTED_BINARY_FORMAT:
+        if file_extension.lower() == '.bst':
+            return app_binary_config.ModelWrapper.BST
+        elif file_extension.lower() in ('.pkl', '.pickle'):
+            return app_binary_config.ModelWrapper.PICKLE
+        else:
+            return app_binary_config.ModelWrapper.JOBLIB
+    else:
+        if is_compatible(model, app_binary_config.ModelWrapper.PMML):
+            return app_binary_config.ModelWrapper.PMML
+        else:
+            return None
 
 
 def is_compatible(
@@ -67,27 +86,30 @@ def store_model(
 
     if model_id is None:
         LOGGER.info('Adding binary directly')
+        input_schema_ops = None
+        output_schema_ops = None
 
-        input_schema_pmml = app_signature_inspection.inspect_pmml_input(model_binary)
-        if input_schema_pmml is None:
-            LOGGER.warning('pmml file does not contain input schema')
-        output_schema_pmml = app_signature_inspection.inspect_pmml_output(model_binary)
-        if output_schema_pmml is None:
-            LOGGER.warning('pmml file does not contain output schema')
+        if format_ is app_binary_config.ModelWrapper.PMML:
+            input_schema_pmml = app_signature_inspection.inspect_pmml_input(model_binary)
+            if input_schema_pmml is None:
+                LOGGER.warning('pmml file does not contain input schema')
+            output_schema_pmml = app_signature_inspection.inspect_pmml_output(model_binary)
+            if output_schema_pmml is None:
+                LOGGER.warning('pmml file does not contain output schema')
 
-        input_schema_ops = None if not input_schema_pmml else [
-                            impl.FeatureImpl(
-                                name=k,
-                                order=i,
-                                type=input_schema_pmml[k]
-                            ) for i, k in enumerate(input_schema_pmml.keys())
-                        ]
-        output_schema_ops = None if not output_schema_pmml else {
-                            k: {
-                                'type': v
+            input_schema_ops = None if not input_schema_pmml else [
+                                impl.FeatureImpl(
+                                    name=k,
+                                    order=i,
+                                    type=input_schema_pmml[k]
+                                ) for i, k in enumerate(input_schema_pmml.keys())
+                            ]
+            output_schema_ops = None if not output_schema_pmml else {
+                                k: {
+                                    'type': v
+                                }
+                                for k, v in output_schema_pmml.items()
                             }
-                            for k, v in output_schema_pmml.items()
-                        }
 
         model = crud.model.create(db, obj_in=schemas.ModelCreate())
         crud.model_config.create_with_model(
