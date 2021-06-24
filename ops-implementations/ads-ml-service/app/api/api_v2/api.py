@@ -24,6 +24,7 @@ import app.api.api_v2.endpoints.login as login
 import app.api.api_v2.endpoints.models as models
 import app.api.api_v2.endpoints.predictions as predictions
 import app.api.api_v2.endpoints.users as users
+import app.api.api_v2.endpoints.upload as upload
 
 api_router = fastapi.APIRouter()
 
@@ -32,5 +33,6 @@ api_router.include_router(login.router, tags=['login'])
 api_router.include_router(info.router, tags=['info'])
 api_router.include_router(capabilities.router, tags=['info'])
 api_router.include_router(models.router)
+api_router.include_router(upload.router)
 api_router.include_router(endpoints.router)
 api_router.include_router(predictions.router, tags=['run'])

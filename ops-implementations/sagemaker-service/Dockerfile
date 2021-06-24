@@ -1,7 +1,5 @@
 FROM python:3.7-slim
 
-RUN pip install connexion[swagger-ui] 
-
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
