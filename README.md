@@ -53,7 +53,7 @@ Instructions to build an use are inside the [ops-client-sdk](ops-client-sdk) fol
 
 ## Contribute
 
-Please read our [CONTRIBUTE](CONTRIBUTE.md) guidelines if you were to raise an issue, propose a new feature or contribute some code or documentation.
+Please read our [CONTRIBUTING](CONTRIBUTING.md) guidelines if you were to raise an issue, propose a new feature or contribute some code or documentation.
 
 ### License
 
