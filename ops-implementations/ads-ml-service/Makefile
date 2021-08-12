@@ -22,3 +22,8 @@ debug: build
 # Launch stress test server
 locust:
 	python3 -m locust -f scripts/locustfile.py
+
+test_upload:
+	curl localhost:8080/upload \
+	  -F "file=@$(pwd)/examples/model_training_and_deployment/ads-samples/model.pmml" \
+	  --trace-ascii /dev/stdout

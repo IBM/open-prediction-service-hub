@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Open Prediction Service
-  version: 2.1.0
+  version: 2.2.0
   description: The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 tags:
   - name: info
@@ -78,6 +78,32 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ModelCreation'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/upload':
+    post:
+      tags:
+        - manage
+      summary: Upload a Model
+      description: Upload a serialized Model to the service
+      operationId: upload_model
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SerializedModel'
         required: true
       responses:
         '201':
@@ -295,6 +321,16 @@ paths:
                 $ref: '#/components/schemas/Error'
 components:
   schemas:
+    SerializedModel:
+      title: SerializedModel
+      required:
+      - file
+      type: object
+      properties:
+        file:
+          title: File
+          type: string
+          format: binary
     ModelBinary:
       title: ModelBinary
       required:
@@ -303,13 +339,10 @@ components:
       properties:
         input_data_structure:
           $ref: "#/components/schemas/ModelInput"
-          default: auto
         output_data_structure:
           $ref: "#/components/schemas/ModelOutput"
-          default: auto
         format:
           $ref: "#/components/schemas/ModelWrapper"
-          default: pickle
         file:
           title: File
           type: string
@@ -743,10 +776,33 @@ components:
               type: array
               items:
                 type: string
-            supported_format:
+            supported_binary_format:
               type: array
               items:
                 type: string
+            supported_upload_format:
+              type: array
+              items:
+                type: string
+      example:
+        capabilities:
+          - info
+          - discover
+          - manage
+          - prediction
+        managed_capabilities:
+          supported_input_data_structure:
+            - "auto"
+            - "Array"
+          supported_output_data_structure:
+            - "auto"
+            - "Array"
+          supported_binary_format:
+            - pickle
+            - bst
+          supported_upload_format:
+            - PMML
+
     Capability:
       title: Capability
       description: capability of a service
