@@ -39,6 +39,7 @@ async def server_capabilities() -> typing.Dict[typing.Text, typing.Any]:
         'managed_capabilities': {
             'supported_input_data_structure': ['auto', 'DataFrame', 'ndarray', 'DMatrix', 'list'],
             'supported_output_data_structure': ['auto', 'DataFrame', 'ndarray', 'list'],
-            'supported_format': ['pickle', 'joblib', 'pmml', 'bst']
+            'supported_binary_format': ['pickle', 'joblib', 'pmml', 'bst'],
+            'supported_upload_format': ['pmml']
         }
     }

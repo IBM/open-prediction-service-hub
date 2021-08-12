@@ -21,6 +21,7 @@ import io
 import logging
 import typing as typ
 
+import fastapi
 import joblib
 import numpy as np
 import pandas as pd
@@ -157,6 +158,10 @@ class ModelInvocationExecutor:
 
         predict = self.loaded_model.predict(prepared_data)
         LOGGER.debug('ML output: %s', predict)
+
+        if len(predict) == 0:
+            raise fastapi.HTTPException(500, 'Empty prediction result.')
+
         formatted_predict = self.output_handling(predict)
         if not self.can_predict_proba:
             if not isinstance(formatted_predict, typ.Dict):
