@@ -196,6 +196,4 @@ def test_update_binary(
 
     assert response.status_code == 201
     assert response.json()['status'] == 'in_service'
-    assert response_1.status_code == 201
-    assert response_1.json()['status'] == 'in_service'
-    assert response_1.json()['deployed_at'] != response.json()['deployed_at']
+    assert response_1.status_code == 422

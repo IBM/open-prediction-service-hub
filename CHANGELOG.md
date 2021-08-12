@@ -1,5 +1,11 @@
 # Open Prediction Service HUB
 
+## 2.2.0 _2021/06/23_
+* [ADSML-102] Added support for uploading serialised model
+* [ADSML-115] Updated Notebooks to work with ads-ml-service
+* [ADSML-125] Updated third-party dependencies
+* [ADSML-145] Fixed upload of serialized PMML model should not accept only file with "pmml" extension
+
 ## 2.1.0 _2021/03/29_
 
 * Added the manage capicity description of supported input, output and binary models

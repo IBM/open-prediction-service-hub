@@ -12,6 +12,7 @@ CAPABILITIES_ENDPOINT = '/capabilities'
 INFO_ENDPOINT = '/info'
 MODELS_ENDPOINT = '/models'
 RUN_ENDPOINT = '/predictions'
+UPLOAD_ENDPOINT = '/upload'
 
 
 def pytest_addoption(parser):
@@ -25,6 +26,7 @@ def pytest_configure():
     pytest.INFO_ENDPOINT = INFO_ENDPOINT
     pytest.MODELS_ENDPOINT = MODELS_ENDPOINT
     pytest.RUN_ENDPOINT = RUN_ENDPOINT
+    pytest.UPLOAD_ENDPOINT = UPLOAD_ENDPOINT
 
 
 @pytest.fixture
@@ -39,6 +41,15 @@ def skip_manage_capability_for_proxy(url):
     assert response.status_code == 200
     if 'manage' not in response.json()['capabilities']:
         pytest.skip('Tested service do not provide manage capability')
+
+
+@pytest.fixture
+def skip_pmml_upload_if_not_supported(url, skip_manage_capability_for_proxy):
+    request_url = urllib.parse.urljoin(url, CAPABILITIES_ENDPOINT)
+    response = requests.get(request_url)
+
+    if 'pmml' not in response.json()['managed_capabilities']['supported_upload_format']:
+        pytest.skip('Tested service do not provide pmml upload')
 
 
 @pytest.fixture
