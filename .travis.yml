@@ -9,7 +9,7 @@ services:
 stages:
   - name: testing
   - name: deploy
-    if: env(TRAVIS_PULL_REQUEST) = false AND branch IN (master, develop, release/2020Q3) AND env(DOCKER_REGISTRY_URL) IS present
+    if: (env(TRAVIS_BRANCH) IN (develop, main)) AND (type NOT IN (pull_request)) AND (env(DOCKER_REGISTRY_URL) IS present)
 
 jobs:
   include:
