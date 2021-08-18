@@ -28,14 +28,20 @@ function deploy() {
   local artifactory_username=$6
   local artifactory_passwd=$7
   local branch_name=$8
+  local tag_name=$9
 
   local deploy_tag
-  if [ "${branch_name}" != "main" ]; then
+  if [ "${branch_name}" == "develop" ]; then
     local build_time
     build_time=$(date -u +'%y%m%d-%H%M%S-0000')
     deploy_tag="${project_ver}-snapshot-${build_time}"
-  else
+  elif [ "${branch_name}" == "main" ]; then
     deploy_tag="${project_ver}"
+  elif [ "${tag_name}" != "not-set" ]; then
+    deploy_tag="${tag_name}"
+  else
+    echo "branch not in (develop, main) and is not tag build"
+    exit 1
   fi
   echo "deploy_tag=${deploy_tag}"
 
@@ -67,4 +73,5 @@ deploy \
   "${DEPLOY_SERVICE}" \
   "${DOCKER_USERNAME}" \
   "${DOCKER_PASSWORD}" \
-  "${TRAVIS_BRANCH:-not-set}"
+  "${TRAVIS_BRANCH:-not-set}" \
+  "${TRAVIS_TAG:-not-set}"
