@@ -48,7 +48,7 @@ function deploy() {
   # Build project
   docker build -t "${repository_name}":latest "${__dir}/${project_name}"
   # Docker login
-  echo "${artifactory_passwd}" | docker login -u "${artifactory_username}" --password-stdin "${DOCKER_REGISTRY_URL}"
+  echo "${artifactory_passwd}" | docker login -u "${artifactory_username}" --password-stdin "${artifactory_url}"
 
   docker tag "${repository_name}":latest "${artifactory_url}/${artifactory_namespace}/${repository_name}:${deploy_tag}"
   docker push "${artifactory_url}/${artifactory_namespace}/${repository_name}:${deploy_tag}"
