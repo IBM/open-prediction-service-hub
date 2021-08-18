@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.2.1 _2021/08/18_
+
+* [ADSML-198] Refine image push configuration
+
 ## 2.2.0 _2021/06/23_
 * [ADSML-102] Added support for uploading serialised model
 * [ADSML-115] Updated Notebooks to work with ads-ml-service
