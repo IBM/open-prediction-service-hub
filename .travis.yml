@@ -9,7 +9,7 @@ services:
 stages:
   - name: testing
   - name: deploy
-    if: branch IN (develop, main) AND NOT (type IN (pull_request))
+    if: (branch IN (develop, main) AND NOT (type IN (pull_request))) OR (tag IS present)
 
 jobs:
   include:
