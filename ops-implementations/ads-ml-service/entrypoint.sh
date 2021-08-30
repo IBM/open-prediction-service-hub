@@ -1,38 +1,88 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-
-set -e
-
+set -o errexit
+set -o nounset
+set -o pipefail
+# set -o xtrace
 
 . "${OPS_HOME}"/prestart.sh
 
+function main() {
+  local proxy_host
+  local proxy_port
+  declare -i workers
 
-if [ ! -f "${SETTINGS}/logging.yaml" ]; then
-  # default logging settings
-  echo "[INFO] log configuration not found"
-  echo "[INFO] loading default log configuration"
-  cp "${OPS_HOME}/logging.yaml" "${SETTINGS}/logging.yaml"
-fi
+  proxy_host="${HOST:-0.0.0.0}"
+  proxy_port="${PORT:-8080}"
+  if [[ -v WORKERS ]]; then
+    workers="${WORKERS}"
+  elif [[ -v GUNICORN_WORKER_NUM ]]; then
+    workers="${GUNICORN_WORKER_NUM}"
+  else
+    workers=1
+  fi
+  echo "worker_num=${workers}"
 
+  if [[ -v TLS_CRT ]] && [[ -v TLS_KEY ]] && [[ -v CA_CRT ]]; then
+    echo "launching service with mTLS"
+    launch_mtls "${proxy_host}" "${proxy_port}" "${workers}" "${TLS_CRT}" "${TLS_KEY}" "${CA_CRT}"
+  elif [[ -v TLS_CRT ]] && [[ -v TLS_KEY ]] && [[ ! -v CA_CRT ]]; then
+    echo "launching service with TLS"
+    launch_tls "${proxy_host}" "${proxy_port}" "${workers}" "${TLS_CRT}" "${TLS_KEY}"
+  else
+    echo "launching service without TLS"
+    launch_without_tls "${proxy_host}" "${proxy_port}" "${workers}"
+  fi
+}
 
-if [ ! -f "${SETTINGS}/server.key" ] || [ ! -f "${SETTINGS}/server.crt" ] || [ ! -f "${SETTINGS}/ca.crt" ]; then
-  # default certificate
-  echo "[INFO] SSL certificates not found"
-  echo "[INFO] Creating default certificates"
-  openssl req \
-    -x509 -newkey rsa:4096 -sha512 \
-    -nodes \
-    -subj '/CN=localhost' \
-    -days 365 \
-    -keyout "${SETTINGS}/server.key" -out "${SETTINGS}/server.crt"
-  cp "${SETTINGS}/server.crt" "${SETTINGS}/ca.crt"
-  echo "[INFO] Created self-signed certificates"
-fi
+function launch_mtls() {
+  local host=$1
+  local port=$2
+  declare -i workers=$3
+  local tls_crt=$4
+  local tls_key=$5
+  local ca_crt=$6
 
+  exec \
+    uvicorn \
+    --factory app.main:get_app \
+    --host "${host}" \
+    --port "${port}" \
+    --workers "${workers}" \
+    --ssl-certfile "${tls_crt}" \
+    --ssl-keyfile "${tls_key}" \
+    --ssl-ca-certs "${ca_crt}" \
+    --ssl-cert-reqs 1
+}
 
-# Default parameters:
-#   Uvicorn worker class is required by Fastapi
-exec gunicorn \
-            --worker-class=uvicorn.workers.UvicornWorker \
-             --config=file:"${OPS_HOME}"/app/gunicorn.init.py \
-            "app.main:get_app()"
+function launch_tls() {
+  local host=$1
+  local port=$2
+  declare -i workers=$3
+  local tls_crt=$4
+  local tls_key=$5
+
+  exec \
+    uvicorn \
+    --factory app.main:get_app \
+    --host "${host}" \
+    --port "${port}" \
+    --workers "${workers}" \
+    --ssl-certfile "${tls_crt}" \
+    --ssl-keyfile "${tls_key}"
+}
+
+function launch_without_tls() {
+  local host=$1
+  local port=$2
+  declare -i workers=$3
+
+  exec \
+    uvicorn \
+    --factory app.main:get_app \
+    --host "${host}" \
+    --port "${port}" \
+    --workers "${workers}"
+}
+
+main

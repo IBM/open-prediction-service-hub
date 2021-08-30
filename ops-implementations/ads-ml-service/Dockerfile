@@ -2,13 +2,13 @@ FROM python:3.7 AS python-base
 
 ENV \
     OPS_HOME="/usr/src/ads-ml-service" \
-    VIRTUAL_ENV="/opt/ads-ml-service/venv" \
+    VIRTUAL_ENV="/usr/src/ads-ml-service/venv" \
     CUSTOM_MODULES='/var/lib/ads-ml-service/custom' \
-    LOG_DIR="/var/log/ads-ml-service"
-ENV \
-    PATH="${VIRTUAL_ENV}/bin:${PATH}" \
-    PYTHONPATH="${CUSTOM_MODULES}:${OPS_HOME}:${PYTHONPATH}"
-WORKDIR ${OPS_HOME}
+    PATH="/usr/src/ads-ml-service/venv/bin:${PATH}" \
+    PYTHONPATH="/var/lib/ads-ml-service/custom:/usr/src/ads-ml-service:${PYTHONPATH}" \
+    MODEL_STORAGE="/var/lib/ads-ml-service/models" \
+    RETRAIN_MODELS=FALSE
+WORKDIR /usr/src/ads-ml-service
 
 
 FROM python-base AS codegen-image
@@ -28,62 +28,41 @@ FROM python-base AS build-image
 
 COPY requirements.txt requirements-ml.txt ./
 RUN \
-    python3 -m venv ${VIRTUAL_ENV} && \
+    python3 -m venv /usr/src/ads-ml-service/venv && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
     python3 -m pip install -q --no-cache-dir --requirement requirements.txt && \
-    # requirements-ml will overrides some libraries in requirements.txt. This procedure might raise some false positive
-    # incompatibility errors.
-    python3 -m pip install -q --no-cache-dir --requirement requirements-ml.txt
+    python3 -m pip install -q --no-cache-dir --requirement requirements-ml.txt && \
+    mkdir -p /var/log/ads-ml-service && \
+    mkdir -p /var/lib/ads-ml-service/models
 
 
 FROM python-base AS runtime-image
 
-ENV \
-    MODEL_STORAGE="/var/lib/ads-ml-service/models" \
-    RETRAIN_MODELS=FALSE \
-    SETTINGS="/etc/ads-ml-service" \
-    ENABLE_SSL=FALSE
-    # ENV GUNICORN_TIMEOUT=30
-    # ENV GUNICORN_WORKER_NUM=16
-
-COPY . ./
-COPY custom_modules/. ${CUSTOM_MODULES}/
-# COPY --from=codegen-image ${OPS_HOME}/app/gen/schemas/ops_schemas.py app/gen/schemas/
-# COPY --from=build-image ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-# OpenShift 4.3 does not support ENV variables in COPY
-COPY --from=codegen-image /usr/src/ads-ml-service/app/gen/schemas/ops_schemas.py app/gen/schemas/
-COPY --from=build-image /opt/ads-ml-service/venv /opt/ads-ml-service/venv
-COPY scripts/. scripts/
-COPY entrypoint.sh /entrypoint.sh
-COPY logging.yaml ${SETTINGS}/
+COPY --chown=nobody:root --from=codegen-image /usr/src/ads-ml-service/app/gen/schemas/ops_schemas.py app/gen/schemas/
+COPY --chown=nobody:root --from=build-image /usr/src/ads-ml-service/venv /usr/src/ads-ml-service/venv
+COPY --chown=nobody:root --from=build-image /var/lib/ads-ml-service/models /var/lib/ads-ml-service/models
+COPY --chown=nobody:root --from=build-image /var/log/ads-ml-service /var/log/ads-ml-service
+COPY --chown=nobody:root entrypoint.sh /entrypoint.sh
+COPY --chown=nobody:root logging.yaml /etc/ads-ml-service/logging/logging.yaml
+COPY --chown=nobody:root logging.yaml /usr/src/ads-ml-service/logging.yaml
+COPY --chown=nobody:root custom_modules/. /var/lib/ads-ml-service/custom/
+COPY --chown=nobody:root prestart.sh /usr/src/ads-ml-service/prestart.sh
+COPY --chown=nobody:root preload-conf.yaml /usr/src/ads-ml-service/preload-conf.yaml
+COPY --chown=nobody:root app /usr/src/ads-ml-service/app
+COPY --chown=nobody:root examples/model_training_and_deployment /usr/src/ads-ml-service/examples/model_training_and_deployment
 RUN \
     apt-get -q update && \
-    mkdir -p /usr/share/man/man1 && \
-    apt-get -q install --assume-yes libgomp1 default-jre-headless && \
+    mkdir -p /usr/share/man/man1 && apt-get -q install --assume-yes libgomp1 default-jre-headless && \
     rm -rf /var/lib/apt/lists/* && \
-    mkdir -p ${MODEL_STORAGE} && \
-    mkdir -p "${LOG_DIR}" && \
-    adduser --quiet --shell /bin/false --gid 0 --system ops && \
-    chown ops:root /entrypoint.sh && \
     chmod u+x /entrypoint.sh && \
     chmod g=u /entrypoint.sh && \
-    chown --recursive ops:root ${OPS_HOME} && \
-    chmod --recursive g=u ${OPS_HOME} && \
-    chown --recursive ops:root ${MODEL_STORAGE} && \
-    chmod --recursive g=u ${MODEL_STORAGE} && \
-    chown --recursive ops:root ${SETTINGS} && \
-    chmod --recursive g=u ${SETTINGS} && \
-    chown --recursive ops:root ${CUSTOM_MODULES} && \
-    chmod --recursive g=u ${CUSTOM_MODULES} && \
-    chown --recursive ops:root ${LOG_DIR} && \
-    chmod --recursive g=u ${LOG_DIR}
+    chmod --recursive g=u /var/log/ads-ml-service && \
+    chmod --recursive g=u app/tests
 
-VOLUME ${MODEL_STORAGE}
-VOLUME ${SETTINGS}
-VOLUME ${LOG_DIR}
+VOLUME /var/lib/ads-ml-service/models
+VOLUME /var/log/ads-ml-service
 
-
-USER ops
 EXPOSE 8080
+USER nobody
 
 ENTRYPOINT ["/entrypoint.sh"]
