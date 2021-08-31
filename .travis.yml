@@ -8,8 +8,9 @@ services:
 
 stages:
   - name: testing
+  - name: verify-versions
   - name: deploy
-    if: env(TRAVIS_PULL_REQUEST) = false AND branch IN (master, develop, release/2020Q3) AND env(DOCKER_REGISTRY_URL) IS present
+    if: (branch IN (develop, main) AND NOT (type IN (pull_request))) OR (tag IS present)
 
 jobs:
   include:
@@ -34,12 +35,15 @@ jobs:
       - pip3 install --quiet tox
       - tox
       name: "sagemaker-proxy-test"
+    - stage: verify-versions
+      script:
+        - python3 -m pip install lxml PyYAML
+        - python3 scripts/check_ver.py
     - stage: deploy
       script:
-        - cp open-prediction-service.yaml ops-implementations/ads-ml-service/app/gen/tmp.schemas.ops.yaml
-        - ops-implementations/deploy.sh ads-ml-service
-      name: "ads-ml-service-deploy"
-    - script: ops-implementations/deploy.sh wml-service
-      name: "wml-proxy-deploy"
-    - script: ops-implementations/deploy.sh sagemaker-service
-      name: "sagemaker-proxy-deploy"
+        - ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)"
+      env: TARGET=ads-ml-service
+    - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/sagemaker-service/swagger_server/version.py)"
+      env: TARGET=wml-service
+    - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/wml-service/swagger_server/version.py)"
+      env: TARGET=sagemaker-service
