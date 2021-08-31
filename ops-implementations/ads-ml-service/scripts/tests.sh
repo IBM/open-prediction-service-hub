@@ -18,13 +18,12 @@ function launch_unit_testes() {
 }
 
 function launch_tls_configuration_testes() {
-  echo "Test Tls and mTls connection"
   local service_url_tls
   local service_url_mtls
   declare -i n=0
 
   docker \
-    run --rm -d \
+    run -it \
     -p 8080:8080 \
     --name ads-ml-service-tls \
     -e TLS_CRT=/etc/ads-ml-service/tls/tls.crt \
@@ -34,7 +33,7 @@ function launch_tls_configuration_testes() {
     ads-ml-service:latest
 
   docker \
-    run --rm -d \
+    run -d \
     -p 8081:8080 \
     --name ads-ml-service-mtls \
     -e TLS_CRT=/etc/ads-ml-service/tls/tls.crt \
@@ -45,12 +44,15 @@ function launch_tls_configuration_testes() {
     -v "${__dir}/ads-ml-service-keys/client/tls.crt":/etc/ads-ml-service/tls/ca.crt \
     ads-ml-service:latest
 
+  docker ps -a
+
   service_url_tls="https://127.0.0.1:8080"
   service_url_mtls="https://127.0.0.1:8081"
 
   until ((n >= 60)); do
     test_tls_conn "${service_url_tls}" && break
     n=$((n + 1))
+    echo "${service_url_tls}/info not available"
     sleep 10
   done
   if ! ((n < 60)); then
@@ -62,6 +64,7 @@ function launch_tls_configuration_testes() {
   until ((n >= 60)); do
     test_mtls_conn "${service_url_mtls}" && break
     n=$((n + 1))
+    echo "${service_url_mtls}/info not available"
     sleep 10
   done
   if ! ((n < 60)); then
@@ -96,6 +99,8 @@ function test_mtls_conn() {
   local resp_mtls
   local status_mtls
 
+  echo "Testing mTls connection ${service_url_mtls}"
+
   resp_mtls=$(curl -s \
     --cacert "${__dir}"/ads-ml-service-keys/server/tls.crt \
     --key "${__dir}"/ads-ml-service-keys/client/tls.key \
@@ -114,6 +119,8 @@ function test_tls_conn() {
 
   local status_tls
   local resp_tls
+
+  echo "Testing Tls connection ${service_url_tls}"
 
   resp_tls=$(curl -s \
     --cacert "${__dir}"/ads-ml-service-keys/server/tls.crt \
