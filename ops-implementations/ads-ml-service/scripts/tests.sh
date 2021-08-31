@@ -23,9 +23,10 @@ function launch_tls_configuration_testes() {
   declare -i n=0
 
   docker \
-    run -it \
+    run --rm -d \
     -p 8080:8080 \
     --name ads-ml-service-tls \
+    --user 0 \
     -e TLS_CRT=/etc/ads-ml-service/tls/tls.crt \
     -e TLS_KEY=/etc/ads-ml-service/tls/tls.key \
     -v "${__dir}/ads-ml-service-keys/server/tls.crt":/etc/ads-ml-service/tls/tls.crt \
@@ -33,9 +34,10 @@ function launch_tls_configuration_testes() {
     ads-ml-service:latest
 
   docker \
-    run -d \
+    run --rm -d \
     -p 8081:8080 \
     --name ads-ml-service-mtls \
+    --user 0 \
     -e TLS_CRT=/etc/ads-ml-service/tls/tls.crt \
     -e TLS_KEY=/etc/ads-ml-service/tls/tls.key \
     -e CA_CRT=/etc/ads-ml-service/tls/ca.crt \
