@@ -3,6 +3,7 @@
 ## 2.2.1 _2021/08/18_
 
 * [ADSML-198] Refine image push configuration
+* [ADSML-200] Update https configuration for ads-ml-service
 
 ## 2.2.0 _2021/06/23_
 * [ADSML-102] Added support for uploading serialised model
