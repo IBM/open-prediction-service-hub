@@ -21,10 +21,7 @@ function launch_tls_configuration_testes() {
   echo "Test Tls and mTls connection"
   local service_url_tls
   local service_url_mtls
-  local resp_tls
-  local resp_mtls
-  local status_tls
-  local status_mtls
+  declare -i n=0
 
   docker \
     run --rm -d \
@@ -48,26 +45,30 @@ function launch_tls_configuration_testes() {
     -v "${__dir}/ads-ml-service-keys/client/tls.crt":/etc/ads-ml-service/tls/ca.crt \
     ads-ml-service:latest
 
-  sleep 30
   service_url_tls="https://127.0.0.1:8080"
   service_url_mtls="https://127.0.0.1:8081"
 
-  resp_tls=$(curl -s \
-    --cacert "${__dir}"/ads-ml-service-keys/server/tls.crt \
-    -H "Accept: application/json" -H "Content-Type: application/json" "${service_url_tls}/info")
-  resp_mtls=$(curl -s \
-    --cacert "${__dir}"/ads-ml-service-keys/server/tls.crt \
-    --key "${__dir}"/ads-ml-service-keys/client/tls.key \
-    --cert "${__dir}"/ads-ml-service-keys/client/tls.crt \
-    -H "Accept: application/json" -H "Content-Type: application/json" "${service_url_mtls}/info")
-  status_tls=$(jq -r '.status' <<<"${resp_tls}")
-  status_mtls=$(jq -r '.status' <<<"${resp_mtls}")
-  if ! [ "$status_tls" == "ok" ]; then
-    return 1
+  until ((n >= 60)); do
+    test_tls_conn "${service_url_tls}" && break
+    n=$((n + 1))
+    sleep 10
+  done
+  if ! ((n < 60)); then
+    echo "can not get ${service_url_tls}/info in 10 min"
+    exit 1
   fi
-  if ! [ "$status_mtls" == "ok" ]; then
-    return 1
+
+  n=0
+  until ((n >= 60)); do
+    test_mtls_conn "${service_url_mtls}" && break
+    n=$((n + 1))
+    sleep 10
+  done
+  if ! ((n < 60)); then
+    echo "can not get ${service_url_mtls}/info in 10 min"
+    exit 1
   fi
+
   echo "passed"
 
   docker stop ads-ml-service-tls
@@ -87,6 +88,40 @@ function gen_crts() {
     -addext "subjectAltName = DNS:localhost" \
     -out "${__dir}"/ads-ml-service-keys/client/tls.crt \
     -keyout "${__dir}"/ads-ml-service-keys/client/tls.key
+}
+
+function test_mtls_conn() {
+  local service_url_mtls=$1
+
+  local resp_mtls
+  local status_mtls
+
+  resp_mtls=$(curl -s \
+    --cacert "${__dir}"/ads-ml-service-keys/server/tls.crt \
+    --key "${__dir}"/ads-ml-service-keys/client/tls.key \
+    --cert "${__dir}"/ads-ml-service-keys/client/tls.crt \
+    -H "Accept: application/json" -H "Content-Type: application/json" "${service_url_mtls}/info")
+
+  status_mtls=$(jq -r '.status' <<<"${resp_mtls}")
+
+  if ! [ "$status_mtls" == "ok" ]; then
+    return 1
+  fi
+}
+
+function test_tls_conn() {
+  local service_url_tls=$1
+
+  local status_tls
+  local resp_tls
+
+  resp_tls=$(curl -s \
+    --cacert "${__dir}"/ads-ml-service-keys/server/tls.crt \
+    -H "Accept: application/json" -H "Content-Type: application/json" "${service_url_tls}/info")
+  status_tls=$(jq -r '.status' <<<"${resp_tls}")
+  if ! [ "$status_tls" == "ok" ]; then
+    return 1
+  fi
 }
 
 gen_crts
