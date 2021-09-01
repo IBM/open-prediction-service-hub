@@ -14,12 +14,13 @@ function main() {
 
   proxy_host="${HOST:-0.0.0.0}"
   proxy_port="${PORT:-8080}"
-  if [[ -v WORKERS ]]; then
-    workers="${WORKERS}"
+  if [[ -v WEB_CONCURRENCY ]]; then
+    workers="${WEB_CONCURRENCY}"
   elif [[ -v GUNICORN_WORKER_NUM ]]; then
+    echo "GUNICORN_WORKER_NUM is deprecated in favour of WEB_CONCURRENCY"
     workers="${GUNICORN_WORKER_NUM}"
   else
-    workers=1
+    workers=2
   fi
   echo "worker_num=${workers}"
 
