@@ -285,26 +285,10 @@ docker run --detach --restart=always \
 
 ## Configure HTTPS
 
-Suppose you have already storied your certificates under `${MASTER_CONFIG_DIR}`
+TLS and mTLS can be set by using environment variables. All parameters have defaults and are optional.
 
-### OpenShift
-
-Replace `oc expose service/ads-ml-service` by:
-
-```shell script
-oc create route edge --service=ads-ml-service \
-    --cert=${MASTER_CONFIG_DIR}/server.crt \
-    --key=${MASTER_CONFIG_DIR}/server.key \
-    --ca-cert=${MASTER_CONFIG_DIR}/ca.crt
-```
-
-### Kubernetes
-
-Ingress controller configuration is platform dependent. Contact your K8S provider.
-
-### Local service
-
-It is highly recommended to configure a TLS termination proxy (e.g [traefik](https://docs.traefik.io/))
-to easily and securely manage HTTPS configurations. For testing purposes,
-you can mount a volume containing `server.key`, `server.crt`, `ca.crt`, point
-`SETTINGS` to its path and set `ENABLE_SSL=TRUE` to enable HTTPS.
+| Variable                         | Description                                                                                          | Default              |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------- |
+| `TLS_CRT`                        | Path to pem encoded TLS secret certificate. TLS will be disabled if empty                            |      empty           |
+| `TLS_KEY`                        | Path to pem encoded TLS secret key. TLS will be disabled if empty                                    |      empty           |
+| `CA_CRT`                         | Path to pem encoded Trusted certificates. Mutual TLS authentication will be disabled if empty        |      empty           |
