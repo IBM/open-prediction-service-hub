@@ -3,7 +3,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-set -o xtrace
+# set -o xtrace
 
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(cd "$(dirname "${__dir}")" && pwd)"
@@ -28,7 +28,7 @@ function launch_tls_configuration_testes() {
   chmod 555 "${__dir}/ads-ml-service-keys/client/tls.key"
 
   docker \
-    run -d \
+    run --rm -d \
     -p 127.0.0.1:8081:8080 \
     --name ads-ml-service-tls \
     --user 1001:root \
@@ -39,7 +39,7 @@ function launch_tls_configuration_testes() {
     ads-ml-service:latest
 
   docker \
-    run -d \
+    run --rm -d \
     -p 127.0.0.1:8082:8080 \
     --name ads-ml-service-mtls \
     --user 1001:0 \
