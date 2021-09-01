@@ -76,11 +76,10 @@ Instead, this tutorial will focus on local deployment with Docker/docker-compose
 ### Volumes
 
 Data and configuration files are stored in docker volumes and could be
-persisted. There are three of them:
+persisted. There are two of them:
 
 1. `/var/lib/ads-ml-service/models` is used to store models and model configurations.
-2. `/etc/ads-ml-service` is used to store application configurations and certificates
-3. `/var/log/ads-ml-service` is used to store logs
+2. `/var/log/ads-ml-service` is used to store logs
 
 ### 1. Local service
 
@@ -94,7 +93,6 @@ Run this command in the same directory of this README file.
 
 ```shell script
 docker run \
-  --read-only \
   --detach \
   --restart=always \
   --publish 80:8080 \
@@ -102,21 +100,16 @@ docker run \
   --env USE_SQLITE="True" \
   --volume $(pwd)/example_volume/models:/var/lib/ads-ml-service/models \
   --volume $(pwd)/example_volume/logs:/var/log/ads-ml-service \
-  --volume $(pwd)/example_volume/configs:/etc/ads-ml-service \
   open-prediction:latest
 ```
 
 To verify, run
 ```shell script
-docker ps | grep open-prediction
+docker ps -f name=open-prediction
 ```
 
 Then you will see something like
 ![OpenApi](ops_docker.png)
-
-If you want to change logging/ssl configuration at runtime, you can change files
-under `./example_volume/configs` and then reload the service by 
-`docker kill --signal=HUP open-prediction`
 
 #### Run service with remote database
 
