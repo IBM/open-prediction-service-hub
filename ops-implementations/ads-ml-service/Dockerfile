@@ -27,6 +27,7 @@ RUN \
 FROM python-base AS build-image
 
 COPY requirements.txt requirements-ml.txt ./
+COPY logging.yaml /etc/ads-ml-service/logging/logging.yaml
 RUN \
     python3 -m venv /usr/src/ads-ml-service/venv && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
@@ -42,8 +43,8 @@ COPY --chown=nobody:root --from=codegen-image /usr/src/ads-ml-service/app/gen/sc
 COPY --chown=nobody:root --from=build-image /usr/src/ads-ml-service/venv /usr/src/ads-ml-service/venv
 COPY --chown=nobody:root --from=build-image /var/lib/ads-ml-service/models /var/lib/ads-ml-service/models
 COPY --chown=nobody:root --from=build-image /var/log/ads-ml-service /var/log/ads-ml-service
+COPY --chown=nobody:root --from=build-image /etc/ads-ml-service /etc/ads-ml-service
 COPY --chown=nobody:root entrypoint.sh /entrypoint.sh
-COPY --chown=nobody:root logging.yaml /etc/ads-ml-service/logging/logging.yaml
 COPY --chown=nobody:root logging.yaml /usr/src/ads-ml-service/logging.yaml
 COPY --chown=nobody:root custom_modules/. /var/lib/ads-ml-service/custom/
 COPY --chown=nobody:root prestart.sh /usr/src/ads-ml-service/prestart.sh
@@ -56,8 +57,10 @@ RUN \
     rm -rf /var/lib/apt/lists/* && \
     chmod u+x /entrypoint.sh && \
     chmod g=u /entrypoint.sh && \
+    chmod --recursive g=u app/tests && \
     chmod --recursive g=u /var/log/ads-ml-service && \
-    chmod --recursive g=u app/tests
+    chmod --recursive g=u /etc/ads-ml-service && \
+    chmod --recursive g=u /var/lib/ads-ml-service/models
 
 VOLUME /var/lib/ads-ml-service/models
 VOLUME /var/log/ads-ml-service

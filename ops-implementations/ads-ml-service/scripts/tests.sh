@@ -14,7 +14,7 @@ function prepare_env() {
 
 function launch_unit_testes() {
   echo "Launching unit test"
-  docker run --rm -it --entrypoint="venv/bin/python3" -e RETRAIN_MODELS=1 ads-ml-service:latest -m pytest -v app/tests
+  docker run --rm -it --user=1001:0 --entrypoint="venv/bin/python3" -e RETRAIN_MODELS=1 ads-ml-service:latest -m pytest -v app/tests
 }
 
 function launch_tls_configuration_testes() {
@@ -26,7 +26,7 @@ function launch_tls_configuration_testes() {
     run --rm -d \
     -p 8080:8080 \
     --name ads-ml-service-tls \
-    --user 0 \
+    --user 1001:0 \
     -e TLS_CRT=/etc/ads-ml-service/tls/tls.crt \
     -e TLS_KEY=/etc/ads-ml-service/tls/tls.key \
     -v "${__dir}/ads-ml-service-keys/server/tls.crt":/etc/ads-ml-service/tls/tls.crt \
@@ -37,7 +37,7 @@ function launch_tls_configuration_testes() {
     run --rm -d \
     -p 8081:8080 \
     --name ads-ml-service-mtls \
-    --user 0 \
+    --user 1001:0 \
     -e TLS_CRT=/etc/ads-ml-service/tls/tls.crt \
     -e TLS_KEY=/etc/ads-ml-service/tls/tls.key \
     -e CA_CRT=/etc/ads-ml-service/tls/ca.crt \
