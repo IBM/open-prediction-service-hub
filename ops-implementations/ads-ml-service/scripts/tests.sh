@@ -3,7 +3,7 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-# set -o xtrace
+set -o xtrace
 
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(cd "$(dirname "${__dir}")" && pwd)"
@@ -22,11 +22,16 @@ function launch_tls_configuration_testes() {
   local service_url_mtls
   declare -i n=0
 
+  chmod 555 "${__dir}/ads-ml-service-keys/server/tls.crt"
+  chmod 555 "${__dir}/ads-ml-service-keys/server/tls.key"
+  chmod 555 "${__dir}/ads-ml-service-keys/client/tls.crt"
+  chmod 555 "${__dir}/ads-ml-service-keys/client/tls.key"
+
   docker \
-    run --rm -d \
-    -p 8080:8080 \
+    run -d \
+    -p 127.0.0.1:8081:8080 \
     --name ads-ml-service-tls \
-    --user 1001:0 \
+    --user 1001:root \
     -e TLS_CRT=/etc/ads-ml-service/tls/tls.crt \
     -e TLS_KEY=/etc/ads-ml-service/tls/tls.key \
     -v "${__dir}/ads-ml-service-keys/server/tls.crt":/etc/ads-ml-service/tls/tls.crt \
@@ -34,8 +39,8 @@ function launch_tls_configuration_testes() {
     ads-ml-service:latest
 
   docker \
-    run --rm -d \
-    -p 8081:8080 \
+    run -d \
+    -p 127.0.0.1:8082:8080 \
     --name ads-ml-service-mtls \
     --user 1001:0 \
     -e TLS_CRT=/etc/ads-ml-service/tls/tls.crt \
@@ -46,10 +51,12 @@ function launch_tls_configuration_testes() {
     -v "${__dir}/ads-ml-service-keys/client/tls.crt":/etc/ads-ml-service/tls/ca.crt \
     ads-ml-service:latest
 
+  sleep 5
   docker ps -a
+  docker logs --tail 20 ads-ml-service-tls
 
-  service_url_tls="https://127.0.0.1:8080"
-  service_url_mtls="https://127.0.0.1:8081"
+  service_url_tls="https://127.0.0.1:8081"
+  service_url_mtls="https://127.0.0.1:8082"
 
   until ((n >= 60)); do
     test_tls_conn "${service_url_tls}" && break
