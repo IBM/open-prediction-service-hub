@@ -76,11 +76,10 @@ Instead, this tutorial will focus on local deployment with Docker/docker-compose
 ### Volumes
 
 Data and configuration files are stored in docker volumes and could be
-persisted. There are three of them:
+persisted. There are two of them:
 
 1. `/var/lib/ads-ml-service/models` is used to store models and model configurations.
-2. `/etc/ads-ml-service` is used to store application configurations and certificates
-3. `/var/log/ads-ml-service` is used to store logs
+2. `/var/log/ads-ml-service` is used to store logs
 
 ### 1. Local service
 
@@ -94,7 +93,6 @@ Run this command in the same directory of this README file.
 
 ```shell script
 docker run \
-  --read-only \
   --detach \
   --restart=always \
   --publish 80:8080 \
@@ -102,21 +100,16 @@ docker run \
   --env USE_SQLITE="True" \
   --volume $(pwd)/example_volume/models:/var/lib/ads-ml-service/models \
   --volume $(pwd)/example_volume/logs:/var/log/ads-ml-service \
-  --volume $(pwd)/example_volume/configs:/etc/ads-ml-service \
   open-prediction:latest
 ```
 
 To verify, run
 ```shell script
-docker ps | grep open-prediction
+docker ps -f name=open-prediction
 ```
 
 Then you will see something like
 ![OpenApi](ops_docker.png)
-
-If you want to change logging/ssl configuration at runtime, you can change files
-under `./example_volume/configs` and then reload the service by 
-`docker kill --signal=HUP open-prediction`
 
 #### Run service with remote database
 
@@ -285,26 +278,10 @@ docker run --detach --restart=always \
 
 ## Configure HTTPS
 
-Suppose you have already storied your certificates under `${MASTER_CONFIG_DIR}`
+TLS and mTLS can be set by using environment variables. All parameters have defaults and are optional.
 
-### OpenShift
-
-Replace `oc expose service/ads-ml-service` by:
-
-```shell script
-oc create route edge --service=ads-ml-service \
-    --cert=${MASTER_CONFIG_DIR}/server.crt \
-    --key=${MASTER_CONFIG_DIR}/server.key \
-    --ca-cert=${MASTER_CONFIG_DIR}/ca.crt
-```
-
-### Kubernetes
-
-Ingress controller configuration is platform dependent. Contact your K8S provider.
-
-### Local service
-
-It is highly recommended to configure a TLS termination proxy (e.g [traefik](https://docs.traefik.io/))
-to easily and securely manage HTTPS configurations. For testing purposes,
-you can mount a volume containing `server.key`, `server.crt`, `ca.crt`, point
-`SETTINGS` to its path and set `ENABLE_SSL=TRUE` to enable HTTPS.
+| Variable                         | Description                                                                                          | Default              |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------- |
+| `TLS_CRT`                        | Path to pem encoded TLS secret certificate. TLS will be disabled if empty                            |      empty           |
+| `TLS_KEY`                        | Path to pem encoded TLS secret key. TLS will be disabled if empty                                    |      empty           |
+| `CA_CRT`                         | Path to pem encoded Trusted certificates. Mutual TLS authentication will be disabled if empty        |      empty           |

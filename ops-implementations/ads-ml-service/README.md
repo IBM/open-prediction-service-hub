@@ -1,5 +1,3 @@
-
-
 # OPS with scikit and xgboost sample
 
 0. [Installation](doc/installation/README.md)
@@ -29,12 +27,16 @@ docker build -t ads-ml-service .
 To run the microservice
 
 ```sh
-docker run --rm --read-only -it -p 8080:8080 --name ads-ml-service ads-ml-service
+docker \
+  run --rm -d \
+  -p 8080:8080 \
+  --name ads-ml-service-demo \
+  ads-ml-service
 ```
 
 To check that you have a running container
 ```sh
-docker ps ads-ml-service
+docker ps -f name=ads-ml-service-demo
 ```
 
 > Your predictive service is available at [http://localhost:8080/](http://localhost:8080/).
@@ -44,7 +46,7 @@ docker ps ads-ml-service
 ### Stop the microservice
 To stop the container
 ```sh
-docker stop ads-ml-service
+docker stop ads-ml-service-demo
 ```
 
 ## Open Prediction Service

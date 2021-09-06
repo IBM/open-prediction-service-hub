@@ -42,10 +42,10 @@ class ServerConfiguration(BaseSettings):
 
     ADDITIONAL_INFO_FIELD: Text = 'additional'
     DATABASE_NAME: Text = 'db.sqlite'
+    LOGGING: typing.Optional[Path] = '/etc/ads-ml-service/logging/logging.yaml'
     RETRAIN_MODELS: bool = False
     MODEL_CACHE_SIZE: int = 64
     CACHE_TTL: int = 60
-    SETTINGS: Path
 
     USE_SQLITE: bool = True
     MODEL_STORAGE: typing.Optional[Path] = None

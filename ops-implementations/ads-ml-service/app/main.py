@@ -16,25 +16,17 @@
 
 
 import logging.config
-import os
 
 import fastapi
 import fastapi.responses as responses
 import yaml
 
 import app.api.api_v2.api as api_v2
-import app.core.configuration as app_cong
+import app.core.configuration as app_conf
 import app.version as ads_ml_service_version
 
 
 def get_app() -> fastapi.FastAPI:
-    with app_cong.get_config().SETTINGS.joinpath('logging.yaml').open(mode='r') as fd:
-        conf = yaml.safe_load(fd)
-        for _, handler in conf['handlers'].items():
-            if 'filename' in handler:
-                handler['filename'] = handler['filename'].replace('{{LOG_DIR}}', os.getenv('LOG_DIR'))
-        logging.config.dictConfig(conf)
-
     app = fastapi.FastAPI(
         version=ads_ml_service_version.__version__,
         title='ADS ML Service',
@@ -42,6 +34,11 @@ def get_app() -> fastapi.FastAPI:
         openapi_url='/open-prediction-service.json',
         default_response_class=responses.ORJSONResponse
     )
+
+    @app.on_event("startup")
+    async def startup():
+        conf = yaml.safe_load(app_conf.get_config().LOGGING.read_text())
+        logging.config.dictConfig(conf)
 
     @app.get(path='/', include_in_schema=False)
     async def redirect_docs() -> responses.RedirectResponse:
