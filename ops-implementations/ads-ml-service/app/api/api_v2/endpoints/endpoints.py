@@ -43,7 +43,7 @@ def get_endpoints(
     return {
         'endpoints': [
             impl.EndpointImpl.from_database(model)
-            for model in crud.endpoint.get_all(db)
+            for model in crud.model.get_all(db)
         ]
     }
 
@@ -58,7 +58,7 @@ def get_endpoint(
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
     return impl.EndpointImpl.from_database(
-        e=crud.endpoint.get(db, id=endpoint_id)
+        m=crud.model.get(db, id=endpoint_id)
     )
 
 

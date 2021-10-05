@@ -161,4 +161,4 @@ async def add_binary(
         format_=format_,
         model_id=model_id
     )
-    return impl.EndpointImpl.from_database(crud.endpoint.get(db, id=m))
+    return impl.EndpointImpl.from_database(crud.model.get(db, id=m))
