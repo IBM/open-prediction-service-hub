@@ -100,6 +100,29 @@ def test_update_model_name(
             dt.datetime.strptime(model['created_at'], '%Y-%m-%dT%H:%M:%S.%f%z')).seconds > 1
 
 
+def test_update_model_metadata(
+        client: tstc.TestClient,
+        xgboost_endpoint
+) -> typing.NoReturn:
+    original_model = client.get(url=conf.get_config().API_V2_STR + '/models' + f'/{xgboost_endpoint.id}').json()
+    original_endpoint = client.get(url=conf.get_config().API_V2_STR + '/endpoints' + f'/{xgboost_endpoint.id}').json()
+
+    updated_model = client.patch(
+        url=conf.get_config().API_V2_STR + '/models' + f'/{xgboost_endpoint.id}',
+        json={
+            'metadata': {
+                'my-tag': 'predictive-model-1'
+            }
+        }
+    ).json()
+    updated_endpoint = client.get(url=conf.get_config().API_V2_STR + '/endpoints' + f'/{xgboost_endpoint.id}').json()
+
+    assert original_model['metadata'] == {'description': 'xgboost model for test'}
+    assert original_model['metadata'] == original_endpoint['metadata']
+    assert updated_model['metadata'] == {'description': None, 'my-tag': 'predictive-model-1'}
+    assert updated_model['metadata'] == updated_endpoint['metadata']
+
+
 def test_update_model_conf(
         db: orm.Session,
         client: tstc.TestClient,
