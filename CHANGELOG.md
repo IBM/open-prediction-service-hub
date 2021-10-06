@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.3.0 _2021/10/06_
+
+* [ADSML-225] Add metadata in endpoints
+
 ## 2.2.1 _2021/08/18_
 
 * [ADSML-198] Refine image push configuration
