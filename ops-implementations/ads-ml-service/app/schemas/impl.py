@@ -98,20 +98,23 @@ class ModelsImpl(ops_schemas.Models):
 
 class EndpointImpl(ops_schemas.Endpoint):
     @staticmethod
-    def from_database(e: models.Endpoint) -> typing.Dict[typing.Text, typing.Any]:
+    def from_database(m: models.Model) -> typing.Dict[typing.Text, typing.Any]:
+        endpoint = m.endpoint
+        metadata = m.config.configuration.get('metadata')
         return {
-            'id': e.id,
-            'name': e.name,
-            'deployed_at': e.deployed_at.astimezone(dt.timezone.utc).isoformat(),
-            'status': StatusImpl.in_service if e.binary else StatusImpl.creating,
+            'id': endpoint.id,
+            'name': endpoint.name,
+            'deployed_at': endpoint.deployed_at.astimezone(dt.timezone.utc).isoformat(),
+            'status': StatusImpl.in_service if endpoint.binary else StatusImpl.creating,
+            'metadata': metadata,
             'links': [
                 {
                     'rel': 'self',
-                    'href': app_uri.TEMPLATE.format(resource_type='endpoints', resource_id=e.id)
+                    'href': app_uri.TEMPLATE.format(resource_type='endpoints', resource_id=endpoint.id)
                 },
                 {
                     'rel': 'model',
-                    'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=e.id)
+                    'href': app_uri.TEMPLATE.format(resource_type='models', resource_id=endpoint.id)
                 }
 
             ]
