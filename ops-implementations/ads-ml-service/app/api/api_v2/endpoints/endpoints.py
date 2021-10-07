@@ -71,7 +71,7 @@ def patch_endpoint(
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
     endpoint = crud.endpoint.get(db, id=endpoint_id)
-    crud.endpoint.update(db, db_obj=endpoint, obj_in=e_in)
+    crud.endpoint.update(db, db_obj=endpoint, obj_in=schemas.EndpointUpdate(name=e_in.name, metadata_=e_in.metadata))
     return impl.EndpointImpl.from_database(endpoint)
 
 

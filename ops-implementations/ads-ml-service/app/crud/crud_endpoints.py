@@ -30,8 +30,8 @@ class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, 
     def update(self, db: orm.Session, *, db_obj: models.Endpoint, obj_in: schemas.EndpointUpdate) -> models.Endpoint:
         update_data = obj_in.dict(exclude_unset=True)
         new_config = {
-            'name': update_data['name'] if 'name' in update_data else db_obj.name,
-            'metadata_': update_data['metadata'] if 'metadata' in update_data else db_obj.name
+            'name': db_obj.name if 'name' not in update_data else update_data['name'],
+            'metadata_':  db_obj.metadata_ if 'metadata_' not in update_data else update_data['metadata_']
         }
         for field in new_config:
             setattr(db_obj, field, new_config[field])
