@@ -49,18 +49,22 @@ class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, 
             *,
             ec: schemas.EndpointCreate,
             bc: schemas.BinaryMlModelCreate,
-            model_id: app_crud_base.IdType,
+            model: models.Model
     ):
+        model_config = None if model.config is None else model.config.configuration
+        model_metadata = None if model_config is None else model_config.get('metadata')
+        ec.metadata_ = model_metadata
+
         # noinspection PyArgumentList
         endpoint_db_obj = self.model(
             **encoders.jsonable_encoder(ec),
-            id=model_id,
+            id=model.id,
             deployed_at=dt.datetime.now(tz=dt.timezone.utc)
         )
         # noinspection PyArgumentList
         binary_db_obj = models.BinaryMlModel(
             **bc.dict(),
-            id=model_id
+            id=model.id
         )
         db.add(endpoint_db_obj)
         db.add(binary_db_obj)
