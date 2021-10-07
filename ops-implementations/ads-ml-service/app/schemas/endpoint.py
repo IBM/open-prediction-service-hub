@@ -23,10 +23,13 @@ import pydantic as pyd
 
 class EndpointBase(pyd.BaseModel):
     name: typing.Optional[typing.Text] = None
+    # metadata is a reserved keyword for sqlalchemy
+    metadata_: typing.Optional[typing.Dict[typing.Text, typing.Any]]
 
 
 class EndpointCreate(EndpointBase):
     name: typing.Text
+    metadata_: typing.Optional[typing.Dict[typing.Text, typing.Any]] = None
 
 
 class EndpointUpdate(EndpointBase):

@@ -55,3 +55,34 @@ def test_cascade_delete_with_binary(
     binary_1 = crud.binary_ml_model.get(db, id=binary.id)
 
     assert binary_1 is None
+
+
+def test_create_endpoint_with_metadata(db: orm.Session, model_in_db: models.Model) -> typing.NoReturn:
+    endpoint_name = utils.random_string()
+    metadata_in = {
+        'tag': 'endpoint'
+    }
+    endpoint_in = schemas.EndpointCreate(name=endpoint_name, metadata_=metadata_in)
+    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
+
+    assert endpoint.name == endpoint_name
+    assert endpoint.id == model_in_db.id
+    assert endpoint.metadata_ == metadata_in
+
+
+def test_update_endpoint_with_metadata(db: orm.Session, model_in_db: models.Model) -> typing.NoReturn:
+    endpoint_name = utils.random_string()
+    metadata_in = {
+        'tag': 'endpoint'
+    }
+    metadata_new = {
+        'tag': 'new-endpoint'
+    }
+    endpoint_in = schemas.EndpointCreate(name=endpoint_name, metadata_=metadata_in)
+    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
+    endpoint_update = schemas.EndpointUpdate(metadata_=metadata_new)
+    endpoint_updated = crud.endpoint.update(db, db_obj=endpoint, obj_in=endpoint_update)
+
+    assert endpoint_updated.name == endpoint_name
+    assert endpoint_updated.id == model_in_db.id
+    assert endpoint_updated.metadata_ == metadata_new
