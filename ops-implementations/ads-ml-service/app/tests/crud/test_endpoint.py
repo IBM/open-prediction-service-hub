@@ -32,7 +32,7 @@ import app.tests.utils.utils as utils
 def test_create_endpoint(db: orm.Session, model_in_db: models.Model) -> typing.NoReturn:
     endpoint_name = utils.random_string()
     endpoint_in = schemas.EndpointCreate(name=endpoint_name)
-    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
+    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model=model_in_db)
 
     assert endpoint.name == endpoint_name
     assert endpoint.id == model_in_db.id
@@ -62,8 +62,9 @@ def test_create_endpoint_with_metadata(db: orm.Session, model_in_db: models.Mode
     metadata_in = {
         'tag': 'endpoint'
     }
-    endpoint_in = schemas.EndpointCreate(name=endpoint_name, metadata_=metadata_in)
-    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
+    crud.model_config.create_with_model(db, obj_in=schemas.ModelConfigCreate(configuration={'metadata': metadata_in}), model_id=model_in_db.id)
+    endpoint_in = schemas.EndpointCreate(name=endpoint_name)
+    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model=model_in_db)
 
     assert endpoint.name == endpoint_name
     assert endpoint.id == model_in_db.id
@@ -79,7 +80,7 @@ def test_update_endpoint_with_metadata(db: orm.Session, model_in_db: models.Mode
         'tag': 'new-endpoint'
     }
     endpoint_in = schemas.EndpointCreate(name=endpoint_name, metadata_=metadata_in)
-    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model_id=model_in_db.id)
+    endpoint = crud.endpoint.create_with_model(db, obj_in=endpoint_in, model=model_in_db)
     endpoint_update = schemas.EndpointUpdate(metadata_=metadata_new)
     endpoint_updated = crud.endpoint.update(db, db_obj=endpoint, obj_in=endpoint_update)
 

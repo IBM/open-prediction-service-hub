@@ -54,5 +54,5 @@ def endpoint_in_db(
         db: orm.Session, model_in_db: models.Model
 ) -> models.Endpoint:
     return crud.endpoint.create_with_model(
-        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_in_db.id
+        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model=model_in_db
     )

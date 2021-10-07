@@ -27,13 +27,16 @@ import app.schemas as schemas
 
 class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, schemas.EndpointUpdate]):
     def create_with_model(
-            self, db: orm.Session, *, obj_in: schemas.EndpointCreate, model_id: app_crud_base.IdType
+            self, db: orm.Session, *, obj_in: schemas.EndpointCreate, model: models.Model
     ) -> models.Endpoint:
+        model_config = None if model.config is None else model.config.configuration
+        model_metadata = None if model_config is None else model_config.get('metadata')
+        obj_in.metadata_ = model_metadata
         # noinspection PyArgumentList
         db_obj = self.model(
             **encoders.jsonable_encoder(obj_in),
             deployed_at=dt.datetime.now(tz=dt.timezone.utc),
-            id=model_id
+            id=model.id
         )
         db.add(db_obj)
         db.commit()
