@@ -74,6 +74,12 @@ def test_patch_endpoint(
         skl_endpoint: models.Endpoint
 ) -> typ.NoReturn:
     current_endpoint = client.get(url=f'/endpoints/{skl_endpoint.id}').json()
+    patched_endpoint_0 = client.patch(
+        url=f'/endpoints/{skl_endpoint.id}',
+        json={
+            'metadata': {'tag': 'updated-metadata-0'}
+        }
+    ).json()
     patch_endpoint_resp = client.patch(
         url=f'/endpoints/{skl_endpoint.id}',
         json={
@@ -85,6 +91,7 @@ def test_patch_endpoint(
     updated_endpoint = client.get(url=f'/endpoints/{skl_endpoint.id}').json()
 
     assert patch_endpoint_resp.status_code == 200
+    assert patched_endpoint_0['metadata'] == {'description': None, 'tag': 'updated-metadata-0'}
     assert current_endpoint['name'] == 'skl predictor endpoint'
     assert current_endpoint['metadata'] is None
     assert updated_endpoint['name'] == 'new-name'
