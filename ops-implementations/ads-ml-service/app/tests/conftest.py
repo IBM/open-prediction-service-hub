@@ -23,6 +23,7 @@ import fastapi.testclient as fastapi_testclient
 import pytest
 import sqlalchemy
 import sqlalchemy.orm as sqlalchemy_orm
+import yaml
 
 import app.core.configuration as app_config
 import app.crud as app_crud
@@ -51,9 +52,12 @@ def db(tmp_path) -> typing.Iterable[sqlalchemy_orm.Session]:
 
 @pytest.fixture
 def client(db, tmp_path) -> typing.Iterable[fastapi_testclient.TestClient]:
-    os.environ['LOG_DIR'] = tmp_path.__str__()
+    logging_configs = yaml.safe_load(pathlib.Path(__file__).parents[2].joinpath('logging.yaml').read_text())
+    logging_configs['handlers']['info_file_handler']['filename'] = tmp_path.joinpath('info.log').__str__()
+    logging_configs['handlers']['error_file_handler']['filename'] = tmp_path.joinpath('error.log').__str__()
+    os.environ['LOGGING'] = tmp_path.joinpath('logging.yaml').__str__()
     os.environ['SETTINGS'] = tmp_path.__str__()
-    tmp_path.joinpath('logging.yaml').write_text(pathlib.Path(__file__).parents[2].joinpath('logging.yaml').read_text())
+    tmp_path.joinpath('logging.yaml').write_text(yaml.dump(logging_configs))
 
     user = app_crud.user.create(db, obj_in=app_schemas.UserCreate(
         username=app_config.get_config().DEFAULT_USER, password=app_config.get_config().DEFAULT_USER_PWD))

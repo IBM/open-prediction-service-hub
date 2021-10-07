@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Open Prediction Service
-  version: 2.2.1
+  version: 2.3.0
   description: The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 tags:
   - name: info
@@ -437,6 +437,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Link'
+        metadata:
+          type: object
+          description: additional metadata
+          properties:
+            description:
+              type: string
+          additionalProperties: true
       example:
         name: South America gigafactory
         status: in_service
@@ -473,6 +480,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Link'
+        metadata:
+          type: object
+          description: additional metadata
+          properties:
+            description:
+              type: string
+          additionalProperties: true
         id:
           title: Id
           type: string
@@ -491,6 +505,9 @@ components:
             href: 'http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003'
           - rel: model
             href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
+        metadata:
+          tags: [ 'endpoint' ]
+          
     Models:
       title: List of Machine Learning Models
       description: List of Machine Learning Models
