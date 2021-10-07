@@ -26,6 +26,20 @@ import app.schemas as schemas
 
 
 class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, schemas.EndpointUpdate]):
+
+    def update(self, db: orm.Session, *, db_obj: models.Endpoint, obj_in: schemas.EndpointUpdate) -> models.Endpoint:
+        update_data = obj_in.dict(exclude_unset=True)
+        new_config = {
+            'name': update_data['name'] if 'name' in update_data else db_obj.name,
+            'metadata_': update_data['metadata'] if 'metadata' in update_data else db_obj.name
+        }
+        for field in new_config:
+            setattr(db_obj, field, new_config[field])
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
     def create_with_model(
             self, db: orm.Session, *, obj_in: schemas.EndpointCreate, model: models.Model
     ) -> models.Endpoint:

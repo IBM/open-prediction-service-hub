@@ -69,6 +69,30 @@ def test_get_endpoints(
     assert endpoints['endpoints'][0]['id'] == str(skl_endpoint.id)
 
 
+def test_patch_endpoint(
+        client: tstc.TestClient,
+        skl_endpoint: models.Endpoint
+) -> typ.NoReturn:
+    current_endpoint = client.get(url=f'/endpoints/{skl_endpoint.id}').json()
+    patch_endpoint_resp = client.patch(
+        url=f'/endpoints/{skl_endpoint.id}',
+        json={
+            'name': 'new-name',
+            'metadata': {'tag': 'updated-metadata'}
+        }
+    )
+    patched_endpoint = patch_endpoint_resp.json()
+    updated_endpoint = client.get(url=f'/endpoints/{skl_endpoint.id}').json()
+
+    assert patch_endpoint_resp.status_code == 200
+    assert current_endpoint['name'] == 'skl predictor endpoint'
+    assert current_endpoint['metadata'] is None
+    assert updated_endpoint['name'] == 'new-name'
+    assert updated_endpoint['metadata'] == {'description': None, 'tag': 'updated-metadata'}
+    assert updated_endpoint['name'] == patched_endpoint['name']
+    assert updated_endpoint['metadata'] == patched_endpoint['metadata']
+
+
 def test_delete_endpoint(
         db: saorm.Session,
         client: tstc.TestClient,

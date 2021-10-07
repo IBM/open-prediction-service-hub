@@ -42,8 +42,8 @@ def get_endpoints(
 ) -> typing.Dict[typing.Text, typing.Any]:
     return {
         'endpoints': [
-            impl.EndpointImpl.from_database(model)
-            for model in crud.model.get_all(db)
+            impl.EndpointImpl.from_database(endpoint)
+            for endpoint in crud.endpoint.get_all(db)
         ]
     }
 
@@ -57,9 +57,22 @@ def get_endpoint(
         endpoint_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
-    return impl.EndpointImpl.from_database(
-        m=crud.model.get(db, id=endpoint_id)
-    )
+    return impl.EndpointImpl.from_database(crud.endpoint.get(db, id=endpoint_id))
+
+
+@router.patch(
+    path='/endpoints/{endpoint_id}',
+    response_model=ops_schemas.Endpoint,
+    tags=['manage']
+)
+def patch_endpoint(
+        endpoint_id: int,
+        e_in: ops_schemas.EndpointUpdate,
+        db: saorm.Session = fastapi.Depends(deps.get_db)
+) -> typing.Dict[typing.Text, typing.Any]:
+    endpoint = crud.endpoint.get(db, id=endpoint_id)
+    crud.endpoint.update(db, db_obj=endpoint, obj_in=e_in)
+    return impl.EndpointImpl.from_database(endpoint)
 
 
 @router.delete(
