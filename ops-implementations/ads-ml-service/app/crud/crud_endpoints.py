@@ -23,12 +23,17 @@ import sqlalchemy.orm as orm
 import app.crud.base as app_crud_base
 import app.models as models
 import app.schemas as schemas
+import app.models.metadata as app_model_metadata
 
 
 class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, schemas.EndpointUpdate]):
 
     def update(self, db: orm.Session, *, db_obj: models.Endpoint, obj_in: schemas.EndpointUpdate) -> models.Endpoint:
         update_data = obj_in.dict(exclude_unset=True)
+
+        current_metadata = db_obj.metadata_
+        if current_metadata is not None and update_data.get('metadata_') is not None:
+            update_data['metadata_'] = app_model_metadata.patch_metadata(current_metadata, update_data['metadata_'])
         new_config = {
             'name': db_obj.name if 'name' not in update_data else update_data['name'],
             'metadata_':  db_obj.metadata_ if 'metadata_' not in update_data else update_data['metadata_']

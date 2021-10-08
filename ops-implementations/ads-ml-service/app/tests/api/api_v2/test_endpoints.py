@@ -100,6 +100,24 @@ def test_patch_endpoint(
     assert updated_endpoint['metadata'] == patched_endpoint['metadata']
 
 
+def test_patch_partial_endpoint(
+        client: tstc.TestClient,
+        xgboost_endpoint: models.Endpoint
+) -> typ.NoReturn:
+    current_endpoint = client.get(url=f'/endpoints/{xgboost_endpoint.id}').json()
+    patched_endpoint = client.patch(
+        url=f'/endpoints/{xgboost_endpoint.id}',
+        json={
+            'metadata': {'tag': 'updated-metadata-0'}
+        }
+    ).json()
+
+    assert patched_endpoint['metadata'] == {
+        'description': current_endpoint['metadata']['description'],
+        'tag': 'updated-metadata-0'
+    }
+
+
 def test_delete_endpoint(
         db: saorm.Session,
         client: tstc.TestClient,
