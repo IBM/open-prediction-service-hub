@@ -66,7 +66,7 @@ def test_cascade_delete_with_config(
 
 def test_cascade_delete_with_endpoint(db: orm.Session, model_in_db: models.Endpoint) -> typing.NoReturn:
     endpoint = crud.endpoint.create_with_model(
-        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model_id=model_in_db.id
+        db, obj_in=schemas.EndpointCreate(name=utils.random_string()), model=model_in_db
     )
     crud.model.delete(db, id=model_in_db.id)
     endpoint_1 = crud.endpoint.get(db, id=endpoint.id)

@@ -23,17 +23,39 @@ import sqlalchemy.orm as orm
 import app.crud.base as app_crud_base
 import app.models as models
 import app.schemas as schemas
+import app.models.metadata as app_model_metadata
 
 
 class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, schemas.EndpointUpdate]):
+
+    def update(self, db: orm.Session, *, db_obj: models.Endpoint, obj_in: schemas.EndpointUpdate) -> models.Endpoint:
+        update_data = obj_in.dict(exclude_unset=True)
+
+        current_metadata = db_obj.metadata_
+        if current_metadata is not None and update_data.get('metadata_') is not None:
+            update_data['metadata_'] = app_model_metadata.patch_metadata(current_metadata, update_data['metadata_'])
+        new_config = {
+            'name': db_obj.name if 'name' not in update_data else update_data['name'],
+            'metadata_':  db_obj.metadata_ if 'metadata_' not in update_data else update_data['metadata_']
+        }
+        for field in new_config:
+            setattr(db_obj, field, new_config[field])
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
     def create_with_model(
-            self, db: orm.Session, *, obj_in: schemas.EndpointCreate, model_id: app_crud_base.IdType
+            self, db: orm.Session, *, obj_in: schemas.EndpointCreate, model: models.Model
     ) -> models.Endpoint:
+        model_config = None if model.config is None else model.config.configuration
+        model_metadata = None if model_config is None else model_config.get('metadata')
+        obj_in.metadata_ = model_metadata
         # noinspection PyArgumentList
         db_obj = self.model(
             **encoders.jsonable_encoder(obj_in),
             deployed_at=dt.datetime.now(tz=dt.timezone.utc),
-            id=model_id
+            id=model.id
         )
         db.add(db_obj)
         db.commit()
@@ -46,18 +68,22 @@ class CRUDModel(app_crud_base.CRUDBase[models.Endpoint, schemas.EndpointCreate, 
             *,
             ec: schemas.EndpointCreate,
             bc: schemas.BinaryMlModelCreate,
-            model_id: app_crud_base.IdType,
+            model: models.Model
     ):
+        model_config = None if model.config is None else model.config.configuration
+        model_metadata = None if model_config is None else model_config.get('metadata')
+        ec.metadata_ = model_metadata
+
         # noinspection PyArgumentList
         endpoint_db_obj = self.model(
             **encoders.jsonable_encoder(ec),
-            id=model_id,
+            id=model.id,
             deployed_at=dt.datetime.now(tz=dt.timezone.utc)
         )
         # noinspection PyArgumentList
         binary_db_obj = models.BinaryMlModel(
             **bc.dict(),
-            id=model_id
+            id=model.id
         )
         db.add(endpoint_db_obj)
         db.add(binary_db_obj)

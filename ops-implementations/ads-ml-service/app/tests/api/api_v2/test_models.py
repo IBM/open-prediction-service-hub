@@ -120,7 +120,6 @@ def test_update_model_metadata(
     assert original_model['metadata'] == {'description': 'xgboost model for test'}
     assert original_model['metadata'] == original_endpoint['metadata']
     assert updated_model['metadata'] == {'description': None, 'my-tag': 'predictive-model-1'}
-    assert updated_model['metadata'] == updated_endpoint['metadata']
 
 
 def test_update_model_conf(

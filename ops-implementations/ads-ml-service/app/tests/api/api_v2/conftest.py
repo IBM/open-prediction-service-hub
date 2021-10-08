@@ -40,7 +40,7 @@ def endpoint_with_model(
         db, obj_in=schemas.ModelConfigCreate(configuration=app_test_skl.get_conf()['model']), model_id=model.id
     )
     endpoint = crud.endpoint.create_with_model(
-        db, obj_in=schemas.EndpointCreate(name=app_test_utils.random_string()), model_id=model.id
+        db, obj_in=schemas.EndpointCreate(name=app_test_utils.random_string()), model=model
     )
     return endpoint
 
@@ -66,7 +66,7 @@ def identity_endpoint(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
     endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
-                                               model_id=model.id)
+                                               model=model)
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(obj=app_test_identity.get_identity_predictor()),
         **config['binary']
@@ -84,7 +84,7 @@ def skl_endpoint(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
     endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
-                                               model_id=model.id)
+                                               model=model)
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(app_test_skl.get_classification_predictor()),
         **config['binary']
@@ -108,7 +108,7 @@ def skl_endpoint_with_metadata_for_binary(
         model_id=model.id
     )
     endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
-                                               model_id=model.id)
+                                               model=model)
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=pickle.dumps(app_test_skl.get_classification_predictor()),
         **config['binary']
@@ -130,7 +130,7 @@ def pmml_endpoint(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
     endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
-                                               model_id=model.id)
+                                               model=model)
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(
         model_b64=pmml_file,
         **config['binary']
@@ -151,7 +151,7 @@ def xgboost_endpoint(
         db, obj_in=schemas.ModelConfigCreate(configuration=config['model']), model_id=model.id
     )
     endpoint = crud.endpoint.create_with_model(db, obj_in=schemas.EndpointCreate(**config['endpoint']),
-                                               model_id=model.id)
+                                               model=model)
     with model_path.open(mode='rb') as fd:
         content = fd.read()
     crud.binary_ml_model.create_with_endpoint(db, obj_in=schemas.BinaryMlModelCreate(

@@ -22,6 +22,7 @@ class Endpoint(base_class.Base):
                     nullable=False, unique=True, index=True, primary_key=True)
     name = sql.Column('name', sql.NCHAR(length=128), nullable=False)
     deployed_at = sql.Column('deployed_at', sql.DateTime(timezone=True), nullable=False)
+    metadata_ = sql.Column('metadata_', sql.JSON, nullable=True)
 
     model = sql_orm.relationship('Model', back_populates='endpoint', uselist=False)
     binary = sql_orm.relationship('BinaryMlModel', back_populates='endpoint', cascade='all, delete', uselist=False)
