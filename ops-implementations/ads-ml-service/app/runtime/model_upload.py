@@ -141,7 +141,7 @@ def store_model(
         # Creation
         crud.endpoint.create_with_model_and_binary(
             db,
-            model_id=model.id,
+            model=model,
             ec=schemas.EndpointCreate(name=model_config.configuration['name']),
             bc=schemas.BinaryMlModelCreate(
                 model_b64=model_binary,
