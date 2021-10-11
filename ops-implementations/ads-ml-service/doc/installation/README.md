@@ -73,6 +73,11 @@ The OpenShift/K8S example is a single node service with local storage. It could
 be extended but that is more advanced than this tutorial.
 Instead, this tutorial will focus on local deployment with Docker/docker-compose.
 
+### Number of workers
+
+The number of worker can be configured by environment variable `GUNICORN_WORKER_NUM` or `WEB_CONCURRENCY`. THe default 
+worker number is `2`.
+
 ### Volumes
 
 Data and configuration files are stored in docker volumes and could be
