@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.4.2 _2021/10/18_
+
+* [ADSML-225] Update database migration for endpoint metadata
+
 ## 2.4.1 _2021/10/11_
 
 * [ADSML-235] Install ads-ml-service in the new Fyre env and update installation docs
