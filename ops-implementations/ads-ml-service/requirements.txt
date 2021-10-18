@@ -3,6 +3,7 @@
 ## Web interface
 python-multipart~=0.0.5
 sqlalchemy~=1.4.11
+alembic~=1.7.4
 psycopg2-binary~=2.8.6
 fastapi~=0.65.2
 orjson~=3.5.2

@@ -50,6 +50,8 @@ COPY --chown=nobody:root custom_modules/. /var/lib/ads-ml-service/custom/
 COPY --chown=nobody:root prestart.sh /usr/src/ads-ml-service/prestart.sh
 COPY --chown=nobody:root preload-conf.yaml /usr/src/ads-ml-service/preload-conf.yaml
 COPY --chown=nobody:root app /usr/src/ads-ml-service/app
+COPY --chown=nobody:root alembic.ini /usr/src/ads-ml-service/alembic.ini
+COPY --chown=nobody:root alembic /usr/src/ads-ml-service/alembic
 COPY --chown=nobody:root examples/model_training_and_deployment /usr/src/ads-ml-service/examples/model_training_and_deployment
 RUN \
     apt-get -q update && \

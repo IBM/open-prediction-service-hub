@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Open Prediction Service
-  version: 2.3.0-SNAPSHOT
+  version: 2.4.2-SNAPSHOT
   description: The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 tags:
   - name: info

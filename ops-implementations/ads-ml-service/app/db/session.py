@@ -16,6 +16,7 @@
 
 
 import logging
+import typing
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -25,25 +26,26 @@ from app.core.configuration import get_config
 logger = logging.getLogger(__name__)
 
 
-def get_engine():
+def get_db_url() -> str:
     if get_config().USE_SQLITE:
         logger.info('Using SQLITE database')
-        engine = create_engine(
-            f'sqlite:///{get_config().MODEL_STORAGE.joinpath(get_config().DATABASE_NAME)}',
-            connect_args={"check_same_thread": False}
-        )
+        return f'sqlite:///{get_config().MODEL_STORAGE.joinpath(get_config().DATABASE_NAME)}'
     else:
         logger.info('Using customized database')
-        if get_config().DB_ARGS is not None:
-            engine = create_engine(
-                get_config().DB_URL,
-                **get_config().DB_ARGS
-            )
-        else:
-            engine = create_engine(
-                get_config().DB_URL
-            )
-    return engine
+        return get_config().DB_URL
+
+
+def get_db_opts() -> typing.Dict[str, typing.Any]:
+    if get_config().USE_SQLITE:
+        return {'connect_args': {"check_same_thread": False}}
+    else:
+        return {} if get_config().DB_ARGS is None else get_config().DB_ARGS
+
+
+def get_engine():
+    url = get_db_url()
+    db_options = get_db_opts()
+    return create_engine(url, **db_options)
 
 
 SessionLocal = sessionmaker(
