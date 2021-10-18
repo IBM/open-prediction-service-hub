@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.4.2 _2021/10/18_
+
+* [ADSML-225] Update database migration for endpoint metadata
+
 ## 2.3.0 _2021/10/06_
 
 * [ADSML-225] Add metadata in endpoints
