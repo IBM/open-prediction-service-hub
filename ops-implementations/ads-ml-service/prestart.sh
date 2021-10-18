@@ -20,12 +20,10 @@ function db_migration() {
 python3 "${__dir}"/app/backend_pre_start.py
 
 # Run migrations
-if python3 -m alembic current | grep -m 1 -o -q -E "[^[:space:]]{12}" - ; then
-  db_migration
-else
-  init_rev
-  db_migration
+if (! python3 -m alembic current | grep -m 1 -o -q -E "[^[:space:]]{12}") && python3 "${__dir}"/app/database_initialized.py - ; then
+    init_rev
 fi
+db_migration
 
 
 
