@@ -32,7 +32,8 @@ def get_app() -> fastapi.FastAPI:
         title='ADS ML Service',
         description='A simple Machine Learning serving environment for tests',
         openapi_url='/open-prediction-service.json',
-        default_response_class=responses.ORJSONResponse
+        default_response_class=responses.ORJSONResponse,
+        debug=True
     )
 
     @app.on_event("startup")
