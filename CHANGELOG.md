@@ -3,6 +3,7 @@
 ## 2.4.3 _2021/10/19_
 
 * [ADSML-245] WhiteSource scan finds multiple CVE in ads-ml-service repo
+* [ADSML-252] Update environment.yml for sklean-service (CVE fix)
 
 ## 2.4.2 _2021/10/18_
 
