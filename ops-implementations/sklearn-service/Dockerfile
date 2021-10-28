@@ -1,7 +1,7 @@
 # The build-stage image:
 FROM continuumio/miniconda3 AS build
 
-RUN conda update -n base -c defaults conda
+RUN apt-get update && apt-get install -y linux-headers-amd64 build-essential && conda update -n base -c defaults conda
 
 # Install the package as normal:
 COPY environment.yml .
