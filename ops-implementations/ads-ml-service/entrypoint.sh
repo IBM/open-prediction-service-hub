@@ -38,39 +38,41 @@ function main() {
 
 function launch_mtls() {
   local host=$1
-  local port=$2
-  declare -i workers=$3
-  local tls_crt=$4
-  local tls_key=$5
-  local ca_crt=$6
+  local http_port=$2
+  local https_port=$3
+  declare -i workers=$4
+  local tls_crt=$5
+  local tls_key=$6
+  local ca_crt=$7
 
   exec \
-    uvicorn \
-    --factory app.main:get_app \
-    --host "${host}" \
-    --port "${port}" \
+    hypercorn \
+    --insecure-bind "${host}:${http_port}" \
+    --bind "${host}:${https_port}" \
     --workers "${workers}" \
-    --ssl-certfile "${tls_crt}" \
-    --ssl-keyfile "${tls_key}" \
-    --ssl-ca-certs "${ca_crt}" \
-    --ssl-cert-reqs 1
+    --certfile "${tls_crt}" \
+    --keyfile "${tls_key}" \
+    --ca_certs "${ca_crt}" \
+    --verify_mode 2 \
+    'app.main:get_app()'
 }
 
 function launch_tls() {
   local host=$1
-  local port=$2
-  declare -i workers=$3
-  local tls_crt=$4
-  local tls_key=$5
+  local http_port=$2
+  local https_port=$3
+  declare -i workers=$4
+  local tls_crt=$5
+  local tls_key=$6
 
   exec \
-    uvicorn \
-    --factory app.main:get_app \
-    --host "${host}" \
-    --port "${port}" \
+    hypercorn \
+    --insecure-bind "${host}:${http_port}" \
+    --bind "${host}:${https_port}" \
     --workers "${workers}" \
-    --ssl-certfile "${tls_crt}" \
-    --ssl-keyfile "${tls_key}"
+    --certfile "${tls_crt}" \
+    --keyfile "${tls_key}" \
+    'app.main:get_app()'
 }
 
 function launch_without_tls() {
