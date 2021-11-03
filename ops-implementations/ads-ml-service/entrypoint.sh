@@ -79,11 +79,10 @@ function launch_without_tls() {
   declare -i workers=$3
 
   exec \
-    uvicorn \
-    --factory app.main:get_app \
-    --host "${host}" \
-    --port "${port}" \
-    --workers "${workers}"
+    hypercorn \
+    --bind "${host}:${port}" \
+    --workers "${workers}" \
+    'app.main:get_app()'
 }
 
 main
