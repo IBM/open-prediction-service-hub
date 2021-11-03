@@ -55,7 +55,7 @@ loggers:
       - info_file_handler
       - error_file_handler
 
-  uvicorn:
+  'hypercorn':
     level: INFO
     handlers:
       - console
