@@ -22,10 +22,10 @@ function launch_tls_configuration_testes() {
   local service_url_mtls
   declare -i n=0
 
-  chmod 555 "${__dir}/ads-ml-service-keys/server/tls.crt"
-  chmod 555 "${__dir}/ads-ml-service-keys/server/tls.key"
-  chmod 555 "${__dir}/ads-ml-service-keys/client/tls.crt"
-  chmod 555 "${__dir}/ads-ml-service-keys/client/tls.key"
+  chmod 666 "${__dir}/ads-ml-service-keys/server/tls.crt"
+  chmod 666 "${__dir}/ads-ml-service-keys/server/tls.key"
+  chmod 666 "${__dir}/ads-ml-service-keys/client/tls.crt"
+  chmod 666 "${__dir}/ads-ml-service-keys/client/tls.key"
 
   docker \
     run --rm -d \
@@ -55,8 +55,20 @@ function launch_tls_configuration_testes() {
   docker ps -a
   docker logs --tail 20 ads-ml-service-tls
 
+  service_url_tls_redirect="http://127.0.0.1:8081"
   service_url_tls="https://127.0.0.1:8081"
   service_url_mtls="https://127.0.0.1:8082"
+
+  until ((n >= 60)); do
+    test_tls_conn "${service_url_tls_redirect}" && break
+    n=$((n + 1))
+    echo "${service_url_tls_redirect}/info not available"
+    sleep 10
+  done
+  if ! ((n < 60)); then
+    echo "can not get ${service_url_tls_redirect}/info in 10 min"
+    exit 1
+  fi
 
   until ((n >= 60)); do
     test_tls_conn "${service_url_tls}" && break
