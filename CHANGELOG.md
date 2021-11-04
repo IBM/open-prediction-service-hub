@@ -3,6 +3,7 @@
 ## 2.4.3 _2021/10/19_
 
 * [ADSML-245] WhiteSource scan finds multiple CVE in ads-ml-service repo
+* [ADSML-253] ads-ml-service should handle both http and https requests
 
 ## 2.4.2 _2021/10/18_
 
