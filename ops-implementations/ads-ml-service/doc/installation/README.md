@@ -290,4 +290,4 @@ TLS and mTLS can be configured by using environment variables. All parameters ha
 | `TLS_CRT`                        | Path to pem encoded TLS secret certificate. TLS will be disabled if empty                            |      empty           |
 | `TLS_KEY`                        | Path to pem encoded TLS secret key. TLS will be disabled if empty                                    |      empty           |
 | `CA_CRT`                         | Path to pem encoded Trusted certificates. Mutual TLS authentication will be disabled if empty        |      empty           |
-| `HTTPS_PORT`                     | Https port, must be different from `HTTP_PORT`                                                   |      8443            |
+| `HTTPS_PORT`                     | Https port, must be different from `HTTP_PORT`                                                       |      8443            |
