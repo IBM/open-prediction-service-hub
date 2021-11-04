@@ -9,11 +9,12 @@ set -o pipefail
 
 function main() {
   local proxy_host
-  local proxy_port
+  local http_port
   declare -i workers
 
   proxy_host="${HOST:-0.0.0.0}"
-  proxy_port="${PORT:-8080}"
+  http_port="${HTTP_PORT:-8080}"
+  https_port="${HTTPS_PORT:-8443}"
   if [[ -v WEB_CONCURRENCY ]]; then
     workers="${WEB_CONCURRENCY}"
   elif [[ -v GUNICORN_WORKER_NUM ]]; then
@@ -26,13 +27,13 @@ function main() {
 
   if [[ -v TLS_CRT ]] && [[ -v TLS_KEY ]] && [[ -v CA_CRT ]]; then
     echo "launching service with mTLS"
-    launch_mtls "${proxy_host}" "${proxy_port}" "${workers}" "${TLS_CRT}" "${TLS_KEY}" "${CA_CRT}"
+    launch_mtls "${proxy_host}" "${http_port}" "${https_port}" "${workers}" "${TLS_CRT}" "${TLS_KEY}" "${CA_CRT}"
   elif [[ -v TLS_CRT ]] && [[ -v TLS_KEY ]] && [[ ! -v CA_CRT ]]; then
     echo "launching service with TLS"
-    launch_tls "${proxy_host}" "${proxy_port}" "${workers}" "${TLS_CRT}" "${TLS_KEY}"
+    launch_tls "${proxy_host}" "${http_port}" "${https_port}" "${workers}" "${TLS_CRT}" "${TLS_KEY}"
   else
     echo "launching service without TLS"
-    launch_without_tls "${proxy_host}" "${proxy_port}" "${workers}"
+    launch_without_tls "${proxy_host}" "${http_port}" "${workers}"
   fi
 }
 
