@@ -53,8 +53,8 @@ function launch_mtls() {
     --workers "${workers}" \
     --certfile "${tls_crt}" \
     --keyfile "${tls_key}" \
-    --ca_certs "${ca_crt}" \
-    --verify_mode 2 \
+    --ca-certs "${ca_crt}" \
+    --verify-mode CERT_REQUIRED \
     'app.main:get_app()'
 }
 
