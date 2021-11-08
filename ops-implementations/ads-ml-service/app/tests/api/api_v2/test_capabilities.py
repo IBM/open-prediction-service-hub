@@ -37,7 +37,8 @@ def test_get_server_capabilities(
 
 
 def test_get_managed_capabilities(
-        client: tstc.TestClient
+        client: tstc.TestClient,
+        test_upload_size_limit
 ):
     response = client.get(f'{conf.get_config().API_V2_STR}/capabilities')
     content = response.json()
@@ -54,3 +55,4 @@ def test_get_managed_capabilities(
     assert 'pickle' in content['managed_capabilities']['supported_binary_format']
     assert 'pmml' in content['managed_capabilities']['supported_binary_format']
     assert 'pmml' in content['managed_capabilities']['supported_upload_format']
+    assert content['managed_capabilities']['file_size_limit'] == test_upload_size_limit

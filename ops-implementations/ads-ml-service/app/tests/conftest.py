@@ -18,6 +18,7 @@
 import os
 import pathlib
 import typing
+import random
 
 import fastapi.testclient as fastapi_testclient
 import pytest
@@ -51,13 +52,19 @@ def db(tmp_path) -> typing.Iterable[sqlalchemy_orm.Session]:
 
 
 @pytest.fixture
-def client(db, tmp_path) -> typing.Iterable[fastapi_testclient.TestClient]:
+def test_upload_size_limit() -> int:
+    return random.randint(1, 100)
+
+
+@pytest.fixture
+def client(db, tmp_path, test_upload_size_limit) -> typing.Iterable[fastapi_testclient.TestClient]:
     logging_configs = yaml.safe_load(pathlib.Path(__file__).parents[2].joinpath('logging.yaml').read_text())
     logging_configs['handlers']['info_file_handler']['filename'] = tmp_path.joinpath('info.log').__str__()
     logging_configs['handlers']['error_file_handler']['filename'] = tmp_path.joinpath('error.log').__str__()
     os.environ['LOGGING'] = tmp_path.joinpath('logging.yaml').__str__()
     os.environ['SETTINGS'] = tmp_path.__str__()
     tmp_path.joinpath('logging.yaml').write_text(yaml.dump(logging_configs))
+    os.environ['UPLOAD_SIZE_LIMIT'] = test_upload_size_limit.__str__()
 
     user = app_crud.user.create(db, obj_in=app_schemas.UserCreate(
         username=app_config.get_config().DEFAULT_USER, password=app_config.get_config().DEFAULT_USER_PWD))
