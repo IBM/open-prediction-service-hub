@@ -18,7 +18,6 @@
 import os
 import pathlib
 import typing
-import random
 
 import fastapi.testclient as fastapi_testclient
 import pytest
@@ -53,7 +52,7 @@ def db(tmp_path) -> typing.Iterable[sqlalchemy_orm.Session]:
 
 @pytest.fixture
 def test_upload_size_limit() -> int:
-    return random.randint(1, 100)
+    return 1024
 
 
 @pytest.fixture
