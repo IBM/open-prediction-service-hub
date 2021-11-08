@@ -52,6 +52,7 @@ class ServerConfiguration(BaseSettings):
     DB_URL: typing.Optional[pydantic.AnyUrl] = None
     # Additional args for sqlalchemy.create_engine()
     DB_ARGS: typing.Optional[pydantic.Json] = None
+    UPLOAD_SIZE_LIMIT: int = 0
 
     @validator('MODEL_STORAGE')
     def storage_check(
