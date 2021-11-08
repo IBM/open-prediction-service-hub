@@ -801,6 +801,11 @@ components:
               type: array
               items:
                 type: string
+            file_size_limit:
+              type: integer
+              minimum: 0
+              default: 0
+              description: Maximum length of model file in bytes. 0 means no limit.
       example:
         capabilities:
           - info
@@ -819,6 +824,7 @@ components:
             - bst
           supported_upload_format:
             - PMML
+          file_size_limit: 134217728
 
     Capability:
       title: Capability
