@@ -1,3 +1,7 @@
 {
-  "settingsInheritedFrom": "whitesource-config/whitesource-config@master"
+  "settingsInheritedFrom": "whitesource-config/whitesource-config@python3.7",
+  "remediateSettings": {
+    "enableRenovate": true,
+    "extends": ["config:base"]
+  }
 }

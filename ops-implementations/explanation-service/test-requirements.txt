@@ -1,7 +1,7 @@
-pytest~=4.6.7 # needed for python 2.7+3.4
-pytest-cov>=2.8.1
+pytest==4.6.11 # needed for python 2.7+3.4
+pytest-cov==3.0.0
 pytest-randomly==1.2.3 # needed for python 2.7+3.4
-Flask-Testing==0.8.0
+Flask-Testing==0.8.1
 pylint
 flake8
 autopep8
