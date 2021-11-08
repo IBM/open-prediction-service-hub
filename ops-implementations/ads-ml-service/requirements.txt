@@ -10,9 +10,8 @@ orjson==3.5.4
 numpy==1.19.5
 pandas==1.2.5
 
-## Process management
-uvicorn[standard]==0.15.0
-gunicorn==20.1.0
+## ASGI server
+hypercorn==0.11.2
 
 ## Cache
 cachetools==4.2.4
