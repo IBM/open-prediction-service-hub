@@ -803,6 +803,7 @@ components:
                 type: string
             file_size_limit:
               type: integer
+              format: int64
               minimum: 0
               default: 0
               description: Maximum length of model file in bytes. 0 means no limit.
