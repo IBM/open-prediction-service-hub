@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Open Prediction Service
-  version: 2.4.3-SNAPSHOT
+  version: 2.5.0-SNAPSHOT
   description: The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 tags:
   - name: info
@@ -801,6 +801,12 @@ components:
               type: array
               items:
                 type: string
+            file_size_limit:
+              type: integer
+              format: int64
+              minimum: 0
+              default: 0
+              description: Maximum length of model file in bytes. 0 means no limit.
       example:
         capabilities:
           - info
@@ -819,6 +825,7 @@ components:
             - bst
           supported_upload_format:
             - PMML
+          file_size_limit: 134217728
 
     Capability:
       title: Capability

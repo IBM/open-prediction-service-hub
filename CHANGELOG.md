@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.5.0 _2021/11/09_
+
+* [ADSML-137] Add max supported file size for upload ML model
+
 ## 2.4.3 _2021/10/19_
 
 * [ADSML-245] WhiteSource scan finds multiple CVE in ads-ml-service repo
