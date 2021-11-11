@@ -147,7 +147,7 @@ limitations under the License.IBM Confidential]]>
                         <groupId>com.mycila</groupId>
                         <artifactId>license-maven-plugin-git</artifactId>
                         <!-- make sure you use the same version as license-maven-plugin -->
-                        <version>3.0</version>
+                        <version>4.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
