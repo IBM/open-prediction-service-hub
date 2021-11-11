@@ -4,4 +4,4 @@ setuptools ==56.0.0
 jsonschema ==3.2.0
 
 boto3 ==1.19.12
-sagemaker ==1.67.1.post0
+sagemaker ==1.72.1
