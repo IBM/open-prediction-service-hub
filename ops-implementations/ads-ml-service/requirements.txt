@@ -21,7 +21,7 @@ readerwriterlock==1.0.9
 tenacity==7.0.0
 
 ## Authentication
-pyjwt==2.1.0
+pyjwt==2.3.0
 passlib[bcrypt]==1.7.4
 
 ## Read configuration files
