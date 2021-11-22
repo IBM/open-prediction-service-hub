@@ -30,4 +30,4 @@ PyYAML==6.0
 ## Testes
 requests==2.26.0
 pytest==6.2.5
-nyoka==4.4.0
+nyoka==5.0.1
