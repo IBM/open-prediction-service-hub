@@ -1,6 +1,6 @@
 connexion[swagger-ui] ==2.9.0
 python_dateutil ==2.8.2
-setuptools ==59.3.0
+setuptools ==59.4.0
 jsonschema ==3.2.0
 
 boto3 ==1.20.16
