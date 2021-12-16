@@ -14,15 +14,18 @@
 # limitations under the License.IBM Confidential
 #
 
+import botocore
+import boto3
+import sys
+import numpy as np
+import sagemaker.serializers as sage_serializers
+import sagemaker.deserializers as sage_deserializers
 
 from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.prediction_response import PredictionResponse  # noqa: E501
 
-import botocore
-import boto3
-from sagemaker.predictor import npy_serializer, numpy_deserializer
-import sys
-import numpy as np
+npy_serializer = sage_serializers.NumpySerializer()
+npy_deserializer = sage_deserializers.NumpyDeserializer()
 
 
 def prediction(body):  # noqa: E501
@@ -54,9 +57,9 @@ def prediction(body):  # noqa: E501
     # serialize     input
     # deserialize   output
     # content type  The MIME type of the input data in the request body.
-    [serializer, deserializer, contentType] = [npy_serializer, numpy_deserializer, 'application/x-npy']
+    [serializer, deserializer, contentType] = [npy_serializer, npy_deserializer, 'application/x-npy']
 
-    body = serializer(data)
+    body = serializer.serialize(data)
 
     try:
         client = boto3.client('sagemaker-runtime')
@@ -67,7 +70,7 @@ def prediction(body):  # noqa: E501
             ContentType=contentType
         )
         response_body = response["Body"]
-        result = deserializer(response_body, response["ContentType"])
+        result = deserializer.deserialize(response_body, response["ContentType"])
         predictions = result[0]
         return PredictionResponse(result=dict(predictions=predictions))
     except botocore.exceptions.ClientError as error:
