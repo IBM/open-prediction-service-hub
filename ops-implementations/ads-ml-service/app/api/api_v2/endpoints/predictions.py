@@ -63,7 +63,7 @@ async def predict(
     deserialized = app_cache.cache.get_deserialized_model(db, endpoint_id=resource_id)
     if not deserialized:
         raise fastapi.HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail='Resource not found')
+            status_code=status.HTTP_404_NOT_FOUND, detail='Requested model not found.')
 
     prediction_output = deserialized.predict(pre_in.parameters)
 
