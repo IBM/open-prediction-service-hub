@@ -19,7 +19,6 @@ import typing as typ
 
 import fastapi.testclient as tstc
 import pytest
-import sqlalchemy.orm as saorm
 
 import app.core.configuration as app_conf
 import app.core.uri as app_uri
@@ -66,7 +65,6 @@ def test_identity_prediction(
 
 
 def test_xgboost_prediction(
-        db: saorm.Session,
         client: tstc.TestClient,
         xgboost_endpoint: app_models.Endpoint
 ) -> typ.NoReturn:
@@ -89,7 +87,6 @@ def test_xgboost_prediction(
 
 
 def test_skl_prediction(
-        db: saorm.Session,
         client: tstc.TestClient,
         skl_endpoint
 ) -> typ.NoReturn:
@@ -113,7 +110,6 @@ def test_skl_prediction(
 
 
 def test_pmml_prediction(
-        db: saorm.Session,
         client: tstc.TestClient,
         pmml_endpoint: app_models.Endpoint
 ) -> typ.NoReturn:
@@ -135,7 +131,6 @@ def test_pmml_prediction(
 
 
 def test_prediction_with_additional_info(
-        db: saorm.Session,
         client: tstc.TestClient,
         skl_endpoint_with_metadata_for_binary: app_models.Endpoint
 ) -> typ.NoReturn:
@@ -157,3 +152,22 @@ def test_prediction_with_additional_info(
     assert response.status_code == 200
     assert additional_info['names']
     assert additional_info['names'] == ['x', 'y']
+
+
+def test_prediction_with_additional_info(
+        client: tstc.TestClient
+) -> typ.NoReturn:
+    response = client.post(
+        url=app_conf.get_config().API_V2_STR + '/predictions',
+        json={
+            'parameters': [{'name': 'x', 'value': 0.5}, {'name': 'y', 'value': 0.5}],
+            'target': [
+                {'rel': 'endpoint', 'href': app_uri.TEMPLATE.format(
+                    resource_type='endpoints', resource_id='123456')}
+            ]
+        }
+    )
+
+    assert response.status_code == 404
+    assert response.json().get('detail') is not None
+    assert 'model not found' in response.json().get('detail')

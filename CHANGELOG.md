@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.5.1 _2021/12/17_
+
+* [ADSML-282] Add clear error message when model is missing during prediction
+
 ## 2.5.0 _2021/11/09_
 
 * [ADSML-137] Add max supported file size for upload ML model

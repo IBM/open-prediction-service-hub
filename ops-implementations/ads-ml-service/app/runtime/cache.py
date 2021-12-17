@@ -48,12 +48,15 @@ class ModelCache(object):
 
         model_binary = crud.binary_ml_model.get_by_endpoint(db, endpoint_id=endpoint_id)
         model_config = crud.model_config.get(db, id=endpoint_id)
+
+        if not model_binary or not model_config:
+            # a deserialized model should contain a binary and associated metadata
+            LOGGER.error('Requested model does not exist')
+            return None
+
         metadata = model_config.configuration.get('metadata')
         additional_metadata = {} if not metadata else metadata.get(METADATA_FIELD)
 
-        if not model_binary:
-            LOGGER.error('Binary not exist', exc_info=True)
-            return None
         deserialized = runtime_wrapper.ModelInvocationExecutor(
             model=model_binary.model_b64,
             input_type=model_binary.input_data_structure,
