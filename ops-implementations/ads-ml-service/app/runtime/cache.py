@@ -51,7 +51,7 @@ class ModelCache(object):
 
         if not model_binary or not model_config:
             # a deserialized model should contain a binary and associated metadata
-            LOGGER.error('Requested model not exist')
+            LOGGER.error('Requested model does not exist')
             return None
 
         metadata = model_config.configuration.get('metadata')
