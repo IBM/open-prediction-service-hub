@@ -19,7 +19,6 @@ import typing as typ
 
 import fastapi.testclient as tstc
 import pytest
-import sqlalchemy.orm as saorm
 
 import app.core.configuration as app_conf
 import app.core.uri as app_uri
@@ -66,7 +65,6 @@ def test_identity_prediction(
 
 
 def test_xgboost_prediction(
-        db: saorm.Session,
         client: tstc.TestClient,
         xgboost_endpoint: app_models.Endpoint
 ) -> typ.NoReturn:
@@ -89,7 +87,6 @@ def test_xgboost_prediction(
 
 
 def test_skl_prediction(
-        db: saorm.Session,
         client: tstc.TestClient,
         skl_endpoint
 ) -> typ.NoReturn:
@@ -113,7 +110,6 @@ def test_skl_prediction(
 
 
 def test_pmml_prediction(
-        db: saorm.Session,
         client: tstc.TestClient,
         pmml_endpoint: app_models.Endpoint
 ) -> typ.NoReturn:
@@ -135,7 +131,6 @@ def test_pmml_prediction(
 
 
 def test_prediction_with_additional_info(
-        db: saorm.Session,
         client: tstc.TestClient,
         skl_endpoint_with_metadata_for_binary: app_models.Endpoint
 ) -> typ.NoReturn:
