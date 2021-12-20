@@ -50,9 +50,9 @@ paths:
   /models:
     get:
       parameters:
-        - $ref: '#/components/parameters/PaginationLimitParam'
-        - $ref: '#/components/parameters/PaginationOffsetParam'
-        - $ref: '#/components/parameters/PaginationTotalCountParam'
+        - $ref: '#/components/parameters/PaginationLimitParamQuery'
+        - $ref: '#/components/parameters/PaginationOffsetParamQuery'
+        - $ref: '#/components/parameters/PaginationTotalCountParamQuery'
       tags:
         - discover
       summary: List Models
@@ -221,9 +221,9 @@ paths:
       operationId: list_endpoints
       parameters:
         - $ref: '#/components/parameters/ModelIDParamQuery'
-        - $ref: '#/components/parameters/PaginationLimitParam'
-        - $ref: '#/components/parameters/PaginationOffsetParam'
-        - $ref: '#/components/parameters/PaginationTotalCountParam'
+        - $ref: '#/components/parameters/PaginationLimitParamQuery'
+        - $ref: '#/components/parameters/PaginationOffsetParamQuery'
+        - $ref: '#/components/parameters/PaginationTotalCountParamQuery'
       responses:
         '200':
           description: Successful Response
@@ -916,7 +916,7 @@ components:
       description: ID of model
       schema:
         type: string
-    PaginationOffsetParam:
+    PaginationOffsetParamQuery:
       in: query
       name: offset
       schema:
@@ -924,7 +924,7 @@ components:
         default: 0
       description: The number of items to skip before starting to collect the result set
       required: false
-    PaginationLimitParam:
+    PaginationLimitParamQuery:
       in: query
       name: limit
       schema:
@@ -932,7 +932,7 @@ components:
         default: 100
       description: The numbers of items to return
       required: false
-    PaginationTotalCountParam:
+    PaginationTotalCountParamQuery:
       in: query
       name: total_count
       schema:
