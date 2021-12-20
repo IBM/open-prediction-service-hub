@@ -26,8 +26,8 @@ import app.api.deps as deps
 import app.crud as crud
 import app.gen.schemas.ops_schemas as ops_schemas
 import app.schemas as schemas
-import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
+import app.core.configuration as app_conf
 
 router = fastapi.APIRouter()
 
@@ -38,13 +38,20 @@ router = fastapi.APIRouter()
     tags=['discover']
 )
 def get_endpoints(
-        db: saorm.Session = fastapi.Depends(deps.get_db)
+        db: saorm.Session = fastapi.Depends(deps.get_db),
+        total_count: typing.Optional[bool] = False,
+        offset: typing.Optional[int] = 0,
+        limit: typing.Optional[int] = 100
 ) -> typing.Dict[typing.Text, typing.Any]:
+    if not (0 < limit <= app_conf.get_config().MAX_PAGE_SIZE and offset >= 0):
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='Requested offset/limit is not valid')
     return {
         'endpoints': [
             impl.EndpointImpl.from_database(endpoint)
-            for endpoint in crud.endpoint.get_all(db)
-        ]
+            for endpoint in crud.endpoint.get_multi(db, skip=offset, limit=limit)
+        ],
+        'total_count': 0 if not total_count else crud.endpoint.count(db)
     }
 
 
