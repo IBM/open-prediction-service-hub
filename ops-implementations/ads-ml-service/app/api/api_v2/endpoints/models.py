@@ -31,6 +31,7 @@ import app.runtime.model_upload as app_model_upload
 import app.schemas as schemas
 import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
+import app.core.configuration as app_conf
 
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
@@ -42,13 +43,20 @@ LOGGER = logging.getLogger(__name__)
     tags=['discover']
 )
 def get_models(
-        db: saorm.Session = fastapi.Depends(deps.get_db)
+        db: saorm.Session = fastapi.Depends(deps.get_db),
+        total_count: typing.Optional[bool] = False,
+        offset: typing.Optional[int] = 0,
+        limit: typing.Optional[int] = 100
 ) -> typing.Dict[typing.Text, typing.Any]:
+    if not (0 < limit <= app_conf.get_config().MAX_PAGE_SIZE and offset >= 0):
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='Requested offset/limit is not valid')
     return {
         'models': [
             impl.ModelImpl.from_database(model)
-            for model in crud.model.get_all(db)
-        ]
+            for model in crud.model.get_multi(db, skip=offset, limit=limit)
+        ],
+        'total_count': 0 if not total_count else crud.model.count(db)
     }
 
 
