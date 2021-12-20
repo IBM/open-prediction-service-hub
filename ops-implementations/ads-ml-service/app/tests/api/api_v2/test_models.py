@@ -21,6 +21,7 @@ import time
 import typing
 import typing as typ
 
+import pytest
 import fastapi.testclient as tstc
 import sqlalchemy.orm as orm
 import sqlalchemy.orm as saorm
@@ -33,7 +34,6 @@ import app.tests.predictors.scikit_learn.model as app_test_skl
 
 
 def test_get_model(
-        db: orm.Session,
         client: tstc.TestClient,
         model_with_config
 ) -> typing.NoReturn:
@@ -54,7 +54,6 @@ def test_get_model(
 
 
 def test_get_models(
-        db: orm.Session,
         client: tstc.TestClient,
         model_with_config
 ) -> typing.NoReturn:
@@ -65,8 +64,25 @@ def test_get_models(
     assert rst['models'][0]['id'] == str(model_with_config.id)
 
 
+@pytest.mark.parametrize(
+    'http_params',
+    [
+         ({'offset': -1}),
+         ({'limit': 0}),
+         ({'limit': 201})
+    ]
+)
+def test_get_endpoints_with_invalid_params(
+        client: tstc.TestClient,
+        http_params
+):
+    response = client.get(url=conf.get_config().API_V2_STR + '/models', params=http_params)
+
+    assert response.status_code == 422
+    assert response.json()['detail'] == 'Requested offset/limit is not valid'
+
+
 def test_add_model(
-        db: orm.Session,
         client: tstc.TestClient,
 ) -> typing.NoReturn:
     response = client.post(
@@ -81,7 +97,6 @@ def test_add_model(
 
 
 def test_update_model_name(
-        db: orm.Session,
         client: tstc.TestClient,
         model_with_config
 ) -> typing.NoReturn:
@@ -123,7 +138,6 @@ def test_update_model_metadata(
 
 
 def test_update_model_conf(
-        db: orm.Session,
         client: tstc.TestClient,
         model_with_config
 ) -> typing.NoReturn:

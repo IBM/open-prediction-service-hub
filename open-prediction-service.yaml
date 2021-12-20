@@ -49,6 +49,10 @@ paths:
                 $ref: '#/components/schemas/ServerInfo'
   /models:
     get:
+      parameters:
+        - $ref: '#/components/parameters/PaginationLimitParamQuery'
+        - $ref: '#/components/parameters/PaginationOffsetParamQuery'
+        - $ref: '#/components/parameters/PaginationTotalCountParamQuery'
       tags:
         - discover
       summary: List Models
@@ -141,7 +145,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags:
+      tags: 
         - manage
       summary: Upload a new serialized model to create an endpoint
       operationId: upload_model_with_id
@@ -152,7 +156,7 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/ModelBinary'
-      responses:
+      responses: 
         '201':
           description: Successful Response
           content:
@@ -217,6 +221,9 @@ paths:
       operationId: list_endpoints
       parameters:
         - $ref: '#/components/parameters/ModelIDParamQuery'
+        - $ref: '#/components/parameters/PaginationLimitParamQuery'
+        - $ref: '#/components/parameters/PaginationOffsetParamQuery'
+        - $ref: '#/components/parameters/PaginationTotalCountParamQuery'
       responses:
         '200':
           description: Successful Response
@@ -410,6 +417,9 @@ components:
           description: List of Endpoints
           items:
             $ref: '#/components/schemas/Endpoint'
+        total_count:
+          type: integer
+          description: Total numer of items. Computed explicitly only when 'total_count=true' query parameter is present.
     EndpointUpdate:
       title: Machine Learning Model Endpoint Update
       description: Represents a way to access to the runnable Prediction
@@ -518,6 +528,9 @@ components:
           description: List of models
           items:
             $ref: '#/components/schemas/Model'
+        total_count:
+          type: integer
+          description: Total numer of items. Computed explicitly only when 'total_count=true' query parameter is present.
     ModelUpdate:
       title: Machine Learning Model Update
       description: Machine learning model data
@@ -822,7 +835,7 @@ components:
             - "Array"
           supported_binary_format:
             - pickle
-            - bst
+            - bst            
           supported_upload_format:
             - PMML
           file_size_limit: 134217728
@@ -903,6 +916,30 @@ components:
       description: ID of model
       schema:
         type: string
+    PaginationOffsetParamQuery:
+      in: query
+      name: offset
+      schema:
+        type: integer
+        default: 0
+      description: The number of items to skip before starting to collect the result set
+      required: false
+    PaginationLimitParamQuery:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        default: 100
+      description: The numbers of items to return
+      required: false
+    PaginationTotalCountParamQuery:
+      in: query
+      name: total_count
+      schema:
+        type: boolean
+        default: false
+      description: Compute total number of item
+      required: false
     EndpointIDParam:
       in: path
       required: true

@@ -53,6 +53,7 @@ class ServerConfiguration(BaseSettings):
     # Additional args for sqlalchemy.create_engine()
     DB_ARGS: typing.Optional[pydantic.Json] = None
     UPLOAD_SIZE_LIMIT: int = 0
+    MAX_PAGE_SIZE: int = 200
 
     @validator('MODEL_STORAGE')
     def storage_check(
