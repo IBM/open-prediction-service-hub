@@ -1,4 +1,4 @@
-scikit-learn==1.0.1
+scikit-learn==1.0.2
 connexion[swagger-ui]== 2.9.0
 swagger-ui-bundle==0.0.9
 python_dateutil==2.8.2
