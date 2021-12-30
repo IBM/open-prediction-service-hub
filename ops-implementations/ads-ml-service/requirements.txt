@@ -11,7 +11,7 @@ numpy==1.21.5
 pandas==1.3.5
 
 ## ASGI server
-hypercorn==0.13.1
+hypercorn==0.13.2
 
 ## Cache
 cachetools==5.0.0
