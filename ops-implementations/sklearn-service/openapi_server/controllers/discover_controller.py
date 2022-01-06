@@ -73,10 +73,13 @@ def list_endpoints(model_id=None, limit=None, offset=None, total_count=None):  #
 
     :rtype: Endpoints
     """
-    list_model_id = [
-        model_id] if model_id in supported_models else supported_models
-
-    return Endpoints(endpoints=[model_id_to_endpoint(model_id) for model_id in list_model_id], total_count=0)
+    listed = supported_models if model_id is None or model_id not in supported_models else [model_id]
+    count = 0 if not total_count else len(listed)
+    start = offset if offset < len(listed) else len(listed)
+    end = offset + limit if offset + limit < len(listed) else len(listed)
+    filtered = listed[start:end]
+    endpoints = [model_id_to_endpoint(model_id) for model_id in filtered]
+    return Endpoints(endpoints=endpoints, total_count=count)
 
 
 def list_models(limit=None, offset=None, total_count=None):  # noqa: E501
@@ -93,4 +96,9 @@ def list_models(limit=None, offset=None, total_count=None):  # noqa: E501
 
     :rtype: Models
     """
-    return Models(models=[model_id_to_model(model_id) for model_id in supported_models], total_count=0)
+    count = 0 if not total_count else len(supported_models)
+    start = offset if offset < len(supported_models) else len(supported_models)
+    end = offset + limit if offset + limit < len(supported_models) else len(supported_models)
+    filtered = supported_models[start:end]
+    models = [model_id_to_model(model_id) for model_id in filtered]
+    return Models(models=models, total_count=count)
