@@ -57,19 +57,40 @@ def get_model_by_id(model_id):  # noqa: E501
     return model_id_to_model(model_id)
 
 
-def list_endpoints(model_id=None):  # noqa: E501
+def list_endpoints(model_id=None, limit=None, offset=None, total_count=None):  # noqa: E501
+    """List Endpoints
+
+     # noqa: E501
+
+    :param model_id: ID of model
+    :type model_id: str
+    :param limit: The numbers of items to return
+    :type limit: int
+    :param offset: The number of items to skip before starting to collect the result set
+    :type offset: int
+    :param total_count: Compute total number of item
+    :type total_count: bool
+
+    :rtype: Endpoints
+    """
     list_model_id = [
         model_id] if model_id in supported_models else supported_models
 
-    return Endpoints(endpoints=[model_id_to_endpoint(model_id) for model_id in list_model_id])
+    return Endpoints(endpoints=[model_id_to_endpoint(model_id) for model_id in list_model_id], total_count=0)
 
 
-def list_models():  # noqa: E501
+def list_models(limit=None, offset=None, total_count=None):  # noqa: E501
     """List Models
 
     Returns the list of ML Models. # noqa: E501
 
+    :param limit: The numbers of items to return
+    :type limit: int
+    :param offset: The number of items to skip before starting to collect the result set
+    :type offset: int
+    :param total_count: Compute total number of item
+    :type total_count: bool
 
     :rtype: Models
     """
-    return Models(models=[model_id_to_model(model_id) for model_id in supported_models])
+    return Models(models=[model_id_to_model(model_id) for model_id in supported_models], total_count=0)
