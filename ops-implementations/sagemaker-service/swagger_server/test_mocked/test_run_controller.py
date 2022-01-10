@@ -42,8 +42,8 @@ from swagger_server.controllers.run_controller import prediction
 class TestRunController(BaseTestCase):
     """RunController integration test stubs"""
 
-    @mock.patch("swagger_server.controllers.run_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.run_controller.boto3.client")
+    @mock.patch("swagger_server.services.run.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.run.boto3.client")
     def test_prediction(self, mock_boto_client, mock_invoke_endpoint):
         """Test case for prediction
 
@@ -74,8 +74,8 @@ class TestRunController(BaseTestCase):
         mock_boto_client.assert_called_once_with('sagemaker-runtime')
         mock_invoke_endpoint.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.run_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.run_controller.boto3.client")
+    @mock.patch("swagger_server.services.run.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.run.boto3.client")
     def test_prediction_no_endpoint_in_target(self, mock_boto_client, mock_invoke_endpoint):
         """Test case for prediction
 
@@ -94,8 +94,8 @@ class TestRunController(BaseTestCase):
         mock_boto_client.assert_not_called()
         mock_invoke_endpoint.assert_not_called()
 
-    @mock.patch("swagger_server.controllers.run_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.run_controller.boto3.client")
+    @mock.patch("swagger_server.services.run.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.run.boto3.client")
     def test_prediction_client_error(self, mock_boto_client, mock_invoke_endpoint):
         """Test case for prediction
 
@@ -121,8 +121,8 @@ class TestRunController(BaseTestCase):
         mock_boto_client.assert_called_once_with('sagemaker-runtime')
         mock_invoke_endpoint.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.run_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.run_controller.boto3.client")
+    @mock.patch("swagger_server.services.run.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.run.boto3.client")
     def test_prediction_param_validation_error(self, mock_boto_client, mock_invoke_endpoint):
         """Test case for prediction
 
@@ -146,8 +146,8 @@ class TestRunController(BaseTestCase):
         mock_boto_client.assert_called_once_with('sagemaker-runtime')
         mock_invoke_endpoint.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.run_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.run_controller.boto3.client")
+    @mock.patch("swagger_server.services.run.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.run.boto3.client")
     def test_prediction_unknown_error(self, mock_boto_client, mock_invoke_endpoint):
         """Test case for prediction
 
