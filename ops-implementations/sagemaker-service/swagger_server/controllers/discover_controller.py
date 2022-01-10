@@ -57,7 +57,7 @@ def list_endpoints(model_id=None, limit=None, offset=None, total_count=None):  #
 
     :rtype: Endpoints
     """
-    return discovery_service.list_models(model_id, limit, offset, total_count)
+    return discovery_service.list_endpoints(model_id, limit, offset, total_count)
 
 
 def list_models(limit=50, offset=0, total_count=False):  # noqa: E501
