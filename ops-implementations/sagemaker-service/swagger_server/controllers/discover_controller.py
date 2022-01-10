@@ -16,6 +16,7 @@
 
 import boto3
 import botocore
+import typing
 import sys
 from swagger_server.models.link import Link  # noqa: E501
 from swagger_server.models.endpoint import Endpoint  # noqa: E501
@@ -160,7 +161,7 @@ def get_model_by_id(model_id):  # noqa: E501
         return Error(error=str(sys.exc_info()[0]))
 
 
-def list_endpoints(model_id=None):  # noqa: E501
+def list_endpoints(model_id=None, limit=None, offset=None, total_count=None):  # noqa: E501
     """List Endpoints
 
      # noqa: E501
@@ -211,7 +212,8 @@ def list_endpoints(model_id=None):  # noqa: E501
 
         do_for_each_endpoint(client, callback_for_each_endpoints)
 
-        return Endpoints(endpoints=endpoints_list)
+        paginated_endpoint_list, count = paginated_resp(endpoints_list, limit, offset, total_count)
+        return Endpoints(endpoints=paginated_endpoint_list, total_count=count)
     except botocore.exceptions.ClientError as error:
         return Error(error=str(error))
     except:
@@ -219,7 +221,7 @@ def list_endpoints(model_id=None):  # noqa: E501
         return Error(error=str(sys.exc_info()[0]))
 
 
-def list_models():  # noqa: E501
+def list_models(limit=None, offset=None, total_count=None):  # noqa: E501
     """List Models
 
     Returns the list of ML models. # noqa: E501
@@ -268,9 +270,18 @@ def list_models():  # noqa: E501
                     links=links_by_model[model_name]
                 )
             )
-        return Models(models=model_list)
+        paginated_model_list, count = paginated_resp(model_list, limit, offset, total_count)
+        return Models(models=paginated_model_list, total_count=count)
     except botocore.exceptions.ClientError as error:
         return Error(error=str(error))
     except:
         print("Unexpected error:", sys.exc_info()[0])
         return Error(error=str(sys.exc_info()[0]))
+
+
+def paginated_resp(pre_pagination: typing.List, limit: int = 100, offset: int = 0, total_count: bool = False):
+    count = 0 if not total_count else len(pre_pagination)
+    start = offset if offset < len(pre_pagination) else len(pre_pagination)
+    end = offset + limit if offset + limit < len(pre_pagination) else len(pre_pagination)
+    filtered = pre_pagination[start:end]
+    return filtered, count
