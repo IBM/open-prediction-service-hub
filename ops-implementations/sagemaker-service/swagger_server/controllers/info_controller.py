@@ -14,12 +14,7 @@
 # limitations under the License.IBM Confidential
 #
 
-import sys
-
-import boto3
-from swagger_server.models.capabilities import Capabilities  # noqa: E501
-from swagger_server.models.capability import Capability  # noqa: E501
-from swagger_server.models.server_info import ServerInfo  # noqa: E501
+import swagger_server.services.info as info_service
 
 
 def get_capabilities():  # noqa: E501
@@ -30,8 +25,7 @@ def get_capabilities():  # noqa: E501
 
     :rtype: Capabilities
     """
-
-    return Capabilities([Capability.INFO, Capability.DISCOVER, Capability.RUN])
+    return info_service.get_capabilities()
 
 
 def get_info():  # noqa: E501
@@ -42,12 +36,4 @@ def get_info():  # noqa: E501
 
     :rtype: ServerInfo
     """
-    info = dict(
-        description='Open Prediction Service for Amazon Sagemaker based on OPSv2 API'
-    )
-    try:
-        boto3.client('sagemaker')
-        return ServerInfo(status='ok', info=info)
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        return ServerInfo(status='error', info=info, error=str(sys.exc_info()[0]))
+    return info_service.get_info()

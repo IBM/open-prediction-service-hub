@@ -44,7 +44,7 @@ class TestStatusController(BaseTestCase):
         assert str(response) == expected, 'response is not matching expected response'
 
     # GET STATUS
-    @mock.patch("swagger_server.controllers.info_controller.boto3.client")
+    @mock.patch("swagger_server.services.info.boto3.client")
     def test_get_info(self, mock_boto_client):
         """Test case for get_info
 
@@ -61,7 +61,7 @@ class TestStatusController(BaseTestCase):
 
         mock_boto_client.assert_called_once_with('sagemaker')
 
-    @mock.patch("swagger_server.controllers.info_controller.boto3.client")
+    @mock.patch("swagger_server.services.info.boto3.client")
     def test_get_info_error(self, mock_boto_client):
         """Test case for get_info
 
