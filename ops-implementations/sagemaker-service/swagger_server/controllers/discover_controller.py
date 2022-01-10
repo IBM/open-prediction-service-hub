@@ -14,62 +14,11 @@
 # limitations under the License.IBM Confidential
 #
 
-import boto3
-import botocore
-import typing
-import sys
-from swagger_server.models.link import Link  # noqa: E501
+import swagger_server.services.discovery as discovery_service
 from swagger_server.models.endpoint import Endpoint  # noqa: E501
 from swagger_server.models.endpoints import Endpoints  # noqa: E501
-from swagger_server.models.error import Error  # noqa: E501
 from swagger_server.models.model import Model  # noqa: E501
 from swagger_server.models.models import Models  # noqa: E501
-
-from flask import request
-from types import SimpleNamespace
-
-
-statusMapper = {
-    'OutOfService': 'out_of_service',
-    'Creating': 'creating',
-    'Updating': 'updating',
-    'SystemUpdating': 'under_maintenance',
-    'RollingBack': 'rolling_back',
-    'InService': 'in_service',
-    'Deleting': 'deleting',
-    'Failed': 'failed'
-}
-
-
-def retrieve_endpoint_data(client, endpoint_name):
-    endpoint_details = client.describe_endpoint(EndpointName=endpoint_name)
-    endpoint_config = endpoint_details['EndpointConfigName']
-    endpoint_config_details = client.describe_endpoint_config(EndpointConfigName=endpoint_config)
-    # Support for 1 endpoint hosting multiple models
-    model_names = []
-    for model in endpoint_config_details['ProductionVariants']:
-        model_names.append(model['ModelName'])
-
-    return dict(
-        endpoint_details=endpoint_details,
-        endpoint_config_details=endpoint_config_details,
-        model_names=model_names
-    )
-
-
-def do_for_each_endpoint(client, callback):
-    endpoints = client.list_endpoints()['Endpoints']
-    for endpoint in endpoints:
-        # For every endpoint (deployed model) retrieve model name
-        endpoint_name = endpoint['EndpointName']
-        endpoint_data = SimpleNamespace(**retrieve_endpoint_data(client, endpoint_name))
-        dict_element = dict(
-            endpoint_name=endpoint_name,
-            endpoint_details=endpoint_data.endpoint_details,
-            endpoint_config_details=endpoint_data.endpoint_config_details,
-            model_names=endpoint_data.model_names
-        )
-        callback(**dict_element)
 
 
 def get_endpoint_by_id(endpoint_id):  # noqa: E501
@@ -82,37 +31,7 @@ def get_endpoint_by_id(endpoint_id):  # noqa: E501
 
     :rtype: Endpoint
     """
-    root_url = request.url_root
-    try:
-        client = boto3.client('sagemaker')
-        endpoint_data = SimpleNamespace(**retrieve_endpoint_data(client, endpoint_id))
-
-        links = [
-            Link(
-                rel='self',
-                href=root_url + 'endpoints/' + endpoint_id
-            )
-        ]
-        for model_name in endpoint_data.model_names:
-            links.append(
-                Link(
-                    rel='model',
-                    href=root_url + 'models/' + model_name
-                )
-            )
-
-        return Endpoint(
-            id=endpoint_id,
-            name=endpoint_id,
-            status=statusMapper[endpoint_data.endpoint_details['EndpointStatus']],
-            deployed_at=endpoint_data.endpoint_details['CreationTime'],
-            links=links
-        )
-    except botocore.exceptions.ClientError as error:
-        return Error(error=str(error))
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        return Error(error=str(sys.exc_info()[0]))
+    return discovery_service.get_endpoint_by_id(endpoint_id)
 
 
 def get_model_by_id(model_id):  # noqa: E501
@@ -125,40 +44,7 @@ def get_model_by_id(model_id):  # noqa: E501
 
     :rtype: Model
     """
-    root_url = request.url_root
-    try:
-        client = boto3.client('sagemaker')
-        model = client.describe_model(ModelName=model_id)
-
-        links = [
-            Link(
-                rel='self',
-                href=root_url + 'models/' + model_id
-            )
-        ]
-
-        def callback_for_each_endpoints(endpoint_name, model_names, **__):
-            if model_id in model_names:
-                links.append(
-                    Link(
-                        rel='endpoint',
-                        href=root_url + 'endpoints/' + endpoint_name
-                    )
-                )
-
-        do_for_each_endpoint(client, callback_for_each_endpoints)
-
-        return Model(
-            id=model['ModelName'],
-            name=model['ModelName'],
-            created_at=model['CreationTime'],
-            links=links
-        )
-    except botocore.exceptions.ClientError as error:
-        return Error(error=str(error))
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        return Error(error=str(sys.exc_info()[0]))
+    return discovery_service.get_model_by_id(model_id)
 
 
 def list_endpoints(model_id=None, limit=None, offset=None, total_count=None):  # noqa: E501
@@ -171,57 +57,10 @@ def list_endpoints(model_id=None, limit=None, offset=None, total_count=None):  #
 
     :rtype: Endpoints
     """
-    root_url = request.url_root
-    try:
-        client = boto3.client('sagemaker')
-
-        endpoints_list = []
-
-        def append_endpoint(endpoint_name, endpoint_details, model_names):
-
-            links = [
-                Link(
-                    rel='self',
-                    href=root_url + 'endpoints/' + endpoint_name
-                )
-            ]
-            for model_name in model_names:
-                links.append(
-                    Link(
-                        rel='model',
-                        href=root_url + 'models/' + model_name
-                    )
-                )
-
-            endpoints_list.append(
-                Endpoint(
-                    id=endpoint_name,
-                    name=endpoint_name,
-                    status=statusMapper[endpoint_details['EndpointStatus']],
-                    deployed_at=endpoint_details['CreationTime'],
-                    links=links
-                )
-            )
-
-        def callback_for_each_endpoints(model_names, endpoint_name, endpoint_details, **__):
-            if model_id is None:
-                append_endpoint(endpoint_name, endpoint_details, model_names)
-            else:
-                if model_id in model_names:
-                    append_endpoint(endpoint_name, endpoint_details, model_names)
-
-        do_for_each_endpoint(client, callback_for_each_endpoints)
-
-        paginated_endpoint_list, count = paginated_resp(endpoints_list, limit, offset, total_count)
-        return Endpoints(endpoints=paginated_endpoint_list, total_count=count)
-    except botocore.exceptions.ClientError as error:
-        return Error(error=str(error))
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        return Error(error=str(sys.exc_info()[0]))
+    return discovery_service.list_models(model_id, limit, offset, total_count)
 
 
-def list_models(limit=None, offset=None, total_count=None):  # noqa: E501
+def list_models(limit=50, offset=0, total_count=False):  # noqa: E501
     """List Models
 
     Returns the list of ML models. # noqa: E501
@@ -229,59 +68,4 @@ def list_models(limit=None, offset=None, total_count=None):  # noqa: E501
 
     :rtype: Models
     """
-    root_url = request.url_root
-    try:
-        client = boto3.client('sagemaker')
-        models = client.list_models()['Models']
-
-        links_by_model = {}
-
-        def callback_for_each_endpoints(endpoint_name, model_names, **__):
-            link_tmp = Link(
-                rel='endpoint',
-                href=root_url + 'endpoints/' + endpoint_name
-            )
-            for model_name in model_names:
-                if model_name in links_by_model.keys():
-                    links_by_model[model_name].append(link_tmp)
-                else:
-                    links_by_model[model_name] = [link_tmp]
-
-        do_for_each_endpoint(client, callback_for_each_endpoints)
-
-        model_list = []
-        for model in models:
-            model_name = model['ModelName']
-
-            link = Link(
-                rel='self',
-                href=root_url + 'models/' + model_name
-            )
-            if model_name in links_by_model.keys():
-                links_by_model[model_name].insert(0, link)
-            else:
-                links_by_model[model_name] = [link]
-
-            model_list.append(
-                Model(
-                    id=model_name,
-                    name=model_name,
-                    created_at=model['CreationTime'],
-                    links=links_by_model[model_name]
-                )
-            )
-        paginated_model_list, count = paginated_resp(model_list, limit, offset, total_count)
-        return Models(models=paginated_model_list, total_count=count)
-    except botocore.exceptions.ClientError as error:
-        return Error(error=str(error))
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        return Error(error=str(sys.exc_info()[0]))
-
-
-def paginated_resp(pre_pagination: typing.List, limit: int = 100, offset: int = 0, total_count: bool = False):
-    count = 0 if not total_count else len(pre_pagination)
-    start = offset if offset < len(pre_pagination) else len(pre_pagination)
-    end = offset + limit if offset + limit < len(pre_pagination) else len(pre_pagination)
-    filtered = pre_pagination[start:end]
-    return filtered, count
+    return discovery_service.list_models(limit, offset, total_count)

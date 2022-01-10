@@ -36,8 +36,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
     """DiscoverController integration test stubs"""
 
     # GET ENDPOINT BY ID
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_get_endpoint_by_id(self, mock_boto_client, mock_list_endpoints):
         """Test case for get_endpoint_by_id
 
@@ -130,8 +130,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_list_endpoints.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_get_endpoint_by_id_client_error(self, mock_boto_client, mock_list_endpoints):
         """Test case for get_endpoint_by_id
 
@@ -156,8 +156,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_list_endpoints.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_get_endpoint_by_id_unknown_error(self, mock_boto_client, mock_list_endpoints):
         """Test case for get_endpoint_by_id
 
@@ -181,8 +181,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_list_endpoints.assert_called_once()
 
     # GET MODEL BY ID
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_get_model_by_id(self, mock_boto_client, mock_client):
         """Test case for get_model_by_id
 
@@ -297,8 +297,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_client.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_get_model_by_id_client_error(self, mock_boto_client, mock_list_models):
         """Test case for get_model_by_id
 
@@ -323,8 +323,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_list_models.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_get_model_by_id_unknown_error(self, mock_boto_client, mock_list_models):
         """Test case for get_model_by_id
 
@@ -348,8 +348,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_list_models.assert_called_once()
 
     # LIST ENDPOINTS
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_endpoints(self, mock_boto_client, mock_list_endpoints):
         """Test case for list_endpoints
 
@@ -455,8 +455,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_list_endpoints.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_endpoints_with_model_id(self, mock_boto_client, mock_list_endpoints):
         """Test case for list_endpoints
 
@@ -564,8 +564,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_list_endpoints.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_endpoints_not_existing_model_id(self, mock_boto_client, mock_list_endpoints):
         """Test case for list_endpoints
 
@@ -666,8 +666,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_list_endpoints.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_endpoints_client_error(self, mock_boto_client, mock_list_endpoints):
         """Test case for list_endpoints
 
@@ -691,8 +691,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_list_endpoints.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_endpoints_unknown_error(self, mock_boto_client, mock_list_endpoints):
         """Test case for list_endpoints
 
@@ -715,8 +715,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_list_endpoints.assert_called_once()
 
     # LIST MODELS
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_models(self, mock_boto_client, mock_client):
         """Test case for list_models
 
@@ -837,8 +837,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_client.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_models_no_endpoint_for_a_model(self, mock_boto_client, mock_client):
         """Test case for list_models
 
@@ -947,9 +947,10 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "             'modified_at': None,\n" +
                     "             'name': 'FakeModelId',\n" +
                     "             'output_schema': None,\n" +
-                    "             'version': None}]}")
+                    "             'version': None}], total_count: 0}")
 
         response = list_models()
+        response_str = str(response)
 
         assert isinstance(response, Models)
         assert str(response) == expected, 'response is not matching expected response'
@@ -957,8 +958,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_client.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_models_multiple_endpoints_for_a_model(self, mock_boto_client, mock_client):
         """Test case for list_models
 
@@ -1156,8 +1157,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_client.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_models_client_error(self, mock_boto_client, mock_list_models):
         """Test case for list_models
 
@@ -1181,8 +1182,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
         mock_boto_client.assert_called_once_with('sagemaker')
         mock_list_models.assert_called_once()
 
-    @mock.patch("swagger_server.controllers.discover_controller.botocore.client.BaseClient")
-    @mock.patch("swagger_server.controllers.discover_controller.boto3.client")
+    @mock.patch("swagger_server.services.discovery.botocore.client.BaseClient")
+    @mock.patch("swagger_server.services.discovery.boto3.client")
     def test_list_models_unknown_error(self, mock_boto_client, mock_list_models):
         """Test case for list_models
 
