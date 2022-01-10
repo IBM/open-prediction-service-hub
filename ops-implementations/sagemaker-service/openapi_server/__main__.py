@@ -31,9 +31,9 @@ def main():
         metavar=8080
     )
     args = parser.parse_args()
-    app = connexion.App(__name__, specification_dir='./swagger/')
+    app = connexion.App(__name__, specification_dir='openapi/')
     app.app.json_encoder = encoder.JSONEncoder
-    app.add_api('swagger.yaml', arguments={'title': 'Open Prediction Service'}, pythonic_params=True)
+    app.add_api('openapi.yaml', arguments={'title': 'Open Prediction Service'}, pythonic_params=True)
     app.run(port=args.port)
 
 
