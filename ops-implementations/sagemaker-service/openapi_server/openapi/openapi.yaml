@@ -764,11 +764,6 @@ components:
           title: Name
           type: string
         value:
-          anyOf:
-          - type: integer
-          - type: number
-          - type: string
-          - type: boolean
           description: Value of the feature
           title: Value
       required:
