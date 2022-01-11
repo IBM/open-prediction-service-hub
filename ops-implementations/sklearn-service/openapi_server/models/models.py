@@ -17,21 +17,26 @@ class Models(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, models=None):  # noqa: E501
+    def __init__(self, models=None, total_count=None):  # noqa: E501
         """Models - a model defined in OpenAPI
 
         :param models: The models of this Models.  # noqa: E501
         :type models: List[Model]
+        :param total_count: The total_count of this Models.  # noqa: E501
+        :type total_count: int
         """
         self.openapi_types = {
-            'models': List[Model]
+            'models': List[Model],
+            'total_count': int
         }
 
         self.attribute_map = {
-            'models': 'models'
+            'models': 'models',
+            'total_count': 'total_count'
         }
 
         self._models = models
+        self._total_count = total_count
 
     @classmethod
     def from_dict(cls, dikt) -> 'Models':
@@ -66,3 +71,26 @@ class Models(Model):
         """
 
         self._models = models
+
+    @property
+    def total_count(self):
+        """Gets the total_count of this Models.
+
+        Total numer of items. Computed explicitly only when 'total_count=true' query parameter is present.  # noqa: E501
+
+        :return: The total_count of this Models.
+        :rtype: int
+        """
+        return self._total_count
+
+    @total_count.setter
+    def total_count(self, total_count):
+        """Sets the total_count of this Models.
+
+        Total numer of items. Computed explicitly only when 'total_count=true' query parameter is present.  # noqa: E501
+
+        :param total_count: The total_count of this Models.
+        :type total_count: int
+        """
+
+        self._total_count = total_count

@@ -47,6 +47,9 @@ paths:
         schema:
           type: string
         style: form
+      - $ref: '#/components/parameters/PaginationLimitParam'
+      - $ref: '#/components/parameters/PaginationOffsetParam'
+      - $ref: '#/components/parameters/PaginationTotalCountParam'
       responses:
         "200":
           content:
@@ -111,6 +114,10 @@ paths:
       x-openapi-router-controller: openapi_server.controllers.info_controller
   /models:
     get:
+      parameters:
+        - $ref: '#/components/parameters/PaginationLimitParam'
+        - $ref: '#/components/parameters/PaginationOffsetParam'
+        - $ref: '#/components/parameters/PaginationTotalCountParam'
       description: Returns the list of ML Models.
       operationId: list_models
       responses:
@@ -206,6 +213,30 @@ components:
       schema:
         type: string
       style: form
+    PaginationOffsetParam:
+      in: query
+      name: offset
+      schema:
+        type: integer
+        default: 0
+      description: The number of items to skip before starting to collect the result set
+      required: false
+    PaginationLimitParam:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        default: 100
+      description: The numbers of items to return
+      required: false
+    PaginationTotalCountParam:
+      in: query
+      name: total_count
+      schema:
+        type: boolean
+        default: false
+      description: Compute total number of item
+      required: false
     EndpointIDParam:
       description: ID of endpoint
       explode: false

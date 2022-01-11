@@ -57,19 +57,48 @@ def get_model_by_id(model_id):  # noqa: E501
     return model_id_to_model(model_id)
 
 
-def list_endpoints(model_id=None):  # noqa: E501
-    list_model_id = [
-        model_id] if model_id in supported_models else supported_models
+def list_endpoints(model_id=None, limit=None, offset=None, total_count=None):  # noqa: E501
+    """List Endpoints
 
-    return Endpoints(endpoints=[model_id_to_endpoint(model_id) for model_id in list_model_id])
+     # noqa: E501
+
+    :param model_id: ID of model
+    :type model_id: str
+    :param limit: The numbers of items to return
+    :type limit: int
+    :param offset: The number of items to skip before starting to collect the result set
+    :type offset: int
+    :param total_count: Compute total number of item
+    :type total_count: bool
+
+    :rtype: Endpoints
+    """
+    listed = supported_models if model_id is None or model_id not in supported_models else [model_id]
+    count = 0 if not total_count else len(listed)
+    start = offset if offset < len(listed) else len(listed)
+    end = offset + limit if offset + limit < len(listed) else len(listed)
+    filtered = listed[start:end]
+    endpoints = [model_id_to_endpoint(model_id) for model_id in filtered]
+    return Endpoints(endpoints=endpoints, total_count=count)
 
 
-def list_models():  # noqa: E501
+def list_models(limit=None, offset=None, total_count=None):  # noqa: E501
     """List Models
 
     Returns the list of ML Models. # noqa: E501
 
+    :param limit: The numbers of items to return
+    :type limit: int
+    :param offset: The number of items to skip before starting to collect the result set
+    :type offset: int
+    :param total_count: Compute total number of item
+    :type total_count: bool
 
     :rtype: Models
     """
-    return Models(models=[model_id_to_model(model_id) for model_id in supported_models])
+    count = 0 if not total_count else len(supported_models)
+    start = offset if offset < len(supported_models) else len(supported_models)
+    end = offset + limit if offset + limit < len(supported_models) else len(supported_models)
+    filtered = supported_models[start:end]
+    models = [model_id_to_model(model_id) for model_id in filtered]
+    return Models(models=models, total_count=count)
