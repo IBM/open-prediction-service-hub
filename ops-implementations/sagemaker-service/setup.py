@@ -1,9 +1,8 @@
 # coding: utf-8
 
-import sys
 from setuptools import setup, find_packages
 
-NAME = "swagger_server"
+NAME = "openapi_server"
 VERSION = "2.2.0"
 # To install the library, run the following
 #
@@ -12,7 +11,7 @@ VERSION = "2.2.0"
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-REQUIRES = ["connexion"]
+REQUIRES = ["connexion[swagger-ui]"]
 
 setup(
     name=NAME,
@@ -20,13 +19,13 @@ setup(
     description="Open Prediction Service",
     author_email="",
     url="",
-    keywords=["Swagger", "Open Prediction Service"],
+    keywords=["Openapi", "Open Prediction Service"],
     install_requires=REQUIRES,
     packages=find_packages(),
     package_data={'': ['openapi/openapi.yaml']},
     include_package_data=True,
     entry_points={
-        'console_scripts': ['swagger_server=openapi.__main__:main']},
+        'console_scripts': ['openapi_server=openapi.__main__:main']},
     long_description="""\
     The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
     """
