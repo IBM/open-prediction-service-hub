@@ -37,7 +37,7 @@ class TestStatusController(BaseTestCase):
 
         Get Server Capabilities
         """
-        expected = "{'capabilities': ['" + Capability.INFO + "', '" + Capability.DISCOVER + "', '" + Capability.RUN + "']}"
+        expected = "{'capabilities': ['" + Capability.INFO + "', '" + Capability.DISCOVER + "', '" + Capability.RUN + "'], 'managed_capabilities': None}"
         response = get_capabilities()
 
         assert isinstance(response, Capabilities)

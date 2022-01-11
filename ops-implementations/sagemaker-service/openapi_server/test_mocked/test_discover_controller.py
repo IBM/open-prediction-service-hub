@@ -119,6 +119,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     " 'id': 'FakeEndpointId',\n" +
                     " 'links': [{'href': 'http://localhost/endpoints/FakeEndpointId', 'rel': 'self'},\n" +
                     "           {'href': 'http://localhost/models/string', 'rel': 'model'}],\n" +
+                    " 'metadata': None,\n" +
                     " 'name': 'FakeEndpointId',\n" +
                     " 'status': 'in_service'}")
 
@@ -445,8 +446,10 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "                           'rel': 'self'},\n" +
                     "                          {'href': 'http://localhost/models/string',\n" +
                     "                           'rel': 'model'}],\n" +
+                    "                'metadata': None,\n"
                     "                'name': 'string',\n" +
-                    "                'status': 'in_service'}]}")
+                    "                'status': 'in_service'}],\n"
+                    " 'total_count': 0}")
 
         response = list_endpoints()
 
@@ -553,8 +556,10 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "                           'rel': 'self'},\n" +
                     "                          {'href': 'http://localhost/models/FakeModelId',\n" +
                     "                           'rel': 'model'}],\n" +
+                    "                'metadata': None,\n" +
                     "                'name': 'string',\n" +
-                    "                'status': 'in_service'}]}")
+                    "                'status': 'in_service'}],\n"
+                    " 'total_count': 0}")
 
         response = list_endpoints(modelId)
 
@@ -656,7 +661,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
             'CreationTime': datetime(2015, 1, 1)
         }
 
-        expected = "{'endpoints': []}"
+        expected = "{'endpoints': [], 'total_count': 0}"
 
         response = list_endpoints(modelId)
 
@@ -827,7 +832,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "             'modified_at': None,\n" +
                     "             'name': 'FakeModelId',\n" +
                     "             'output_schema': None,\n" +
-                    "             'version': None}]}")
+                    "             'version': None}],\n"
+                    " 'total_count': 0}")
 
         response = list_models()
 
@@ -947,10 +953,10 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "             'modified_at': None,\n" +
                     "             'name': 'FakeModelId',\n" +
                     "             'output_schema': None,\n" +
-                    "             'version': None}], total_count: 0}")
+                    "             'version': None}],\n" +
+                    " 'total_count': 0}")
 
         response = list_models()
-        response_str = str(response)
 
         assert isinstance(response, Models)
         assert str(response) == expected, 'response is not matching expected response'
@@ -1147,7 +1153,8 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "             'modified_at': None,\n" +
                     "             'name': 'FakeModelId',\n" +
                     "             'output_schema': None,\n" +
-                    "             'version': None}]}")
+                    "             'version': None}],\n"
+                    " 'total_count': 0}")
 
         response = list_models()
 
