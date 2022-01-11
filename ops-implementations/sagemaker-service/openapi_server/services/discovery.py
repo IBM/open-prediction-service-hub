@@ -275,6 +275,11 @@ def list_models(limit=50, offset=0, total_count=False):  # noqa: E501
 
 
 def paginated_resp(pre_pagination: typing.List, limit: int = 100, offset: int = 0, total_count: bool = False):
+    # Openapi default is not used during unit test
+    limit = limit or 100
+    offset = offset or 0
+    total_count = total_count or False
+
     count = 0 if not total_count else len(pre_pagination)
     start = offset if offset < len(pre_pagination) else len(pre_pagination)
     end = offset + limit if offset + limit < len(pre_pagination) else len(pre_pagination)
