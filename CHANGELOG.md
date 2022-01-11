@@ -4,6 +4,7 @@
 
 * [ADSML-282] Add clear error message when model is missing during prediction
 * [ADSML-283] Update pagination for ads-ml-service
+* [ADSML-286] Update pagination for sklearn service
 
 ## 2.5.0 _2021/11/09_
 

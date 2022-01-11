@@ -17,21 +17,26 @@ class Endpoints(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, endpoints=None):  # noqa: E501
+    def __init__(self, endpoints=None, total_count=None):  # noqa: E501
         """Endpoints - a model defined in OpenAPI
 
         :param endpoints: The endpoints of this Endpoints.  # noqa: E501
         :type endpoints: List[Endpoint]
+        :param total_count: The total_count of this Endpoints.  # noqa: E501
+        :type total_count: int
         """
         self.openapi_types = {
-            'endpoints': List[Endpoint]
+            'endpoints': List[Endpoint],
+            'total_count': int
         }
 
         self.attribute_map = {
-            'endpoints': 'endpoints'
+            'endpoints': 'endpoints',
+            'total_count': 'total_count'
         }
 
         self._endpoints = endpoints
+        self._total_count = total_count
 
     @classmethod
     def from_dict(cls, dikt) -> 'Endpoints':
@@ -66,3 +71,26 @@ class Endpoints(Model):
         """
 
         self._endpoints = endpoints
+
+    @property
+    def total_count(self):
+        """Gets the total_count of this Endpoints.
+
+        Total numer of items. Computed explicitly only when 'total_count=true' query parameter is present.  # noqa: E501
+
+        :return: The total_count of this Endpoints.
+        :rtype: int
+        """
+        return self._total_count
+
+    @total_count.setter
+    def total_count(self, total_count):
+        """Sets the total_count of this Endpoints.
+
+        Total numer of items. Computed explicitly only when 'total_count=true' query parameter is present.  # noqa: E501
+
+        :param total_count: The total_count of this Endpoints.
+        :type total_count: int
+        """
+
+        self._total_count = total_count
