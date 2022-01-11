@@ -1,23 +1,8 @@
-#!/usr/bin/env python3
-#
-# Copyright 2020 IBM
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.IBM Confidential
-#
-
 import datetime
 
 import six
 import typing
+from openapi_server import typing_utils
 
 
 def _deserialize(data, klass):
@@ -31,7 +16,7 @@ def _deserialize(data, klass):
     if data is None:
         return None
 
-    if klass in six.integer_types or klass in (float, str, bool):
+    if klass in six.integer_types or klass in (float, str, bool, bytearray):
         return _deserialize_primitive(data, klass)
     elif klass == object:
         return _deserialize_object(data)
@@ -39,10 +24,10 @@ def _deserialize(data, klass):
         return deserialize_date(data)
     elif klass == datetime.datetime:
         return deserialize_datetime(data)
-    elif hasattr(klass, '__origin__'):
-        if klass.__origin__ == list:
+    elif typing_utils.is_generic(klass):
+        if typing_utils.is_list(klass):
             return _deserialize_list(data, klass.__args__[0])
-        if klass.__origin__ == dict:
+        if typing_utils.is_dict(klass):
             return _deserialize_dict(data, klass.__args__[1])
     else:
         return deserialize_model(data, klass)
@@ -67,7 +52,7 @@ def _deserialize_primitive(data, klass):
 
 
 def _deserialize_object(value):
-    """Return a original value.
+    """Return an original value.
 
     :return: object.
     """
@@ -82,6 +67,9 @@ def deserialize_date(string):
     :return: date.
     :rtype: date
     """
+    if string is None:
+      return None
+    
     try:
         from dateutil.parser import parse
         return parse(string).date()
@@ -99,6 +87,9 @@ def deserialize_datetime(string):
     :return: datetime.
     :rtype: datetime
     """
+    if string is None:
+      return None
+    
     try:
         from dateutil.parser import parse
         return parse(string)
@@ -116,10 +107,10 @@ def deserialize_model(data, klass):
     """
     instance = klass()
 
-    if not instance.swagger_types:
+    if not instance.openapi_types:
         return data
 
-    for attr, attr_type in six.iteritems(instance.swagger_types):
+    for attr, attr_type in six.iteritems(instance.openapi_types):
         if data is not None \
                 and instance.attribute_map[attr] in data \
                 and isinstance(data, (list, dict)):
