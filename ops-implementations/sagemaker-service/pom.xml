@@ -38,7 +38,7 @@
                         <groupId>org.openapitools</groupId>
                         <artifactId>openapi-generator-maven-plugin</artifactId>
                         <!-- RELEASE_VERSION -->
-                        <version>5.3.1</version>
+                        <version>${openapi-generator-version}</version>
                         <!-- /RELEASE_VERSION -->
                         <executions>
                             <execution>
@@ -73,16 +73,4 @@
             </build>
         </profile>
     </profiles>
-    <dependencies>
-        <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>openapi-generator</artifactId>
-            <version>${openapi-generator-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>openapi-generator-maven-plugin</artifactId>
-            <version>${openapi-generator-version}</version>
-        </dependency>
-    </dependencies>
 </project>
