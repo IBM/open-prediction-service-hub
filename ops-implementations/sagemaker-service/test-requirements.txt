@@ -1,6 +1,2 @@
 flask_testing==0.8.1
-coverage==6.2
-nose==1.3.7
-pluggy==1.0.0
-py==1.11.0
-randomize==0.14
+pytest==6.2.5

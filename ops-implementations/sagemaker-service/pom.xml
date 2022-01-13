@@ -12,6 +12,9 @@
     <artifactId>sagemaker-service</artifactId>
     <packaging>docker-build</packaging>
 
+    <properties>
+        <openapi-generator-version>5.3.1</openapi-generator-version>
+    </properties>
 
     <build>
         <plugins>
@@ -28,84 +31,43 @@
     </build>
     <profiles>
         <profile>
-            <id>wicked</id>
+            <id>generate</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <name>%g/%a:%l</name>
-                                </image>
-                            </images>
-                        </configuration>
+                        <groupId>org.openapitools</groupId>
+                        <artifactId>openapi-generator-maven-plugin</artifactId>
+                        <!-- RELEASE_VERSION -->
+                        <version>${openapi-generator-version}</version>
+                        <!-- /RELEASE_VERSION -->
                         <executions>
                             <execution>
-                                <id>save</id>
-                                <phase>post-integration-test</phase>
                                 <goals>
-                                    <goal>save</goal>
+                                    <goal>generate</goal>
                                 </goals>
                                 <configuration>
-                                    <saveFile>${project.build.directory}/docker/image-to-scan.tar</saveFile>
+                                    <inputSpec>${project.basedir}/../../open-prediction-service.yaml
+                            </inputSpec>
+                                    <generatorName>python-flask</generatorName>
+                                    <output>${project.basedir}</output>
+                                    <!-- <configurationFile>${project.basedir}/src/main/resources/openapi/openapi-config.json
+                            </configurationFile> -->
+                                    <generateApiTests>false</generateApiTests>
+                                    <generateModelTests>false</generateModelTests>
+                                    <!-- <library>okhttp-gson</library> -->
+                                    <!-- <templateDirectory>src/main/resources/openapi/okhttp-gson-eml</templateDirectory> -->
+
+                                    <!--                            <library>jersey2</library>-->
+                                    <!--                            <library>rest-assured</library>-->
+                                    <!--                            <configOptions>-->
+                                    <!--                                <serializationLibrary>jackson</serializationLibrary>-->
+                                    <!--                            </configOptions>-->
+                                    <!--                            <templateDirectory>src/main/resources/openapi/okhttp-gson-eml</templateDirectory>-->
+                                    <artifactVersion>${project.version}</artifactVersion>
+                                    <!--                            <verbose>true</verbose>-->
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>1.12.1</version>
-                        <configuration>
-                            <nodeVersion>v12.8.0</nodeVersion>
-                            <npmVersion>6.10.2</npmVersion>
-                            <workingDirectory>${project.basedir}</workingDirectory>
-                            <installDirectory>${project.build.directory}/node-v12.8.0</installDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>install node and npm</id>
-                                <goals>
-                                    <goal>install-node-and-npm</goal>
-                                </goals>
-                                <phase>initialize</phase>
-                            </execution>
-                            <execution>
-                                <id>npm install</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <phase>compile</phase>
-                                <configuration>
-                                    <arguments>--userconfig ${user.home}/.npmrc install</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>generate 3rd parties report and diff with Wicked</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <phase>verify</phase>
-                                <configuration>
-                                    <arguments>run wicked-cli</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-clean-plugin</artifactId>
-                        <version>3.1.0</version>
-                        <configuration>
-                            <filesets>
-                                <fileset>
-                                    <directory>${wicked.scan.directory}</directory>
-                                    <directory>${wicked.ref.directory}</directory>
-                                    <directory>node_modules</directory>
-                                </fileset>
-                            </filesets>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

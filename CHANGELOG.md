@@ -2,6 +2,7 @@
 
 ## 2.5.1 _2021/12/17_
 
+* [ADSML-285] Update pagination for sagemaker-service
 * [ADSML-282] Add clear error message when model is missing during prediction
 * [ADSML-283] Update pagination for ads-ml-service
 * [ADSML-286] Update pagination for sklearn service
