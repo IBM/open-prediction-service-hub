@@ -19,6 +19,7 @@ import datetime as dt
 import time
 import typing as typ
 
+import pytest
 import fastapi.testclient as tstc
 import sqlalchemy.orm as saorm
 
@@ -28,7 +29,6 @@ import app.models as models
 
 
 def test_get_endpoint(
-        db: saorm.Session,
         client: tstc.TestClient,
         endpoint_with_model: models.Endpoint
 ) -> typ.NoReturn:
@@ -47,7 +47,6 @@ def test_get_endpoint(
 
 
 def test_get_endpoint_with_binary(
-        db: saorm.Session,
         client: tstc.TestClient,
         skl_endpoint: models.Endpoint
 ) -> typ.NoReturn:
@@ -58,7 +57,6 @@ def test_get_endpoint_with_binary(
 
 
 def test_get_endpoints(
-        db: saorm.Session,
         client: tstc.TestClient,
         skl_endpoint: models.Endpoint
 ) -> typ.NoReturn:
@@ -67,6 +65,24 @@ def test_get_endpoints(
 
     assert response.status_code == 200
     assert endpoints['endpoints'][0]['id'] == str(skl_endpoint.id)
+
+
+@pytest.mark.parametrize(
+    'http_params',
+    [
+         ({'offset': -1}),
+         ({'limit': 0}),
+         ({'limit': 201})
+    ]
+)
+def test_get_endpoints_with_invalid_params(
+        client: tstc.TestClient,
+        http_params
+):
+    response = client.get(url=conf.get_config().API_V2_STR + '/endpoints', params=http_params)
+
+    assert response.status_code == 422
+    assert response.json()['detail'] == 'Requested offset/limit is not valid'
 
 
 def test_patch_endpoint(

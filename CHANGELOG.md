@@ -1,5 +1,16 @@
 # Open Prediction Service HUB
 
+## 2.5.1 _2021/12/17_
+
+* [ADSML-285] Update pagination for sagemaker-service
+* [ADSML-282] Add clear error message when model is missing during prediction
+* [ADSML-283] Update pagination for ads-ml-service
+* [ADSML-286] Update pagination for sklearn service
+
+## 2.5.0 _2021/11/09_
+
+* [ADSML-137] Add max supported file size for upload ML model
+
 ## 2.4.3 _2021/10/19_
 
 * [ADSML-245] WhiteSource scan finds multiple CVE in ads-ml-service repo

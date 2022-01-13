@@ -1,7 +1,7 @@
 dist: bionic
 language: python
 python:
-  - "3.7"
+  - "3.8"
 
 # Additional services for testing and deployment
 services:
@@ -39,7 +39,7 @@ jobs:
       script:
         - ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)"
       env: TARGET=ads-ml-service
-    - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/sagemaker-service/swagger_server/version.py)"
-      env: TARGET=wml-service
-    - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/wml-service/swagger_server/version.py)"
+    - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/sagemaker-service/openapi_server/version.py)"
       env: TARGET=sagemaker-service
+    - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/wml-service/swagger_server/version.py)"
+      env: TARGET=wml-service

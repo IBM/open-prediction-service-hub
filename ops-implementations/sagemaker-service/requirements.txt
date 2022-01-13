@@ -1,7 +1,30 @@
-connexion[swagger-ui] ==2.7.0
-python_dateutil ==2.8.2
-setuptools ==56.0.0
-jsonschema ==3.2.0
+connexion[swagger-ui]==2.9.0
 
-boto3 ==1.19.11
-sagemaker ==1.67.1.post0
+# --- Dependences of connexion[swagger-ui] --- start
+attrs==21.4.0
+certifi==2021.10.8
+charset-normalizer==2.0.10
+click==7.1.2
+clickclick==20.10.2
+connexion==2.9.0
+Flask==1.1.4
+idna==3.3
+inflection==0.5.1
+isodate==0.6.1
+itsdangerous==1.1.0
+Jinja2==2.11.3
+jsonschema==3.2.0
+MarkupSafe==2.0.1
+openapi-schema-validator==0.1.6
+openapi-spec-validator==0.3.1
+pyrsistent==0.18.0
+PyYAML==5.4.1
+requests==2.27.1
+six==1.16.0
+swagger-ui-bundle==0.0.9
+urllib3==1.26.8
+Werkzeug==1.0.1
+# --- Dependences of connexion --- end
+
+boto3==1.20.32
+sagemaker==2.72.3

@@ -20,6 +20,7 @@ import typing
 import fastapi
 
 import app.gen.schemas.ops_schemas as ops_model
+import app.core.configuration as app_conf
 
 router = fastapi.APIRouter()
 
@@ -40,6 +41,7 @@ async def server_capabilities() -> typing.Dict[typing.Text, typing.Any]:
             'supported_input_data_structure': ['auto', 'DataFrame', 'ndarray', 'DMatrix', 'list'],
             'supported_output_data_structure': ['auto', 'DataFrame', 'ndarray', 'list'],
             'supported_binary_format': ['pickle', 'joblib', 'pmml', 'bst'],
-            'supported_upload_format': ['pmml']
+            'supported_upload_format': ['pmml'],
+            'file_size_limit': app_conf.get_config().UPLOAD_SIZE_LIMIT
         }
     }

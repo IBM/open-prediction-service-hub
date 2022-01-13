@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Open Prediction Service
-  version: 2.3.0-SNAPSHOT
+  version: 2.5.1-SNAPSHOT
   description: The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 tags:
   - name: info
@@ -49,6 +49,10 @@ paths:
                 $ref: '#/components/schemas/ServerInfo'
   /models:
     get:
+      parameters:
+        - $ref: '#/components/parameters/PaginationLimitParamQuery'
+        - $ref: '#/components/parameters/PaginationOffsetParamQuery'
+        - $ref: '#/components/parameters/PaginationTotalCountParamQuery'
       tags:
         - discover
       summary: List Models
@@ -217,6 +221,9 @@ paths:
       operationId: list_endpoints
       parameters:
         - $ref: '#/components/parameters/ModelIDParamQuery'
+        - $ref: '#/components/parameters/PaginationLimitParamQuery'
+        - $ref: '#/components/parameters/PaginationOffsetParamQuery'
+        - $ref: '#/components/parameters/PaginationTotalCountParamQuery'
       responses:
         '200':
           description: Successful Response
@@ -410,6 +417,9 @@ components:
           description: List of Endpoints
           items:
             $ref: '#/components/schemas/Endpoint'
+        total_count:
+          type: integer
+          description: Total numer of items. Computed explicitly only when 'total_count=true' query parameter is present.
     EndpointUpdate:
       title: Machine Learning Model Endpoint Update
       description: Represents a way to access to the runnable Prediction
@@ -507,7 +517,7 @@ components:
             href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
         metadata:
           tags: [ 'endpoint' ]
-          
+
     Models:
       title: List of Machine Learning Models
       description: List of Machine Learning Models
@@ -518,6 +528,9 @@ components:
           description: List of models
           items:
             $ref: '#/components/schemas/Model'
+        total_count:
+          type: integer
+          description: Total numer of items. Computed explicitly only when 'total_count=true' query parameter is present.
     ModelUpdate:
       title: Machine Learning Model Update
       description: Machine learning model data
@@ -801,6 +814,12 @@ components:
               type: array
               items:
                 type: string
+            file_size_limit:
+              type: integer
+              format: int64
+              minimum: 0
+              default: 0
+              description: Maximum length of model file in bytes. 0 means no limit.
       example:
         capabilities:
           - info
@@ -819,6 +838,7 @@ components:
             - bst
           supported_upload_format:
             - PMML
+          file_size_limit: 134217728
 
     Capability:
       title: Capability
@@ -896,6 +916,30 @@ components:
       description: ID of model
       schema:
         type: string
+    PaginationOffsetParamQuery:
+      in: query
+      name: offset
+      schema:
+        type: integer
+        default: 0
+      description: The number of items to skip before starting to collect the result set
+      required: false
+    PaginationLimitParamQuery:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        default: 100
+      description: The numbers of items to return
+      required: false
+    PaginationTotalCountParamQuery:
+      in: query
+      name: total_count
+      schema:
+        type: boolean
+        default: false
+      description: Compute total number of item
+      required: false
     EndpointIDParam:
       in: path
       required: true

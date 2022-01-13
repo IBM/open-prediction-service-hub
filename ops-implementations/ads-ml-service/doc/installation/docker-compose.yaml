@@ -2,7 +2,7 @@ version: '3'
 
 services:
   db:
-    image: postgres:13.1
+    image: postgres:14.1
     restart: always
     environment:
       POSTGRES_DB: 'serving'
