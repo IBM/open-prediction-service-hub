@@ -47,8 +47,10 @@ async def upload(
     LOGGER.info('Receiving file %s', file.filename)
     file_name, file_extension = os.path.splitext(file.filename)
     model_binary = await file.read()
+    LOGGER.debug('Received model length: %s', len(model_binary))
 
     file_format = app_model_upload.infer_file_format(model_binary, file_extension)
+    LOGGER.debug('Inferred Model format: %s', file_format)
 
     if file_format is None:
         LOGGER.error(

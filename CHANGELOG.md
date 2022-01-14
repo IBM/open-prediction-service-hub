@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.5.2 _2022/01/14_
+
+* [ADSML-290] Fix upload problem found in ads-ml-integration test
+
 ## 2.5.1 _2021/12/17_
 
 * [ADSML-285] Update pagination for sagemaker-service
