@@ -68,6 +68,7 @@ def is_compatible(
             binary_format=format_
         )
     except Exception:
+        LOGGER.error('Model can not be parsed as %s', format_)
         return False
     return True
 
