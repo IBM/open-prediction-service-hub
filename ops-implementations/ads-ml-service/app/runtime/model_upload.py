@@ -112,10 +112,10 @@ def store_model(
                                 for k, v in output_schema_pmml.items()
                             }
 
-        model = crud.model.create(db, obj_in=schemas.ModelCreate())
-        crud.model_config.create_with_model(
+        model = crud.model.create_with_config(
             db,
-            obj_in=schemas.ModelConfigCreate(
+            obj_in=schemas.ModelCreate(),
+            config_in=schemas.ModelConfigCreate(
                 configuration=encoders.jsonable_encoder(
                     obj=impl.ModelCreateImpl(
                         name=name,
@@ -123,9 +123,7 @@ def store_model(
                         output_schema=output_schema_ops
                     )
                 )
-            ),
-            model_id=model.id
-        )
+            ))
     else:
         LOGGER.info('Adding binary for model %s', model_id)
         model = crud.model.get(db, id=model_id)

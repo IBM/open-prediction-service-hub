@@ -26,5 +26,5 @@ class Model(app_db_base.Base):
     created_at = sql.Column('deployed_at', sql.DateTime(timezone=True), nullable=False)
     modified_at = sql.Column('modified_at', sql.DateTime(timezone=True), nullable=False)
 
-    config = sql_orm.relationship('ModelConfig', back_populates='model', cascade='all, delete', uselist=False)
-    endpoint = sql_orm.relationship('Endpoint', back_populates='model', cascade='all, delete', uselist=False)
+    config = sql_orm.relationship('ModelConfig', back_populates='model', cascade='all, delete', uselist=False, lazy='joined')
+    endpoint = sql_orm.relationship('Endpoint', back_populates='model', cascade='all, delete', uselist=False, lazy='joined')

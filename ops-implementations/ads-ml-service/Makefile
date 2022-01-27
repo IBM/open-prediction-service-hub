@@ -17,11 +17,7 @@ test: build
 	docker run --rm -it --entrypoint="python3" -e RETRAIN_MODELS=1 ads-ml-service -m pytest -v app/tests
 
 debug: build
-	docker run --rm --read-only -it --entrypoint="bash" --user 0 ads-ml-service
-
-# Launch stress test server
-locust:
-	python3 -m locust -f scripts/locustfile.py
+	docker run --rm -it --entrypoint="bash" --user root ads-ml-service
 
 test_upload:
 	curl localhost:8080/upload \
