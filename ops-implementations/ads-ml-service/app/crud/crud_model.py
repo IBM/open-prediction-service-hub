@@ -40,6 +40,24 @@ class CRUDModel(app_crud_base.CRUDBase[models.Model, schemas.ModelCreate, schema
         db.refresh(db_obj)
         return db_obj
 
+    def create_with_config(self, db: orm.Session, *, obj_in: schemas.ModelCreate, config_in: schemas.ModelConfigCreate) -> models.Model:
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        # noinspection PyArgumentList
+        config_obj = models.model_config.ModelConfig(
+            **encoders.jsonable_encoder(config_in),
+        )
+        db_obj = self.model(
+            **encoders.jsonable_encoder(obj_in),
+            created_at=now,
+            modified_at=now,
+            config=config_obj
+        )
+
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
     def update(
             self,
             db: orm.Session,
