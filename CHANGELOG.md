@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.5.3 _2022/01/27_
+
+* [ADSML-293] Fix concurrency problem for model discovery
+
 ## 2.5.2 _2022/01/14_
 
 * [ADSML-290] Fix upload problem found in ads-ml-integration test
