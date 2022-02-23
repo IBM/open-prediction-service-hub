@@ -39,6 +39,7 @@ router = fastapi.APIRouter()
 )
 def get_endpoints(
         db: saorm.Session = fastapi.Depends(deps.get_db),
+        model_id: typing.Optional[int] = -1,
         total_count: typing.Optional[bool] = False,
         offset: typing.Optional[int] = 0,
         limit: typing.Optional[int] = 100
@@ -46,6 +47,15 @@ def get_endpoints(
     if not (0 < limit <= app_conf.get_config().MAX_PAGE_SIZE and offset >= 0):
         raise fastapi.HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail='Requested offset/limit is not valid')
+    if model_id != -1:
+        model = crud.model.get(db, id=model_id)
+        if model is None:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
+        return {
+            'endpoints': [impl.EndpointImpl.from_database(model.endpoint)],
+            'total_count': 0 if not total_count else 1
+        }
     return {
         'endpoints': [
             impl.EndpointImpl.from_database(endpoint)
