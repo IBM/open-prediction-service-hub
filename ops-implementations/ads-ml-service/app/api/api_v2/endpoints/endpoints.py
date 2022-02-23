@@ -64,7 +64,11 @@ def get_endpoint(
         endpoint_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
-    return impl.EndpointImpl.from_database(crud.endpoint.get(db, id=endpoint_id))
+    endpoint = crud.endpoint.get(db, id=endpoint_id)
+    if endpoint is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Endpoint with id {endpoint_id} is not found')
+    return impl.EndpointImpl.from_database(endpoint)
 
 
 @router.patch(
@@ -78,6 +82,9 @@ def patch_endpoint(
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
     endpoint = crud.endpoint.get(db, id=endpoint_id)
+    if endpoint is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Endpoint with id {endpoint_id} is not found')
     endpoint_in = e_in.dict(exclude_unset=True)
     if endpoint_in.get('metadata'):
         endpoint_in['metadata_'] = endpoint_in.pop('metadata')
@@ -95,7 +102,8 @@ def delete_endpoint(
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> responses.Response:
     endpoint = crud.endpoint.get(db, id=endpoint_id)
-    if not endpoint:
-        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+    if endpoint is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Endpoint with id {endpoint_id} is not found')
     crud.endpoint.delete(db, id=endpoint_id)
     return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
