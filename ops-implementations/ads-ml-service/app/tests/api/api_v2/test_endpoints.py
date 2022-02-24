@@ -85,6 +85,19 @@ def test_get_endpoints_with_invalid_params(
     assert response.json()['detail'] == 'Requested offset/limit is not valid'
 
 
+def test_get_endpoints_with_model_id(
+        client: tstc.TestClient,
+        skl_endpoint: models.Endpoint
+):
+    response = client.get(url=conf.get_config().API_V2_STR + f'/endpoints', params={'model_id': skl_endpoint.id})
+    response2 = client.get(url=conf.get_config().API_V2_STR + f'/endpoints', params={'model_id': skl_endpoint.id + 1})
+    endpoints = response.json()
+
+    assert response.status_code == 200
+    assert endpoints['endpoints'][0]['id'] == str(skl_endpoint.id)
+    assert response2.status_code == 404
+
+
 def test_patch_endpoint(
         client: tstc.TestClient,
         skl_endpoint: models.Endpoint

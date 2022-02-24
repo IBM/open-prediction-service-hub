@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.5.4 _2022/02/23_
+
+* [ADSML-299] Add error messages for all OPS HTTP GET queries
+
 ## 2.5.3 _2022/01/27_
 
 * [ADSML-293] Fix concurrency problem for model discovery

@@ -171,7 +171,7 @@ def test_delete_model(
     model = crud.model.get(db, id=model_with_config.id)
 
     assert response.status_code == 204
-    assert response_1.status_code == 204
+    assert response_1.status_code == 404
     assert model is None
 
 

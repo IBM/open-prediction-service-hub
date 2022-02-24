@@ -69,8 +69,12 @@ def get_model(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
+    model = crud.model.get(db, id=model_id)
+    if model is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
     return impl.ModelImpl.from_database(
-        db_obj=crud.model.get(db, id=model_id)
+        db_obj=model
     )
 
 
@@ -108,8 +112,11 @@ def patch_model(
         m_in: impl.ModelUpdateImpl,
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[typing.Text, typing.Any]:
-    update_data = m_in.dict(exclude_unset=True)
     model = crud.model.get(db, id=model_id)
+    if model is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
+    update_data = m_in.dict(exclude_unset=True)
     new_config = {
         field: update_data[field] if field in update_data else model.config.configuration[field]
         for field in model.config.configuration
@@ -135,9 +142,9 @@ def delete_model(
 ) -> responses.Response:
     LOGGER.info('Deleting model %s', model_id)
     model = crud.model.get(db, id=model_id)
-    if not model:
-        LOGGER.info('Model %s not found', model_id)
-        return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
+    if model is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
     crud.model.delete(db, id=model_id)
     return responses.Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -156,6 +163,11 @@ async def add_binary(
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> ops_schemas.Endpoint:
+    model = crud.model.get(db, id=model_id)
+    if model is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
+
     model_binary = await file.read()
 
     if not app_model_upload.is_compatible(model_binary, format_):
