@@ -1,8 +1,8 @@
-connexion[swagger-ui]==2.9.0
+connexion[swagger-ui]==2.12.0
 
 # --- Dependences of connexion[swagger-ui] that need to be freezed --- start
-openapi-schema-validator==0.1.6
+openapi-schema-validator==0.2.3
 # --- Dependences of connexion[swagger-ui] --- end
 
-boto3==1.20.37
+boto3==1.20.47
 sagemaker==2.72.3

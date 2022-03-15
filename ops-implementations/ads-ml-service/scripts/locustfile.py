@@ -26,8 +26,11 @@ import locust
 API_VER = 'v1'
 
 TEST_MODEL_PATH = pathlib.Path(__file__).parent.joinpath('model.pmml')
+TEST_MODEL_PATH_2 = pathlib.Path(__file__).parent.joinpath('MachineLearningModel.pmml')
 TEST_MODEL_NAME = TEST_MODEL_PATH.name
+TEST_MODEL_NAME_2 = TEST_MODEL_PATH_2.name
 TEST_MODEL_CONTENT = TEST_MODEL_PATH.read_bytes()
+TEST_MODEL_CONTENT_2 = TEST_MODEL_PATH_2.read_bytes()
 
 
 def get_prediction_payload(model_id):
@@ -65,6 +68,19 @@ class ApiUser(locust.HttpUser):
     @locust.task(10)
     def read_models(self):
         self.client.get('/models')
+
+    @locust.task(30)
+    def upload_then_get_endpoint_then_delete(self):
+        model_creation_resp2 = self.client.post(
+            url='/upload',
+            files={'file': (TEST_MODEL_NAME_2, TEST_MODEL_CONTENT_2)}
+        )
+
+        model_json2 = model_creation_resp2.json()
+        model_id2 = model_json2['id']
+
+        self.client.get(url=f'/endpoints/{model_id2}', name="/endpoints/[id]")
+        self.client.delete(url=f'/models/{model_id2}', name="/models/[id]")
 
     @locust.task(30)
     def upload_then_predict_then_delete(self):

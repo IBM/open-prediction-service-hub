@@ -16,7 +16,7 @@ FROM python-base AS codegen-image
 COPY app/gen/. app/gen/
 RUN \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
-    python3 -m pip install -q datamodel-code-generator~=0.5.30 && \
+    python3 -m pip install -q datamodel-code-generator~=0.11.19 && \
     datamodel-codegen \
 		--input app/gen/tmp.schemas.ops.yaml \
 		--input-file-type openapi \
