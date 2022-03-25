@@ -1295,7 +1295,17 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                                     ]
                                 }
                             ],
-                            "output": []
+                            "output": [
+                                {
+                                    "id": "auto_ai_kb_input_schema",
+                                    "fields": [
+                                        {
+                                            "name": "age",
+                                            "type": "int64"
+                                        }
+                                    ]
+                                }
+                            ]
                         }
                     }
                 }
@@ -1397,7 +1407,7 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
                     "             'modified_at': '2020-06-05T07:20:15.802Z',\n" +
                     "             'name': 'Bank marketing (sample) test - P8 '\n" +
                     "                     'LGBMClassifierEstimator',\n" +
-                    "             'output_schema': {},\n" +
+                    "             'output_schema': {'age': {'type': 'int64'}},\n" +
                     "             'version': None}]}")
 
         response = list_models()
