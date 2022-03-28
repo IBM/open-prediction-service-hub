@@ -73,11 +73,11 @@ class TestInfoController(BaseTestCase):
             ]
         }
 
-        expected = "{'error': None, 'info': None, 'status': 'ok'}"
         response = get_info()
 
-        assert isinstance(response, ServerInfo)
-        assert str(response) == expected, 'response is not matching expected response'
+        assert response is not None
+        assert response.status == 'ok'
+        assert response.info.get('server-version') is not None
         assert mock_cred.called
 
         mock_request.assert_called_once_with("GET", MOCKED_CREDENTIALS["url"] + '/v4/deployments?version=2020-10-20&space_id=space_id', data={}, headers=mock.ANY)

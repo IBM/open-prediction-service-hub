@@ -22,6 +22,8 @@ from swagger_server.models.capabilities import Capabilities  # noqa: E501
 from swagger_server.models.capability import Capability  # noqa: E501
 from swagger_server.models.server_info import ServerInfo  # noqa: E501
 
+import swagger_server.version as version
+
 
 def get_capabilities():  # noqa: E501
     """Get Server Capabilities
@@ -56,7 +58,9 @@ def get_info():  # noqa: E501
 
         response = requests.request("GET", url, headers=headers, data=payload)
         response.raise_for_status()
-        return ServerInfo(status='ok')
+        return ServerInfo(status='ok', info={
+            'server-version': version.__version__
+        })
     except:
         print("Unexpected error:", sys.exc_info()[0])
         return ServerInfo(status='error', error=str(sys.exc_info()[0]))
