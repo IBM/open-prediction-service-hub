@@ -289,18 +289,22 @@ def list_models():  # noqa: E501
                 link_by_model[model_id] = [link]
 
             output_schema = {}
-            if (len(model['entity']['schemas']['output']) > 0 and 'fields' in model['entity']['schemas']['output'][0]):
+            if len(model['entity']['schemas']['output']) > 0 and 'fields' in model['entity']['schemas']['output'][0]:
                 output_schema = {field['name']: {'type': field['type']} for field in (model['entity']['schemas']['output'][0]['fields'])}
+
+            input_schema = []
+            if len(model['entity']['schemas']['input']) > 0 and 'fields' in model['entity']['schemas']['input'][0]:
+                input_schema = [
+                    {'name': field['name'], 'order': i, 'type': field['type']}
+                    for i, field in enumerate(model['entity']['schemas']['input'][0]['fields'])
+                ]
+
 
             model_list.append(
                 Model(
                     id=model_id,
                     name=model['metadata']['name'],
-                    input_schema= (
-                        model['entity']['schemas']['input'][0]['fields']
-                        if len(model['entity']['schemas']['input']) > 0 and 'fields' in model['entity']['schemas']['input'][0]
-                        else []
-                    ),
+                    input_schema=input_schema,
                     output_schema=output_schema,
                     created_at=model['metadata']['created_at'],
                     modified_at=model['metadata']['modified_at'],
