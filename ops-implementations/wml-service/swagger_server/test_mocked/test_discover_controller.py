@@ -1381,22 +1381,22 @@ class TestDiscoverController(BaseTestCase, unittest.TestCase):
 
         expected = ("{'models': [{'created_at': '2020-06-05T07:20:15.760Z',\n" +
                     "             'id': 'FakeModelId',\n" +
-                    "             'input_schema': [{'name': 'age', 'type': 'int64'},\n" +
-                    "                              {'name': 'job', 'type': 'object'},\n" +
-                    "                              {'name': 'marital', 'type': 'object'},\n" +
-                    "                              {'name': 'education', 'type': 'object'},\n" +
-                    "                              {'name': 'default', 'type': 'object'},\n" +
-                    "                              {'name': 'balance', 'type': 'int64'},\n" +
-                    "                              {'name': 'housing', 'type': 'object'},\n" +
-                    "                              {'name': 'loan', 'type': 'object'},\n" +
-                    "                              {'name': 'contact', 'type': 'object'},\n" +
-                    "                              {'name': 'day', 'type': 'int64'},\n" +
-                    "                              {'name': 'month', 'type': 'object'},\n" +
-                    "                              {'name': 'duration', 'type': 'int64'},\n" +
-                    "                              {'name': 'campaign', 'type': 'int64'},\n" +
-                    "                              {'name': 'pdays', 'type': 'int64'},\n" +
-                    "                              {'name': 'previous', 'type': 'int64'},\n" +
-                    "                              {'name': 'poutcome', 'type': 'object'}],\n" +
+                    "             'input_schema': [{'name': 'age', 'order': 0, 'type': 'int64'},\n" +
+                    "                              {'name': 'job', 'order': 1, 'type': 'object'},\n" +
+                    "                              {'name': 'marital', 'order': 2, 'type': 'object'},\n" +
+                    "                              {'name': 'education', 'order': 3, 'type': 'object'},\n" +
+                    "                              {'name': 'default', 'order': 4, 'type': 'object'},\n" +
+                    "                              {'name': 'balance', 'order': 5, 'type': 'int64'},\n" +
+                    "                              {'name': 'housing', 'order': 6, 'type': 'object'},\n" +
+                    "                              {'name': 'loan', 'order': 7, 'type': 'object'},\n" +
+                    "                              {'name': 'contact', 'order': 8, 'type': 'object'},\n" +
+                    "                              {'name': 'day', 'order': 9, 'type': 'int64'},\n" +
+                    "                              {'name': 'month', 'order': 10, 'type': 'object'},\n" +
+                    "                              {'name': 'duration', 'order': 11, 'type': 'int64'},\n" +
+                    "                              {'name': 'campaign', 'order': 12, 'type': 'int64'},\n" +
+                    "                              {'name': 'pdays', 'order': 13, 'type': 'int64'},\n" +
+                    "                              {'name': 'previous', 'order': 14, 'type': 'int64'},\n" +
+                    "                              {'name': 'poutcome', 'order': 15, 'type': 'object'}],\n" +
                     "             'links': [{'href': 'http://localhost/models/FakeModelId',\n" +
                     "                        'rel': 'self'},\n" +
                     "                       {'href': 'http://localhost/endpoints/FakeEndpointId',\n" +
