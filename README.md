@@ -1,3 +1,5 @@
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/5779/badge)](https://bestpractices.coreinfrastructure.org/projects/5779)
+
 # Open Prediction Service HUB
 
 This repository contains material and guidelines related to implementing [Open Prediction Service API](https://github.com/icp4a/automation-decision-services-extensions/tree/master/open-prediction-service) services.
