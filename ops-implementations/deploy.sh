@@ -64,6 +64,26 @@ function deploy() {
   fi
 }
 
+if [[ -z "${DOCKER_REGISTRY_URL+x}" ]]; then
+  echo "DOCKER_REGISTRY_URL not set can't deploy"
+  exit 0
+fi
+
+if [[ -z "${DOCKER_NAMESPACE+x}" ]]; then
+  echo "DOCKER_NAMESPACE not set can't deploy"
+  exit 0
+fi
+
+if [[ -z "${DOCKER_USERNAME+x}" ]]; then
+  echo "DOCKER_USERNAME not set can't deploy"
+  exit 0
+fi
+
+if [[ -z "${DOCKER_PASSWORD+x}" ]]; then
+  echo "DOCKER_PASSWORD not set can't deploy"
+  exit 0
+fi
+
 trace_deploy
 deploy \
   "${DEPLOY_SERVICE}" \
