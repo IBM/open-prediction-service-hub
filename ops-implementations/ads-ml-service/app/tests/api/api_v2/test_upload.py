@@ -101,6 +101,7 @@ def test_add_pickle(
     predictor_b = pickle.dumps(predictor)
     model_creation_resp = client.post(
         url=conf.get_config().API_V2_STR + '/upload',
+        data={'format': 'pickle'},
         files={'file': ('model.pkl', predictor_b)}
     )
 
