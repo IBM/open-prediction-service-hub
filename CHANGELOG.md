@@ -1,5 +1,11 @@
 # Open Prediction Service HUB
 
+## 2.6.0 _2022/04/06_
+
+* [ADSML-320] Churn PMML returns 0 in ADS
+* Fix wml-proxy input schema
+* Fix wml-proxy output schema
+
 ## 2.5.4 _2022/02/23_
 
 * [ADSML-299] Add error messages for all OPS HTTP GET queries
