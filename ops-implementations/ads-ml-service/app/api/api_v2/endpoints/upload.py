@@ -41,6 +41,9 @@ LOGGER = logging.getLogger(__name__)
     tags=['manage']
 )
 async def upload(
+        input_data_structure: app_binary_config.ModelInput = fastapi.Form(app_binary_config.ModelInput.AUTO),
+        output_data_structure: app_binary_config.ModelOutput = fastapi.Form(app_binary_config.ModelOutput.AUTO),
+        format_: app_binary_config.ModelWrapper = fastapi.Form(app_binary_config.ModelWrapper.PMML, alias='format'),
         file: fastapi.UploadFile = fastapi.File(...),
         db: saorm.Session = fastapi.Depends(deps.get_db)
 ) -> typing.Dict[str, typing.Any]:
@@ -72,9 +75,9 @@ async def upload(
     m = app_model_upload.store_model(
         db,
         model_binary,
-        input_data_structure=app_binary_config.ModelInput.AUTO,
-        output_data_structure=app_binary_config.ModelOutput.AUTO,
-        format_=file_format,
+        input_data_structure,
+        output_data_structure,
+        format_,
         name=model_name
     )
 

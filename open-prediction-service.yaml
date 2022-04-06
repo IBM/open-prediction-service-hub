@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Open Prediction Service
-  version: 2.5.7-SNAPSHOT
+  version: 2.6.0-SNAPSHOT
   description: The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 tags:
   - name: info
@@ -145,7 +145,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      tags: 
+      tags:
         - manage
       summary: Upload a new serialized model to create an endpoint
       operationId: upload_model_with_id
@@ -155,8 +155,8 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ModelBinary'
-      responses: 
+              $ref: '#/components/schemas/SerializedModel'
+      responses:
         '201':
           description: Successful Response
           content:
@@ -331,17 +331,7 @@ components:
     SerializedModel:
       title: SerializedModel
       required:
-      - file
-      type: object
-      properties:
-        file:
-          title: File
-          type: string
-          format: binary
-    ModelBinary:
-      title: ModelBinary
-      required:
-      - file
+        - file
       type: object
       properties:
         input_data_structure:
@@ -350,36 +340,46 @@ components:
           $ref: "#/components/schemas/ModelOutput"
         format:
           $ref: "#/components/schemas/ModelWrapper"
+        fileContentType:
+          title: file content type
+          type: string
+        fileName:
+          title: file name
+          type: string
+        fileContentLength:
+          title: file content length
+          type: integer
+          format: int64
         file:
           title: File
           type: string
-          format: binary
+          format: object
     ModelInput:
       title: ModelInput
       enum:
-      - auto
-      - DataFrame
-      - ndarray
-      - DMatrix
-      - list
+        - auto
+        - DataFrame
+        - ndarray
+        - DMatrix
+        - list
       type: string
       description: Supported model input formats.
     ModelOutput:
       title: ModelOutput
       enum:
-      - auto
-      - ndarray
-      - DataFrame
-      - list
+        - auto
+        - ndarray
+        - DataFrame
+        - list
       type: string
       description: Supported model output formats.
     ModelWrapper:
       title: ModelWrapper
       enum:
-      - pickle
-      - joblib
-      - pmml
-      - bst
+        - pickle
+        - joblib
+        - pmml
+        - bst
       type: string
       description: An enumeration.
     Link:
@@ -517,7 +517,7 @@ components:
             href: 'http://open-prediction-service.org/models/78bcb500-cdce-11ea-87d0-0242ac130003'
         metadata:
           tags: [ 'endpoint' ]
-          
+
     Models:
       title: List of Machine Learning Models
       description: List of Machine Learning Models
@@ -835,7 +835,7 @@ components:
             - "Array"
           supported_binary_format:
             - pickle
-            - bst            
+            - bst
           supported_upload_format:
             - PMML
           file_size_limit: 134217728
