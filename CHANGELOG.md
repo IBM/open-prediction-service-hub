@@ -1,6 +1,6 @@
 # Open Prediction Service HUB
 
-## 2.6.1 _2022/04/06_
+## 2.6.0 _2022/04/06_
 
 * [ADSML-320] Churn PMML returns 0 in ADS
 * Fix wml-proxy input schema
