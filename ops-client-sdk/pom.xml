@@ -211,7 +211,7 @@ limitations under the License.IBM Confidential]]>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <gson-fire-version>1.8.5</gson-fire-version>
-        <swagger-core-version>1.6.5</swagger-core-version>
+        <swagger-core-version>1.6.6</swagger-core-version>
         <okhttp-version>4.9.3</okhttp-version>
         <gson-version>2.9.0</gson-version>
         <commons-lang3-version>3.12.0</commons-lang3-version>
