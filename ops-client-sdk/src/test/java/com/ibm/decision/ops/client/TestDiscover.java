@@ -35,7 +35,7 @@ public class TestDiscover {
     @Test
     public void getModelsTest() throws ApiException {
 
-        Models response = client.getDiscoverApi().listModels();
+        Models response = client.getDiscoverApi().listModels(100, 0, false);
 
         Model loan_approval_rfr = response.getModels().stream().filter(m -> m.getName().equals("[RandomForestRegressor] loan approval example")).findFirst().get();
 
@@ -62,13 +62,13 @@ public class TestDiscover {
     @Test
     public void getEndpointsTest() throws ApiException {
 
-        Models models = client.getDiscoverApi().listModels();
+        Models models = client.getDiscoverApi().listModels(100, 0, false);
 
         Model model = models.getModels().stream().filter(m -> m.getName().equals("[RandomForestRegressor] loan approval example")).findFirst().get();
 
         assertNotNull(model);
 
-        Endpoints endpoints = client.getDiscoverApi().listEndpoints(model.getId());
+        Endpoints endpoints = client.getDiscoverApi().listEndpoints(model.getId(), 100, 0, false);
 
         assertNotNull(endpoints);
 
