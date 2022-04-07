@@ -22,7 +22,7 @@ import java.util.List;
 public class DiscoverApiMock extends DiscoverApi {
 
     @Override
-    public Models listModels() throws ApiException {
+    public Models listModels(Integer limit, Integer offset, Boolean totalCount) throws ApiException {
 
         List<Model> modelList = MockResources.getResourceList("model.json", Model.class);
         Models models = new Models();
@@ -39,7 +39,7 @@ public class DiscoverApiMock extends DiscoverApi {
     }
 
     @Override
-    public Endpoints listEndpoints(String modelId) throws ApiException {
+    public Endpoints listEndpoints(String modelId, Integer limit, Integer offset, Boolean totalCount) throws ApiException {
         List<Endpoint> endpointList = MockResources.getResourceList("endpoint.json", Endpoint.class);
 
         Endpoints endpoints = new Endpoints();
