@@ -239,6 +239,12 @@ limitations under the License.IBM Confidential]]>
             <id>github</id>
             <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/IBM/open-prediction-service-hub</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
     </distributionManagement>
 </project>
