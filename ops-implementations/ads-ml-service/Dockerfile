@@ -54,7 +54,7 @@ COPY --chown=nobody:root alembic /usr/src/ads-ml-service/alembic
 COPY --chown=nobody:root examples/model_training_and_deployment /usr/src/ads-ml-service/examples/model_training_and_deployment
 RUN \
     apt-get -q update && \
-    mkdir -p /usr/share/man/man1 && apt-get -q install --assume-yes libgomp1 default-jre-headless && \
+    mkdir -p /usr/share/man/man1 && apt-get -q install --assume-yes libgomp1 openjdk-11-jre-headless && \
     rm -rf /var/lib/apt/lists/* && \
     chmod u+x /entrypoint.sh && \
     chmod g=u /entrypoint.sh && \
