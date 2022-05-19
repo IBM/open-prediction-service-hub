@@ -1,0 +1,46 @@
+{
+  "target": [
+    {
+      "rel": "endpoint",
+      "href": "/endpoints/endpoint_id"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "Gender",
+      "value": "M"
+    },
+    {
+      "name": "Status",
+      "value": "M"
+    },
+    {
+      "name": "Car Owner",
+      "value": "T"
+    },
+    {
+      "name": "Paymethod",
+      "value": "CC"
+    },
+    {
+      "name": "Children",
+      "value": 2
+    },
+    {
+      "name": "Est Income",
+      "value": 56000
+    },
+    {
+      "name": "Age",
+      "value": 43
+    },
+    {
+      "name": "Usage",
+      "value": 105
+    },
+    {
+      "name": "RatePlan",
+      "value": 1
+    }
+  ]
+}
