@@ -7,7 +7,7 @@ alembic==1.7.7
 psycopg2-binary==2.9.3
 fastapi==0.71.0
 orjson==3.6.7
-pandas==1.3.5
+pandas==1.4.2
 
 ## ASGI server
 hypercorn==0.11.2
