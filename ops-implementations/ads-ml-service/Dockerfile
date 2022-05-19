@@ -26,13 +26,12 @@ RUN \
 
 FROM python-base AS build-image
 
-COPY requirements.txt requirements-ml.txt ./
+COPY requirements.txt ./
 COPY logging.yaml /etc/ads-ml-service/logging/logging.yaml
 RUN \
     python3 -m venv /usr/src/ads-ml-service/venv && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
     python3 -m pip install -q --no-cache-dir --requirement requirements.txt && \
-    python3 -m pip install -q --no-cache-dir --requirement requirements-ml.txt && \
     mkdir -p /var/log/ads-ml-service && \
     mkdir -p /var/lib/ads-ml-service/models
 
@@ -55,7 +54,7 @@ COPY --chown=nobody:root alembic /usr/src/ads-ml-service/alembic
 COPY --chown=nobody:root examples/model_training_and_deployment /usr/src/ads-ml-service/examples/model_training_and_deployment
 RUN \
     apt-get -q update && \
-    mkdir -p /usr/share/man/man1 && apt-get -q install --assume-yes libgomp1 default-jre-headless && \
+    mkdir -p /usr/share/man/man1 && apt-get -q install --assume-yes libgomp1 openjdk-11-jre-headless && \
     rm -rf /var/lib/apt/lists/* && \
     chmod u+x /entrypoint.sh && \
     chmod g=u /entrypoint.sh && \

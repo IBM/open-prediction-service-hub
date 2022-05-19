@@ -24,6 +24,7 @@ function main() {
     workers=2
   fi
   echo "worker_num=${workers}"
+  java -version
 
   if [[ -v TLS_CRT ]] && [[ -v TLS_KEY ]] && [[ -v CA_CRT ]]; then
     echo "launching service with mTLS"
