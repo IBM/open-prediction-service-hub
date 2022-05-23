@@ -5,4 +5,4 @@ openapi-schema-validator==0.2.3
 # --- Dependences of connexion[swagger-ui] --- end
 
 boto3==1.23.5
-sagemaker==2.72.3
+sagemaker==2.91.1
