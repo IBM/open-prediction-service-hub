@@ -13,7 +13,7 @@ pandas==1.4.2
 hypercorn==0.11.2
 
 ## Cache
-cachetools==5.0.0
+cachetools==5.1.0
 readerwriterlock==1.0.9
 
 ## Service initialization
