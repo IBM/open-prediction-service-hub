@@ -30,7 +30,7 @@ PyYAML==6.0
 xgboost==1.2.1
 scikit-learn==0.23.2
 pypmml==0.9.9
-py4j==0.10.9.2
+py4j==0.10.9.5
 
 ## Testes
 requests==2.27.1
