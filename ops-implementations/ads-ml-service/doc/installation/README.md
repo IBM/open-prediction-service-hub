@@ -7,14 +7,12 @@ ADS-ML-Service is a containerized service. Installation consist of three steps:
 
 ## Build image
 
-First clone the project to retrieve the files locally and then build an image.
+Build docker image from github repository.
 ```shell script
-# Clone the project
-git clone <git-url-of-this-project>
-
-# Build image
-cd <sub-directory-containing-Dockerfile>
-docker build -t open-prediction:0.1.0 -t open-prediction:latest -f Dockerfile .
+docker build \
+  -t open-prediction:0.1.0 \
+  -t open-prediction:latest \
+  https://github.com/IBM/open-prediction-service-hub.git#main:ops-implementations/ads-ml-service
 ```
 The image is then built and can be identified by two tags: `0.1.0` and `latest`.
 
