@@ -163,9 +163,11 @@ oc project ads-ml-service
 
 # 2. Create kubernetes service and associated deployment for OPS
 oc new-app \
-  https://github.com/icp4a/automation-decision-services-extensions#master \
-  --name ads-ml-service \
-  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service
+  --allow-missing-images \
+  --strategy=docker \
+  --name=ads-ml-service \
+  --context-dir=ops-implementations/ads-ml-service \
+  https://github.com/IBM/open-prediction-service-hub#main
   
 # Expose service to external clients (If ADS client is not in the same cluster)
 oc expose service/ads-ml-service
