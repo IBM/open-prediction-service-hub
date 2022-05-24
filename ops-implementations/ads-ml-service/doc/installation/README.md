@@ -239,9 +239,11 @@ You can achieve this simply by overriding the service creation command:
 
 ```shell script
 oc new-app \
-  https://github.com/icp4a/automation-decision-services-extensions#master \
-  --name ads-ml-service \
-  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service \
+  --allow-missing-images \
+  --strategy=docker \
+  --name=ads-ml-service \
+  --context-dir=ops-implementations/ads-ml-service \
+  https://github.com/IBM/open-prediction-service-hub#main \
   DEFAULT_USER=toto \
   DEFAULT_USER_PWD=titi
 ```
