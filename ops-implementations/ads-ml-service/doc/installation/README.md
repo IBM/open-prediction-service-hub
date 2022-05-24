@@ -98,7 +98,7 @@ Run this command in the same directory of this README file.
 docker run \
   --detach \
   --restart=always \
-  --publish 80:8080 \
+  --publish 127.0.0.1:80:8080 \
   --name open-prediction \
   --env USE_SQLITE="True" \
   --volume $(pwd)/example_volume/models:/var/lib/ads-ml-service/models \
