@@ -7,7 +7,7 @@ ADS-ML-Service is a containerized service. Installation consist of three steps:
 
 ## Build image
 
-Build docker image from github repository.
+Build docker image from GitHub repository.
 ```shell script
 docker build \
   -t open-prediction:0.1.0 \
