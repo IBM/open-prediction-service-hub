@@ -55,7 +55,7 @@ def test_customer_churn_upload(client: testclient.TestClient):
             'supported_upload_format': [
                 'pmml'
             ],
-            'file_size_limit': 0,
+            'file_size_limit': 1024,
             'unknown_file_size': True
         }
     }
