@@ -18,44 +18,15 @@
 import fastapi.testclient as testclient
 
 
-def test_customer_churn_upload(client: testclient.TestClient):
+def test_file_upload_http_info(client: testclient.TestClient):
     # act
     cap_resp = client.get(url='/capabilities')
     cap = cap_resp.json()
 
     # assert
     assert cap is not None
-    assert cap == {
-        'capabilities': [
-            'info',
-            'discover',
-            'manage',
-            'run'
-        ],
-        'managed_capabilities': {
-            'supported_input_data_structure': [
-                'auto',
-                'DataFrame',
-                'ndarray',
-                'DMatrix',
-                'list'
-            ],
-            'supported_output_data_structure': [
-                'auto',
-                'DataFrame',
-                'ndarray',
-                'list'
-            ],
-            'supported_binary_format': [
-                'pickle',
-                'joblib',
-                'pmml',
-                'bst'
-            ],
-            'supported_upload_format': [
-                'pmml'
-            ],
-            'file_size_limit': 1024,
-            'unknown_file_size': True
-        }
-    }
+    assert 'managed_capabilities' in cap
+    assert 'file_size_limit' in cap['managed_capabilities']
+    assert 'unknown_file_size' in cap['managed_capabilities']
+    assert cap['managed_capabilities']['file_size_limit'] == 1024
+    assert cap['managed_capabilities']['unknown_file_size'] is True
