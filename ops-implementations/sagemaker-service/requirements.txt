@@ -9,4 +9,4 @@ protobuf==3.20.1
 # --- Dependences of sagemaker --- end
 
 boto3==1.23.5
-sagemaker==2.91.1
+sagemaker==2.92.1
