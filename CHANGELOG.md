@@ -1,6 +1,6 @@
 # Open Prediction Service HUB
 
-## 2.6.2 _2022/05/30_
+## 2.7.0 _2022/05/30_
 
 - updated dependency orjson to v3.6.8
 - updated dependency sagemaker to v2.91.1
