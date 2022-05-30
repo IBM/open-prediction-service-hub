@@ -1,5 +1,15 @@
 # Open Prediction Service HUB
 
+## 2.6.2 _2022/05/30_
+
+- updated dependency orjson to v3.6.8
+- updated dependency sagemaker to v2.92.1
+- updated dependency scikit-learn to v1.1.1
+- updated dependency setuptools to v62
+- updated dependency pytest to v7
+- updated dependency org.openapitools:openapi-generator-maven-plugin to v6
+- deploy java SDK packages on public GitHub thanks to @tarilabs contribution
+
 ## 2.6.1 _2022/05/19_
 
 * [DBACLD-47445] Churn PMML returns 0 in ADS (Changed java version)

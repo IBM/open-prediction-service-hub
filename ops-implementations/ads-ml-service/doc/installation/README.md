@@ -7,14 +7,12 @@ ADS-ML-Service is a containerized service. Installation consist of three steps:
 
 ## Build image
 
-First clone the project to retrieve the files locally and then build an image.
+Build docker image from GitHub repository.
 ```shell script
-# Clone the project
-git clone <git-url-of-this-project>
-
-# Build image
-cd <sub-directory-containing-Dockerfile>
-docker build -t open-prediction:0.1.0 -t open-prediction:latest -f Dockerfile .
+docker build \
+  -t open-prediction:0.1.0 \
+  -t open-prediction:latest \
+  https://github.com/IBM/open-prediction-service-hub.git#main:ops-implementations/ads-ml-service
 ```
 The image is then built and can be identified by two tags: `0.1.0` and `latest`.
 
@@ -100,7 +98,7 @@ Run this command in the same directory of this README file.
 docker run \
   --detach \
   --restart=always \
-  --publish 80:8080 \
+  --publish 127.0.0.1:80:8080 \
   --name open-prediction \
   --env USE_SQLITE="True" \
   --volume $(pwd)/example_volume/models:/var/lib/ads-ml-service/models \
@@ -165,9 +163,11 @@ oc project ads-ml-service
 
 # 2. Create kubernetes service and associated deployment for OPS
 oc new-app \
-  https://github.com/icp4a/automation-decision-services-extensions#master \
-  --name ads-ml-service \
-  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service
+  --allow-missing-images \
+  --strategy=docker \
+  --name=ads-ml-service \
+  --context-dir=ops-implementations/ads-ml-service \
+  https://github.com/IBM/open-prediction-service-hub#main
   
 # Expose service to external clients (If ADS client is not in the same cluster)
 oc expose service/ads-ml-service
@@ -239,9 +239,11 @@ You can achieve this simply by overriding the service creation command:
 
 ```shell script
 oc new-app \
-  https://github.com/icp4a/automation-decision-services-extensions#master \
-  --name ads-ml-service \
-  --context-dir open-prediction-service/ml-service-implementations/ads-ml-service \
+  --allow-missing-images \
+  --strategy=docker \
+  --name=ads-ml-service \
+  --context-dir=ops-implementations/ads-ml-service \
+  https://github.com/IBM/open-prediction-service-hub#main \
   DEFAULT_USER=toto \
   DEFAULT_USER_PWD=titi
 ```
