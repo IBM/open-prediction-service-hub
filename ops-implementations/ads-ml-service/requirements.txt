@@ -34,5 +34,5 @@ py4j==0.10.9.5
 
 ## Testes
 requests==2.27.1
-pytest==6.2.5
+pytest==7.1.2
 nyoka==5.3.0
