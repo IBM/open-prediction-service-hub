@@ -33,6 +33,6 @@ pypmml==0.9.9
 py4j==0.10.9.5
 
 ## Testes
-requests==2.27.1
+requests==2.28.1
 pytest==7.1.2
 nyoka==5.3.0
