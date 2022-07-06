@@ -49,7 +49,6 @@ function launch_mtls() {
 
   exec \
     hypercorn \
-    --insecure-bind "${host}:${http_port}" \
     --bind "${host}:${https_port}" \
     --workers "${workers}" \
     --certfile "${tls_crt}" \
@@ -69,7 +68,6 @@ function launch_tls() {
 
   exec \
     hypercorn \
-    --insecure-bind "${host}:${http_port}" \
     --bind "${host}:${https_port}" \
     --workers "${workers}" \
     --certfile "${tls_crt}" \
