@@ -54,15 +54,8 @@ loggers:
       - console
       - info_file_handler
       - error_file_handler
-
-  'hypercorn.access':
-    level: INFO
-    handlers:
-      - console
-    propagate: no
-
-  'hypercorn.error':
+  'hypercorn.*':
     level: ERROR
+    propagate: no
     handlers:
       - console
-    propagate: no
