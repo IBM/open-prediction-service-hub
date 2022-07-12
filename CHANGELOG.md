@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.7.0 _2022/07/07_
+
+* [DBACLD-55843] Reduce the number of logs for ads-ml-service
+
 ## 2.6.2 _2022/05/30_
 
 - updated dependency orjson to v3.6.8
