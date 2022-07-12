@@ -24,6 +24,8 @@ import fastapi
 import fastapi.responses as responses
 import yaml
 
+LOGGER = logging.getLogger(__name__)
+
 
 def get_app() -> fastapi.FastAPI:
     import app.api.api_v2.api as api_v2
@@ -42,10 +44,13 @@ def get_app() -> fastapi.FastAPI:
     @app.on_event("startup")
     async def startup():
         conf = yaml.safe_load(app_conf.get_config().LOGGING.read_text())
-        if app_conf.get_config().DEBUG:
+        debug_mode = app_conf.get_config().DEBUG
+        if debug_mode:
             for _, logger_config in conf['loggers'].items():
                 logger_config['level'] = 'DEBUG'
         logging.config.dictConfig(conf)
+        if debug_mode:
+            LOGGER.info("Launching application in debug mode")
 
     @app.get(path='/', include_in_schema=False)
     async def redirect_docs() -> responses.RedirectResponse:
