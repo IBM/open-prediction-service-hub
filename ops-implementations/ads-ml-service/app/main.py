@@ -42,6 +42,9 @@ def get_app() -> fastapi.FastAPI:
     @app.on_event("startup")
     async def startup():
         conf = yaml.safe_load(app_conf.get_config().LOGGING.read_text())
+        if app_conf.get_config().DEBUG:
+            for _, logger_config in conf['loggers'].items():
+                logger_config['level'] = 'DEBUG'
         logging.config.dictConfig(conf)
 
     @app.get(path='/', include_in_schema=False)
