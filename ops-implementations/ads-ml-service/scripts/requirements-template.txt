@@ -1,0 +1,38 @@
+# Dependences for web service
+
+## Web interface
+python-multipart==0.0.5
+sqlalchemy==1.4.39
+alembic==1.8.0
+psycopg2-binary==2.9.3
+fastapi==0.78.0
+orjson==3.7.6
+pandas
+
+## ASGI server
+hypercorn==0.11.2
+
+## Cache
+cachetools==5.2.0
+readerwriterlock==1.0.9
+
+## Service initialization
+tenacity==8.0.1
+
+## Authentication
+pyjwt==2.4.0
+passlib[bcrypt]==1.7.4
+
+## Read configuration files
+PyYAML==6.0
+
+# ML
+xgboost==1.2.1
+scikit-learn
+pypmml=={pypmml_version}
+py4j=={py4j_version}
+
+## Testes
+requests==2.28.1
+pytest==7.1.2
+nyoka==5.3.0
