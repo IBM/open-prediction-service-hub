@@ -6,7 +6,7 @@ sqlalchemy==1.4.39
 alembic==1.8.0
 psycopg2-binary==2.9.3
 fastapi==0.78.0
-orjson==3.7.6
+orjson==3.8.0
 pandas==1.4.3
 
 ## ASGI server
