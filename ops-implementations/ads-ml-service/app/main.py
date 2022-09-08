@@ -79,6 +79,11 @@ def launch_test_server():
         os.environ['MODEL_STORAGE'] = str(root)
         (root / 'logging.yaml').write_text(yaml.dump(logging_configs))
 
+        import app.db.base as db_base
+        import app.db.session as db_session
+
+        db_base.Base.metadata.create_all(bind=db_session.get_engine())
+
         app = get_app()
         hypercorn_config = h_config.Config()
         hypercorn_config.bind = ["localhost:8080"]
