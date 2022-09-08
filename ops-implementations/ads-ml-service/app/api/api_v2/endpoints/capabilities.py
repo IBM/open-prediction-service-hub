@@ -42,6 +42,7 @@ async def server_capabilities() -> typing.Dict[typing.Text, typing.Any]:
             'supported_output_data_structure': ['auto', 'DataFrame', 'ndarray', 'list'],
             'supported_binary_format': ['pickle', 'joblib', 'pmml', 'bst'],
             'supported_upload_format': ['pmml'],
-            'file_size_limit': app_conf.get_config().UPLOAD_SIZE_LIMIT
+            'file_size_limit': app_conf.get_config().UPLOAD_SIZE_LIMIT,
+            'unknown_file_size': True
         }
     }

@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.7.0 _2022/05/30_
+
+* [DBACLD-49507] New OPS capability return
+
 ## 2.6.2 _2022/05/30_
 
 - updated dependency orjson to v3.6.8
