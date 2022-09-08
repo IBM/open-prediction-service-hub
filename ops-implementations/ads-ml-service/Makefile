@@ -10,7 +10,7 @@ build: prepare-schemas-gen
 
 # Launch a testing server
 launch: build
-	docker run --rm --read-only -it -p 8080:8080 --name ads-ml-service ads-ml-service:latest
+	docker run --rm --read-only -it -p 127.0.0.1:8080:8080 --name ads-ml-service -e DEBUG=True ads-ml-service:latest
 
 # Test
 test: build

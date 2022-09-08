@@ -1,7 +1,8 @@
 # Open Prediction Service HUB
 
-## 2.7.0 _2022/05/30_
+## 2.7.0 _2022/07/07_
 
+* [DBACLD-55843] Reduce the number of logs for ads-ml-service
 * [DBACLD-49507] New OPS capability return
 
 ## 2.6.2 _2022/05/30_
