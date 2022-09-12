@@ -28,7 +28,7 @@ PyYAML==6.0
 
 # ML
 xgboost==1.2.1
-scikit-learn==1.1.1
+scikit-learn==1.1.2
 pypmml==0.9.9
 py4j==0.10.9.7
 
