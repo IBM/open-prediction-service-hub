@@ -10,7 +10,7 @@ orjson==3.8.0
 pandas==1.4.4
 
 ## ASGI server
-hypercorn==0.11.2
+hypercorn==0.14.3
 
 ## Cache
 cachetools==5.2.0
