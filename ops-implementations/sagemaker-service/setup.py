@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 NAME = "openapi_server"
-VERSION = "2.6.2"
+VERSION = "2.7.0"
 # To install the library, run the following
 #
 # python setup.py install
