@@ -1,2 +1,2 @@
 flask_testing==0.8.1
-pytest==7.1.2
+pytest==7.1.3
