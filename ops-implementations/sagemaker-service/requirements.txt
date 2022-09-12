@@ -1,4 +1,4 @@
-connexion[swagger-ui]==2.14.0
+connexion[swagger-ui]==2.14.1
 
 # --- Dependences of connexion[swagger-ui] that need to be freezed --- start
 openapi-schema-validator==0.3.3
