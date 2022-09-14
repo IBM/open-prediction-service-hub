@@ -8,5 +8,5 @@ openapi-schema-validator==0.3.4
 protobuf==3.20.1
 # --- Dependences of sagemaker --- end
 
-boto3==1.24.70
+boto3==1.24.72
 sagemaker==2.97.0
