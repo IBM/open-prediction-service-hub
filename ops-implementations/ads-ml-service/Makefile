@@ -2,7 +2,7 @@ default: build
 
 # Prepare interface schema generation
 prepare-schemas-gen:
-	cp $(CURDIR)/../../open-prediction-service.yaml $(CURDIR)/app/gen/tmp.schemas.ops.yaml
+	cp ${CURDIR}/../../open-prediction-service.yaml ${CURDIR}/app/gen/tmp.schemas.ops.yaml
 
 # Build docker container
 build: prepare-schemas-gen
@@ -21,5 +21,5 @@ debug: build
 
 test_upload:
 	curl localhost:8080/upload \
-	  -F "file=@$(CURDIR)/examples/model_training_and_deployment/ads-samples/model.pmml" \
+	  -F "file=@${CURDIR}/examples/model_training_and_deployment/ads-samples/model.pmml" \
 	  --trace-ascii /dev/stdout
