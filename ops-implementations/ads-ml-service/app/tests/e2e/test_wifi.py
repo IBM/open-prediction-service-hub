@@ -17,11 +17,13 @@
 
 import json
 import pathlib
+import pytest
 
 import fastapi.testclient as testclient
 
 
-def test_customer_churn_upload(client: testclient.TestClient):
+@pytest.mark.skip(reason="Currently pypmml cannot support default rule and random forest at the same time")
+def test_default_rule_wifi(client: testclient.TestClient):
     import app.runtime.cache as app_cache
     app_cache.cache.clear()
     customer_churn_model_path = pathlib.Path(__file__).parent / 'wifi.pmml'
