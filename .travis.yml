@@ -18,7 +18,6 @@ jobs:
     - stage: testing
       script:
         - cd ops-implementations/ads-ml-service
-        - cp ../../open-prediction-service.yaml app/gen/tmp.schemas.ops.yaml
         - bash scripts/tests.sh
       name: "ads-ml-service-test"
     - script:
