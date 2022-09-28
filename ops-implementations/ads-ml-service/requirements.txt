@@ -17,7 +17,7 @@ cachetools==5.2.0
 readerwriterlock==1.0.9
 
 ## Service initialization
-tenacity==8.0.1
+tenacity==8.1.0
 
 ## Authentication
 pyjwt==2.4.0
