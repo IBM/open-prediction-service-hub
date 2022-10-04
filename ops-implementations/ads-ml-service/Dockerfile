@@ -1,4 +1,5 @@
-FROM python:3.8-slim AS python-base
+ARG PYTHON_BASE_IMAGE
+FROM ${PYTHON_BASE_IMAGE:-python}:3.8-slim AS python-base
 
 ENV \
     OPS_HOME="/usr/src/ads-ml-service" \
