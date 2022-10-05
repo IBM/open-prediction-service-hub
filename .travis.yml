@@ -42,11 +42,11 @@ jobs:
       env: TARGET=sagemaker-service
     - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/wml-service/swagger_server/version.py)"
       env: TARGET=wml-service
-    - before_script:
+    - script:
         - sudo apt-get update
         - sudo apt-get install qemu binfmt-support qemu-user-static # Install the qemu packages
         - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
-    - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)"
+        - ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)"
       env:
         - TARGET=ads-ml-service
         - DOCKER_NAMESPACE=decisions-tooling/aarch64
