@@ -12,8 +12,7 @@ stages:
   - name: verify-versions
   - name: deploy
     if: (branch IN (develop, main) AND NOT (type IN (pull_request))) OR (tag IS present)
-  - name: deploy-aarch64
-    if: (branch IN (develop, main) AND NOT (type IN (pull_request))) OR (tag IS present)
+
 jobs:
   include:
     - stage: testing
@@ -43,12 +42,11 @@ jobs:
       env: TARGET=sagemaker-service
     - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/wml-service/swagger_server/version.py)"
       env: TARGET=wml-service
-    - stage: deploy-aarch64
-      before_script:
+    - before_script:
         - sudo apt-get update
         - sudo apt-get install qemu binfmt-support qemu-user-static # Install the qemu packages
         - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
-      script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)"
+    - script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)"
       env:
         - TARGET=ads-ml-service
         - DOCKER_NAMESPACE=decisions-tooling/aarch64
