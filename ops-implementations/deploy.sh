@@ -49,7 +49,7 @@ function deploy() {
   echo "platform=${platform}"
 
   # Build project
-  docker buildx build --load --platform "${platform}" -t "${repository_name}":latest "${__dir}/${project_name}"
+  docker buildx build --load --progress plain --platform "${platform}" -t "${repository_name}":latest "${__dir}/${project_name}"
   # Docker login
   echo "${artifactory_passwd}" | docker login -u "${artifactory_username}" --password-stdin "${artifactory_url}"
 
