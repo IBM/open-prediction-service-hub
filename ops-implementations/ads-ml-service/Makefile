@@ -9,7 +9,7 @@ build:
     # docker buildx create --use
 	rm "${CURDIR}/app/gen/tmp.schemas.ops.yaml"
 	cp -f "${CURDIR}/../../open-prediction-service.yaml" "${CURDIR}/app/gen/tmp.schemas.ops.yaml"
-	docker buildx build --platform linux/amd64 -t ads-ml-service:latest .
+	docker buildx build --load --platform linux/amd64 -t ads-ml-service:latest .
 
 build-arm:
     # docker buildx create --use
