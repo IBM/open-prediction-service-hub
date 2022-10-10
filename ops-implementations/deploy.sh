@@ -9,6 +9,7 @@ __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 DEPLOY_SERVICE=$1
 DEPLOY_VERSION=$2
+PLATFORM="${3:-linux/amd64}"
 
 function trace_deploy() {
   echo "Deployment environment:"
@@ -29,7 +30,7 @@ function deploy() {
   local artifactory_passwd=$7
   local branch_name=$8
   local tag_name=$9
-  local base_image=${10}
+  local platform=${10}
 
   local deploy_tag
   if [ "${branch_name}" == "develop" ]; then
@@ -45,9 +46,10 @@ function deploy() {
     exit 1
   fi
   echo "deploy_tag=${deploy_tag}"
+  echo "platform=${platform}"
 
   # Build project
-  docker build -t "${repository_name}":latest --build-arg PYTHON_BASE_IMAGE="${base_image}" "${__dir}/${project_name}"
+  docker buildx build --load --progress plain --platform "${platform}" -t "${repository_name}":latest "${__dir}/${project_name}"
   # Docker login
   echo "${artifactory_passwd}" | docker login -u "${artifactory_username}" --password-stdin "${artifactory_url}"
 
@@ -96,4 +98,4 @@ deploy \
   "${DOCKER_PASSWORD}" \
   "${TRAVIS_BRANCH:-not-set}" \
   "${TRAVIS_TAG:-not-set}" \
-  "${PYTHON_BASE_IMAGE:-python}"
+  "${PLATFORM}"
