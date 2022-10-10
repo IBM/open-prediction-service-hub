@@ -9,7 +9,7 @@ __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 DEPLOY_SERVICE=$1
 DEPLOY_VERSION=$2
-PLATFORM=$3
+PLATFORM="${3:-linux/amd64}"
 
 function trace_deploy() {
   echo "Deployment environment:"
