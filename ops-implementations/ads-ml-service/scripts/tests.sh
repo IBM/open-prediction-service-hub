@@ -3,13 +3,13 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-# set -o xtrace
+set -o xtrace
 
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __root="$(cd "$(dirname "${__dir}")" && pwd)"
 
 function prepare_env() {
-  docker build -t ads-ml-service:latest "${__root}"
+  docker buildx build --load --progress plain --platform linux/amd64 -t ads-ml-service:latest "${__root}"
 }
 
 function launch_unit_testes() {
