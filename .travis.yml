@@ -10,6 +10,7 @@ services:
 before_install:
   - sudo apt-get update
   - sudo apt-get install qemu binfmt-support qemu-user-static # Install the qemu packages
+  - bash scripts/update_docker.sh
 
 stages:
   - name: testing
