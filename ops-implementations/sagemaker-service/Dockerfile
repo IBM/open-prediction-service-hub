@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM --platform=${BUILDPLATFORM} python:3.7-slim
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
