@@ -49,7 +49,7 @@ jobs:
       env: TARGET=wml-service
     - script:
         - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes # This step will execute the registering scripts
-        - ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)"
+        - ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)" linux/arm64
       env:
         - TARGET=ads-ml-service
         - DOCKER_NAMESPACE=decisions-tooling/aarch64
