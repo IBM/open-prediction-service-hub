@@ -48,3 +48,4 @@ def test_default_rule_wifi(client: testclient.TestClient):
     default_res = default_response.json()
 
     assert default_res['result']['predicted'] is not None
+    assert default_res['result']['confidence'] is not None
