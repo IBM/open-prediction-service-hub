@@ -36,20 +36,14 @@ def get_db_url() -> str:
 
 
 def get_db_opts() -> typing.Dict[str, typing.Any]:
-    if get_config().USE_SQLITE:
-        return {'connect_args': {"check_same_thread": False}}
-    else:
-        return {} if get_config().DB_ARGS is None else get_config().DB_ARGS
-
-
-def get_engine():
-    url = get_db_url()
-    db_options = get_db_opts()
-    return create_engine(url, **db_options)
+    opt = {'connect_args': {"timeout": 20}} if get_config().USE_SQLITE and not get_config().DB_ARGS \
+        else get_config().DB_ARGS
+    # logger is not initialized yet
+    print(f'sqlalchemy engine arguments: {opt}')
+    return opt
 
 
 SessionLocal = sessionmaker(
         autocommit=False,
         autoflush=False,
-        bind=get_engine()
-)
+        bind=create_engine(get_db_url(), **get_db_opts()))
