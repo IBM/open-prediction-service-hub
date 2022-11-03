@@ -36,7 +36,7 @@ def get_db_url() -> str:
 
 
 def get_db_opts() -> typing.Dict[str, typing.Any]:
-    opt = {'connect_args': {"timeout": 20}} if get_config().USE_SQLITE and not get_config().DB_ARGS \
+    opt = {'connect_args': {'timeout': 20}} if get_config().USE_SQLITE and not get_config().DB_ARGS \
         else get_config().DB_ARGS
     # logger is not initialized yet
     print(f'sqlalchemy engine arguments: {opt}')
