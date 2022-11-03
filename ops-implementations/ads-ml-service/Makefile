@@ -2,7 +2,7 @@ default: build
 
 # Prepare interface schema generation
 prepare-schemas-gen:
-	cp ../../open-prediction-service.yaml app/gen/tmp.schemas.ops.yaml
+	cp "${CURDIR}/../../open-prediction-service.yaml" app/gen/tmp.schemas.ops.yaml
 
 # Build docker container
 build:

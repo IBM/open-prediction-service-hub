@@ -21,11 +21,11 @@ import pathlib
 import fastapi.testclient as testclient
 
 
-def test_customer_churn_upload(client: testclient.TestClient):
+def test_default_rule_wifi(client: testclient.TestClient):
     # arrange
     import app.runtime.cache as app_cache
     app_cache.cache.clear()
-    customer_churn_model_path = pathlib.Path(__file__).parent / 'Churn_RandomForestClassifier.xml'
+    customer_churn_model_path = pathlib.Path(__file__).parent / 'wifi.pmml'
     model_creation_resp = client.post(
         url='/upload',
         files={'file': (customer_churn_model_path.name, customer_churn_model_path.read_bytes())}
@@ -35,14 +35,14 @@ def test_customer_churn_upload(client: testclient.TestClient):
     assert model_json is not None
     model_id = model_json['id']
     assert model_id is not None
-    john_request_path = pathlib.Path(__file__).parent / 'John_churn_request.json'
-    john_request = json.loads(john_request_path.read_text().replace('endpoint_id', model_id))
+    default_request_path = pathlib.Path(__file__).parent / 'default_rule_wifi.json'
+    default_request = json.loads(default_request_path.read_text().replace('endpoint_id', model_id))
 
     # when
-    john_response = client.post(url='/predictions', json=john_request)
+    default_response = client.post(url='/predictions', json=default_request)
 
     # assert
-    assert john_response.status_code == 200
-    john_res = john_response.json()
-    assert john_res['result']['probability(F)'] == 0
-    assert john_res['result']['probability(T)'] == 0
+    assert default_response.status_code == 200
+    default_res = default_response.json()
+    assert default_res['result']['predicted'] is not None
+    assert default_res['result']['confidence'] is None
