@@ -17,13 +17,12 @@
 
 import json
 import pathlib
-import pytest
 
 import fastapi.testclient as testclient
 
 
-@pytest.mark.skip(reason="Currently pypmml cannot support default rule and random forest at the same time")
 def test_default_rule_wifi(client: testclient.TestClient):
+    # arrange
     import app.runtime.cache as app_cache
     app_cache.cache.clear()
     customer_churn_model_path = pathlib.Path(__file__).parent / 'wifi.pmml'
@@ -36,16 +35,14 @@ def test_default_rule_wifi(client: testclient.TestClient):
     assert model_json is not None
     model_id = model_json['id']
     assert model_id is not None
-
     default_request_path = pathlib.Path(__file__).parent / 'default_rule_wifi.json'
-
     default_request = json.loads(default_request_path.read_text().replace('endpoint_id', model_id))
 
+    # when
     default_response = client.post(url='/predictions', json=default_request)
 
+    # assert
     assert default_response.status_code == 200
-
     default_res = default_response.json()
-
     assert default_res['result']['predicted'] is not None
-    assert default_res['result']['confidence'] is not None
+    assert default_res['result']['confidence'] is None

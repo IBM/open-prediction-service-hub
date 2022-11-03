@@ -16,13 +16,13 @@
 
 
 import json
-import math
 import pathlib
 
 import fastapi.testclient as testclient
 
 
 def test_customer_churn_upload(client: testclient.TestClient):
+    # arrange
     import app.runtime.cache as app_cache
     app_cache.cache.clear()
     customer_churn_model_path = pathlib.Path(__file__).parent / 'Churn_RandomForestClassifier.xml'
@@ -35,21 +35,14 @@ def test_customer_churn_upload(client: testclient.TestClient):
     assert model_json is not None
     model_id = model_json['id']
     assert model_id is not None
-
     john_request_path = pathlib.Path(__file__).parent / 'John_churn_request.json'
-    peter_request_path = pathlib.Path(__file__).parent / 'Peter_churn_request.json'
-
     john_request = json.loads(john_request_path.read_text().replace('endpoint_id', model_id))
-    peter_request = json.loads(peter_request_path.read_text().replace('endpoint_id', model_id))
 
+    # when
     john_response = client.post(url='/predictions', json=john_request)
-    peter_response = client.post(url='/predictions', json=peter_request)
 
+    # assert
     assert john_response.status_code == 200
-    assert peter_response.status_code == 200
-
     john_res = john_response.json()
-    peter_res = peter_response.json()
-
-    assert math.isclose(sum([john_res['result']['probability(F)'], john_res['result']['probability(T)']]), 1.0)
-    assert math.isclose(sum([peter_res['result']['probability(F)'], peter_res['result']['probability(T)']]), 1.0)
+    assert john_res['result']['probability(F)'] == 0
+    assert john_res['result']['probability(T)'] == 0
