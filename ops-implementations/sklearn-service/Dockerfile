@@ -23,7 +23,7 @@ RUN /venv/bin/conda-unpack
 # The runtime-stage image; we can use Debian as the
 # base image since the Conda env also includes Python
 # for us.
-FROM debian:buster AS runtime
+FROM debian:bullseye AS runtime
 
 # Copy /venv from the previous stage:
 COPY --from=build /venv /venv

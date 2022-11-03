@@ -1,4 +1,4 @@
-FROM python:3.8-slim AS python-base
+FROM --platform=${BUILDPLATFORM} python:3.8-slim AS python-base
 
 ENV \
     OPS_HOME="/usr/src/ads-ml-service" \
