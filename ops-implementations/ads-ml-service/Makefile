@@ -19,11 +19,23 @@ build-arm:
 
 # Launch a testing server
 launch: build
-	docker run --rm --read-only -it -p 127.0.0.1:8080:8080 --name ads-ml-service -e DEBUG=True ads-ml-service:latest
+	docker run --rm -it -p 127.0.0.1:8080:8080 --name ads-ml-service -e DEBUG=True ads-ml-service:latest
 
-launch-arm:
+launch-arm: build-arm
 	# docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-	docker run --rm --read-only -it -p 127.0.0.1:8080:8080 --name ads-ml-service-arm64 -e DEBUG=True ads-ml-service:latest
+	docker run --rm -it -p 127.0.0.1:8080:8080 --name ads-ml-service-arm64 -e DEBUG=True ads-ml-service:latest
+
+# find device name by `df -h`
+launch-hdd: build
+	docker run \
+		--rm \
+		-it \
+		-p 127.0.0.1:8080:8080 \
+		--name ads-ml-service \
+		-e DEBUG=True \
+		--device-write-iops=/dev/sda:1000 \
+		--device-read-iops=/dev/sda:1000 \
+		ads-ml-service:latest
 
 # Test
 test: build
