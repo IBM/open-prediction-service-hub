@@ -52,8 +52,7 @@ class ServerConfiguration(BaseSettings):
     MODEL_STORAGE: typing.Optional[Path] = None
     DB_URL: typing.Optional[pydantic.AnyUrl] = None
     # Additional args for sqlalchemy.create_engine()
-    DB_ARGS: typing.Optional[pydantic.Json[typing.Dict[str, typing.Union[
-        str, int, bool, typing.Dict[str, typing.Union[str, int, bool]]]]]] = None
+    DB_ARGS: typing.Optional[pydantic.Json] = None
     UPLOAD_SIZE_LIMIT: int = 0
     MAX_PAGE_SIZE: int = 200
 
