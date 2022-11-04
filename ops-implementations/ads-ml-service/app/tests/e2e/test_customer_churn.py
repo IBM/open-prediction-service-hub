@@ -44,5 +44,5 @@ def test_customer_churn_upload(client: testclient.TestClient):
     # assert
     assert john_response.status_code == 200
     john_res = john_response.json()
-    assert john_res['result']['probability(F)'] == 1
+    assert john_res['result']['probability(F)'] == 0
     assert john_res['result']['probability(T)'] == 0
