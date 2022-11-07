@@ -36,10 +36,6 @@ jobs:
       - pip3 install --quiet tox
       - tox
       name: "sagemaker-proxy-test"
-    - stage: verify-versions
-      script:
-        - python3 -m pip install lxml PyYAML
-        - python3 scripts/check_ver.py
     - stage: deploy
       script: ops-implementations/deploy.sh "${TARGET}" "$(grep -m 1 -oP -e "__version__ = ['\"]\K([^'\"]*)(?=['\"])" ops-implementations/ads-ml-service/app/version.py)" "${PLATFORM}"
       env:
