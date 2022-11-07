@@ -6,7 +6,7 @@
 
     <groupId>com.ibm.decision</groupId>
     <artifactId>ops-client-sdk</artifactId>
-    <version>2.7.0-SNAPSHOT</version>
+    <version>2.7.4-SNAPSHOT</version>
     <inceptionYear>2020</inceptionYear>
     <build>
         <plugins>
@@ -224,9 +224,9 @@ limitations under the License.IBM Confidential]]>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <gson-fire-version>1.8.5</gson-fire-version>
-        <swagger-core-version>1.6.7</swagger-core-version>
+        <swagger-core-version>1.6.8</swagger-core-version>
         <okhttp-version>4.10.0</okhttp-version>
-        <gson-version>2.9.1</gson-version>
+        <gson-version>2.10</gson-version>
         <commons-lang3-version>3.12.0</commons-lang3-version>
         <maven-plugin-version>1.0.0</maven-plugin-version>
         <javax-annotation-version>1.0</javax-annotation-version>
