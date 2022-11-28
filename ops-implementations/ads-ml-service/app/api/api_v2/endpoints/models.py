@@ -187,7 +187,7 @@ async def add_binary(
 
 @router.get(
     path='/models/{model_id}/metadata',
-    response_model=typing.Union[ops_schemas.AdditionalPickleModelInfo, ops_schemas.AdditionalPMMLModelInfo],
+    response_model=impl.AdditionalModelInfo,
     tags=['discover']
 )
 def get_model_metadata(
@@ -201,10 +201,10 @@ def get_model_metadata(
             status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
 
     if model.format == app_binary_config.ModelWrapper.PICKLE:
-        return ops_schemas.AdditionalPickleModelInfo(
+        return impl.AdditionalPickleModelInfo(
             modelType='pickle', pickleProtoVersion=str(app_runtime_inspection.inspect_pickle_version(model.model_b64)))
     elif model.format == app_binary_config.ModelWrapper.PMML:
-        return ops_schemas.AdditionalPMMLModelInfo(
+        return impl.AdditionalPMMLModelInfo(
             modelType='pmml', modelSubType=str(app_runtime_inspection.inspect_pmml_subtype(model.model_b64)))
     else:
         raise fastapi.HTTPException(

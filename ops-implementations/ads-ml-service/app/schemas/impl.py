@@ -17,6 +17,7 @@
 
 import enum
 import typing
+import typing_extensions
 import datetime as dt
 
 import numpy
@@ -158,3 +159,17 @@ class PredictionImpl(pydt.BaseModel):
     parameters: typing.List[typing.Union[typing.List[ParameterImpl], ParameterImpl]] = pydt.Field(
         ..., description='Model parameters', title='Parameters'
     )
+
+
+class AdditionalPMMLModelInfo(pydt.BaseModel):
+    modelType: typing.Literal['pmml']
+    modelSubType: typing.Optional[str]
+
+
+class AdditionalPickleModelInfo(pydt.BaseModel):
+    modelType: typing.Literal['pickle']
+    pickleProtoVersion: typing.Optional[str]
+
+
+AdditionalModelInfo = typing_extensions.Annotated[
+    typing.Union[AdditionalPMMLModelInfo, AdditionalPickleModelInfo], pydt.Field(discriminator='modelType')]
