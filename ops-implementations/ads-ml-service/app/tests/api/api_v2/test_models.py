@@ -281,3 +281,20 @@ def test_pmml_metadata(
     assert resp.ok
     assert resp.json()['modelType'] == 'pmml'
     assert resp.json()['modelSubType'] == 'Scorecard'
+
+
+def test_download_binary(
+        client: tstc.TestClient
+) -> typ.NoReturn:
+    # When
+    model_content = app_test_pmml.get_pmml_scorecard_file().read_text()
+    model = client.post(
+        url='/upload',
+        data={'format': 'pmml'},
+        files={'file': ('scorecard.pmml', model_content)}).json()
+    model_id = model['id']
+    resp = client.get(url=f'/models/{model_id}/binary')
+
+    # Assert
+    assert resp.ok
+    assert resp.content == str.encode(model_content)

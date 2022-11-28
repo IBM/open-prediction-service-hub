@@ -17,6 +17,7 @@
 
 import logging
 import typing
+import io
 
 import fastapi
 import fastapi.encoders as encoders
@@ -188,8 +189,7 @@ async def add_binary(
 @router.get(
     path='/models/{model_id}/metadata',
     response_model=impl.AdditionalModelInfo,
-    tags=['discover']
-)
+    tags=['discover'])
 def get_model_metadata(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)):
@@ -210,3 +210,22 @@ def get_model_metadata(
         raise fastapi.HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f'Format {model.format} is not supported for metadata')
+
+
+@router.get(
+    path='/models/{model_id}/binary',
+    tags=['discover'])
+def get_model_binary(
+        model_id: int,
+        db: saorm.Session = fastapi.Depends(deps.get_db)):
+    LOGGER.info('Retrieving model binary for id: %s', model_id)
+    model = crud.binary_ml_model.get(db=db, id=model_id)
+
+    if model is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model binary with id {model_id} is not found')
+
+    filelike = io.BytesIO(model.model_b64)
+    filelike.seek(0)
+
+    return responses.StreamingResponse(content=filelike, media_type='application/octet-stream')
