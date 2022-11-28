@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Open Prediction Service
-  version: 2.7.4-SNAPSHOT
+  version: 2.8.0-SNAPSHOT
   description: The Open Prediction Service API is an effort to provide an Open API that enables unsupported native ML Providers in Decision Designer or Decision Runtime.
 tags:
   - name: info
@@ -207,6 +207,47 @@ paths:
       responses:
         '204':
           description: Successful Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/{model_id}/binary:
+    get:
+      tags:
+        - discover
+      summary: Download model binary
+      operationId: get_binary_by_id
+      parameters:
+        - $ref: '#/components/parameters/ModelIDParam'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            # A binary file:
+            application/octet-stream: {}
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/{model_id}/metadata:
+    get:
+      tags:
+        - discover
+      summary: Get parsed model metadata
+      operationId: get_metadata_by_id
+      parameters:
+        - $ref: '#/components/parameters/ModelIDParam'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdditionalModelInfo'
         default:
           description: Error
           content:
@@ -823,7 +864,7 @@ components:
             unknown_file_size:
               type: boolean
               default: false
-              description: Whether the user can upload a file whose length is unknown at the time of the request.
+              description: Whether the user can upload a file whose length(Content-Length in HTTP header) is unknown at the time of the request.
       example:
         capabilities:
           - info
@@ -907,6 +948,40 @@ components:
         target:
           - rel: endpoint
             href: 'http://open-prediction-service.org/endpoints/8c2af534-cdce-11ea-87d0-0242ac130003'
+    AdditionalModelInfo:
+      type: object
+      title: Additional Model Information
+      required:
+        - modelType
+      properties:
+        modelType:
+          type: string
+          description: the type of imported binary
+          example: pmml
+      discriminator:
+        propertyName: modelType
+        mapping:
+          pmml: '#/components/schemas/AdditionalPMMLModelInfo'
+          pickle: '#/components/schemas/AdditionalPickleModelInfo'
+        oneOf:
+          - $ref: '#/components/schemas/AdditionalPMMLModelInfo'
+          - $ref: '#/components/schemas/AdditionalPickleModelInfo'
+    AdditionalPMMLModelInfo:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalModelInfo'
+        - properties:
+            modelSubType:
+              type: string
+              description: model sub type
+              example: ruleset
+    AdditionalPickleModelInfo:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalModelInfo'
+        - properties:
+            pickleProtoVersion:
+              type: string
+              description: the version of pickle protocol
+              example: 4
   parameters:
     ModelIDParam:
       in: path
