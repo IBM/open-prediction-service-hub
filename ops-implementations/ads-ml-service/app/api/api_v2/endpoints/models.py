@@ -28,6 +28,7 @@ import app.api.deps as deps
 import app.crud as crud
 import app.gen.schemas.ops_schemas as ops_schemas
 import app.runtime.model_upload as app_model_upload
+import app.runtime.inspection as app_runtime_inspection
 import app.schemas as schemas
 import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
@@ -182,3 +183,30 @@ async def add_binary(
         model_id=model_id
     )
     return impl.EndpointImpl.from_database(crud.endpoint.get(db, id=m))
+
+
+@router.get(
+    path='/models/{model_id}/metadata',
+    response_model=typing.Union[ops_schemas.AdditionalPickleModelInfo, ops_schemas.AdditionalPMMLModelInfo],
+    tags=['discover']
+)
+def get_model_metadata(
+        model_id: int,
+        db: saorm.Session = fastapi.Depends(deps.get_db)):
+    LOGGER.info('Retrieving model metadata for id: %s', model_id)
+    model = crud.binary_ml_model.get(db=db, id=model_id)
+
+    if model is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
+
+    if model.format == app_binary_config.ModelWrapper.PICKLE:
+        return ops_schemas.AdditionalPickleModelInfo(
+            modelType='pickle', pickleProtoVersion=str(app_runtime_inspection.inspect_pickle_version(model.model_b64)))
+    elif model.format == app_binary_config.ModelWrapper.PMML:
+        return ops_schemas.AdditionalPMMLModelInfo(
+            modelType='pmml', modelSubType=str(app_runtime_inspection.inspect_pmml_subtype(model.model_b64)))
+    else:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f'Format {model.format} is not supported for metadata')
