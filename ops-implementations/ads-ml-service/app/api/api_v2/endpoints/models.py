@@ -214,6 +214,7 @@ def get_model_metadata(
 
 @router.get(
     path='/models/{model_id}/binary',
+    response_class=responses.StreamingResponse,
     tags=['discover'])
 def get_model_binary(
         model_id: int,
