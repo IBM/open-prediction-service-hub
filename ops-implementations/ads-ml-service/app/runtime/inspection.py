@@ -17,6 +17,7 @@
 
 import logging
 import typing
+import pickletools
 
 import pypmml.base as pypmml_base
 
@@ -65,3 +66,12 @@ def inspect_pmml_model_name(model_file: bytes) -> typing.Optional[str]:
         return wrapper.model.modelName
     else:
         return None
+
+
+def inspect_pmml_subtype(model_file: bytes) -> typing.Optional[str]:
+    wrapper = load_pmml_model(model_file).loaded_model
+    return wrapper.model.modelElement
+
+
+def inspect_pickle_version(model_file: bytes) -> int:
+    return max(op[0].proto for op in pickletools.genops(model_file))
