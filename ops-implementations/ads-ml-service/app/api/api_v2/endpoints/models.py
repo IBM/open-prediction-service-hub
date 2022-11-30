@@ -220,13 +220,32 @@ def get_model_binary(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)):
     LOGGER.info('Retrieving model binary for id: %s', model_id)
-    model = crud.binary_ml_model.get(db=db, id=model_id)
+
+    model = crud.model.get(db=db, id=model_id)
 
     if model is None:
         raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
+
+    filename = model.config.configuration['name']
+
+    try:
+        binary = model.endpoint.binary
+    except AttributeError:
+        raise fastapi.HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f'Model binary with id {model_id} is not found')
 
-    filelike = io.BytesIO(model.model_b64)
-    filelike.seek(0)
+    if binary.format == app_binary_config.ModelWrapper.PMML:
+        file_extension = 'pmml'
+    elif binary.format == app_binary_config.ModelWrapper.PICKLE:
+        file_extension = 'pickle'
+    elif binary.format == app_binary_config.ModelWrapper.JOBLIB:
+        file_extension = 'pickle'
+    else:
+        file_extension = 'bin'
 
-    return responses.StreamingResponse(content=filelike, media_type='application/octet-stream')
+    return responses.StreamingResponse(
+        content=io.BytesIO(binary.model_b64),
+        media_type='application/octet-stream',
+        headers={'Content-Disposition': 'attachment; filename="{basename}.{extension}"'.format(
+            basename=filename, extension=file_extension)})

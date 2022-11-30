@@ -20,6 +20,7 @@ import pickle
 import time
 import typing
 import typing as typ
+import re
 
 import pytest
 import fastapi.testclient as tstc
@@ -294,7 +295,9 @@ def test_download_binary(
         files={'file': ('scorecard.pmml', model_content)}).json()
     model_id = model['id']
     resp = client.get(url=f'/models/{model_id}/binary')
+    received_filename = re.findall("filename=\"(.+)\"", resp.headers['content-disposition'])[0]
 
     # Assert
     assert resp.ok
     assert resp.content == str.encode(model_content)
+    assert received_filename == 'scorecard.pmml'
