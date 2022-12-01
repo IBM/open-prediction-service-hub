@@ -213,7 +213,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /models/{model_id}/binary:
+  /models/{model_id}/download:
     get:
       tags:
         - discover
@@ -871,6 +871,8 @@ components:
           - discover
           - manage
           - prediction
+          - download
+          - metadata
         managed_capabilities:
           supported_input_data_structure:
             - "auto"
@@ -895,6 +897,10 @@ components:
         - discover
         - manage
         - run
+        # Download model binary
+        - download
+        # Inspect model specific metadata, for example for PMML model return subType (Scorecard, Ruleset)
+        - metadata
     Parameter:
       title: Parameter
       description: Parameter for ml model invocation
