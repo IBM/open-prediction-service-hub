@@ -244,6 +244,8 @@ def get_model_binary(
     else:
         file_extension = 'bin'
 
+    LOGGER.info('Downloading model binary with name %s and format %s', filename, file_extension)
+
     return responses.StreamingResponse(
         content=io.BytesIO(binary.model_b64),
         media_type='application/octet-stream',
