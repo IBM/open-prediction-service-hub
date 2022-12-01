@@ -35,7 +35,9 @@ async def server_capabilities() -> typing.Dict[typing.Text, typing.Any]:
             ops_model.Capability.info,
             ops_model.Capability.discover,
             ops_model.Capability.manage,
-            ops_model.Capability.run
+            ops_model.Capability.run,
+            ops_model.Capability.download,
+            ops_model.Capability.metadata
         ],
         'managed_capabilities': {
             'supported_input_data_structure': ['auto', 'DataFrame', 'ndarray', 'DMatrix', 'list'],
