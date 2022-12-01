@@ -240,7 +240,7 @@ def get_model_binary(
     elif binary.format == app_binary_config.ModelWrapper.PICKLE:
         file_extension = 'pickle'
     elif binary.format == app_binary_config.ModelWrapper.JOBLIB:
-        file_extension = 'pickle'
+        file_extension = 'joblib'
     else:
         file_extension = 'bin'
 
