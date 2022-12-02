@@ -2,7 +2,7 @@
 
 ## Web interface
 python-multipart==0.0.5
-sqlalchemy==1.4.43
+sqlalchemy==1.4.44
 alembic==1.8.1
 psycopg2-binary==2.9.5
 fastapi==0.86.0
