@@ -15,6 +15,7 @@ FROM python-base AS codegen-image
 
 COPY app/gen/. app/gen/
 RUN \
+    apt-get -q update && apt-get -q install --assume-yes build-essential && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
     python3 -m pip install -q datamodel-code-generator~=0.11.19 && \
     datamodel-codegen \
@@ -30,8 +31,9 @@ COPY requirements.txt ./
 COPY logging.yaml /etc/ads-ml-service/logging/logging.yaml
 RUN \
     python3 -m venv /usr/src/ads-ml-service/venv && \
+    apt-get -q update && apt-get -q install --assume-yes build-essential libpq-dev python3-numpy && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
-    python3 -m pip install -q --no-cache-dir --requirement requirements.txt && \
+    python3 -m pip install -q --no-cache-dir --prefer-binary --requirement requirements.txt && \
     mkdir -p /var/log/ads-ml-service && \
     mkdir -p /var/lib/ads-ml-service/models
 
