@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.7.1 _2022/09/15_
+
+* [DBACLD-58320] Fix ads ml service rule import
+
 ## 2.7.0 _2022/07/07_
 
 * [DBACLD-55843] Reduce the number of logs for ads-ml-service

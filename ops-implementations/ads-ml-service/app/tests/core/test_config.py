@@ -59,3 +59,14 @@ def test_env_not_exist():
 def test_valid_env():
     os.environ['MODEL_STORAGE'] = str('/tmp')
     ServerConfiguration()
+
+
+def test_database_config():
+    os.environ['MODEL_STORAGE'] = str('/tmp')
+    os.environ['DB_ARGS'] = str('{"connect_args": {"timeout": 30}}')
+    server_config = ServerConfiguration()
+
+    assert server_config.DB_ARGS is not None
+    assert 'connect_args' in server_config.DB_ARGS
+    assert 'timeout' in server_config.DB_ARGS.get('connect_args')
+    assert server_config.DB_ARGS.get('connect_args').get('timeout') == 30

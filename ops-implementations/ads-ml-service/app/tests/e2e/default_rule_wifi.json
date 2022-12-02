@@ -1,0 +1,38 @@
+{
+  "parameters": [
+    {
+      "name": "X4",
+      "value": -64.0
+    },
+    {
+      "name": "X5",
+      "value": -56.0
+    },
+    {
+      "name": "X1",
+      "value": -61.0
+    },
+    {
+      "name": "X7",
+      "value": -66.0
+    },
+    {
+      "name": "X3",
+      "value": -71.0
+    },
+    {
+      "name": "X2",
+      "value": -82.0
+    },
+    {
+      "name": "X6",
+      "value": -81.0
+    }
+  ],
+  "target": [
+    {
+      "rel": "endpoint",
+      "href": "/endpoints/endpoint_id"
+    }
+  ]
+}
