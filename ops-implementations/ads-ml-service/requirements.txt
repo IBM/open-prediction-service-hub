@@ -2,12 +2,12 @@
 
 ## Web interface
 python-multipart==0.0.5
-sqlalchemy==1.4.43
+sqlalchemy==1.4.44
 alembic==1.8.1
 psycopg2-binary==2.9.5
 fastapi==0.86.0
-orjson==3.8.1
-pandas==1.5.1
+orjson==3.8.2
+pandas==1.5.2
 
 ## ASGI server
 hypercorn==0.14.3
@@ -33,7 +33,7 @@ pypmml==0.9.17
 py4j==0.10.9.7
 
 ## Testes
-tox==4.0.0b2
+tox==4.0.0rc1
 requests==2.28.1
 pytest==7.2.0
 nyoka==5.4.0
