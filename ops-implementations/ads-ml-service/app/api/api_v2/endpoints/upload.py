@@ -77,7 +77,7 @@ async def upload(
         model_binary,
         input_data_structure,
         output_data_structure,
-        format_,
+        file_format,
         name=model_name
     )
 
