@@ -291,13 +291,12 @@ def test_download_binary(
     model_content = app_test_pmml.get_pmml_scorecard_file().read_text()
     model = client.post(
         url='/upload',
-        data={'format': 'pmml'},
         files={'file': ('scorecard.pmml', model_content)}).json()
     model_id = model['id']
-    resp = client.get(url=f'/models/{model_id}/binary')
-    received_filename = re.findall("filename=\"(.+)\"", resp.headers['content-disposition'])[0]
+    resp = client.get(url=f'/models/{model_id}/download')
 
     # Assert
     assert resp.ok
     assert resp.content == str.encode(model_content)
-    assert received_filename == 'scorecard.pmml'
+    # filename
+    assert re.findall("filename=\"(.+)\"", resp.headers['content-disposition'])[0] == 'scorecard.pmml'
