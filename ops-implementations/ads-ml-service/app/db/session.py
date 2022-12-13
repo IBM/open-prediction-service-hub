@@ -43,7 +43,11 @@ def get_db_opts() -> typing.Dict[str, typing.Any]:
     return opt
 
 
+def get_engine():
+    return create_engine(get_db_url(), **get_db_opts())
+
+
 SessionLocal = sessionmaker(
         autocommit=False,
         autoflush=False,
-        bind=create_engine(get_db_url(), **get_db_opts()))
+        bind=get_engine())
