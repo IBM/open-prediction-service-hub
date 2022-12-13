@@ -209,7 +209,7 @@ def get_model_metadata(
     else:
         raise fastapi.HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f'Format {model.format} is not supported for metadata')
+            detail=f'Format {model.format.value} is not supported for metadata')
 
 
 @router.get(
