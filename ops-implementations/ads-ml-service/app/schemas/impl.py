@@ -163,13 +163,17 @@ class PredictionImpl(pydt.BaseModel):
 
 class AdditionalPMMLModelInfo(pydt.BaseModel):
     modelType: typing.Literal['pmml']
-    modelSubType: typing.Optional[str]
+    modelSubType: str
 
 
 class AdditionalPickleModelInfo(pydt.BaseModel):
     modelType: typing.Literal['pickle']
-    pickleProtoVersion: typing.Optional[str]
+    pickleProtoVersion: str
+
+
+class AdditionalOtherModelInfo(pydt.BaseModel):
+    modelType: typing.Literal['other']
 
 
 AdditionalModelInfo = typing_extensions.Annotated[
-    typing.Union[AdditionalPMMLModelInfo, AdditionalPickleModelInfo], pydt.Field(discriminator='modelType')]
+    typing.Union[AdditionalPMMLModelInfo, AdditionalPickleModelInfo, AdditionalOtherModelInfo], pydt.Field(discriminator='modelType')]

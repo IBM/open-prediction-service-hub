@@ -246,8 +246,8 @@ def test_not_supported_metadata(
     resp = client.get(url=f'/models/{xgboost_endpoint.id}/metadata')
 
     # Assert
-    assert resp.status_code == 422
-    assert resp.json()['detail'] == 'Format bst is not supported for metadata'
+    assert resp.ok
+    assert resp.json()['modelType'] == 'other'
 
 
 def test_pickle_metadata(

@@ -207,9 +207,8 @@ def get_model_metadata(
         return impl.AdditionalPMMLModelInfo(
             modelType='pmml', modelSubType=str(app_runtime_inspection.inspect_pmml_subtype(model.model_b64)))
     else:
-        raise fastapi.HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f'Format {model.format.value} is not supported for metadata')
+        return impl.AdditionalOtherModelInfo(
+            modelType='other')
 
 
 @router.get(

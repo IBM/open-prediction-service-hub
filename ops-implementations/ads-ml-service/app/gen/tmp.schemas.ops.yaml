@@ -994,6 +994,9 @@ components:
               type: string
               description: the version of pickle protocol
               example: 4
+    AdditionalOtherModelInfo:
+      allOf:
+        - $ref: '#/components/schemas/AdditionalModelInfo'
   parameters:
     ModelIDParam:
       in: path
