@@ -969,9 +969,11 @@ components:
         mapping:
           pmml: '#/components/schemas/AdditionalPMMLModelInfo'
           pickle: '#/components/schemas/AdditionalPickleModelInfo'
+          other: '#/components/schemas/AdditionalOtherModelInfo'
         oneOf:
           - $ref: '#/components/schemas/AdditionalPMMLModelInfo'
           - $ref: '#/components/schemas/AdditionalPickleModelInfo'
+          - $ref: '#/components/schemas/AdditionalOtherModelInfo'
     AdditionalPMMLModelInfo:
       required:
         - modelType
