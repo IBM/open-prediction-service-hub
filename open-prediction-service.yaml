@@ -973,14 +973,20 @@ components:
           - $ref: '#/components/schemas/AdditionalPMMLModelInfo'
           - $ref: '#/components/schemas/AdditionalPickleModelInfo'
     AdditionalPMMLModelInfo:
+      required:
+        - modelType
+        - modelSubType
       allOf:
         - $ref: '#/components/schemas/AdditionalModelInfo'
         - properties:
             modelSubType:
               type: string
-              description: model sub type
+              description: PMML MODEL-ELEMENT. Could be RuleSetModel, Scorecard...
               example: ruleset
     AdditionalPickleModelInfo:
+      required:
+        - modelType
+        - pickleProtoVersion
       allOf:
         - $ref: '#/components/schemas/AdditionalModelInfo'
         - properties:
