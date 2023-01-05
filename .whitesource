@@ -11,5 +11,11 @@
       "patch"
     ],
     "automerge": true
-  }]
+  }],
+      "scanSettings": {
+        "baseBranches": ["develop"],
+        "configMode": "LOCAL",
+        "configExternalURL": "",
+        "projectToken": ""
+      }
 }
