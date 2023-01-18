@@ -263,8 +263,8 @@ def test_pickle_metadata(
 
     # Assert
     assert resp.ok
-    assert resp.json()['modelType'] == 'pickle'
-    assert resp.json()['pickleProtoVersion'] == '4'
+    assert resp.json()['modelPackage'] == 'pickle'
+    assert resp.json()['modelType'] == 'other'
 
 
 def test_pmml_metadata(
@@ -280,8 +280,8 @@ def test_pmml_metadata(
 
     # Assert
     assert resp.ok
-    assert resp.json()['modelType'] == 'pmml'
-    assert resp.json()['modelSubType'] == 'Scorecard'
+    assert resp.json()['modelPackage'] == 'pmml'
+    assert resp.json()['modelType'] == 'Scorecard'
 
 
 def test_download_binary(

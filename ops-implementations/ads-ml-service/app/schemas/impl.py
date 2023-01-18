@@ -159,21 +159,3 @@ class PredictionImpl(pydt.BaseModel):
     parameters: typing.List[typing.Union[typing.List[ParameterImpl], ParameterImpl]] = pydt.Field(
         ..., description='Model parameters', title='Parameters'
     )
-
-
-class AdditionalPMMLModelInfo(pydt.BaseModel):
-    modelType: typing.Literal['pmml']
-    modelSubType: str
-
-
-class AdditionalPickleModelInfo(pydt.BaseModel):
-    modelType: typing.Literal['pickle']
-    pickleProtoVersion: str
-
-
-class AdditionalOtherModelInfo(pydt.BaseModel):
-    modelType: typing.Literal['other']
-
-
-AdditionalModelInfo = typing_extensions.Annotated[
-    typing.Union[AdditionalPMMLModelInfo, AdditionalPickleModelInfo, AdditionalOtherModelInfo], pydt.Field(discriminator='modelType')]

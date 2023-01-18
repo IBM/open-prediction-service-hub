@@ -958,47 +958,28 @@ components:
       type: object
       title: Additional Model Information
       required:
+        - modelPackage
         - modelType
       properties:
+        modelPackage:
+          type: string
+          description: The file format of binary model
+          example: pmml
+          enum:
+            - pmml
+            - joblib
+            - pickle
+            - other
         modelType:
           type: string
-          description: the type of imported binary
-          example: pmml
-      discriminator:
-        propertyName: modelType
-        mapping:
-          pmml: '#/components/schemas/AdditionalPMMLModelInfo'
-          pickle: '#/components/schemas/AdditionalPickleModelInfo'
-          other: '#/components/schemas/AdditionalOtherModelInfo'
-        oneOf:
-          - $ref: '#/components/schemas/AdditionalPMMLModelInfo'
-          - $ref: '#/components/schemas/AdditionalPickleModelInfo'
-          - $ref: '#/components/schemas/AdditionalOtherModelInfo'
-    AdditionalPMMLModelInfo:
-      required:
-        - modelType
-        - modelSubType
-      allOf:
-        - $ref: '#/components/schemas/AdditionalModelInfo'
-        - properties:
-            modelSubType:
-              type: string
-              description: PMML MODEL-ELEMENT. Could be RuleSetModel, Scorecard...
-              example: ruleset
-    AdditionalPickleModelInfo:
-      required:
-        - modelType
-        - pickleProtoVersion
-      allOf:
-        - $ref: '#/components/schemas/AdditionalModelInfo'
-        - properties:
-            pickleProtoVersion:
-              type: string
-              description: the version of pickle protocol
-              example: 4
-    AdditionalOtherModelInfo:
-      allOf:
-        - $ref: '#/components/schemas/AdditionalModelInfo'
+          description: Model type of binary model
+          example: RuleSetModel
+          enum:
+            # pmml ruleset
+            - RuleSetModel
+            # pmml scorecard
+            - Scorecard
+            - other
   parameters:
     ModelIDParam:
       in: path

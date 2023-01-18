@@ -34,6 +34,7 @@ import app.schemas as schemas
 import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
 import app.core.configuration as app_conf
+import app.models as models
 
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
@@ -188,27 +189,42 @@ async def add_binary(
 
 @router.get(
     path='/models/{model_id}/metadata',
-    response_model=impl.AdditionalModelInfo,
+    response_model=ops_schemas.AdditionalModelInfo,
     tags=['discover'])
 def get_model_metadata(
         model_id: int,
         db: saorm.Session = fastapi.Depends(deps.get_db)):
     LOGGER.info('Retrieving model metadata for id: %s', model_id)
-    model = crud.binary_ml_model.get(db=db, id=model_id)
-
-    if model is None:
-        raise fastapi.HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
-
-    if model.format == app_binary_config.ModelWrapper.PICKLE:
-        return impl.AdditionalPickleModelInfo(
-            modelType='pickle', pickleProtoVersion=str(app_runtime_inspection.inspect_pickle_version(model.model_b64)))
-    elif model.format == app_binary_config.ModelWrapper.PMML:
-        return impl.AdditionalPMMLModelInfo(
-            modelType='pmml', modelSubType=str(app_runtime_inspection.inspect_pmml_subtype(model.model_b64)))
-    else:
-        return impl.AdditionalOtherModelInfo(
-            modelType='other')
+    match crud.binary_ml_model.get(db=db, id=model_id):
+        case None:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
+        case models.BinaryMlModel(format=app_binary_config.ModelWrapper.PICKLE):
+            return ops_schemas.AdditionalModelInfo(
+                modelPackage=ops_schemas.ModelPackage.pickle,
+                modelType=ops_schemas.ModelType.other)
+        case models.BinaryMlModel(format=app_binary_config.ModelWrapper.JOBLIB):
+            return ops_schemas.AdditionalModelInfo(
+                modelPackage=ops_schemas.ModelPackage.joblib,
+                modelType=ops_schemas.ModelType.other)
+        case models.BinaryMlModel(format=app_binary_config.ModelWrapper.PMML, model_b64=binary):
+            match app_runtime_inspection.inspect_pmml_subtype(binary):
+                case 'RuleSetModel':
+                    return ops_schemas.AdditionalModelInfo(
+                        modelPackage=ops_schemas.ModelPackage.pmml,
+                        modelType=ops_schemas.ModelType.RuleSetModel)
+                case 'Scorecard':
+                    return ops_schemas.AdditionalModelInfo(
+                        modelPackage=ops_schemas.ModelPackage.pmml,
+                        modelType=ops_schemas.ModelType.Scorecard)
+                case _:
+                    return ops_schemas.AdditionalModelInfo(
+                        modelPackage=ops_schemas.ModelPackage.pmml,
+                        modelType=ops_schemas.ModelType.other)
+        case _:
+            return ops_schemas.AdditionalModelInfo(
+                modelPackage=ops_schemas.ModelPackage.other,
+                modelType=ops_schemas.ModelType.other)
 
 
 @router.get(
