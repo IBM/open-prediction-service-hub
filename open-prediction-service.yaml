@@ -965,21 +965,10 @@ components:
           type: string
           description: The file format of binary model
           example: pmml
-          enum:
-            - pmml
-            - joblib
-            - pickle
-            - other
         modelType:
           type: string
           description: Model type of binary model
           example: RuleSetModel
-          enum:
-            # pmml ruleset
-            - RuleSetModel
-            # pmml scorecard
-            - Scorecard
-            - other
   parameters:
     ModelIDParam:
       in: path

@@ -199,32 +199,24 @@ def get_model_metadata(
         case None:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
-        case models.BinaryMlModel(format=app_binary_config.ModelWrapper.PICKLE):
+        case models.BinaryMlModel(format=app_binary_config.ModelWrapper.PICKLE | app_binary_config.ModelWrapper.JOBLIB as format):
             return ops_schemas.AdditionalModelInfo(
-                modelPackage=ops_schemas.ModelPackage.pickle,
-                modelType=ops_schemas.ModelType.other)
-        case models.BinaryMlModel(format=app_binary_config.ModelWrapper.JOBLIB):
-            return ops_schemas.AdditionalModelInfo(
-                modelPackage=ops_schemas.ModelPackage.joblib,
-                modelType=ops_schemas.ModelType.other)
+                modelPackage=format.value,
+                modelType='other')
         case models.BinaryMlModel(format=app_binary_config.ModelWrapper.PMML, model_b64=binary):
             match app_runtime_inspection.inspect_pmml_subtype(binary):
-                case 'RuleSetModel':
+                case 'Scorecard' | 'RuleSetModel' as typ:
                     return ops_schemas.AdditionalModelInfo(
-                        modelPackage=ops_schemas.ModelPackage.pmml,
-                        modelType=ops_schemas.ModelType.RuleSetModel)
-                case 'Scorecard':
-                    return ops_schemas.AdditionalModelInfo(
-                        modelPackage=ops_schemas.ModelPackage.pmml,
-                        modelType=ops_schemas.ModelType.Scorecard)
+                        modelPackage='pmml',
+                        modelType=typ)
                 case _:
                     return ops_schemas.AdditionalModelInfo(
-                        modelPackage=ops_schemas.ModelPackage.pmml,
-                        modelType=ops_schemas.ModelType.other)
+                        modelPackage='pmml',
+                        modelType='other')
         case _:
             return ops_schemas.AdditionalModelInfo(
-                modelPackage=ops_schemas.ModelPackage.other,
-                modelType=ops_schemas.ModelType.other)
+                modelPackage='other',
+                modelType='other')
 
 
 @router.get(
