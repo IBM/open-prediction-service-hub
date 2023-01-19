@@ -1,0 +1,708 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_4" version="4.4.1">
+    <Header copyright="Copyright IBM Corp, exported to PMML by Nyoka (c) 2022 Software AG" description="Default description">
+        <Application name="ScorecardExport" version="0.0.1"/>
+        <Timestamp>2022-11-25 05:46:41.942928</Timestamp>
+    </Header>
+    <DataDictionary numberOfFields="9">
+        <DataField name="Gender" optype="categorical" dataType="string">
+            <Value value="M"/>
+            <Value value="F"/>
+        </DataField>
+        <DataField name="Status" optype="categorical" dataType="string">
+            <Value value="S"/>
+            <Value value="M"/>
+            <Value value="D"/>
+        </DataField>
+        <DataField name="Children" optype="ordinal" dataType="integer"/>
+        <DataField name="Est Income" optype="continuous" dataType="double"/>
+        <DataField name="Car Owner" optype="categorical" dataType="string">
+            <Value value="N"/>
+            <Value value="Y"/>
+        </DataField>
+        <DataField name="Age" optype="continuous" dataType="double"/>
+        <DataField name="Paymethod" optype="categorical" dataType="string">
+            <Value value="Auto"/>
+            <Value value="CC"/>
+            <Value value="CH"/>
+        </DataField>
+        <DataField name="Usage" optype="continuous" dataType="double"/>
+        <DataField name="RatePlan" optype="ordinal" dataType="integer"/>
+    </DataDictionary>
+    <Scorecard useReasonCodes="false" functionName="regression" algorithmName="ScoreCard" initialScore="1982.6702">
+        <MiningSchema>
+            <MiningField name="Est Income" usageType="active"/>
+            <MiningField name="Age" usageType="active"/>
+            <MiningField name="Usage" usageType="active"/>
+            <MiningField name="Children" usageType="active"/>
+            <MiningField name="RatePlan" usageType="active"/>
+            <MiningField name="Gender" usageType="active"/>
+            <MiningField name="Status" usageType="active"/>
+            <MiningField name="Car Owner" usageType="active"/>
+            <MiningField name="Paymethod" usageType="active"/>
+        </MiningSchema>
+        <Output>
+            <OutputField name="RawResult" optype="continuous" dataType="double" feature="predictedValue"/>
+        </Output>
+        <Characteristics>
+            <Characteristic name="Est Income">
+                <Attribute partialScore="-66.485954">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="lessThan" value="96.47651"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-146.94005">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="96.47651"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="6529.0977"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-31.90001">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="6529.0977"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="12455.6875"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-53.06339">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="12455.6875"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="19471.332"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="31.644451">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="19471.332"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="26676.123"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-161.05292">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="26676.123"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="35152.684"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-127.22706">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="35152.684"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="43111.21"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="1630.9065">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="43111.21"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="46362.91"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-216.47353">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="46362.91"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="51776.35"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-362.49823">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="51776.35"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="56752.26"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="6.394894">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="56752.26"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="63885.977"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-51.198166">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="63885.977"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="70024.89"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-239.5123">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="70024.89"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="76496.84"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-85.397064">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="76496.84"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="81258.09"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-97.134254">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="81258.09"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="84450.734"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-53.598625">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="84450.734"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="90643.734"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-43.914486">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="90643.734"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="97095.71"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-12.24093">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="97095.71"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="99460.78"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="15.015055">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="99460.78"/>
+                        <SimplePredicate field="Est Income" operator="lessThan" value="101947.28"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="63.87957">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Est Income" operator="greaterOrEqual" value="101947.28"/>
+                    </CompoundPredicate>
+                </Attribute>
+            </Characteristic>
+            <Characteristic name="Age">
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="lessThan" value="11.476179"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="1604.9071">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="11.476179"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="15.127762"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="1441.1444">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="15.127762"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="17.714256"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="878.8944">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="17.714256"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="22.948704"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="606.0589">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="22.948704"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="26.810888"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="29.39021">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="26.810888"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="30.979456"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-94.129456">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="30.979456"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="35.994026"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-222.78433">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="35.994026"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="39.8163"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-193.60245">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="39.8163"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="44.868553"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-271.21808">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="44.868553"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="49.230118"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-395.4299">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="49.230118"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="53.031494"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-490.57513">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="53.031494"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="56.033302"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-434.8132">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="56.033302"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="59.107018"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-566.03345">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="59.107018"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="62.144234"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-655.0815">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="62.144234"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="64.197845"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-609.52026">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="64.197845"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="70.25109"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="70.25109"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="73.12924"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-628.1686">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="73.12924"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="85.65199"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="85.65199"/>
+                        <SimplePredicate field="Age" operator="lessThan" value="89.46014"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Age" operator="greaterOrEqual" value="89.46014"/>
+                    </CompoundPredicate>
+                </Attribute>
+            </Characteristic>
+            <Characteristic name="Usage">
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="lessThan" value="-1.9612958"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-1718.4377">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="-1.9612958"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="13.931626"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-1420.9454">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="13.931626"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="32.74984"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-1287.0829">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="32.74984"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="48.202477"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-921.6381">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="48.202477"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="61.93471"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-825.43976">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="61.93471"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="73.9705"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-669.01996">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="73.9705"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="87.543396"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-564.07776">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="87.543396"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="99.61402"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-277.7877">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="99.61402"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="109.88866"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-217.40468">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="109.88866"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="120.46992"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="102.62034">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="120.46992"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="130.58958"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-12.211807">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="130.58958"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="139.25778"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-28.48365">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="139.25778"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="147.3872"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="236.41873">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="147.3872"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="155.15341"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="69.15378">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="155.15341"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="164.12259"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="1426.1254">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="164.12259"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="173.63228"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="873.5635">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="173.63228"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="185.96309"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="2045.377">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="185.96309"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="203.34448"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="1145.796">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="203.34448"/>
+                        <SimplePredicate field="Usage" operator="lessThan" value="203.7056"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="2046.9163">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Usage" operator="greaterOrEqual" value="203.7056"/>
+                    </CompoundPredicate>
+                </Attribute>
+            </Characteristic>
+            <Characteristic name="Children">
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="lessThan" value="-0.2487115"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="11.298579">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="-0.2487115"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="0.21757707"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="0.21757707"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="0.2889162"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="0.2889162"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="0.36025533"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="0.36025533"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="0.43159446"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="0.43159446"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="0.5029336"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="0.5029336"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="0.57427275"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="0.57427275"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="0.6456119"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="0.6456119"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="0.716951"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="67.10213">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="0.716951"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.202252"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.202252"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.2184143"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.2184143"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.2345766"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.2345766"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.2507389"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.2507389"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.2669011"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.2669011"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.2830634"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.2830634"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.2992257"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.2992257"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.315388"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.315388"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="1.3315502"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-78.12412">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="1.3315502"/>
+                        <SimplePredicate field="Children" operator="lessThan" value="15.813075"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="Children" operator="greaterOrEqual" value="15.813075"/>
+                    </CompoundPredicate>
+                </Attribute>
+            </Characteristic>
+            <Characteristic name="RatePlan">
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="0.7987884"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="27.972027">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="0.7987884"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="1.1686239"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="1.1686239"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="1.2708"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="1.2708"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="1.3729761"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="1.3729761"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="1.4751521"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="1.4751521"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="1.5773282"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="1.5773282"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="1.6795043"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-40.279274">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="1.6795043"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="2.3100815"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="2.3100815"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="2.390564"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="2.390564"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="2.4710464"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="2.4710464"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="2.551529"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="2.551529"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="2.6320114"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="2.6320114"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="2.712494"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="-47.175972">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="2.712494"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="3.207161"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="3.207161"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="3.2379646"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="3.2379646"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="3.2687683"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="3.2687683"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="3.299572"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="3.299572"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="3.3303757"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="59.060165">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="3.3303757"/>
+                        <SimplePredicate field="RatePlan" operator="lessThan" value="15.261899"/>
+                    </CompoundPredicate>
+                </Attribute>
+                <Attribute partialScore="0.0">
+                    <CompoundPredicate booleanOperator="and">
+                        <SimplePredicate field="RatePlan" operator="greaterOrEqual" value="15.261899"/>
+                    </CompoundPredicate>
+                </Attribute>
+            </Characteristic>
+            <Characteristic name="Gender">
+                <Attribute partialScore="52.322304">
+                    <SimpleSetPredicate field="Gender" booleanOperator="isIn">
+                        <Array n="1" type="string">"F"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+                <Attribute partialScore="-52.09939">
+                    <SimpleSetPredicate field="Gender" booleanOperator="isIn">
+                        <Array n="1" type="string">"M"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+            </Characteristic>
+            <Characteristic name="Status">
+                <Attribute partialScore="-13.684241">
+                    <SimpleSetPredicate field="Status" booleanOperator="isIn">
+                        <Array n="1" type="string">"D"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+                <Attribute partialScore="-5.6265655">
+                    <SimpleSetPredicate field="Status" booleanOperator="isIn">
+                        <Array n="1" type="string">"M"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+                <Attribute partialScore="19.418262">
+                    <SimpleSetPredicate field="Status" booleanOperator="isIn">
+                        <Array n="1" type="string">"S"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+            </Characteristic>
+            <Characteristic name="Car Owner">
+                <Attribute partialScore="38.36318">
+                    <SimpleSetPredicate field="Car Owner" booleanOperator="isIn">
+                        <Array n="1" type="string">"N"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+                <Attribute partialScore="-38.231785">
+                    <SimpleSetPredicate field="Car Owner" booleanOperator="isIn">
+                        <Array n="1" type="string">"Y"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+            </Characteristic>
+            <Characteristic name="Paymethod">
+                <Attribute partialScore="-90.06868">
+                    <SimpleSetPredicate field="Paymethod" booleanOperator="isIn">
+                        <Array n="1" type="string">"Auto"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+                <Attribute partialScore="51.262794">
+                    <SimpleSetPredicate field="Paymethod" booleanOperator="isIn">
+                        <Array n="1" type="string">"CC"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+                <Attribute partialScore="38.24363">
+                    <SimpleSetPredicate field="Paymethod" booleanOperator="isIn">
+                        <Array n="1" type="string">"CH"</Array>
+                    </SimpleSetPredicate>
+                </Attribute>
+            </Characteristic>
+        </Characteristics>
+    </Scorecard>
+</PMML>

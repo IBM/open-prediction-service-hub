@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM} python:3.7-slim
+FROM --platform=${BUILDPLATFORM} python:3.11-slim
 
 RUN pip3 install connexion[swagger-ui]
 

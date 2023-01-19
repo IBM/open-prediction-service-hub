@@ -17,6 +17,7 @@
 
 import logging
 import typing
+import io
 
 import fastapi
 import fastapi.encoders as encoders
@@ -28,10 +29,12 @@ import app.api.deps as deps
 import app.crud as crud
 import app.gen.schemas.ops_schemas as ops_schemas
 import app.runtime.model_upload as app_model_upload
+import app.runtime.inspection as app_runtime_inspection
 import app.schemas as schemas
 import app.schemas.binary_config as app_binary_config
 import app.schemas.impl as impl
 import app.core.configuration as app_conf
+import app.models as models
 
 router = fastapi.APIRouter()
 LOGGER = logging.getLogger(__name__)
@@ -182,3 +185,76 @@ async def add_binary(
         model_id=model_id
     )
     return impl.EndpointImpl.from_database(crud.endpoint.get(db, id=m))
+
+
+@router.get(
+    path='/models/{model_id}/metadata',
+    response_model=ops_schemas.AdditionalModelInfo,
+    tags=['discover'])
+def get_model_metadata(
+        model_id: int,
+        db: saorm.Session = fastapi.Depends(deps.get_db)):
+    LOGGER.info('Retrieving model metadata for id: %s', model_id)
+    match crud.binary_ml_model.get(db=db, id=model_id):
+        case None:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
+        case models.BinaryMlModel(format=app_binary_config.ModelWrapper.PICKLE | app_binary_config.ModelWrapper.JOBLIB as format):
+            return ops_schemas.AdditionalModelInfo(
+                modelPackage=format.value,
+                modelType='other')
+        case models.BinaryMlModel(format=app_binary_config.ModelWrapper.PMML, model_b64=binary):
+            match app_runtime_inspection.inspect_pmml_subtype(binary):
+                case 'Scorecard' | 'RuleSetModel' as typ:
+                    return ops_schemas.AdditionalModelInfo(
+                        modelPackage='pmml',
+                        modelType=typ)
+                case _:
+                    return ops_schemas.AdditionalModelInfo(
+                        modelPackage='pmml',
+                        modelType='other')
+        case _:
+            return ops_schemas.AdditionalModelInfo(
+                modelPackage='other',
+                modelType='other')
+
+
+@router.get(
+    path='/models/{model_id}/download',
+    response_class=responses.StreamingResponse,
+    tags=['discover'])
+def get_model_binary(
+        model_id: int,
+        db: saorm.Session = fastapi.Depends(deps.get_db)):
+    LOGGER.info('Retrieving model binary for id: %s', model_id)
+
+    model = crud.model.get(db=db, id=model_id)
+
+    if model is None:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model with id {model_id} is not found')
+
+    filename = model.config.configuration['name']
+
+    try:
+        binary = model.endpoint.binary
+    except AttributeError:
+        raise fastapi.HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'Model binary with id {model_id} is not found')
+
+    if binary.format == app_binary_config.ModelWrapper.PMML:
+        file_extension = 'pmml'
+    elif binary.format == app_binary_config.ModelWrapper.PICKLE:
+        file_extension = 'pickle'
+    elif binary.format == app_binary_config.ModelWrapper.JOBLIB:
+        file_extension = 'joblib'
+    else:
+        file_extension = 'bin'
+
+    LOGGER.info('Downloading model binary with name %s and format %s', filename, file_extension)
+
+    return responses.StreamingResponse(
+        content=io.BytesIO(binary.model_b64),
+        media_type='application/octet-stream',
+        headers={'Content-Disposition': 'attachment; filename="{basename}.{extension}"'.format(
+            basename=filename, extension=file_extension)})
