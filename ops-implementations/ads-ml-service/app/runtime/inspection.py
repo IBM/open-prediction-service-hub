@@ -71,7 +71,3 @@ def inspect_pmml_model_name(model_file: bytes) -> typing.Optional[str]:
 def inspect_pmml_subtype(model_file: bytes) -> typing.Optional[str]:
     wrapper = load_pmml_model(model_file).loaded_model
     return wrapper.model.modelElement
-
-
-def inspect_pickle_version(model_file: bytes) -> int:
-    return max(op[0].proto for op in pickletools.genops(model_file))

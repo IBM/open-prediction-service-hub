@@ -17,7 +17,6 @@
 
 import enum
 import typing
-import typing_extensions
 import datetime as dt
 
 import numpy
