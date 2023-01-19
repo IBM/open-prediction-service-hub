@@ -16,6 +16,7 @@
 
 
 import pathlib
+import pickle
 
 import app.runtime.inspection as app_signature_inspection
 import app.tests.predictors.pmml_sample.model as app_test_pmml
@@ -52,3 +53,15 @@ def test_pmml_output_schema_inspection(
         'probability_1': 'double',
         'predicted_paymentDefault': 'integer'
     }
+
+
+def test_inspect_pmml_subtype():
+    # When
+    sub_type_regression = app_signature_inspection.inspect_pmml_subtype(
+        str.encode(app_test_pmml.get_pmml_file().read_text()))
+    sub_type_scorecard = app_signature_inspection.inspect_pmml_subtype(
+        str.encode(app_test_pmml.get_pmml_scorecard_file().read_text()))
+
+    # Assert
+    assert sub_type_regression == 'RegressionModel'
+    assert sub_type_scorecard == 'Scorecard'

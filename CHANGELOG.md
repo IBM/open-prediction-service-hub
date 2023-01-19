@@ -1,5 +1,9 @@
 # Open Prediction Service HUB
 
+## 2.8.0 _2022/11/28_
+
+* [DBACLD-47417] Extend OPS to support downloading of Ruleset Models
+
 ## 2.7.1 _2022/09/15_
 
 * [DBACLD-58320] Fix ads ml service rule import

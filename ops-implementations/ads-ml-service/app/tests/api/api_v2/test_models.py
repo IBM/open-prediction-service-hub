@@ -20,6 +20,7 @@ import pickle
 import time
 import typing
 import typing as typ
+import re
 
 import pytest
 import fastapi.testclient as tstc
@@ -31,6 +32,8 @@ import app.crud as crud
 import app.schemas as schemas
 import app.tests.predictors.identity.model as app_tests_identity
 import app.tests.predictors.scikit_learn.model as app_test_skl
+import app.models as models
+import app.tests.predictors.pmml_sample.model as app_test_pmml
 
 
 def test_get_model(
@@ -233,3 +236,67 @@ def test_update_binary(
     assert response.status_code == 201
     assert response.json()['status'] == 'in_service'
     assert response_1.status_code == 422
+
+
+def test_not_supported_metadata(
+        client: tstc.TestClient,
+        xgboost_endpoint: models.Endpoint
+) -> typ.NoReturn:
+    # When
+    resp = client.get(url=f'/models/{xgboost_endpoint.id}/metadata')
+
+    # Assert
+    assert resp.ok
+    assert resp.json()['modelType'] == 'other'
+
+
+def test_pickle_metadata(
+        client: tstc.TestClient
+) -> typ.NoReturn:
+    # When
+    model = client.post(
+        url='/upload',
+        data={'format': 'pickle'},
+        files={'file': ('model.pkl', pickle.dumps(app_test_skl.get_classification_predictor()))}).json()
+    model_id = model['id']
+    resp = client.get(url=f'/models/{model_id}/metadata')
+
+    # Assert
+    assert resp.ok
+    assert resp.json()['modelPackage'] == 'pickle'
+    assert resp.json()['modelType'] == 'other'
+
+
+def test_pmml_metadata(
+        client: tstc.TestClient
+) -> typ.NoReturn:
+    # When
+    model = client.post(
+        url='/upload',
+        data={'format': 'pmml'},
+        files={'file': ('scorecard.pmml', app_test_pmml.get_pmml_scorecard_file().read_text())}).json()
+    model_id = model['id']
+    resp = client.get(url=f'/models/{model_id}/metadata')
+
+    # Assert
+    assert resp.ok
+    assert resp.json()['modelPackage'] == 'pmml'
+    assert resp.json()['modelType'] == 'Scorecard'
+
+
+def test_download_binary(
+        client: tstc.TestClient
+) -> typ.NoReturn:
+    # When
+    model_content = app_test_pmml.get_pmml_scorecard_file().read_text()
+    model = client.post(
+        url='/upload',
+        files={'file': ('scorecard.pmml', model_content)}).json()
+    model_id = model['id']
+    resp = client.get(url=f'/models/{model_id}/download')
+
+    # Assert
+    assert resp.ok
+    assert resp.content == str.encode(model_content)
+    # filename
+    assert re.findall("filename=\"(.+)\"", resp.headers['content-disposition'])[0] == 'scorecard.pmml'

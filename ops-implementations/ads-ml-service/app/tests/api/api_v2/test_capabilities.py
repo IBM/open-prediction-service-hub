@@ -34,6 +34,8 @@ def test_get_server_capabilities(
     assert 'discover' in content['capabilities']
     assert 'manage' in content['capabilities']
     assert 'run' in content['capabilities']
+    assert 'download' in content['capabilities']
+    assert 'metadata' in content['capabilities']
 
 
 def test_get_managed_capabilities(
