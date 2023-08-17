@@ -9,13 +9,13 @@ ENV \
     MODEL_STORAGE="/var/lib/ads-ml-service/models" \
     RETRAIN_MODELS=FALSE
 WORKDIR /usr/src/ads-ml-service
-
+RUN apt-get update 
 
 FROM python-base AS codegen-image
 
 COPY app/gen/. app/gen/
 RUN \
-    apt-get -q update && apt-get -q install --assume-yes build-essential && \
+    apt-get -q install --assume-yes build-essential && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
     python3 -m pip install -q datamodel-code-generator~=0.11.19 && \
     datamodel-codegen \
@@ -31,7 +31,7 @@ COPY requirements.txt ./
 COPY logging.yaml /etc/ads-ml-service/logging/logging.yaml
 RUN \
     python3 -m venv /usr/src/ads-ml-service/venv && \
-    apt-get -q update && apt-get -q install --assume-yes build-essential libpq-dev python3-numpy && \
+    apt-get -q install --assume-yes build-essential libpq-dev python3-numpy && \
     python3 -m pip install -q --no-cache-dir --upgrade pip && \
     python3 -m pip install -q --no-cache-dir --prefer-binary --requirement requirements.txt && \
     mkdir -p /var/log/ads-ml-service && \
@@ -55,8 +55,7 @@ COPY --chown=nobody:root alembic.ini /usr/src/ads-ml-service/alembic.ini
 COPY --chown=nobody:root alembic /usr/src/ads-ml-service/alembic
 COPY --chown=nobody:root examples/model_training_and_deployment /usr/src/ads-ml-service/examples/model_training_and_deployment
 RUN \
-    apt-get -q update && \
-    mkdir -p /usr/share/man/man1 && apt-get -q install --assume-yes libgomp1 openjdk-11-jre-headless && \
+    mkdir -p /usr/share/man/man1 && apt-get -q install --assume-yes libgomp1 openjdk-17-jre-headless && \
     rm -rf /var/lib/apt/lists/* && \
     chmod u+x /entrypoint.sh && \
     chmod g=u /entrypoint.sh && \
